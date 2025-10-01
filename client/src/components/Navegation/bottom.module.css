@@ -1,0 +1,64 @@
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  height: 64px;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 8px;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  text-align: start;
+}
+
+.item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.active {
+  color: var(--secondary);
+  background: var(--bg-secondary);
+}
+
+.icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.label {
+  line-height: 1;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  text-align: start;
+}
+
+

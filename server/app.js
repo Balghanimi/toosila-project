@@ -1,0 +1,98 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const path = require('path');
+
+// Import configuration
+const config = require('./config/env');
+
+// Import middlewares
+const { generalLimiter } = require('./middlewares/rateLimiters');
+const { errorHandler, notFound } = require('./middlewares/error');
+
+// Import routes
+const authRoutes = require('./routes/auth.routes');
+const offersRoutes = require('./routes/offers.routes');
+const demandsRoutes = require('./routes/demands.routes');
+const bookingsRoutes = require('./routes/bookings.routes');
+const messagesRoutes = require('./routes/messages.routes');
+const ratingsRoutes = require('./routes/ratings.routes');
+
+const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
+
+// CORS configuration
+app.use(cors({
+  origin: config.FRONTEND_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Rate limiting
+app.use('/api/', generalLimiter);
+
+// Body parsing middleware
+app.use(express.json({ 
+  limit: config.MAX_FILE_SIZE,
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
+app.use(express.urlencoded({ 
+  extended: true, 
+  limit: config.MAX_FILE_SIZE 
+}));
+
+// Logging middleware
+if (config.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    ok: true, 
+    timestamp: new Date().toISOString(),
+    environment: config.NODE_ENV,
+    version: '1.0.0'
+  });
+});
+
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/offers', offersRoutes);
+app.use('/api/demands', demandsRoutes);
+app.use('/api/bookings', bookingsRoutes);
+app.use('/api/messages', messagesRoutes);
+app.use('/api/ratings', ratingsRoutes);
+
+// Serve static files from React build (production only)
+if (config.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  });
+}
+
+// Error handling middleware
+app.use(notFound);
+app.use(errorHandler);
+
+module.exports = app;
+
