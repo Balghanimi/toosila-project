@@ -1,0 +1,253 @@
+# Cursor AI Development Rules for Toosila Project
+
+## Core Principles
+
+### 1. Five-Stage Development Process
+Always follow these stages in order:
+
+#### Stage 1: Planning (التخطيط)
+- Read and understand the task requirements completely
+- Review existing code structure and patterns
+- Identify all files that need to be modified
+- List potential issues and dependencies
+- Create a clear plan with specific steps in `tasks/todo.md`
+- **WAIT for user approval before proceeding**
+
+#### Stage 2: Verification (التحقق)
+- Verify all required files exist
+- Check current implementation status
+- Identify any missing dependencies
+- Review related code for context
+- Confirm database schema if needed
+
+#### Stage 3: Execution (التنفيذ)
+- Make ONE change at a time
+- Test each change before moving to next
+- Follow existing code patterns and style
+- Keep changes minimal and focused
+- Explain each modification clearly
+
+#### Stage 4: Simplicity First (البساطة أولاً)
+- Choose the simplest solution that works
+- Avoid over-engineering
+- Don't add unnecessary features
+- Prefer small, focused changes
+- Question if complex code is really needed
+
+#### Stage 5: Review & Documentation (المراجعة والتوثيق)
+- Test the complete workflow
+- Update todo.md with progress
+- Document any breaking changes
+- Note any technical debt created
+- Suggest next steps if applicable
+
+---
+
+## Anti-Lazy Policy (سياسة مكافحة الكسل)
+
+### ❌ NEVER Do These:
+1. **No Band-Aid Fixes**: Don't patch symptoms, fix root causes
+2. **No Assumptions**: Always verify before implementing
+3. **No Skipping Steps**: Follow all 5 stages every time
+4. **No Copy-Paste**: Understand before reusing code
+5. **No Silent Errors**: Always investigate and explain errors
+
+### ✅ ALWAYS Do These:
+1. **Investigate First**: Understand WHY something isn't working
+2. **Test Thoroughly**: Verify each change works as expected
+3. **Explain Clearly**: Document reasoning for decisions
+4. **Ask Questions**: Clarify requirements when unclear
+5. **Update TODO**: Keep tasks/todo.md current
+
+---
+
+## Development Standards
+
+### File Organization
+```
+toosila-project/
+├── .cursorrules          # This file
+├── tasks/
+│   └── todo.md          # Current tasks and progress
+├── client/              # React frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   └── services/
+│   └── package.json
+└── server/              # Express backend
+    ├── models/
+    ├── routes/
+    ├── controllers/
+    ├── middlewares/
+    └── package.json
+```
+
+### TODO.md Format Example
+```markdown
+# Toosila Project - Current Tasks
+
+## 🎯 Current Sprint
+**Goal**: [Main objective]
+**Status**: [X/Y tasks completed]
+
+### ✅ Completed
+- [x] Task name - [Date] - Notes
+
+### 🔄 In Progress
+- [ ] Task name - Started: [Date]
+  - Current status
+  - Blockers (if any)
+
+### 📋 Planned
+- [ ] Task name
+  - Description
+  - Dependencies
+  - Priority: High/Medium/Low
+
+## 🐛 Known Issues
+- Issue description
+  - Impact
+  - Possible solution
+
+## 📝 Notes
+- Important observations
+- Technical decisions made
+- Future considerations
+```
+
+---
+
+## Code Quality Rules
+
+### Backend (Node.js/Express)
+- Use async/await for database operations
+- Always validate input with express-validator
+- Handle errors with try-catch and error middleware
+- Use parameterized queries to prevent SQL injection
+- Follow RESTful conventions for routes
+- Add rate limiting to sensitive endpoints
+
+### Frontend (React)
+- Use functional components with hooks
+- Keep components small and focused
+- Use Context API for global state
+- Handle loading and error states
+- Follow Arabic RTL design patterns
+- Maintain bilingual support (Arabic/English)
+
+### Database (PostgreSQL)
+- Use UUID for primary keys
+- Add proper indexes for performance
+- Use transactions for related operations
+- Follow naming convention: snake_case
+- Add foreign key constraints
+- Include created_at and updated_at timestamps
+
+---
+
+## Security Requirements
+
+### Authentication
+- Use JWT tokens with proper expiration
+- Hash passwords with bcrypt (minimum 10 rounds)
+- Validate tokens on protected routes
+- Implement refresh token mechanism
+- Store sensitive data in environment variables
+
+### API Security
+- Enable CORS with specific origins
+- Use Helmet for security headers
+- Implement rate limiting
+- Validate and sanitize all inputs
+- Return appropriate HTTP status codes
+
+---
+
+## Testing Protocol
+
+### Before Committing
+1. Run backend: `cd server && npm run dev`
+2. Run frontend: `cd client && npm start`
+3. Test user registration and login
+4. Test main feature functionality
+5. Check browser console for errors
+6. Verify no breaking changes to existing features
+
+---
+
+## Language and Communication
+
+### Code Comments
+- Use English for code comments
+- Use Arabic for user-facing messages
+- Be clear and concise
+
+### Variable Naming
+- Backend: camelCase (JavaScript convention)
+- Database: snake_case (PostgreSQL convention)
+- React: camelCase for variables, PascalCase for components
+
+### Error Messages
+- Arabic for user-facing errors
+- English for developer/console errors
+
+---
+
+## Problem-Solving Approach
+
+### When Encountering an Error:
+1. **Read the Error**: Don't skip or ignore it
+2. **Locate the Source**: Find exact file and line
+3. **Understand the Cause**: Why is this happening?
+4. **Research if Needed**: Check docs, similar issues
+5. **Fix Root Cause**: Not just the symptom
+6. **Verify the Fix**: Test thoroughly
+7. **Document the Solution**: Update TODO or add comment
+
+### When Stuck:
+1. Break down the problem into smaller parts
+2. Verify assumptions one by one
+3. Check similar working implementations
+4. Review official documentation
+5. Ask for clarification if requirements are unclear
+
+---
+
+## Final Reminder
+
+**Think like a developer who wants to write excellent code:**
+- Don't take shortcuts
+- Understand every line of code
+- Ask "why" before "how"
+- Learn from mistakes
+- Write code you'll be proud of tomorrow
+
+**Every task goes through all 5 stages. No exceptions.**
+
+---
+
+## 🚀 Starting a New Task
+
+**To begin any new task, copy and paste this prompt:**
+
+```
+الآن ابدأ بالمهمة التالية رجاءً والتزم بالقوانين التي كتبتها
+
+[اكتب وصف المهمة هنا]
+```
+
+**Or in English:**
+
+```
+Now start the following task and follow the rules you wrote
+
+[Write task description here]
+```
+
+---
+
+Last Updated: October 3, 2025
+Project: Toosila - Iraq Ride-Sharing Platform
+

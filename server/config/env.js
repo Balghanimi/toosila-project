@@ -11,6 +11,7 @@ const config = {
   DB_NAME: process.env.DB_NAME || 'toosila',
   DB_USER: process.env.DB_USER || 'postgres',
   DB_PASSWORD: process.env.DB_PASSWORD || 'password',
+  DB_SSL: process.env.DB_SSL === 'true',
   
   // JWT configuration
   JWT_SECRET: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
@@ -20,6 +21,10 @@ const config = {
   
   // Frontend configuration
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3001',
+  corsOrigin: process.env.NODE_ENV === 'production'
+    ? process.env.CORS_ORIGIN
+    : (process.env.CORS_ORIGIN || 'http://localhost:3000'),
   
   // Email configuration (if needed)
   EMAIL_HOST: process.env.EMAIL_HOST || 'smtp.gmail.com',
@@ -37,14 +42,17 @@ const config = {
   
   // Pagination
   DEFAULT_PAGE_SIZE: process.env.DEFAULT_PAGE_SIZE || 10,
-  MAX_PAGE_SIZE: process.env.MAX_PAGE_SIZE || 100
+  MAX_PAGE_SIZE: process.env.MAX_PAGE_SIZE || 100,
+  
+  // Logging
+  LOG_LEVEL: process.env.LOG_LEVEL || 'info'
 };
 
 // Validate required environment variables
 const requiredEnvVars = ['JWT_SECRET'];
 
 if (config.NODE_ENV === 'production') {
-  requiredEnvVars.push('DB_PASSWORD', 'JWT_REFRESH_SECRET');
+  requiredEnvVars.push('DB_PASSWORD', 'JWT_REFRESH_SECRET', 'CORS_ORIGIN', 'FRONTEND_URL');
 }
 
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);

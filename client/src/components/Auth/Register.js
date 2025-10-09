@@ -7,8 +7,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    userType: 'passenger'
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,8 +47,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
     if (!formData.password) {
       errors.password = 'كلمة المرور مطلوبة';
-    } else if (formData.password.length < 6) {
-      errors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    } else if (formData.password.length < 5) {
+      errors.password = 'كلمة المرور يجب أن تكون 5 أحرف أو أرقام على الأقل';
     }
 
     if (!formData.confirmPassword) {
@@ -143,67 +142,6 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* User Type Selection */}
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '12px'
-          }}>
-            نوع المستخدم
-          </label>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '12px'
-          }}>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 16px',
-              border: `2px solid ${formData.userType === 'passenger' ? '#3b82f6' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              cursor: 'pointer',
-              background: formData.userType === 'passenger' ? '#f0f9ff' : 'white',
-              transition: 'all 0.2s ease'
-            }}>
-              <input
-                type="radio"
-                name="userType"
-                value="passenger"
-                checked={formData.userType === 'passenger'}
-                onChange={handleChange}
-                style={{ margin: 0 }}
-              />
-              <span style={{ fontSize: '14px', fontWeight: '500' }}>🧑‍💼 راكب</span>
-            </label>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 16px',
-              border: `2px solid ${formData.userType === 'driver' ? '#3b82f6' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              cursor: 'pointer',
-              background: formData.userType === 'driver' ? '#f0f9ff' : 'white',
-              transition: 'all 0.2s ease'
-            }}>
-              <input
-                type="radio"
-                name="userType"
-                value="driver"
-                checked={formData.userType === 'driver'}
-                onChange={handleChange}
-                style={{ margin: 0 }}
-              />
-              <span style={{ fontSize: '14px', fontWeight: '500' }}>🚗 سائق</span>
-            </label>
-          </div>
-        </div>
-
         {/* Name Input */}
         <div>
           <label style={{
@@ -296,7 +234,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
+              placeholder="أدخل كلمة المرور (5 أحرف أو أرقام على الأقل)"
               style={{
                 width: '100%',
                 padding: '12px 48px 12px 16px',
@@ -333,6 +271,25 @@ export default function Register({ onSwitchToLogin, onClose }) {
               {formErrors.password}
             </div>
           )}
+          
+          {/* Password Instructions */}
+          <div style={{
+            background: '#f0f9ff',
+            border: '1px solid #0ea5e9',
+            borderRadius: '6px',
+            padding: '8px 12px',
+            marginTop: '6px',
+            fontSize: '12px',
+            color: '#0369a1'
+          }}>
+            💡 <strong>تعليمات كلمة المرور:</strong>
+            <ul style={{ margin: '4px 0 0 0', paddingLeft: '16px' }}>
+              <li>أقل عدد 5 أحرف أو أرقام</li>
+              <li>يمكن أن تكون أرقام فقط: مثل 12345</li>
+              <li>يمكن أن تكون أحرف فقط: مثل abcde</li>
+              <li>يمكن أن تكون مختلطة: مثل test1</li>
+            </ul>
+          </div>
         </div>
 
         {/* Confirm Password Input */}

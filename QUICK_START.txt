@@ -1,0 +1,95 @@
+═══════════════════════════════════════════════════════════
+🚗 TOOSILA - QUICK START GUIDE
+═══════════════════════════════════════════════════════════
+
+⚡ GET STARTED IN 3 STEPS:
+
+STEP 1: Setup Database (First time only)
+────────────────────────────────────────
+Open Command Prompt/Terminal:
+  cd C:\Users\a2z\toosila-project\server
+  node scripts/setup-database.js
+
+✅ You should see: "Database schema setup completed successfully!"
+
+STEP 2: Start Backend Server
+────────────────────────────────────────
+Keep terminal open:
+  npm run dev
+
+✅ You should see: "Server running on http://localhost:5000"
+
+STEP 3: Start Frontend (New Terminal)
+────────────────────────────────────────
+Open NEW Command Prompt/Terminal:
+  cd C:\Users\a2z\toosila-project\client
+  npm start
+
+✅ Browser opens automatically at http://localhost:3000
+
+═══════════════════════════════════════════════════════════
+📍 IMPORTANT URLS
+═══════════════════════════════════════════════════════════
+
+Frontend:  http://localhost:3000
+Backend:   http://localhost:5000
+API Test:  http://localhost:3000/test-api
+Health:    http://localhost:5000/api/health
+
+═══════════════════════════════════════════════════════════
+🧪 QUICK TEST
+═══════════════════════════════════════════════════════════
+
+1. Go to: http://localhost:3000/test-api
+2. Click "اختبار التسجيل" (Test Registration)
+3. Click "اختبار تسجيل الدخول" (Test Login)
+4. If both succeed → Everything works! ✅
+
+═══════════════════════════════════════════════════════════
+🎯 WHAT YOU CAN DO
+═══════════════════════════════════════════════════════════
+
+✅ Register as Driver or Passenger
+✅ Post Ride Offers (Driver)
+✅ Search and Book Rides (Passenger)
+✅ Send Messages
+✅ Rate Users
+✅ Manage Profile
+
+═══════════════════════════════════════════════════════════
+🐛 PROBLEMS?
+═══════════════════════════════════════════════════════════
+
+❌ Database Error?
+   → Run: node scripts/setup-database.js
+
+❌ Port 5000 in use?
+   → Change PORT in server/.env
+
+❌ CORS Error?
+   → Check CORS_ORIGIN=http://localhost:3000 in server/.env
+
+❌ Blank Page?
+   → Check browser console (F12)
+   → Run: npm install
+
+═══════════════════════════════════════════════════════════
+📚 MORE HELP
+═══════════════════════════════════════════════════════════
+
+Full Documentation:  README.md
+Detailed Guide:      STARTUP.md
+Feature Checklist:   CHECKLIST.md
+
+═══════════════════════════════════════════════════════════
+✨ APP FEATURES
+═══════════════════════════════════════════════════════════
+
+Authentication ✓     Ride Offers ✓      Bookings ✓
+Ride Requests ✓      Messages ✓         Ratings ✓
+User Profiles ✓      Security ✓         Arabic/RTL ✓
+
+═══════════════════════════════════════════════════════════
+
+🎉 Your app is ready! Happy coding!
+

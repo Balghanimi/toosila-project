@@ -201,9 +201,9 @@ const getBookingStats = asyncHandler(async (req, res) => {
 // Get user booking statistics
 const getUserBookingStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
-  
+
   const result = await query(`
-    SELECT 
+    SELECT
       COUNT(*) as total_bookings,
       COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_bookings,
       COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_bookings,
@@ -219,6 +219,32 @@ const getUserBookingStats = asyncHandler(async (req, res) => {
   });
 });
 
+// Get pending bookings count for current user (both as passenger and driver)
+const getPendingCount = asyncHandler(async (req, res) => {
+  const { query } = require('../config/db');
+
+  // Count bookings I received on my offers (as driver) that are pending
+  const receivedResult = await query(`
+    SELECT COUNT(*) as count
+    FROM bookings b
+    INNER JOIN offers o ON b.offer_id = o.id
+    WHERE o.user_id = $1 AND b.status = 'pending'
+  `, [req.user.id]);
+
+  // Count bookings I made (as passenger) that are pending
+  const sentResult = await query(`
+    SELECT COUNT(*) as count
+    FROM bookings
+    WHERE user_id = $1 AND status = 'pending'
+  `, [req.user.id]);
+
+  res.json({
+    receivedPending: parseInt(receivedResult.rows[0].count),
+    sentPending: parseInt(sentResult.rows[0].count),
+    totalPending: parseInt(receivedResult.rows[0].count) + parseInt(sentResult.rows[0].count)
+  });
+});
+
 module.exports = {
   createBooking,
   getBookings,
@@ -228,6 +254,7 @@ module.exports = {
   getUserBookings,
   getOfferBookings,
   getBookingStats,
-  getUserBookingStats
+  getUserBookingStats,
+  getPendingCount
 };
 

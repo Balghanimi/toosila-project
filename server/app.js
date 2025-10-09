@@ -18,6 +18,7 @@ const demandsRoutes = require('./routes/demands.routes');
 const bookingsRoutes = require('./routes/bookings.routes');
 const messagesRoutes = require('./routes/messages.routes');
 const ratingsRoutes = require('./routes/ratings.routes');
+const statsRoutes = require('./routes/stats.routes');
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: config.FRONTEND_URL,
+  origin: config.corsOrigin, // ← ✅ متوافق مع architecture.md,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -80,6 +81,7 @@ app.use('/api/demands', demandsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/ratings', ratingsRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {

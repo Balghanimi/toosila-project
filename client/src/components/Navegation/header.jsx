@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useNotifications } from '../../context/NotificationContext';
 import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
 
@@ -10,9 +11,11 @@ const Header = ({ title = 'توصيلة' }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, currentUser } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
+  const { pendingBookings, unreadMessages } = useNotifications();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Dynamic page titles based on routes
   const getPageTitle = () => {
@@ -103,14 +106,14 @@ const Header = ({ title = 'توصيلة' }) => {
         </div>
       </header>
 
-      {/* Simple Drawer Placeholder */}
+      {/* Drawer with dynamic menu */}
       {drawerOpen && (
         <div className={styles.drawer}>
           <div className={styles.drawerOverlay} onClick={toggleDrawer} />
           <nav className={styles.drawerContent}>
             <div className={styles.drawerHeader}>
               <h3>القائمة</h3>
-              <button 
+              <button
                 className={styles.drawerClose}
                 onClick={toggleDrawer}
                 aria-label="إغلاق القائمة"
@@ -119,7 +122,143 @@ const Header = ({ title = 'توصيلة' }) => {
               </button>
             </div>
             <div className={styles.drawerBody}>
-              <p className={styles.placeholder}>محتوى الدرج قيد التطوير...</p>
+              {/* الصفحة الرئيسية */}
+              <button
+                className={styles.drawerItem}
+                onClick={() => { navigate('/'); toggleDrawer(); }}
+              >
+                🏠 الصفحة الرئيسية
+              </button>
+
+              {/* قسم السائقين */}
+              {currentUser?.isDriver && (
+                <>
+                  <div className={styles.drawerSection}>قسم السائقين</div>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/post-offer'); toggleDrawer(); }}
+                  >
+                    🚗 نشر عرض رحلة
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/offers'); toggleDrawer(); }}
+                  >
+                    📋 عروضي
+                  </button>
+                </>
+              )}
+
+              {/* قسم الركاب */}
+              {currentUser && !currentUser.isDriver && (
+                <>
+                  <div className={styles.drawerSection}>قسم الركاب</div>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/post-demand'); toggleDrawer(); }}
+                  >
+                    🙋 نشر طلب رحلة
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/demands'); toggleDrawer(); }}
+                  >
+                    📋 طلباتي
+                  </button>
+                </>
+              )}
+
+              {/* القسم المشترك */}
+              {currentUser && (
+                <>
+                  <div className={styles.drawerSection}>المشترك</div>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/dashboard'); toggleDrawer(); }}
+                  >
+                    📊 لوحة التحكم
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate(currentUser.isDriver ? '/demands' : '/offers'); toggleDrawer(); }}
+                  >
+                    👀 {currentUser.isDriver ? 'عرض الطلبات' : 'عرض العروض'}
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/bookings'); toggleDrawer(); }}
+                    style={{ position: 'relative' }}
+                  >
+                    📋 حجوزاتي
+                    {pendingBookings.totalPending > 0 && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: 'var(--space-3)',
+                          transform: 'translateY(-50%)',
+                          background: '#dc2626',
+                          color: 'white',
+                          borderRadius: '50%',
+                          minWidth: '20px',
+                          height: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: '700',
+                          padding: '0 4px'
+                        }}
+                      >
+                        {pendingBookings.totalPending > 99 ? '99+' : pendingBookings.totalPending}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/messages'); toggleDrawer(); }}
+                    style={{ position: 'relative' }}
+                  >
+                    💬 الرسائل
+                    {unreadMessages > 0 && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: 'var(--space-3)',
+                          transform: 'translateY(-50%)',
+                          background: '#dc2626',
+                          color: 'white',
+                          borderRadius: '50%',
+                          minWidth: '20px',
+                          height: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: '700',
+                          padding: '0 4px'
+                        }}
+                      >
+                        {unreadMessages > 99 ? '99+' : unreadMessages}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/profile'); toggleDrawer(); }}
+                  >
+                    👤 الملف الشخصي
+                  </button>
+                </>
+              )}
+
+              {/* إذا لم يكن مسجل دخول */}
+              {!currentUser && (
+                <p className={styles.placeholder}>
+                  يرجى تسجيل الدخول لرؤية القائمة الكاملة
+                </p>
+              )}
             </div>
           </nav>
         </div>

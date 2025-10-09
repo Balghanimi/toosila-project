@@ -1,814 +1,680 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDemands } from '../../context/DemandsContext';
+import { useAuth } from '../../context/AuthContext';
+import { demandsAPI } from '../../services/api';
 
 export default function PostDemand() {
-  // Location selections
-  const [fromGov, setFromGov] = useState('');
-  const [fromArea, setFromArea] = useState('');
-  const [toGov, setToGov] = useState('');
-  const [toArea, setToArea] = useState('');
-  // Date & Time
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [seats, setSeats] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [negotiable, setNegotiable] = useState(false);
-  // Passenger info
-  const [passengerName, setPassengerName] = useState('');
-  const [passengerPhone, setPassengerPhone] = useState('');
+  const [isAnimated, setIsAnimated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const [formData, setFormData] = useState({
+    fromCity: '',
+    toCity: '',
+    earliestDate: '',
+    earliestTime: '',
+    latestDate: '',
+    latestTime: '',
+    seats: '1',
+    budgetMax: ''
+  });
+
   const [errors, setErrors] = useState({});
-  const [showAddFromArea, setShowAddFromArea] = useState(false);
-  const [showAddToArea, setShowAddToArea] = useState(false);
-  const [newFromArea, setNewFromArea] = useState('');
-  const [newToArea, setNewToArea] = useState('');
-  const { addDemand } = useDemands();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  // Governorates and areas (same as PostOffer)
-  const IRAQ_REGIONS = useMemo(() => ({
-    'بغداد': ['الكرخ', 'الرصافة', 'الأعظمية', 'مدينة الصدر', 'الدورة', 'الكاظمية'],
-    'البصرة': ['مركز البصرة', 'الزبير', 'أبو الخصيب', 'القرنة', 'شط العرب'],
-    'أربيل': ['مركز أربيل', 'شقلاوة', 'سوران', 'كويا'],
-    'السليمانية': ['مركز السليمانية', 'دوكان', 'رانية', 'حلبجة'],
-    'نينوى': ['الموصل', 'الحمدانية', 'تلعفر', 'سنجار'],
-    'الأنبار': ['الرمادي', 'الفلوجة', 'هيت', 'حديثة'],
-    'ديالى': ['بعقوبة', 'الخالص', 'خانقين', 'المقدادية'],
-    'كركوك': ['مركز كركوك', 'الحويجة', 'داقوق'],
-    'بابل': ['الحلة', 'المسيب', 'المحاويل'],
-    'كربلاء': ['مركز كربلاء', 'عين التمر', 'الهندية'],
-    'النجف': ['مركز النجف', 'الكوفة', 'المناذرة'],
-    'واسط': ['الكوت', 'الحي', 'النعمانية', 'الصويرة'],
-    'ميسان': ['العمارة', 'الكحلاء', 'المجر الكبير'],
-    'ذي قار': ['الناصرية', 'الشطرة', 'سوق الشيوخ', 'الرفاعي'],
-    'المثنى': ['السماوة', 'الرميثة'],
-    'القادسية': ['الديوانية', 'عفك', 'الحمزة'],
-  }), []);
-
-  const fromAreas = useMemo(() => (fromGov ? IRAQ_REGIONS[fromGov] || [] : []), [fromGov, IRAQ_REGIONS]);
-  const toAreas = useMemo(() => (toGov ? IRAQ_REGIONS[toGov] || [] : []), [toGov, IRAQ_REGIONS]);
-
-  // إضافة منطقة جديدة
-  const addNewFromArea = () => {
-    if (newFromArea.trim() && fromGov) {
-      const updatedRegions = { ...IRAQ_REGIONS };
-      if (!updatedRegions[fromGov]) {
-        updatedRegions[fromGov] = [];
-      }
-      if (!updatedRegions[fromGov].includes(newFromArea.trim())) {
-        updatedRegions[fromGov].push(newFromArea.trim());
-        setFromArea(newFromArea.trim());
-        setNewFromArea('');
-        setShowAddFromArea(false);
-      }
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/');
+      return;
     }
-  };
 
-  const addNewToArea = () => {
-    if (newToArea.trim() && toGov) {
-      const updatedRegions = { ...IRAQ_REGIONS };
-      if (!updatedRegions[toGov]) {
-        updatedRegions[toGov] = [];
-      }
-      if (!updatedRegions[toGov].includes(newToArea.trim())) {
-        updatedRegions[toGov].push(newToArea.trim());
-        setToArea(newToArea.trim());
-        setNewToArea('');
-        setShowAddToArea(false);
-      }
+    setIsAnimated(true);
+    // Set default dates
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+
+    setFormData(prev => ({
+      ...prev,
+      earliestDate: tomorrow.toISOString().split('T')[0],
+      earliestTime: '08:00',
+      latestDate: dayAfter.toISOString().split('T')[0],
+      latestTime: '20:00'
+    }));
+  }, [currentUser, navigate]);
+
+  // Check if user is a passenger (not driver)
+  if (currentUser && currentUser.isDriver) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'var(--space-4)'
+      }}>
+        <div style={{
+          background: 'var(--surface-primary)',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'var(--space-8)',
+          boxShadow: 'var(--shadow-xl)',
+          textAlign: 'center',
+          maxWidth: '500px',
+          border: '2px solid #fbbf24'
+        }}>
+          <div style={{
+            fontSize: '4rem',
+            marginBottom: 'var(--space-4)'
+          }}>
+            🚫
+          </div>
+          <h2 style={{
+            fontSize: 'var(--text-2xl)',
+            fontWeight: '800',
+            color: 'var(--text-primary)',
+            marginBottom: 'var(--space-3)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            هذه الصفحة للركاب فقط
+          </h2>
+          <p style={{
+            fontSize: 'var(--text-lg)',
+            color: 'var(--text-secondary)',
+            marginBottom: 'var(--space-6)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            يجب التبديل إلى وضع الراكب لنشر طلب رحلة
+          </p>
+          <button
+            onClick={() => navigate('/profile')}
+            style={{
+              padding: 'var(--space-4) var(--space-6)',
+              background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 'var(--text-lg)',
+              fontWeight: '700',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+              boxShadow: 'var(--shadow-lg)',
+              width: '100%'
+            }}
+          >
+            الذهاب إلى الملف الشخصي للتبديل 🔄
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const IRAQ_CITIES = [
+    'بغداد - الكرخ', 'بغداد - الرصافة', 'بغداد - الكرادة',
+    'البصرة - المركز', 'أربيل - المركز', 'الموصل - المركز',
+    'كربلاء - المركز', 'النجف - المركز', 'السليمانية - المركز',
+    'دهوك - المركز', 'الناصرية - المركز'
+  ];
+
+  const updateField = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
-  };
-
-  // Normalize Arabic-Indic digits to English and snap price to 250 IQD steps
-  const normalizeDigits = (value) => {
-    if (typeof value !== 'string') return value;
-    const map = {
-      '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
-      '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'
-    };
-    return value.replace(/[٠-٩۰-۹]/g, (d) => map[d] || d);
-  };
-
-  const snapPriceToStep = (val) => {
-    const num = Number(val);
-    if (Number.isNaN(num) || num <= 0) return '';
-    const step = 250;
-    return Math.ceil(num / step) * step;
+    setError('');
   };
 
   const validate = () => {
     const newErrors = {};
-    if (!fromGov) newErrors.fromGov = 'حقل إجباري';
-    if (!fromArea) newErrors.fromArea = 'حقل إجباري';
-    if (!toGov) newErrors.toGov = 'حقل إجباري';
-    if (!toArea) newErrors.toArea = 'حقل إجباري';
-    if (!date) newErrors.date = 'حقل إجباري';
-    if (!time) newErrors.time = 'حقل إجباري';
-    const seatsNum = Number(seats);
-    if (!seats || Number.isNaN(seatsNum) || seatsNum <= 0) newErrors.seats = 'يجب أن يكون رقمًا موجبًا';
-    const priceNum = Number(maxPrice);
-    if (!maxPrice || Number.isNaN(priceNum) || priceNum <= 0) newErrors.maxPrice = 'يجب أن يكون رقمًا موجبًا';
-    if (!passengerName.trim()) newErrors.passengerName = 'اسم الراكب مطلوب';
-    if (!passengerPhone.trim() || passengerPhone.trim().length < 7) newErrors.passengerPhone = 'رقم هاتف غير صالح';
+
+    if (!formData.fromCity) newErrors.fromCity = 'اختر مدينة الانطلاق';
+    if (!formData.toCity) newErrors.toCity = 'اختر مدينة الوصول';
+    if (formData.fromCity === formData.toCity) {
+      newErrors.toCity = 'مدينة الوصول يجب أن تختلف عن مدينة الانطلاق';
+    }
+    if (!formData.earliestDate) newErrors.earliestDate = 'اختر تاريخ البداية';
+    if (!formData.earliestTime) newErrors.earliestTime = 'اختر وقت البداية';
+    if (!formData.latestDate) newErrors.latestDate = 'اختر تاريخ النهاية';
+    if (!formData.latestTime) newErrors.latestTime = 'اختر وقت النهاية';
+
+    // Check that latest is after earliest
+    if (formData.earliestDate && formData.latestDate) {
+      const earliest = new Date(`${formData.earliestDate}T${formData.earliestTime}`);
+      const latest = new Date(`${formData.latestDate}T${formData.latestTime}`);
+      if (latest <= earliest) {
+        newErrors.latestDate = 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية';
+      }
+    }
+
+    if (!formData.seats || parseInt(formData.seats) < 1) {
+      newErrors.seats = 'أدخل عدد مقاعد صحيح';
+    }
+    if (!formData.budgetMax || parseFloat(formData.budgetMax) < 1000) {
+      newErrors.budgetMax = 'أدخل ميزانية صحيحة (الحد الأدنى 1000 د.ع)';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
-    const from = `${fromGov} - ${fromArea}`;
-    const to = `${toGov} - ${toArea}`;
-    const isoDateTime = new Date(`${date}T${time}:00`).toISOString();
-    const demand = {
-      id: Date.now().toString(),
-      from,
-      to,
-      date: isoDateTime,
-      seats: Number(seats),
-      maxPrice: Number(maxPrice),
-      negotiable: Boolean(negotiable),
-      passengerName: passengerName.trim(),
-      passengerPhone: passengerPhone.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    addDemand(demand);
-    navigate('/demands');
-  };
 
-  const formatIQD = (value) => {
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    setError('');
+
     try {
-      return new Intl.NumberFormat('ar-IQ', { style: 'currency', currency: 'IQD', maximumFractionDigits: 0 }).format(Number(value));
-    } catch {
-      return `${value} IQD`;
+      // Combine date and time into ISO format
+      const earliestDateTime = new Date(`${formData.earliestDate}T${formData.earliestTime}:00`);
+      const latestDateTime = new Date(`${formData.latestDate}T${formData.latestTime}:00`);
+
+      const demandData = {
+        fromCity: formData.fromCity,
+        toCity: formData.toCity,
+        earliestTime: earliestDateTime.toISOString(),
+        latestTime: latestDateTime.toISOString(),
+        seats: parseInt(formData.seats),
+        budgetMax: parseFloat(formData.budgetMax)
+      };
+
+      await demandsAPI.create(demandData);
+      setSuccess(true);
+
+      setTimeout(() => {
+        navigate('/demands');
+      }, 2000);
+
+    } catch (err) {
+      console.error('Error creating demand:', err);
+      setError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  const examplePrice = maxPrice ? formatIQD(maxPrice) : formatIQD(15000);
+
+  if (success) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'var(--space-4)'
+      }}>
+        <div style={{
+          background: 'var(--surface-primary)',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'var(--space-8)',
+          boxShadow: 'var(--shadow-xl)',
+          textAlign: 'center',
+          maxWidth: '500px',
+          animation: 'fadeInUp 0.5s ease-out'
+        }}>
+          <div style={{
+            fontSize: '5rem',
+            marginBottom: 'var(--space-4)',
+            animation: 'bounce 1s infinite'
+          }}>
+            ✅
+          </div>
+          <h2 style={{
+            fontSize: 'var(--text-3xl)',
+            fontWeight: '800',
+            color: 'var(--text-primary)',
+            marginBottom: 'var(--space-3)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            تم نشر طلبك بنجاح! 🎉
+          </h2>
+          <p style={{
+            fontSize: 'var(--text-lg)',
+            color: 'var(--text-secondary)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            جاري تحويلك إلى صفحة الطلبات...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ 
-      maxWidth: 600, 
-      margin: '1rem auto', 
-      padding: '0 16px',
-      background: '#ffffff',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      paddingBottom: '100px'
     }}>
-      {/* Header */}
-      <div style={{ 
-        padding: '20px 0 16px 0',
-        borderBottom: '1px solid #e5e7eb',
-        marginBottom: '20px'
+      <div className="container" style={{
+        paddingTop: 'var(--space-6)',
+        maxWidth: '600px',
+        margin: '0 auto',
+        transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
+        opacity: isAnimated ? 1 : 0,
+        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
       }}>
-        <button 
-          onClick={() => navigate('/')}
-          style={{
-            background: '#f3f4f6',
-            border: 'none',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            color: '#374151',
-            marginBottom: '12px'
-          }}
-        >
-          ← رجوع للرئيسية
-        </button>
-        <h2 style={{ 
-          margin: '0 0 8px 0', 
-          fontSize: '24px',
-          fontWeight: '700',
-          color: '#1f2937',
-          textAlign: 'center'
+
+        {/* Header */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: 'var(--space-8)'
         }}>
-          👤 طلب مقعد
-        </h2>
-        <p style={{ 
-          margin: '0',
-          fontSize: '14px',
-          color: '#6b7280',
-          textAlign: 'center'
-        }}>
-          أنا راكب أبحث عن سائق
-        </p>
+          <h1 style={{
+            fontSize: 'var(--text-3xl)',
+            fontWeight: '800',
+            color: 'var(--text-primary)',
+            marginBottom: 'var(--space-2)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            🙋 نشر طلب رحلة
+          </h1>
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontSize: 'var(--text-lg)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            اطلب رحلتك واعثر على سائق
+          </p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            background: '#fee',
+            border: '2px solid #f88',
+            borderRadius: 'var(--radius)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)',
+            color: '#c00',
+            fontFamily: '"Cairo", sans-serif',
+            fontSize: 'var(--text-base)'
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <div style={{
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-6)',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-light)',
+            display: 'grid',
+            gap: 'var(--space-6)'
+          }}>
+
+            {/* Route */}
+            <div>
+              <h3 style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-4)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)'
+              }}>
+                🛣️ المسار
+              </h3>
+
+              <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    من (مدينة الانطلاق)
+                  </label>
+                  <select
+                    value={formData.fromCity}
+                    onChange={(e) => updateField('fromCity', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3)',
+                      border: `2px solid ${errors.fromCity ? '#f88' : 'var(--border-light)'}`,
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-base)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)',
+                      color: 'var(--text-primary)'
+                    }}
+                  >
+                    <option value="">اختر المدينة</option>
+                    {IRAQ_CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                  {errors.fromCity && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.fromCity}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    إلى (مدينة الوصول)
+                  </label>
+                  <select
+                    value={formData.toCity}
+                    onChange={(e) => updateField('toCity', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3)',
+                      border: `2px solid ${errors.toCity ? '#f88' : 'var(--border-light)'}`,
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-base)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)',
+                      color: 'var(--text-primary)'
+                    }}
+                  >
+                    <option value="">اختر المدينة</option>
+                    {IRAQ_CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                  {errors.toCity && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.toCity}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Time Window */}
+            <div>
+              <h3 style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-4)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)'
+              }}>
+                📅 نطاق الوقت المطلوب
+              </h3>
+
+              <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+                {/* Earliest */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    من تاريخ (أقرب وقت)
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                    <input
+                      type="date"
+                      value={formData.earliestDate}
+                      onChange={(e) => updateField('earliestDate', e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-3)',
+                        border: `2px solid ${errors.earliestDate ? '#f88' : 'var(--border-light)'}`,
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontFamily: '"Cairo", sans-serif',
+                        background: 'var(--surface-primary)'
+                      }}
+                    />
+                    <input
+                      type="time"
+                      value={formData.earliestTime}
+                      onChange={(e) => updateField('earliestTime', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-3)',
+                        border: `2px solid ${errors.earliestTime ? '#f88' : 'var(--border-light)'}`,
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontFamily: '"Cairo", sans-serif',
+                        background: 'var(--surface-primary)'
+                      }}
+                    />
+                  </div>
+                  {(errors.earliestDate || errors.earliestTime) && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.earliestDate || errors.earliestTime}
+                    </p>
+                  )}
+                </div>
+
+                {/* Latest */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    إلى تاريخ (آخر وقت)
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                    <input
+                      type="date"
+                      value={formData.latestDate}
+                      onChange={(e) => updateField('latestDate', e.target.value)}
+                      min={formData.earliestDate || new Date().toISOString().split('T')[0]}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-3)',
+                        border: `2px solid ${errors.latestDate ? '#f88' : 'var(--border-light)'}`,
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontFamily: '"Cairo", sans-serif',
+                        background: 'var(--surface-primary)'
+                      }}
+                    />
+                    <input
+                      type="time"
+                      value={formData.latestTime}
+                      onChange={(e) => updateField('latestTime', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-3)',
+                        border: `2px solid ${errors.latestTime ? '#f88' : 'var(--border-light)'}`,
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontFamily: '"Cairo", sans-serif',
+                        background: 'var(--surface-primary)'
+                      }}
+                    />
+                  </div>
+                  {(errors.latestDate || errors.latestTime) && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.latestDate || errors.latestTime}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Seats & Budget */}
+            <div>
+              <h3 style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-4)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)'
+              }}>
+                💺 التفاصيل
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    عدد المقاعد
+                  </label>
+                  <select
+                    value={formData.seats}
+                    onChange={(e) => updateField('seats', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3)',
+                      border: `2px solid ${errors.seats ? '#f88' : 'var(--border-light)'}`,
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-base)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  >
+                    {[1,2,3,4,5,6,7].map(num => (
+                      <option key={num} value={num}>{num} مقعد</option>
+                    ))}
+                  </select>
+                  {errors.seats && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.seats}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    الميزانية القصوى (د.ع)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.budgetMax}
+                    onChange={(e) => updateField('budgetMax', e.target.value)}
+                    placeholder="20000"
+                    min="1000"
+                    step="1000"
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3)',
+                      border: `2px solid ${errors.budgetMax ? '#f88' : 'var(--border-light)'}`,
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-base)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  />
+                  {errors.budgetMax && (
+                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                      {errors.budgetMax}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                padding: 'var(--space-4)',
+                background: isSubmitting
+                  ? 'var(--text-muted)'
+                  : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: isSubmitting ? 'none' : 'var(--shadow-lg)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+                width: '100%'
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTop: '2px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                  جاري النشر...
+                </>
+              ) : (
+                '🙋 نشر الطلب'
+              )}
+            </button>
+          </div>
+        </form>
       </div>
 
-      <form onSubmit={handleSubmit} noValidate style={{ display: 'grid', gap: '20px' }}>
-        {/* معلومات الراكب */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #22c55e',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#22c55e',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            معلومات الراكب
-          </div>
-          <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '6px', 
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#15803d'
-              }}>
-                اسم الراكب
-              </label>
-              <input
-                placeholder="أدخل اسمك الكامل"
-                value={passengerName}
-                onChange={(e) => { setPassengerName(e.target.value); if (errors.passengerName) setErrors((p) => ({ ...p, passengerName: undefined })); }}
-                aria-invalid={!!errors.passengerName}
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #22c55e',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  background: 'white'
-                }}
-              />
-              {errors.passengerName ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.passengerName}</div> : null}
-            </div>
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '6px', 
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#15803d'
-              }}>
-                رقم الهاتف
-              </label>
-              <input
-                placeholder="07XXXXXXXX"
-                inputMode="tel"
-                value={passengerPhone}
-                onChange={(e) => { setPassengerPhone(e.target.value); if (errors.passengerPhone) setErrors((p) => ({ ...p, passengerPhone: undefined })); }}
-                aria-invalid={!!errors.passengerPhone}
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #22c55e',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  background: 'white'
-                }}
-              />
-              {errors.passengerPhone ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.passengerPhone}</div> : null}
-            </div>
-          </div>
-        </div>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-        {/* تفاصيل الرحلة */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #0ea5e9',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#0ea5e9',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            تفاصيل الرحلة
-          </div>
-          <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
-            {/* من */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  من - المحافظة
-                </label>
-                <select
-                  value={fromGov}
-                  onChange={(e) => { setFromGov(e.target.value); setFromArea(''); if (errors.fromGov) setErrors((p) => ({ ...p, fromGov: undefined })); }}
-                  aria-invalid={!!errors.fromGov}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                >
-                  <option value="">اختر المحافظة</option>
-                  {Object.keys(IRAQ_REGIONS).map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
-                {errors.fromGov ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.fromGov}</div> : null}
-              </div>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  من - المنطقة
-                </label>
-                <select
-                  value={fromArea}
-                  onChange={(e) => { 
-                    if (e.target.value === 'add-new') {
-                      setShowAddFromArea(true);
-                    } else {
-                      setFromArea(e.target.value); 
-                      if (errors.fromArea) setErrors((p) => ({ ...p, fromArea: undefined }));
-                    }
-                  }}
-                  aria-invalid={!!errors.fromArea}
-                  required
-                  disabled={!fromGov}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: fromGov ? 'white' : '#f9fafb'
-                  }}
-                >
-                  <option value="">اختر المنطقة</option>
-                  {fromAreas.map((a) => (
-                    <option key={a} value={a}>{a}</option>
-                  ))}
-                  <option value="add-new" style={{ color: '#0ea5e9', fontWeight: '600' }}>
-                    ➕ إضافة منطقة جديدة
-                  </option>
-                </select>
-                {errors.fromArea ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.fromArea}</div> : null}
-                
-                {/* إضافة منطقة جديدة */}
-                {showAddFromArea && (
-                  <div style={{ 
-                    marginTop: '8px', 
-                    padding: '12px', 
-                    background: '#f0f9ff', 
-                    border: '1px solid #0ea5e9', 
-                    borderRadius: '8px' 
-                  }}>
-                    <label style={{ 
-                      display: 'block', 
-                      marginBottom: '6px', 
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#0369a1'
-                    }}>
-                      اسم المنطقة الجديدة
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        placeholder="أدخل اسم المنطقة"
-                        value={newFromArea}
-                        onChange={(e) => setNewFromArea(e.target.value)}
-                        style={{
-                          flex: 1,
-                          padding: '8px',
-                          border: '1px solid #0ea5e9',
-                          borderRadius: '6px',
-                          fontSize: '14px'
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            addNewFromArea();
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={addNewFromArea}
-                        style={{
-                          background: '#0ea5e9',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        إضافة
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowAddFromArea(false);
-                          setNewFromArea('');
-                        }}
-                        style={{
-                          background: '#dc2626',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        إلغاء
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-15px,0);
+          }
+          70% {
+            transform: translate3d(0,-7px,0);
+          }
+          90% {
+            transform: translate3d(0,-2px,0);
+          }
+        }
 
-            {/* إلى */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  إلى - المحافظة
-                </label>
-                <select
-                  value={toGov}
-                  onChange={(e) => { setToGov(e.target.value); setToArea(''); if (errors.toGov) setErrors((p) => ({ ...p, toGov: undefined })); }}
-                  aria-invalid={!!errors.toGov}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                >
-                  <option value="">اختر المحافظة</option>
-                  {Object.keys(IRAQ_REGIONS).map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
-                {errors.toGov ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.toGov}</div> : null}
-              </div>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  إلى - المنطقة
-                </label>
-                <select
-                  value={toArea}
-                  onChange={(e) => { 
-                    if (e.target.value === 'add-new') {
-                      setShowAddToArea(true);
-                    } else {
-                      setToArea(e.target.value); 
-                      if (errors.toArea) setErrors((p) => ({ ...p, toArea: undefined }));
-                    }
-                  }}
-                  aria-invalid={!!errors.toArea}
-                  required
-                  disabled={!toGov}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: toGov ? 'white' : '#f9fafb'
-                  }}
-                >
-                  <option value="">اختر المنطقة</option>
-                  {toAreas.map((a) => (
-                    <option key={a} value={a}>{a}</option>
-                  ))}
-                  <option value="add-new" style={{ color: '#0ea5e9', fontWeight: '600' }}>
-                    ➕ إضافة منطقة جديدة
-                  </option>
-                </select>
-                {errors.toArea ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.toArea}</div> : null}
-                
-                {/* إضافة منطقة جديدة */}
-                {showAddToArea && (
-                  <div style={{ 
-                    marginTop: '8px', 
-                    padding: '12px', 
-                    background: '#f0f9ff', 
-                    border: '1px solid #0ea5e9', 
-                    borderRadius: '8px' 
-                  }}>
-                    <label style={{ 
-                      display: 'block', 
-                      marginBottom: '6px', 
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#0369a1'
-                    }}>
-                      اسم المنطقة الجديدة
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        placeholder="أدخل اسم المنطقة"
-                        value={newToArea}
-                        onChange={(e) => setNewToArea(e.target.value)}
-                        style={{
-                          flex: 1,
-                          padding: '8px',
-                          border: '1px solid #0ea5e9',
-                          borderRadius: '6px',
-                          fontSize: '14px'
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            addNewToArea();
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={addNewToArea}
-                        style={{
-                          background: '#0ea5e9',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        إضافة
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowAddToArea(false);
-                          setNewToArea('');
-                        }}
-                        style={{
-                          background: '#dc2626',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        إلغاء
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* التاريخ والوقت */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  التاريخ
-                </label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => { setDate(e.target.value); if (errors.date) setErrors((p) => ({ ...p, date: undefined })); }}
-                  aria-invalid={!!errors.date}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                />
-                {errors.date ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.date}</div> : null}
-              </div>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#0369a1'
-                }}>
-                  الوقت
-                </label>
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => { setTime(e.target.value); if (errors.time) setErrors((p) => ({ ...p, time: undefined })); }}
-                  aria-invalid={!!errors.time}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #0ea5e9',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                />
-                {errors.time ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.time}</div> : null}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* السعر والمقاعد */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #f59e0b',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#f59e0b',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            السعر والمقاعد
-          </div>
-          <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#92400e'
-                }}>
-                  عدد المقاعد المطلوبة
-                </label>
-                <input
-                  placeholder="مثال: 2"
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  lang="en"
-                  dir="ltr"
-                  value={seats}
-                  onChange={(e) => {
-                    const v = normalizeDigits(e.target.value);
-                    setSeats(v);
-                    if (errors.seats) setErrors((p) => ({ ...p, seats: undefined }));
-                  }}
-                  aria-invalid={!!errors.seats}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #f59e0b',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                />
-                {errors.seats ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.seats}</div> : null}
-              </div>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#92400e'
-                }}>
-                  أقصى سعر يمكنني دفعه (دينار)
-                </label>
-                <input
-                  placeholder="مثال: 20000"
-                  type="number"
-                  min={250}
-                  step={250}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  lang="en"
-                  dir="ltr"
-                  value={maxPrice}
-                  onChange={(e) => {
-                    const normalized = normalizeDigits(e.target.value);
-                    const snapped = snapPriceToStep(normalized);
-                    setMaxPrice(snapped);
-                    if (errors.maxPrice) setErrors((p) => ({ ...p, maxPrice: undefined }));
-                  }}
-                  aria-invalid={!!errors.maxPrice}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #f59e0b',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    background: 'white'
-                  }}
-                />
-                <div style={{ fontSize: '12px', color: '#92400e', marginTop: '4px' }}>
-                  مثال: {examplePrice}
-                </div>
-                {errors.maxPrice ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.maxPrice}</div> : null}
-              </div>
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px',
-              padding: '12px',
-              background: 'rgba(255, 255, 255, 0.5)',
-              borderRadius: '8px',
-              border: '1px solid rgba(245, 158, 11, 0.3)'
-            }}>
-              <input 
-                type="checkbox" 
-                checked={negotiable} 
-                onChange={(e) => setNegotiable(e.target.checked)}
-                style={{ transform: 'scale(1.2)' }}
-              />
-              <span style={{ fontSize: '14px', fontWeight: '600', color: '#92400e' }}>
-                السعر قابل للتفاوض
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* زر الإرسال */}
-        <button 
-          type="submit"
-          style={{
-            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-            color: 'white',
-            border: 'none',
-            padding: '16px 24px',
-            borderRadius: '12px',
-            fontSize: '18px',
-            fontWeight: '700',
-            cursor: 'pointer',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 8px 15px -3px rgba(0, 0, 0, 0.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-          }}
-        >
-          👤 إرسال طلب المقعد
-        </button>
-      </form>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

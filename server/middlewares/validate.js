@@ -24,22 +24,20 @@ const validateUserRegistration = [
     .normalizeEmail()
     .withMessage('Please provide a valid email address'),
   body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
-  body('firstName')
+    .isLength({ min: 5 })
+    .withMessage('كلمة المرور يجب أن تكون 5 أحرف أو أرقام على الأقل'),
+  body('name')
     .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('First name must be between 2 and 50 characters'),
-  body('lastName')
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters'),
-  body('phone')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Name must be between 2 and 100 characters'),
+  body('isDriver')
     .optional()
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number'),
+    .isBoolean()
+    .withMessage('isDriver must be a boolean'),
+  body('languagePreference')
+    .optional()
+    .isIn(['ar', 'en'])
+    .withMessage('Language must be either ar or en'),
   handleValidationErrors
 ];
 
@@ -55,25 +53,20 @@ const validateUserLogin = [
 ];
 
 const validateUserUpdate = [
-  body('firstName')
+  body('name')
     .optional()
     .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('First name must be between 2 and 50 characters'),
-  body('lastName')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Name must be between 2 and 100 characters'),
+  body('email')
     .optional()
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters'),
-  body('phone')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+  body('languagePreference')
     .optional()
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number'),
-  body('bio')
-    .optional()
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage('Bio must not exceed 500 characters'),
+    .isIn(['ar', 'en'])
+    .withMessage('Language must be either ar or en'),
   handleValidationErrors
 ];
 

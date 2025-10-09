@@ -4,23 +4,24 @@ import { useAuth } from '../../context/AuthContext';
 import MessageSearch from './MessageSearch';
 
 const ConversationList = ({ onSelectConversation, selectedConversation }) => {
-  const { getUserConversations, searchConversations } = useMessages();
+  const { conversations, loading, fetchConversations } = useMessages();
   const { user } = useAuth();
-  const [conversations, setConversations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Load conversations
   useEffect(() => {
     if (user?.id) {
-      const userConversations = getUserConversations(user.id);
-      setConversations(userConversations);
+      fetchConversations();
     }
-  }, [user?.id, getUserConversations]);
+  }, [user?.id, fetchConversations]);
 
   // Filter conversations based on search
-  const filteredConversations = searchTerm 
-    ? searchConversations(user?.id, searchTerm)
+  const filteredConversations = searchTerm
+    ? conversations.filter(conv =>
+        conv.otherUserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        conv.lastMessage?.content?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : conversations;
 
   const formatTime = (timestamp) => {

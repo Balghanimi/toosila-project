@@ -9,10 +9,13 @@ import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { MessagesProvider } from './context/MessagesContext';
 import { BookingsProvider } from './context/BookingContext';
+import { NotificationProvider } from './context/NotificationContext';
 // الصفحات
 import Home from './pages/Home';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
+import Bookings from './pages/Bookings';
+import Dashboard from './pages/Dashboard';
 // العروض
 import PostOfferModern from './pages/offers/PostOfferModern';
 import ViewOffers from './pages/offers/ViewOffers';
@@ -31,24 +34,28 @@ import RatingsByUserType from './pages/RatingsByUserType';
 import RatingsByDate from './pages/RatingsByDate';
 import RatingsByComments from './pages/RatingsByComments';
 import RatingsByRating from './pages/RatingsByRating';
+import TestAPI from './pages/SimpleTestAPI';
 import './App.css';
 
 export default function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <MessagesProvider>
-          <BookingsProvider>
-            <OffersProvider>
-              <DemandsProvider>
-                <RatingProvider>
-                  <div>
-                  <Header title="توصيلة" />
-                  <main className="appContent">
+        <NotificationProvider>
+          <MessagesProvider>
+            <BookingsProvider>
+              <OffersProvider>
+                <DemandsProvider>
+                  <RatingProvider>
+                    <div>
+                    <Header title="توصيلة" />
+                    <main className="appContent">
                   <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/bookings" element={<Bookings />} />
                     {/* مسارات العروض */}
                     <Route path="/post-offer" element={<PostOfferModern />} />
                     <Route path="/offers" element={<ViewOffers />} />
@@ -68,6 +75,8 @@ export default function App() {
                     <Route path="/ratings-by-date" element={<RatingsByDate />} />
                     <Route path="/ratings-by-comments" element={<RatingsByComments />} />
                     <Route path="/ratings-by-rating" element={<RatingsByRating />} />
+                    {/* صفحة اختبار API */}
+                    <Route path="/test-api" element={<TestAPI />} />
                     
                   </Routes>
                 </main>
@@ -78,7 +87,8 @@ export default function App() {
           </OffersProvider>
         </BookingsProvider>
       </MessagesProvider>
-    </AuthProvider>
-  </LanguageProvider>
+    </NotificationProvider>
+  </AuthProvider>
+</LanguageProvider>
   );
 }

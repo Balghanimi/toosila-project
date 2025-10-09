@@ -9,6 +9,7 @@ const {
   updateDemand,
   deactivateDemand,
   getUserDemands,
+  searchDemands,
   getCategories,
   getDemandStats
 } = require('../controllers/demands.controller');
@@ -24,6 +25,7 @@ const {
 
 // Public routes
 router.get('/', validatePagination, getDemands);
+router.get('/search', validatePagination, searchDemands);
 router.get('/categories', getCategories);
 router.get('/:id', validateId, getDemandById);
 

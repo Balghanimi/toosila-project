@@ -11,7 +11,8 @@ const {
   getUserBookings,
   getOfferBookings,
   getBookingStats,
-  getUserBookingStats
+  getUserBookingStats,
+  getPendingCount
 } = require('../controllers/bookings.controller');
 
 // Import middlewares
@@ -31,6 +32,7 @@ router.post('/', moderateLimiter, validateBookingCreation, createBooking);
 router.get('/', validatePagination, getBookings);
 router.get('/stats', getBookingStats);
 router.get('/my/stats', getUserBookingStats);
+router.get('/my/pending-count', getPendingCount);
 router.get('/:id', validateId, getBookingById);
 router.put('/:id/status', moderateLimiter, updateBookingStatus);
 router.put('/:id/cancel', moderateLimiter, cancelBooking);

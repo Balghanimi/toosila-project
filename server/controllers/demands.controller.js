@@ -3,54 +3,57 @@ const { asyncHandler, AppError } = require('../middlewares/error');
 
 // Create a new demand
 const createDemand = asyncHandler(async (req, res) => {
-  const { title, description, maxPrice, category, location } = req.body;
-  
+  const { fromCity, toCity, earliestTime, latestTime, seats, budgetMax } = req.body;
+
   const demand = await Demand.create({
-    userId: req.user.id,
-    title,
-    description,
-    maxPrice,
-    category,
-    location
+    passengerId: req.user.id,
+    fromCity,
+    toCity,
+    earliestTime,
+    latestTime,
+    seats,
+    budgetMax
   });
 
   res.status(201).json({
-    message: 'Demand created successfully',
+    message: 'تم إنشاء الطلب بنجاح',
     demand: demand.toJSON()
   });
 });
 
 // Get all demands with filters and pagination
 const getDemands = asyncHandler(async (req, res) => {
-  const { 
-    page = 1, 
-    limit = 10, 
-    category, 
-    location, 
-    maxPrice, 
-    search,
-    userId 
+  const {
+    page = 1,
+    limit = 10,
+    fromCity,
+    toCity,
+    maxBudget,
+    passengerId,
+    earliestDate,
+    latestDate
   } = req.query;
 
   const filters = {};
-  if (category) filters.category = category;
-  if (location) filters.location = location;
-  if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
-  if (search) filters.search = search;
-  if (userId) filters.userId = parseInt(userId);
+  if (fromCity) filters.fromCity = fromCity;
+  if (toCity) filters.toCity = toCity;
+  if (maxBudget) filters.maxBudget = parseFloat(maxBudget);
+  if (passengerId) filters.passengerId = passengerId;
+  if (earliestDate) filters.earliestDate = earliestDate;
+  if (latestDate) filters.latestDate = latestDate;
 
   const result = await Demand.findAll(parseInt(page), parseInt(limit), filters);
-  
+
   res.json(result);
 });
 
 // Get demand by ID
 const getDemandById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   const demand = await Demand.findById(id);
   if (!demand) {
-    throw new AppError('Demand not found', 404);
+    throw new AppError('الطلب غير موجود', 404);
   }
 
   res.json({
@@ -61,28 +64,30 @@ const getDemandById = asyncHandler(async (req, res) => {
 // Update demand
 const updateDemand = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description, maxPrice, category, location } = req.body;
-  
+  const { fromCity, toCity, earliestTime, latestTime, seats, budgetMax } = req.body;
+
   const demand = await Demand.findById(id);
   if (!demand) {
-    throw new AppError('Demand not found', 404);
+    throw new AppError('الطلب غير موجود', 404);
   }
 
   // Check if user owns the demand
-  if (demand.userId !== req.user.id && req.user.role !== 'admin') {
-    throw new AppError('You can only update your own demands', 403);
+  if (demand.passengerId !== req.user.id && req.user.role !== 'admin') {
+    throw new AppError('يمكنك فقط تعديل طلباتك الخاصة', 403);
   }
 
-  const updatedDemand = await demand.update({
-    title,
-    description,
-    max_price: maxPrice,
-    category,
-    location
-  });
+  const updateData = {};
+  if (fromCity) updateData.from_city = fromCity;
+  if (toCity) updateData.to_city = toCity;
+  if (earliestTime) updateData.earliest_time = earliestTime;
+  if (latestTime) updateData.latest_time = latestTime;
+  if (seats) updateData.seats = seats;
+  if (budgetMax) updateData.budget_max = budgetMax;
+
+  const updatedDemand = await demand.update(updateData);
 
   res.json({
-    message: 'Demand updated successfully',
+    message: 'تم تحديث الطلب بنجاح',
     demand: updatedDemand.toJSON()
   });
 });
@@ -90,62 +95,68 @@ const updateDemand = asyncHandler(async (req, res) => {
 // Deactivate demand
 const deactivateDemand = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   const demand = await Demand.findById(id);
   if (!demand) {
-    throw new AppError('Demand not found', 404);
+    throw new AppError('الطلب غير موجود', 404);
   }
 
   // Check if user owns the demand
-  if (demand.userId !== req.user.id && req.user.role !== 'admin') {
-    throw new AppError('You can only deactivate your own demands', 403);
+  if (demand.passengerId !== req.user.id && req.user.role !== 'admin') {
+    throw new AppError('يمكنك فقط إلغاء تفعيل طلباتك الخاصة', 403);
   }
 
   await demand.deactivate();
 
   res.json({
-    message: 'Demand deactivated successfully'
+    message: 'تم إلغاء تفعيل الطلب بنجاح'
   });
 });
 
 // Get user's demands
 const getUserDemands = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
-  const userId = req.params.userId || req.user.id;
+  const passengerId = req.params.userId || req.user.id;
 
-  const result = await Demand.findByUserId(userId, parseInt(page), parseInt(limit));
-  
+  const result = await Demand.findByPassengerId(passengerId, parseInt(page), parseInt(limit));
+
   res.json(result);
 });
 
-// Get demand categories
-const getCategories = asyncHandler(async (req, res) => {
-  const categories = [
-    { value: 'transportation', label: 'Transportation' },
-    { value: 'accommodation', label: 'Accommodation' },
-    { value: 'food', label: 'Food & Dining' },
-    { value: 'services', label: 'Services' },
-    { value: 'other', label: 'Other' }
-  ];
+// Search demands
+const searchDemands = asyncHandler(async (req, res) => {
+  const { q: searchTerm, page = 1, limit = 10 } = req.query;
 
-  res.json({ categories });
+  if (!searchTerm) {
+    throw new AppError('مطلوب كلمة بحث', 400);
+  }
+
+  const result = await Demand.search(searchTerm, parseInt(page), parseInt(limit));
+
+  res.json(result);
+});
+
+// Get demand categories (Iraqi cities)
+const getCategories = asyncHandler(async (req, res) => {
+  const { query } = require('../config/db');
+
+  const result = await query('SELECT * FROM categories WHERE is_active = true ORDER BY name');
+
+  res.json({
+    categories: result.rows
+  });
 });
 
 // Get demand statistics (admin only)
 const getDemandStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
-  
+
   const result = await query(`
-    SELECT 
+    SELECT
       COUNT(*) as total_demands,
       COUNT(CASE WHEN is_active = true THEN 1 END) as active_demands,
       COUNT(CASE WHEN is_active = false THEN 1 END) as inactive_demands,
-      AVG(max_price) as average_max_price,
-      COUNT(CASE WHEN category = 'transportation' THEN 1 END) as transportation_count,
-      COUNT(CASE WHEN category = 'accommodation' THEN 1 END) as accommodation_count,
-      COUNT(CASE WHEN category = 'food' THEN 1 END) as food_count,
-      COUNT(CASE WHEN category = 'services' THEN 1 END) as services_count,
-      COUNT(CASE WHEN category = 'other' THEN 1 END) as other_count
+      AVG(budget_max) as average_budget_max
     FROM demands
   `);
 
@@ -161,7 +172,7 @@ module.exports = {
   updateDemand,
   deactivateDemand,
   getUserDemands,
+  searchDemands,
   getCategories,
   getDemandStats
 };
-

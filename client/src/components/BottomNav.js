@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useMessages } from '../context/MessagesContext';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 
 // Simple outline SVG icons
 const Icons = {
@@ -42,33 +43,41 @@ const BottomNav = () => {
   const { t } = useLanguage();
   const { getTotalUnreadCount } = useMessages();
   const { user } = useAuth();
+  const { unreadMessages } = useNotifications();
   const currentPath = location.pathname;
 
-  // Get total unread message count
-  const totalUnreadCount = user?.id ? getTotalUnreadCount(user.id) : 0;
+  // Get total unread message count (using NotificationContext polling instead)
+  const totalUnreadCount = unreadMessages;
 
   const NAV_ITEMS = [
-    { 
-      key: 'carpool', 
-      label: t('home'), 
+    {
+      key: 'carpool',
+      label: t('home'),
       icon: Icons.carpool,
       paths: ['/', '/offers', '/post-offer']
     },
-    { 
-      key: 'rides', 
-      label: t('offers'), 
-      icon: Icons.myRides,
-      paths: ['/my-rides', '/demands', '/post-demand']
+    {
+      key: 'dashboard',
+      label: 'لوحة التحكم',
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      ),
+      paths: ['/dashboard', '/bookings']
     },
-    { 
-      key: 'messages', 
-      label: t('messages'), 
+    {
+      key: 'messages',
+      label: t('messages'),
       icon: Icons.messages,
       paths: ['/messages', '/chat']
     },
-    { 
-      key: 'profile', 
-      label: t('profile'), 
+    {
+      key: 'profile',
+      label: t('profile'),
       icon: Icons.profile,
       paths: ['/profile', '/settings', '/ratings']
     },

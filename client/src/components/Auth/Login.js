@@ -140,7 +140,7 @@ export default function Login({ onSwitchToRegister, onClose }) {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="أدخل كلمة المرور"
+              placeholder="أدخل كلمة المرور (5 أحرف أو أرقام على الأقل)"
               required
               style={{
                 width: '100%',

@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 
-const ChatInterface = ({ 
-  tripId, 
-  otherUserId, 
-  otherUserName, 
+const ChatInterface = ({
+  tripId,
+  otherUserId,
+  otherUserName,
   tripInfo,
-  onClose 
+  onClose
 }) => {
-  const { sendMessage, getMessages, markAsRead } = useMessages();
+  const { sendMessage, currentConversation, fetchConversation, loading } = useMessages();
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
+  const { showSuccess, showError } = useNotifications();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Load messages for this conversation
   useEffect(() => {
-    if (tripId && otherUserId && user?.id) {
-      const conversationMessages = getMessages(user.id, otherUserId, tripId);
-      setMessages(conversationMessages);
+    if (otherUserId && user?.id) {
+      fetchConversation(otherUserId);
     }
-  }, [tripId, otherUserId, user?.id, getMessages]);
+  }, [otherUserId, user?.id, fetchConversation]);
 
   // Handle sending a message
   const handleSendMessage = async (content) => {
-    if (!user?.id || !otherUserId || !tripId || !content.trim()) {
+    if (!user?.id || !tripId || !content.trim()) {
       return;
     }
 
@@ -35,25 +35,22 @@ const ChatInterface = ({
     setError('');
 
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const newMessage = sendMessage(user.id, otherUserId, tripId, content);
-      
-      // Update local messages state
-      setMessages(prev => [...prev, newMessage]);
-      
+      // Assuming rideType is 'offer' for now - this should be passed as prop
+      await sendMessage('offer', tripId, content);
+
+      showSuccess('✅ تم إرسال الرسالة بنجاح!');
+
+      // Refresh conversation
+      fetchConversation(otherUserId);
+
     } catch (err) {
-      setError('فشل في إرسال الرسالة. حاول مرة أخرى.');
+      const errorMsg = err.message || 'فشل في إرسال الرسالة. حاول مرة أخرى.';
+      setError(errorMsg);
+      showError(errorMsg);
       console.error('Error sending message:', err);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Handle marking messages as read
-  const handleMarkAsRead = (currentUserId, tripId, senderId) => {
-    markAsRead(currentUserId, tripId, senderId);
   };
 
   // Format trip info for display
@@ -185,9 +182,8 @@ const ChatInterface = ({
         minHeight: 0
       }}>
         <MessageList
-          messages={messages}
+          messages={currentConversation}
           currentUserId={user?.id}
-          onMarkAsRead={handleMarkAsRead}
         />
       </div>
 

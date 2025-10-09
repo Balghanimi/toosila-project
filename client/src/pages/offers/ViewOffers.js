@@ -1,146 +1,168 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { useOffers } from '../../context/OffersContext';
-import { useRatings } from '../../context/RatingContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { offersAPI, bookingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { useMessages } from '../../context/MessagesContext';
-import { useBookings } from '../../context/BookingContext';
-import RatingModal from '../../components/RatingModal';
-import RatingDisplay from '../../components/RatingDisplay';
-import { ListSkeleton, EmptyOffersState } from '../../components/Skeleton';
-import AuthModal from '../../components/Auth/AuthModal';
-import ChatModal from '../../components/Chat/ChatModal';
-import BookingModal from '../../components/BookingModal';
-import DateTimeSelector from '../../components/DateTimeSelector';
+import { useNotifications } from '../../context/NotificationContext';
 
 export default function ViewOffers() {
-  const { offers, clearOffers } = useOffers();
-  const { addRating } = useRatings();
-  const { user, isAuthenticated } = useAuth();
-  const { getUnreadCount } = useMessages();
-  const { getUserBookings } = useBookings();
-  const [gov, setGov] = useState('');
-  const [area, setArea] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedOffer, setSelectedOffer] = useState(null);
-  const [passengerName, setPassengerName] = useState('');
-  const [passengerPhone, setPassengerPhone] = useState('');
-  const [passengerSeats, setPassengerSeats] = useState('1');
-  const [errors, setErrors] = useState({});
-  const [showChat, setShowChat] = useState(false);
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [ratingOffer, setRatingOffer] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [selectedChatOffer, setSelectedChatOffer] = useState(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedBookingOffer, setSelectedBookingOffer] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isAnimated, setIsAnimated] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [bookingMessage, setBookingMessage] = useState('');
+
+  // Filters
+  const [filters, setFilters] = useState({
+    fromCity: '',
+    toCity: '',
+    departureDate: '',
+    minPrice: '',
+    maxPrice: '',
+    minSeats: '',
+    sortBy: 'date' // date, price, rating
+  });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  const { currentUser } = useAuth();
+  const { showSuccess, showError } = useNotifications();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setIsAnimated(true);
-  }, []);
 
-  // Mock data for demonstration
-  const mockOffers = [
-    {
-      id: 1,
-      driverName: 'أحمد علي',
-      driverRating: 4.8,
-      pickupLocation: 'الكرادة',
-      dropLocation: 'الجادرية',
-      date: 'اليوم',
-      time: '08:00 ص',
-      price: '15,000',
-      availableSeats: 3,
-      carModel: 'كيا سيراتو 2020',
-      carColor: 'أبيض',
-      isVerified: true,
-      completedTrips: 45,
-      features: ['تكييف', 'موسيقى', 'واي فاي']
-    },
-    {
-      id: 2,
-      driverName: 'سارة محمد',
-      driverRating: 4.9,
-      pickupLocation: 'الجادرية',
-      dropLocation: 'الكاظمية',
-      date: 'غداً',
-      time: '07:30 ص',
-      price: '20,000',
-      availableSeats: 2,
-      carModel: 'تويوتا كورولا 2021',
-      carColor: 'فضي',
-      isVerified: true,
-      completedTrips: 67,
-      features: ['تكييف', 'أمان عالي']
-    },
-    {
-      id: 3,
-      driverName: 'عمار حسن',
-      driverRating: 4.7,
-      pickupLocation: 'السيدية',
-      dropLocation: 'الكرادة',
-      date: 'اليوم',
-      time: '06:00 م',
-      price: '12,000',
-      availableSeats: 4,
-      carModel: 'هيونداي إلنترا 2019',
-      carColor: 'أسود',
-      isVerified: false,
-      completedTrips: 23,
-      features: ['تكييف']
+    // استقبال معايير البحث من Home
+    if (location.state) {
+      const searchParams = location.state;
+      setFilters(prev => ({
+        ...prev,
+        fromCity: searchParams.fromCity || '',
+        toCity: searchParams.toCity || '',
+        departureDate: searchParams.departureDate || ''
+      }));
+      fetchOffers(searchParams);
+    } else {
+      fetchOffers();
     }
-  ];
+    // eslint-disable-next-line
+  }, [location.state]);
 
-  const handleBookRide = (offer) => {
-    setSelectedOffer(offer);
-    setShowModal(true);
+  const fetchOffers = async (filterParams = {}) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await offersAPI.getAll(filterParams);
+      setOffers(response.offers || []);
+    } catch (err) {
+      console.error('Error fetching offers:', err);
+      setError('حدث خطأ أثناء تحميل العروض');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSendMessage = (offer) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    
-    // Create a mock driver ID for the offer
-    const driverId = `driver_${offer.id}`;
-    
-    setSelectedChatOffer({
-      tripId: `trip_${offer.id}`,
-      otherUserId: driverId,
-      otherUserName: offer.driverName,
-      tripInfo: {
-        from: offer.pickupLocation,
-        to: offer.dropLocation,
-        date: offer.date,
-        time: offer.time
-      }
+  const handleFilter = () => {
+    const filterParams = {};
+    if (filters.fromCity) filterParams.fromCity = filters.fromCity;
+    if (filters.toCity) filterParams.toCity = filters.toCity;
+    if (filters.departureDate) filterParams.departureDate = filters.departureDate;
+    if (filters.minPrice) filterParams.minPrice = filters.minPrice;
+    if (filters.maxPrice) filterParams.maxPrice = filters.maxPrice;
+    if (filters.minSeats) filterParams.minSeats = filters.minSeats;
+    if (filters.sortBy) filterParams.sortBy = filters.sortBy;
+
+    fetchOffers(filterParams);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      fromCity: '',
+      toCity: '',
+      departureDate: '',
+      minPrice: '',
+      maxPrice: '',
+      minSeats: '',
+      sortBy: 'date'
     });
-    setShowChatModal(true);
+    setShowAdvancedFilters(false);
+    fetchOffers();
   };
 
-  const handleBooking = (offer) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dateOnly = date.toISOString().split('T')[0];
+    const todayOnly = today.toISOString().split('T')[0];
+    const tomorrowOnly = tomorrow.toISOString().split('T')[0];
+
+    if (dateOnly === todayOnly) return 'اليوم';
+    if (dateOnly === tomorrowOnly) return 'غداً';
+
+    return date.toLocaleDateString('ar-EG', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('ar-EG', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const handleBookNow = (offer) => {
+    if (!currentUser) {
+      alert('يجب تسجيل الدخول أولاً');
+      navigate('/');
       return;
     }
-    
-    setSelectedBookingOffer(offer);
+
+    if (currentUser.isDriver) {
+      alert('لا يمكن للسائقين حجز رحلات. قم بالتبديل إلى وضع الراكب من الملف الشخصي');
+      return;
+    }
+
+    setSelectedOffer(offer);
     setShowBookingModal(true);
   };
 
-  const handleBookingCreated = (booking) => {
-    console.log('Booking created:', booking);
-    // You can add additional logic here, like showing a success message
+  const handleConfirmBooking = async () => {
+    if (!selectedOffer) return;
+
+    try {
+      await bookingsAPI.create({
+        offerId: selectedOffer.id,
+        message: bookingMessage,
+        seats: 1 // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
+      });
+
+      setShowBookingModal(false);
+      setBookingMessage('');
+      setSelectedOffer(null);
+      showSuccess('✅ تم إرسال طلب الحجز بنجاح! يمكنك متابعة حالته من صفحة الحجوزات');
+      navigate('/bookings');
+    } catch (err) {
+      showError(err.message || 'حدث خطأ أثناء الحجز');
+    }
   };
 
+  const IRAQ_CITIES = [
+    'بغداد - الكرخ', 'بغداد - الرصافة', 'بغداد - الكرادة',
+    'البصرة - المركز', 'أربيل - المركز', 'الموصل - المركز',
+    'كربلاء - المركز', 'النجف - المركز', 'السليمانية - المركز'
+  ];
+
   return (
-    <div style={{ 
+    <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
       paddingBottom: '100px'
@@ -149,9 +171,9 @@ export default function ViewOffers() {
         paddingTop: 'var(--space-6)',
         transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
         opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.6s ease'
       }}>
-        
+
         {/* Header */}
         <div style={{
           textAlign: 'center',
@@ -164,751 +186,710 @@ export default function ViewOffers() {
             marginBottom: 'var(--space-2)',
             fontFamily: '"Cairo", sans-serif'
           }}>
-            🔍 البحث عن رحلة
+            🚗 العروض المتاحة
           </h1>
-        <p style={{ 
+          <p style={{
             color: 'var(--text-secondary)',
             fontSize: 'var(--text-lg)',
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '500'
+            fontFamily: '"Cairo", sans-serif'
           }}>
-            اعثر على الرحلة المناسبة لك
-        </p>
-      </div>
+            ابحث عن رحلتك المثالية
+          </p>
+        </div>
 
-        {/* Filter Section */}
-      <div style={{ 
+        {/* Filters */}
+        <div style={{
           background: 'var(--surface-primary)',
           borderRadius: 'var(--radius-xl)',
           padding: 'var(--space-6)',
-          boxShadow: 'var(--shadow-xl)',
-          border: '1px solid var(--border-light)',
-          marginBottom: 'var(--space-6)'
+          marginBottom: 'var(--space-6)',
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-light)'
         }}>
+          <h3 style={{
+            fontSize: 'var(--text-lg)',
+            fontWeight: '600',
+            marginBottom: 'var(--space-4)',
+            fontFamily: '"Cairo", sans-serif',
+            color: 'var(--text-primary)'
+          }}>
+            🔍 البحث والتصفية
+          </h3>
+
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: 'var(--space-4)',
             marginBottom: 'var(--space-4)'
           }}>
-          <div>
-            <label style={{ 
-              display: 'block', 
+            <div>
+              <label style={{
+                display: 'block',
                 fontSize: 'var(--text-sm)',
-              fontWeight: '600',
-                color: 'var(--text-secondary)',
+                fontWeight: '600',
                 marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif'
-            }}>
-              المحافظة
-            </label>
-            <select 
-              value={gov} 
-                onChange={(e) => setGov(e.target.value)}
-              style={{
-                width: '100%',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-secondary)'
+              }}>
+                من
+              </label>
+              <select
+                value={filters.fromCity}
+                onChange={(e) => setFilters({...filters, fromCity: e.target.value})}
+                style={{
+                  width: '100%',
                   padding: 'var(--space-3)',
                   border: '2px solid var(--border-light)',
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
-                  background: 'var(--surface-primary)',
-                  color: 'var(--text-primary)',
                   fontFamily: '"Cairo", sans-serif',
-                  transition: 'var(--transition)',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = 'var(--focus-ring)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-light)';
-                  e.target.style.boxShadow = 'none';
+                  background: 'var(--surface-primary)'
                 }}
               >
-                <option value="">جميع المحافظات</option>
-                <option value="بغداد">بغداد</option>
-                <option value="البصرة">البصرة</option>
-                <option value="النجف">النجف</option>
-                <option value="كربلاء">كربلاء</option>
-            </select>
-          </div>
+                <option value="">جميع المدن</option>
+                {IRAQ_CITIES.map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
 
             <div>
               <label style={{
                 display: 'block',
                 fontSize: 'var(--text-sm)',
                 fontWeight: '600',
-                color: 'var(--text-secondary)',
                 marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-secondary)'
               }}>
-                التاريخ والوقت
+                إلى
               </label>
-              <div style={{
-                background: 'var(--surface-primary)',
-                borderRadius: 'var(--radius)',
-                padding: 'var(--space-2)',
-                border: '2px solid var(--border-light)',
-                minHeight: '48px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'var(--transition)'
-              }}
-              onClick={() => {
-                // Show DateTimeSelector modal
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  right: 0;
-                  bottom: 0;
-                  background: rgba(0,0,0,0.5);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  z-index: 1000;
-                  padding: 20px;
-                `;
-                
-                const content = document.createElement('div');
-                content.style.cssText = `
-                  background: white;
-                  border-radius: 12px;
-                  padding: 20px;
-                  max-width: 400px;
-                  width: 100%;
-                `;
-                
-                const closeBtn = document.createElement('button');
-                closeBtn.innerHTML = '×';
-                closeBtn.style.cssText = `
-                  position: absolute;
-                  top: 10px;
-                  right: 10px;
-                  background: none;
-                  border: none;
-                  font-size: 20px;
-                  cursor: pointer;
-                `;
-                
-                closeBtn.onclick = () => document.body.removeChild(modal);
-                modal.onclick = (e) => {
-                  if (e.target === modal) document.body.removeChild(modal);
-                };
-                
-                content.appendChild(closeBtn);
-                modal.appendChild(content);
-                document.body.appendChild(modal);
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'var(--border-light)';
-              }}
-              >
-                <span style={{
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--text-secondary)',
-                  fontFamily: '"Cairo", sans-serif'
-                }}>
-                  {date ? `${date} - ${time}` : 'اختر التاريخ والوقت'}
-                </span>
-              </div>
-            </div>
-
-          <div>
-            <label style={{ 
-              display: 'block', 
-                fontSize: 'var(--text-sm)',
-              fontWeight: '600',
-                color: 'var(--text-secondary)',
-                marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif'
-            }}>
-                الحد الأقصى للسعر
-            </label>
               <select
-              value={maxPrice} 
-              onChange={(e) => setMaxPrice(e.target.value)}
-              style={{
-                width: '100%',
+                value={filters.toCity}
+                onChange={(e) => setFilters({...filters, toCity: e.target.value})}
+                style={{
+                  width: '100%',
                   padding: 'var(--space-3)',
                   border: '2px solid var(--border-light)',
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
-                  background: 'var(--surface-primary)',
-                  color: 'var(--text-primary)',
                   fontFamily: '"Cairo", sans-serif',
-                  transition: 'var(--transition)',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = 'var(--focus-ring)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-light)';
-                  e.target.style.boxShadow = 'none';
+                  background: 'var(--surface-primary)'
                 }}
               >
-                <option value="">أي سعر</option>
-                <option value="10000">10,000 د.ع</option>
-                <option value="15000">15,000 د.ع</option>
-                <option value="20000">20,000 د.ع</option>
-                <option value="25000">25,000 د.ع</option>
+                <option value="">جميع المدن</option>
+                {IRAQ_CITIES.map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
               </select>
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-2)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-secondary)'
+              }}>
+                التاريخ
+              </label>
+              <input
+                type="date"
+                value={filters.departureDate}
+                onChange={(e) => setFilters({...filters, departureDate: e.target.value})}
+                min={new Date().toISOString().split('T')[0]}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-3)',
+                  border: '2px solid var(--border-light)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-base)',
+                  fontFamily: '"Cairo", sans-serif',
+                  background: 'var(--surface-primary)'
+                }}
+              />
             </div>
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-3)',
-            justifyContent: 'center'
-          }}>
-          <button 
-              onClick={() => {
-                setGov('');
-                setArea('');
-                setDate('');
-                setTime('');
-                setMaxPrice('');
-              }}
+          {/* Advanced Filters Toggle */}
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             style={{
-                padding: 'var(--space-3) var(--space-6)',
-                border: '2px solid var(--border-light)',
+              width: '100%',
+              padding: 'var(--space-2)',
+              background: 'transparent',
+              color: 'var(--primary)',
+              border: 'none',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+              marginBottom: 'var(--space-4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)'
+            }}
+          >
+            {showAdvancedFilters ? '🔼' : '🔽'} فلاتر متقدمة
+          </button>
+
+          {/* Advanced Filters Section */}
+          {showAdvancedFilters && (
+            <div style={{
+              padding: 'var(--space-4)',
+              background: 'var(--surface-secondary)',
+              borderRadius: 'var(--radius-lg)',
+              marginBottom: 'var(--space-4)',
+              border: '2px dashed var(--border-light)'
+            }}>
+              <h4 style={{
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-3)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)'
+              }}>
+                🎛️ خيارات إضافية
+              </h4>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-3)'
+              }}>
+                {/* Min Price */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    💰 السعر الأدنى
+                  </label>
+                  <input
+                    type="number"
+                    value={filters.minPrice}
+                    onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  />
+                </div>
+
+                {/* Max Price */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    💰 السعر الأعلى
+                  </label>
+                  <input
+                    type="number"
+                    value={filters.maxPrice}
+                    onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                    placeholder="∞"
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  />
+                </div>
+
+                {/* Min Seats */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    🪑 الحد الأدنى للمقاعد
+                  </label>
+                  <input
+                    type="number"
+                    value={filters.minSeats}
+                    onChange={(e) => setFilters({...filters, minSeats: e.target.value})}
+                    placeholder="1"
+                    min="1"
+                    max="7"
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  />
+                </div>
+
+                {/* Sort By */}
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    🔀 ترتيب حسب
+                  </label>
+                  <select
+                    value={filters.sortBy}
+                    onChange={(e) => setFilters({...filters, sortBy: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)'
+                    }}
+                  >
+                    <option value="date">التاريخ (الأقرب أولاً)</option>
+                    <option value="price_asc">السعر (الأرخص أولاً)</option>
+                    <option value="price_desc">السعر (الأغلى أولاً)</option>
+                    <option value="rating">التقييم (الأعلى أولاً)</option>
+                    <option value="seats">المقاعد (الأكثر أولاً)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <button
+              onClick={handleFilter}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3)',
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white',
+                border: 'none',
                 borderRadius: 'var(--radius)',
-                background: 'var(--surface-primary)',
-                color: 'var(--text-secondary)',
                 fontSize: 'var(--text-base)',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'var(--transition)',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: 'var(--shadow-md)'
+              }}
+            >
+              🔍 بحث
+            </button>
+            <button
+              onClick={handleClearFilters}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3)',
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-primary)',
+                border: '2px solid var(--border-light)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                cursor: 'pointer',
                 fontFamily: '"Cairo", sans-serif'
               }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--text-secondary)';
-                e.target.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'var(--border-light)';
-                e.target.style.transform = 'translateY(0)';
-              }}
             >
-              مسح الفلاتر
-          </button>
+              ✖️ مسح الفلاتر
+            </button>
+          </div>
         </div>
-      </div>
 
-        {/* Results Summary */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: 'var(--space-6)',
-          padding: 'var(--space-4)',
-          background: 'var(--surface-secondary)',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--border-light)'
-        }}>
-          <p style={{
-            fontSize: 'var(--text-base)',
-            color: 'var(--text-secondary)',
-            margin: 0,
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '500'
+        {/* Error */}
+        {error && (
+          <div style={{
+            background: '#fee',
+            border: '2px solid #f88',
+            borderRadius: 'var(--radius)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)',
+            color: '#c00',
+            fontFamily: '"Cairo", sans-serif'
           }}>
-            🚗 تم العثور على <strong style={{ color: 'var(--primary)' }}>{mockOffers.length}</strong> رحلة متاحة
-          </p>
-        </div>
+            {error}
+          </div>
+        )}
 
-      {/* Offers List */}
-        <div style={{
-          display: 'grid',
-          gap: 'var(--space-6)'
-        }}>
-          {mockOffers.map((offer, index) => (
-            <div
-              key={offer.id}
-              style={{
-                background: 'var(--surface-primary)',
-                borderRadius: 'var(--radius-xl)',
-                padding: 'var(--space-6)',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--border-light)',
-                transition: 'var(--transition)',
-                position: 'relative',
-                overflow: 'hidden',
-                animationDelay: `${index * 0.1}s`
-              }}
-              onMouseEnter={(e) => { 
-                e.target.style.transform = 'translateY(-4px)';
-                e.target.style.boxShadow = 'var(--shadow-xl)';
-              }}
-              onMouseLeave={(e) => { 
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'var(--shadow-md)';
-              }}
-            >
-              {/* Header */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 'var(--space-4)',
-                marginBottom: 'var(--space-4)',
-                paddingBottom: 'var(--space-4)',
-                borderBottom: '1px solid var(--border-light)'
-              }}>
-                <div style={{ 
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+        {/* Loading */}
+        {loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: 'var(--space-8)',
+            color: 'var(--text-secondary)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid var(--border-light)',
+              borderTop: '4px solid var(--primary)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto var(--space-4) auto'
+            }} />
+            جاري التحميل...
+          </div>
+        )}
+
+        {/* Offers List */}
+        {!loading && offers.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: 'var(--space-8)',
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            boxShadow: 'var(--shadow-md)'
+          }}>
+            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🚗</div>
+            <h3 style={{
+              fontSize: 'var(--text-2xl)',
+              fontWeight: '700',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+              color: 'var(--text-primary)'
+            }}>
+              لا توجد عروض متاحة
+            </h3>
+            <p style={{
+              color: 'var(--text-secondary)',
+              fontFamily: '"Cairo", sans-serif',
+              marginBottom: 'var(--space-4)'
+            }}>
+              لم نعثر على رحلات تطابق بحثك
+            </p>
+            {currentUser && currentUser.isDriver && (
+              <button
+                onClick={() => navigate('/post-offer')}
+                style={{
+                  padding: 'var(--space-3) var(--space-6)',
+                  background: 'var(--primary)',
                   color: 'white',
-                  fontSize: 'var(--text-xl)',
-                  fontWeight: '700',
-                  fontFamily: '"Cairo", sans-serif',
-                  boxShadow: 'var(--shadow-md)'
-                }}>
-                  {offer.driverName.charAt(0)}
-                </div>
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Cairo", sans-serif'
+                }}
+              >
+                ➕ انشر رحلتك الآن
+              </button>
+            )}
+          </div>
+        )}
 
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
-                    <h3 style={{
+        {!loading && offers.length > 0 && (
+          <div style={{
+            display: 'grid',
+            gap: 'var(--space-4)'
+          }}>
+            {offers.map((offer) => (
+              <div
+                key={offer.id}
+                style={{
+                  background: 'var(--surface-primary)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-5)',
+                  boxShadow: 'var(--shadow-md)',
+                  border: '1px solid var(--border-light)',
+                  transition: 'var(--transition)',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'start',
+                  marginBottom: 'var(--space-4)'
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
                       fontSize: 'var(--text-lg)',
                       fontWeight: '700',
                       color: 'var(--text-primary)',
-                      margin: 0,
+                      marginBottom: 'var(--space-2)',
                       fontFamily: '"Cairo", sans-serif'
                     }}>
-                      {offer.driverName}
-                    </h3>
-                    {offer.isVerified && (
-                      <div style={{
-                        background: 'var(--primary)',
-                    color: 'white',
-                        fontSize: 'var(--text-xs)',
-                        padding: '2px 6px',
-                        borderRadius: 'var(--radius-full)',
-                    fontWeight: '600'
-                  }}>
-                        ✓ موثق
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-                      <span style={{ color: 'var(--warning)' }}>⭐</span>
-                      <span style={{
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: '600',
-                        color: 'var(--text-primary)'
-                      }}>
-                        {offer.driverRating}
-                  </span>
+                      {offer.fromCity} ← {offer.toCity}
                     </div>
                     <div style={{
+                      display: 'flex',
+                      gap: 'var(--space-4)',
                       fontSize: 'var(--text-sm)',
                       color: 'var(--text-secondary)',
                       fontFamily: '"Cairo", sans-serif'
                     }}>
-                      {offer.completedTrips} رحلة مكتملة
+                      <span>📅 {formatDate(offer.departureTime)}</span>
+                      <span>🕐 {formatTime(offer.departureTime)}</span>
+                      <span>💺 {offer.seats} مقعد</span>
                     </div>
                   </div>
-                </div>
-                
-                <div style={{
-                  textAlign: 'end'
-                }}>
+
                   <div style={{
                     fontSize: 'var(--text-2xl)',
                     fontWeight: '800',
                     color: 'var(--primary)',
                     fontFamily: '"Cairo", sans-serif'
                   }}>
-                    {offer.price} د.ع
-                  </div>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    للشخص الواحد
-                  </div>
-                </div>
-              </div>
-
-              {/* Route Info */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-3)',
-                marginBottom: 'var(--space-4)',
-                padding: 'var(--space-4)',
-                background: 'var(--surface-secondary)',
-                borderRadius: 'var(--radius-lg)'
-              }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    من
-                  </div>
-                  <div style={{
-                    fontSize: 'var(--text-lg)',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.pickupLocation}
+                    {offer.price.toLocaleString()} د.ع
                   </div>
                 </div>
 
                 <div style={{
-                  width: '40px',
-                  height: '2px',
-                  background: 'var(--primary)',
-                  position: 'relative',
-                  borderRadius: '1px'
+                  padding: 'var(--space-3)',
+                  background: 'var(--surface-secondary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: '"Cairo", sans-serif',
+                  marginBottom: 'var(--space-3)'
                 }}>
-                  <div style={{
-                    position: 'absolute',
-                    right: '-6px',
-                    top: '-4px',
-                    width: '10px',
-                    height: '10px',
-                    borderTop: '2px solid var(--primary)',
-                    borderRight: '2px solid var(--primary)',
-                    transform: 'rotate(45deg)'
-                  }} />
+                  👤 السائق: {offer.name || 'غير متوفر'}
                 </div>
 
-                <div style={{ flex: 1, textAlign: 'end' }}>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    إلى
-                  </div>
-                  <div style={{
-                    fontSize: 'var(--text-lg)',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.dropLocation}
-                  </div>
-                </div>
-              </div>
-
-              {/* Trip Details */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                gap: 'var(--space-4)',
-                marginBottom: 'var(--space-5)'
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: 'var(--text-2xl)',
-                    marginBottom: 'var(--space-1)'
-                  }}>📅</div>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    التاريخ
-                    </div>
-                  <div style={{
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.date}
-                      </div>
-                    </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: 'var(--text-2xl)',
-                    marginBottom: 'var(--space-1)'
-                  }}>⏰</div>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    الوقت
-                  </div>
-                  <div style={{
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.time}
-                  </div>
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: 'var(--text-2xl)',
-                    marginBottom: 'var(--space-1)'
-                  }}>👥</div>
-              <div style={{ 
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    المقاعد
-                  </div>
-                <div style={{ 
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '600',
-                    color: 'var(--primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.availableSeats} متاح
-                  </div>
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: 'var(--text-2xl)',
-                    marginBottom: 'var(--space-1)'
-                  }}>🚗</div>
-                  <div style={{ 
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 'var(--space-1)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    السيارة
-                  </div>
-                  <div style={{
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
-                    {offer.carColor}
-                  </div>
-                </div>
-              </div>
-
-              {/* Features */}
-                <div style={{
-                  display: 'flex',
-                flexWrap: 'wrap',
-                gap: 'var(--space-2)',
-                marginBottom: 'var(--space-5)'
-              }}>
-                {offer.features.map((feature, idx) => (
-                  <span
-                    key={idx}
-                    style={{
-                      background: 'var(--surface-tertiary)',
-                      color: 'var(--text-secondary)',
-                      padding: 'var(--space-1) var(--space-3)',
-                      borderRadius: 'var(--radius-full)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '500',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}
-                  >
-                    {feature}
-                  </span>
-                ))}
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{
-                display: 'flex',
-                gap: 'var(--space-3)'
-              }}>
+                {/* Book Now Button */}
+                {currentUser && !currentUser.isDriver && (
                   <button
-                  onClick={() => handleBooking(offer)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBookNow(offer);
+                    }}
                     style={{
-                    flex: 1,
-                    padding: 'var(--space-4)',
-                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                      width: '100%',
+                      padding: 'var(--space-3)',
+                      background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
                       color: 'white',
                       border: 'none',
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '700',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-base)',
+                      fontWeight: '700',
                       cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    fontFamily: '"Cairo", sans-serif',
-                    boxShadow: 'var(--shadow-md)'
+                      fontFamily: '"Cairo", sans-serif',
+                      boxShadow: 'var(--shadow-md)',
+                      transition: 'var(--transition)'
                     }}
                     onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = 'var(--shadow-lg)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'var(--shadow-md)';
+                      e.target.style.boxShadow = 'var(--shadow-md)';
                     }}
                   >
-                  🎫 احجز الآن
+                    🎫 احجز الآن
                   </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-                  <button
-                  onClick={() => handleSendMessage(offer)}
-                    style={{
-                    padding: 'var(--space-4)',
+        {/* Booking Modal */}
+        {showBookingModal && selectedOffer && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: 'var(--space-4)'
+            }}
+            onClick={() => setShowBookingModal(false)}
+          >
+            <div
+              style={{
+                background: 'var(--surface-primary)',
+                borderRadius: 'var(--radius-xl)',
+                padding: 'var(--space-6)',
+                maxWidth: '500px',
+                width: '100%',
+                boxShadow: 'var(--shadow-xl)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2
+                style={{
+                  fontSize: 'var(--text-2xl)',
+                  fontWeight: '800',
+                  color: 'var(--text-primary)',
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: '"Cairo", sans-serif',
+                  textAlign: 'center'
+                }}
+              >
+                🎫 تأكيد الحجز
+              </h2>
+
+              <div
+                style={{
+                  background: 'var(--surface-secondary)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-4)',
+                  marginBottom: 'var(--space-4)'
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: '700',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif'
+                  }}
+                >
+                  {selectedOffer.fromCity} ← {selectedOffer.toCity}
+                </div>
+                <div
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-secondary)',
+                    fontFamily: '"Cairo", sans-serif',
+                    marginBottom: 'var(--space-1)'
+                  }}
+                >
+                  📅 {formatDate(selectedOffer.departureTime)} - 🕐 {formatTime(selectedOffer.departureTime)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 'var(--text-xl)',
+                    fontWeight: '800',
+                    color: 'var(--primary)',
+                    fontFamily: '"Cairo", sans-serif'
+                  }}
+                >
+                  💰 {selectedOffer.price.toLocaleString()} د.ع
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  رسالة للسائق (اختياري)
+                </label>
+                <textarea
+                  value={bookingMessage}
+                  onChange={(e) => setBookingMessage(e.target.value)}
+                  placeholder="مثال: مرحباً، أود الحجز من موقع محدد..."
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    padding: 'var(--space-3)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: '"Cairo", sans-serif',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <button
+                  onClick={() => {
+                    setShowBookingModal(false);
+                    setBookingMessage('');
+                    setSelectedOffer(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: 'var(--space-3)',
                     background: 'var(--surface-secondary)',
                     color: 'var(--text-primary)',
                     border: '2px solid var(--border-light)',
                     borderRadius: 'var(--radius-lg)',
                     fontSize: 'var(--text-base)',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                    transition: 'var(--transition)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
                     fontFamily: '"Cairo", sans-serif'
-                    }}
-                    onMouseEnter={(e) => {
-                    e.target.style.borderColor = 'var(--primary)';
-                    e.target.style.color = 'var(--primary)';
-                    e.target.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                    e.target.style.borderColor = 'var(--border-light)';
-                    e.target.style.color = 'var(--text-primary)';
-                      e.target.style.transform = 'translateY(0)';
-                    }}
-                  >
-                  💬
-                  </button>
-                </div>
-            </div>
-          ))}
-      </div>
-
-        {/* Call to Action */}
-        <div style={{
-          marginTop: 'var(--space-8)',
-          textAlign: 'center',
-          padding: 'var(--space-8)',
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          borderRadius: 'var(--radius-xl)',
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-20%',
-            right: '-10%',
-            width: '100px',
-            height: '100px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '50%'
-          }} />
-          
-          <h2 style={{
-            fontSize: 'var(--text-2xl)',
-            fontWeight: '800',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            لم تجد الرحلة المناسبة؟
-          </h2>
-          
-          <p style={{
-            fontSize: 'var(--text-lg)',
-            marginBottom: 'var(--space-4)',
-            opacity: 0.9,
-            fontFamily: '"Cairo", sans-serif',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            انشر رحلتك الخاصة واستقبل طلبات الركاب
-          </p>
-          
-          <button
-            onClick={() => window.location.href = '/post-offer'}
-          style={{
-              padding: 'var(--space-4) var(--space-8)',
-              background: 'white',
-              color: 'var(--primary)',
-              border: 'none',
-              borderRadius: 'var(--radius-lg)',
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'var(--transition)',
-              fontFamily: '"Cairo", sans-serif',
-              boxShadow: 'var(--shadow-lg)',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px) scale(1.05)';
-              e.target.style.boxShadow = 'var(--shadow-xl)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0) scale(1)';
-              e.target.style.boxShadow = 'var(--shadow-lg)';
-            }}
-          >
-            🚗 انشر رحلة جديدة
-              </button>
+                  }}
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={handleConfirmBooking}
+                  style={{
+                    flex: 1,
+                    padding: 'var(--space-3)',
+                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-lg)',
+                    fontSize: 'var(--text-base)',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontFamily: '"Cairo", sans-serif',
+                    boxShadow: 'var(--shadow-lg)'
+                  }}
+                >
+                  ✅ تأكيد الحجز
+                </button>
+              </div>
             </div>
           </div>
+        )}
+      </div>
 
-      {/* Modals */}
-      {showAuthModal && (
-        <AuthModal onClose={() => setShowAuthModal(false)} />
-      )}
-      
-      {showChatModal && selectedChatOffer && (
-        <ChatModal
-          isOpen={showChatModal}
-          onClose={() => {
-            setShowChatModal(false);
-            setSelectedChatOffer(null);
-          }}
-          tripId={selectedChatOffer.tripId}
-          otherUserId={selectedChatOffer.otherUserId}
-          otherUserName={selectedChatOffer.otherUserName}
-          tripInfo={selectedChatOffer.tripInfo}
-        />
-      )}
-      
-      {/* Booking Modal */}
-      {showBookingModal && selectedBookingOffer && (
-        <BookingModal
-          isOpen={showBookingModal}
-          onClose={() => {
-            setShowBookingModal(false);
-            setSelectedBookingOffer(null);
-          }}
-          tripType="offer"
-          tripData={selectedBookingOffer}
-          onBookingCreated={handleBookingCreated}
-        />
-      )}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

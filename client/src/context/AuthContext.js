@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -17,27 +18,44 @@ export function AuthProvider({ children }) {
 
   // Load user from localStorage on app start
   useEffect(() => {
-    try {
-      const token = localStorage.getItem('token');
-      const savedUser = localStorage.getItem('currentUser');
-      
-      if (token && savedUser) {
-        const userData = JSON.parse(savedUser);
-        // Validate user data structure
-        if (userData.id && userData.email && userData.name) {
-          setUser(userData);
-        } else {
-          localStorage.removeItem('currentUser');
-          localStorage.removeItem('token');
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('currentUser');
+        
+        if (token && savedUser) {
+          const userData = JSON.parse(savedUser);
+          // Validate user data structure
+          if (userData.id && userData.email && userData.name) {
+            setUser(userData);
+            // Verify token with server
+            try {
+              const profileData = await authAPI.getProfile();
+              if (profileData.success) {
+                setUser(profileData.data.user);
+                localStorage.setItem('currentUser', JSON.stringify(profileData.data.user));
+              }
+            } catch (error) {
+              console.error('Token verification failed:', error);
+              localStorage.removeItem('currentUser');
+              localStorage.removeItem('token');
+              setUser(null);
+            }
+          } else {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
+          }
         }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('token');
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    loadUser();
   }, []);
 
   // Helper function to get all users from localStorage
@@ -77,30 +95,17 @@ export function AuthProvider({ children }) {
         throw new Error('البريد الإلكتروني غير صحيح');
       }
 
-      if (password.length < 6) {
-        throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      if (password.length < 5) {
+        throw new Error('كلمة المرور يجب أن تكون 5 أحرف أو أرقام على الأقل');
       }
 
       // Call API
-      const response = await fetch('http://localhost:5001/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.toLowerCase().trim(),
-          password,
-          isDriver: userType === 'driver',
-          languagePreference: 'ar'
-        }),
+      const data = await authAPI.register({
+        name,
+        email,
+        password,
+        userType
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'فشل في إنشاء الحساب');
-      }
 
       // Save token and user data
       localStorage.setItem('token', data.data.token);
@@ -164,22 +169,7 @@ export function AuthProvider({ children }) {
       }
 
       // Call API
-      const response = await fetch('http://localhost:5001/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.toLowerCase().trim(),
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'فشل في تسجيل الدخول');
-      }
+      const data = await authAPI.login(email, password);
 
       // Save token and user data
       localStorage.setItem('token', data.data.token);
@@ -209,13 +199,6 @@ export function AuthProvider({ children }) {
     if (!user) return { success: false, error: 'غير مسجل دخول' };
 
     try {
-      const allUsers = getAllUsers();
-      const userIndex = allUsers.findIndex(u => u.id === user.id);
-      
-      if (userIndex === -1) {
-        throw new Error('المستخدم غير موجود');
-      }
-
       // Validate updates
       if (updates.email && !/^\S+@\S+\.\S+$/.test(updates.email)) {
         throw new Error('البريد الإلكتروني غير صحيح');
@@ -225,28 +208,11 @@ export function AuthProvider({ children }) {
         throw new Error('رقم الهاتف غير صحيح');
       }
 
-      // Check for duplicate email/phone
-      if (updates.email || updates.phone) {
-        const duplicate = allUsers.find(u => 
-          u.id !== user.id && 
-          (u.email === updates.email || u.phone === updates.phone)
-        );
-        if (duplicate) {
-          throw new Error('البريد الإلكتروني أو رقم الهاتف مستخدم بالفعل');
-        }
-      }
-
-      // Update user
-      const updatedUser = {
-        ...allUsers[userIndex],
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-
-      allUsers[userIndex] = updatedUser;
-      saveAllUsers(allUsers);
+      // Call API
+      const data = await authAPI.updateProfile(updates);
 
       // Update current user
+      const updatedUser = data.data.user;
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
 
@@ -275,6 +241,8 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    currentUser: user,
+    setCurrentUser: setUser,
     loading,
     error,
     register,

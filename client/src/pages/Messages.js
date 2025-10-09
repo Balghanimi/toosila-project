@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessagesContext';
+import { useNotifications } from '../context/NotificationContext';
 import ConversationList from '../components/Chat/ConversationList';
 import ChatInterface from '../components/Chat/ChatInterface';
 
 const Messages = () => {
   const { user, isAuthenticated } = useAuth();
-  const { getUserConversations } = useMessages();
+  const { conversations, loading, fetchConversations } = useMessages();
+  const { showSuccess, showError } = useNotifications();
   const [selectedConversation, setSelectedConversation] = useState(null);
-  const [conversations, setConversations] = useState([]);
   const [isAnimated, setIsAnimated] = useState(false);
 
   useEffect(() => {
     setIsAnimated(true);
   }, []);
 
-  // Load conversations
+  // Load conversations when component mounts
   useEffect(() => {
     if (user?.id) {
-      const userConversations = getUserConversations(user.id);
-      setConversations(userConversations);
+      fetchConversations();
     }
-  }, [user?.id, getUserConversations]);
+  }, [user?.id, fetchConversations]);
 
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);

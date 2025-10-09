@@ -81,6 +81,34 @@ class Offer {
       paramCount++;
     }
 
+    if (filters.minSeats) {
+      whereClause += ` AND o.available_seats >= $${paramCount}`;
+      values.push(filters.minSeats);
+      paramCount++;
+    }
+
+    // Determine ORDER BY clause
+    let orderBy = 'o.departure_time ASC';
+    if (filters.sortBy) {
+      switch(filters.sortBy) {
+        case 'price_asc':
+          orderBy = 'o.price ASC';
+          break;
+        case 'price_desc':
+          orderBy = 'o.price DESC';
+          break;
+        case 'rating':
+          orderBy = 'u.rating_avg DESC NULLS LAST';
+          break;
+        case 'seats':
+          orderBy = 'o.available_seats DESC';
+          break;
+        case 'date':
+        default:
+          orderBy = 'o.departure_time ASC';
+      }
+    }
+
     values.push(limit, offset);
 
     const result = await query(
@@ -88,7 +116,7 @@ class Offer {
        FROM offers o
        JOIN users u ON o.driver_id = u.id
        ${whereClause}
-       ORDER BY o.departure_time ASC
+       ORDER BY ${orderBy}
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
       values
     );

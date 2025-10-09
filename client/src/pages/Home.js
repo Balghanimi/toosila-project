@@ -15,6 +15,10 @@ const Home = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
+  const goToTestAPI = () => {
+    navigate('/test-api');
+  };
+
   useEffect(() => {
     setIsAnimated(true);
     // Set default time to current time + 1 hour
@@ -26,7 +30,21 @@ const Home = () => {
 
   const handleNext = () => {
     if (mode === 'find') {
-      navigate('/offers');
+      // إرسال معايير البحث إلى صفحة العروض
+      const searchParams = {};
+      if (pickupLocation) searchParams.fromCity = pickupLocation;
+      if (dropLocation) searchParams.toCity = dropLocation;
+      if (selectedDate && selectedDate !== 'today' && selectedDate !== 'tomorrow') {
+        searchParams.departureDate = selectedDate;
+      } else if (selectedDate === 'today') {
+        searchParams.departureDate = new Date().toISOString().split('T')[0];
+      } else if (selectedDate === 'tomorrow') {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        searchParams.departureDate = tomorrow.toISOString().split('T')[0];
+      }
+
+      navigate('/offers', { state: searchParams });
     } else {
       navigate('/post-offer');
     }
