@@ -1,8 +1,8 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-// Neon Database Configuration
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_kDqsn02WrKQg@ep-lingering-dream-ads9r939-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require';
+// Railway Database Configuration
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:password@containers-us-west-xxx.railway.app:xxxx/railway';
 
 const pool = new Pool({
   connectionString: DATABASE_URL,

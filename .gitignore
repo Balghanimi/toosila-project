@@ -80,7 +80,9 @@ jspm_packages/
 
 # Gatsby files
 .cache/
+# Ignore public folders except client/public
 public
+!client/public/
 
 # Storybook build outputs
 .out
