@@ -1,61 +1,63 @@
 # ========================================
-# Multi-Stage Dockerfile for Toosila
-# Railway Deployment - Express serves React
+# Dockerfile محسّن لتطبيق Toosila
+# Railway Deployment - Express يخدم React
 # ========================================
 
-# ==================== STAGE 1: Frontend Builder ====================
+# ==================== المرحلة 1: بناء الواجهة الأمامية ====================
 FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app/client
 
-# Copy client package files
-COPY client/package*.json ./
+# نسخ ملفات package أولاً (للاستفادة من cache)
+COPY client/package.json client/package-lock.json ./
 
-# Install ALL dependencies (including devDependencies for build)
+# تثبيت جميع التبعيات (بما في ذلك devDependencies للبناء)
 RUN npm ci
 
-# Copy client source
+# نسخ كود المصدر
 COPY client/ ./
 
-# Build React app
+# بناء تطبيق React
 RUN npm run build
 
-# ==================== STAGE 2: Backend Dependencies ====================
-FROM node:22-alpine AS backend-builder
+# ==================== المرحلة 2: تبعيات الخادم ====================
+FROM node:22-alpine AS backend-deps
 
 WORKDIR /app/server
 
-# Copy server package files
-COPY server/package*.json ./
+# نسخ ملفات package
+COPY server/package.json server/package-lock.json ./
 
-# Install ONLY production dependencies
+# تثبيت التبعيات للإنتاج فقط
 RUN npm ci --only=production
 
-# ==================== STAGE 3: Production ====================
+# ==================== المرحلة 3: الإنتاج ====================
 FROM node:22-alpine AS production
 
-# Install wget for healthcheck
+# تثبيت wget للـ health check
 RUN apk add --no-cache wget
 
 WORKDIR /app
 
-# Copy server with production dependencies
-COPY --from=backend-builder /app/server/node_modules ./server/node_modules
+# نسخ تبعيات الخادم من المرحلة السابقة
+COPY --from=backend-deps /app/server/node_modules ./server/node_modules
+
+# نسخ كود الخادم
 COPY server/ ./server/
 
-# Copy built frontend
+# نسخ بناء الواجهة الأمامية
 COPY --from=frontend-builder /app/client/build ./build
 
-# Set environment variables
+# تعيين متغيرات البيئة
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Expose port (Railway will override with $PORT)
+# فتح المنفذ (Railway سيستبدله تلقائياً)
 EXPOSE 3000
 
-# Health check
+# فحص صحة التطبيق
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/api/health || exit 1
 
-# Start the server directly (no shell script needed)
+# بدء الخادم مباشرةً (بدون shell script)
 CMD ["node", "server/server.js"]
