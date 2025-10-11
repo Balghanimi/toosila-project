@@ -9,10 +9,10 @@ FROM node:22-alpine AS frontend-builder
 WORKDIR /app/client
 
 # نسخ ملفات package أولاً (للاستفادة من cache)
-COPY client/package.json client/package-lock.json ./
+COPY client/package.json ./
 
 # تثبيت جميع التبعيات (بما في ذلك devDependencies للبناء)
-RUN npm ci
+RUN npm install
 
 # نسخ كود المصدر
 COPY client/ ./
