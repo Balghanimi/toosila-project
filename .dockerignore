@@ -1,59 +1,71 @@
 # Dependencies
-node_modules
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Production builds
-client/build
-client/dist
+# Build artifacts
+client/build/
+dist/
+*.local
 
-# Environment files
+# Environment files (use Railway's env vars instead)
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.production
+.env.*.local
 
-# IDE files
-.vscode
-.idea
-*.swp
-*.swo
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation and configs (not needed in image)
+*.md
+!README.md
+.vscode/
+.idea/
+*.code-workspace
+
+# Testing
+coverage/
+.nyc_output/
+**/*.test.js
+**/*.spec.js
+__tests__/
+__mocks__/
+tests/
+test-results/
+playwright-report/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+
+# Logs
+logs/
+*.log
 
 # OS files
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
-# Git
-.git
-.gitignore
-
-# Documentation
-README.md
-*.md
-docs/
-
-# Test files
-tests/
-test-results/
-coverage/
-
-# Logs
-logs
-*.log
+# Temporary files
+tmp/
+temp/
+*.tmp
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# nyc test coverage
-.nyc_output
 
 # Dependency directories
 jspm_packages/
@@ -79,7 +91,7 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# parcel-bundler cache
 .cache
 .parcel-cache
 
@@ -88,23 +100,18 @@ jspm_packages/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
-.cache/
 public
 
 # Storybook build outputs
 .out
 .storybook-out
 
-# Temporary folders
-tmp/
-temp/
-
-# Playwright
-playwright-report/
-test-results/
-
-# Backup folders
+# Backup files
+Dockerfile.old
+Dockerfile.optimized
+package.json.proposal
+.dockerignore.optimized
+MIGRATION_PLAN.md
 backup-*

@@ -64,13 +64,20 @@ if (config.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
-// Health check endpoint
+// Health check endpoint with memory monitoring
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    ok: true, 
+  const used = process.memoryUsage();
+  res.json({
+    ok: true,
     timestamp: new Date().toISOString(),
     environment: config.NODE_ENV,
-    version: '1.0.0'
+    version: '1.0.0',
+    memory: {
+      heapUsed: `${Math.round(used.heapUsed / 1024 / 1024)} MB`,
+      heapTotal: `${Math.round(used.heapTotal / 1024 / 1024)} MB`,
+      rss: `${Math.round(used.rss / 1024 / 1024)} MB`
+    },
+    uptime: `${Math.round(process.uptime())} seconds`
   });
 });
 
@@ -86,8 +93,9 @@ app.use('/api/stats', statsRoutes);
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../build')));
-  
-  app.get('*', (req, res) => {
+
+  // Handle React client-side routing - catch all non-API routes
+  app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }

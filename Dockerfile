@@ -1,91 +1,61 @@
-# Multi-stage build for Toosila Ride-Sharing App
-FROM node:22-alpine AS base
+# ========================================
+# Multi-Stage Dockerfile for Toosila
+# Railway Deployment - Express serves React
+# ========================================
 
-# Set working directory
-WORKDIR /app
+# ==================== STAGE 1: Frontend Builder ====================
+FROM node:22-alpine AS frontend-builder
 
-# Install dependencies needed for native modules
-RUN apk add --no-cache python3 make g++
-
-# Copy root package files
-COPY package*.json ./
-
-# Install root dependencies
-RUN npm ci --only=production
-
-# Frontend build stage
-FROM base AS frontend-builder
+WORKDIR /app/client
 
 # Copy client package files
-COPY client/package*.json ./client/
+COPY client/package*.json ./
 
-# Install client dependencies
-WORKDIR /app/client
-RUN npm install
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy client source
 COPY client/ ./
 
-# Build the React app
+# Build React app
 RUN npm run build
 
-# Backend stage
-FROM base AS backend-builder
+# ==================== STAGE 2: Backend Dependencies ====================
+FROM node:22-alpine AS backend-builder
+
+WORKDIR /app/server
 
 # Copy server package files
-COPY server/package*.json ./server/
+COPY server/package*.json ./
 
-# Install server dependencies
-WORKDIR /app/server
+# Install ONLY production dependencies
 RUN npm ci --only=production
 
-# Copy server source
-COPY server/ ./
-
-# Production stage
+# ==================== STAGE 3: Production ====================
 FROM node:22-alpine AS production
+
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
 WORKDIR /app
 
-# Install serve globally for frontend
-RUN npm install -g serve
+# Copy server with production dependencies
+COPY --from=backend-builder /app/server/node_modules ./server/node_modules
+COPY server/ ./server/
 
-# Copy built frontend from frontend-builder
+# Copy built frontend
 COPY --from=frontend-builder /app/client/build ./build
 
-# Copy backend from backend-builder
-COPY --from=backend-builder /app/server ./server
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Copy root package files
-COPY package*.json ./
-
-# Install root dependencies
-RUN npm ci --only=production
-
-# Create startup script
-RUN cat > /app/start.sh << 'EOF'\n\
-#!/bin/sh\n\
-# Set default port if not provided\n\
-if [ -z "$PORT" ]; then\n\
-  export PORT=3000\n\
-fi\n\
-# Start backend in background\n\
-cd /app/server\n\
-PORT=5001 node server.js &\n\
-# Wait a moment for backend to start\n\
-sleep 2\n\
-# Start frontend\n\
-cd /app\n\
-serve -s build -l $PORT\n\
-EOF\n\
-RUN chmod +x /app/start.sh
-
-# Expose port
+# Expose port (Railway will override with $PORT)
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/ || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/api/health || exit 1
 
-# Start command
-CMD ["/bin/sh", "/app/start.sh"]
+# Start the server directly (no shell script needed)
+CMD ["node", "server/server.js"]
