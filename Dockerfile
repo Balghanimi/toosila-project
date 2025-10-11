@@ -1,34 +1,87 @@
-# Use Node.js 22 Alpine base image
-FROM node:22-alpine AS builder
+# Multi-stage build for Toosila Ride-Sharing App
+FROM node:22-alpine AS base
 
 # Set working directory
 WORKDIR /app
 
-# Copy client package files
-COPY client/package*.json ./
+# Install dependencies needed for native modules
+RUN apk add --no-cache python3 make g++
 
-# Install dependencies
+# Copy root package files
+COPY package*.json ./
+
+# Install root dependencies
 RUN npm ci --only=production
+
+# Frontend build stage
+FROM base AS frontend-builder
+
+# Copy client package files
+COPY client/package*.json ./client/
+
+# Install client dependencies
+WORKDIR /app/client
+RUN npm install
 
 # Copy client source
 COPY client/ ./
 
-# Build the app
+# Build the React app
 RUN npm run build
 
+# Backend stage
+FROM base AS backend-builder
+
+# Copy server package files
+COPY server/package*.json ./server/
+
+# Install server dependencies
+WORKDIR /app/server
+RUN npm ci --only=production
+
+# Copy server source
+COPY server/ ./
+
 # Production stage
-FROM node:22-alpine
+FROM node:22-alpine AS production
 
 WORKDIR /app
 
-# Install serve globally
+# Install serve globally for frontend
 RUN npm install -g serve
 
-# Copy built files from builder
-COPY --from=builder /app/build ./build
+# Copy built frontend from frontend-builder
+COPY --from=frontend-builder /app/client/build ./build
+
+# Copy backend from backend-builder
+COPY --from=backend-builder /app/server ./server
+
+# Copy root package files
+COPY package*.json ./
+
+# Install root dependencies
+RUN npm ci --only=production
+
+# Create startup script
+RUN echo '#!/bin/sh\n\
+# Set default port if not provided\n\
+if [ -z "$PORT" ]; then\n\
+  export PORT=3000\n\
+fi\n\
+# Start backend in background\n\
+cd /app/server && PORT=5001 node server.js &\n\
+# Wait a moment for backend to start\n\
+sleep 2\n\
+# Start frontend\n\
+cd /app && serve -s build -l $PORT\n\
+' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port
 EXPOSE 3000
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/ || exit 1
+
 # Start command
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["/app/start.sh"]
