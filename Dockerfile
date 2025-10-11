@@ -29,7 +29,7 @@ WORKDIR /app/server
 COPY server/package.json server/package-lock.json ./
 
 # تثبيت التبعيات للإنتاج فقط
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # ==================== المرحلة 3: الإنتاج ====================
 FROM node:22-alpine AS production
