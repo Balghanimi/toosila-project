@@ -360,6 +360,31 @@ sudo nginx -t
 sudo tail -f /var/log/nginx/toosila-error.log
 ```
 
+### مشكلة: Docker Container فشل في البدء
+```bash
+# خطأ: "The executable `cd` could not be found"
+# الحل: تأكد من استخدام heredoc syntax في Dockerfile
+# بدلاً من:
+RUN echo '#!/bin/sh\ncd /app/server && node server.js' > start.sh
+
+# استخدم:
+RUN cat > /app/start.sh << 'EOF'
+#!/bin/sh
+cd /app/server
+node server.js
+EOF
+RUN chmod +x /app/start.sh
+```
+
+### مشكلة: Railway Deployment فشل
+```bash
+# تحقق من:
+# 1. Dockerfile موجود في root directory
+# 2. railway.toml مُكوَّن بشكل صحيح
+# 3. متغيرات البيئة مُعرَّفة في Railway dashboard
+# 4. PostgreSQL plugin مُضاف ومُكوَّن
+```
+
 ---
 
 ## منصات النشر السحابية (بدائل)
@@ -394,6 +419,25 @@ heroku config:set FRONTEND_URL=https://toosila-app.herokuapp.com
 # 3. إضافة PostgreSQL من Plugins
 # 4. تكوين متغيرات البيئة
 # 5. النشر تلقائي
+```
+
+**ملاحظة مهمة للنشر على Railway:**
+- تأكد من أن Dockerfile يستخدم Alpine Linux بشكل صحيح
+- إذا واجهت خطأ "The executable `cd` could not be found"، تأكد من أن startup script يستخدم `cat` مع heredoc syntax بدلاً من `echo` مع escaped newlines
+- مثال على startup script صحيح:
+```dockerfile
+RUN cat > /app/start.sh << 'EOF'
+#!/bin/sh
+if [ -z "$PORT" ]; then
+  export PORT=3000
+fi
+cd /app/server
+PORT=5001 node server.js &
+sleep 2
+cd /app
+serve -s build -l $PORT
+EOF
+RUN chmod +x /app/start.sh
 ```
 
 ### 3. DigitalOcean App Platform

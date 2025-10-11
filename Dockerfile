@@ -63,18 +63,22 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 # Create startup script
-RUN echo '#!/bin/sh\n\
+RUN cat > /app/start.sh << 'EOF'\n\
+#!/bin/sh\n\
 # Set default port if not provided\n\
 if [ -z "$PORT" ]; then\n\
   export PORT=3000\n\
 fi\n\
 # Start backend in background\n\
-cd /app/server && PORT=5001 node server.js &\n\
+cd /app/server\n\
+PORT=5001 node server.js &\n\
 # Wait a moment for backend to start\n\
 sleep 2\n\
 # Start frontend\n\
-cd /app && serve -s build -l $PORT\n\
-' > /app/start.sh && chmod +x /app/start.sh
+cd /app\n\
+serve -s build -l $PORT\n\
+EOF\n\
+RUN chmod +x /app/start.sh
 
 # Expose port
 EXPOSE 3000

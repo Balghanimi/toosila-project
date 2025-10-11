@@ -1,0 +1,49 @@
+{
+  "name": "toosila-monorepo",
+  "version": "1.0.0",
+  "description": "Toosila - Ride Sharing Application",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "npm run dev --workspace=server",
+    "client:dev": "npm run start --workspace=client",
+    "server:start": "npm run start --workspace=server",
+    "client:build": "npm run build --workspace=client",
+    "build": "npm run client:build",
+    "start": "npm run server:start",
+    "test": "npm run test --workspaces --if-present",
+    "install:all": "npm install",
+    "clean": "rm -rf node_modules client/node_modules server/node_modules",
+    "docker:build": "docker build -t toosila:latest .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env toosila:latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/toosila.git"
+  },
+  "keywords": [
+    "ride-sharing",
+    "carpooling",
+    "react",
+    "nodejs",
+    "postgresql",
+    "توصيلة"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/toosila/issues"
+  },
+  "homepage": "https://github.com/yourusername/toosila#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

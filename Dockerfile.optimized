@@ -1,0 +1,81 @@
+# ========================================
+# Optimized Multi-Stage Dockerfile
+# For Toosila Ride-Sharing App on Railway
+# ========================================
+
+# ==================== STAGE 1: Base Dependencies ====================
+FROM node:22-alpine AS base
+
+# Install system dependencies for native modules (bcrypt, pg)
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy all package files first (enables better layer caching)
+COPY package*.json ./
+COPY client/package*.json ./client/
+COPY server/package*.json ./server/
+
+# ==================== STAGE 2: Frontend Builder ====================
+FROM base AS frontend-builder
+
+WORKDIR /app/client
+
+# Copy client package files (already in base, but explicit for clarity)
+COPY client/package*.json ./
+
+# Install ALL client dependencies (including devDependencies for build)
+RUN npm ci
+
+# Copy client source code
+COPY client/ ./
+
+# Build the React app
+# This creates the /app/client/build directory
+RUN npm run build
+
+# ==================== STAGE 3: Backend Dependencies ====================
+FROM base AS backend-deps
+
+WORKDIR /app/server
+
+# Copy server package files
+COPY server/package*.json ./
+
+# Install ONLY production dependencies for server
+RUN npm ci --only=production
+
+# ==================== STAGE 4: Production ====================
+FROM node:22-alpine AS production
+
+# Install minimal runtime dependencies (if needed for native modules)
+RUN apk add --no-cache dumb-init
+
+WORKDIR /app
+
+# Copy server production dependencies from backend-deps stage
+COPY --from=backend-deps /app/server/node_modules ./server/node_modules
+
+# Copy server source code
+COPY server/ ./server/
+
+# Copy built frontend from frontend-builder stage
+COPY --from=frontend-builder /app/client/build ./build
+
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Expose the port (Railway will override with $PORT)
+EXPOSE 3000
+
+# Health check - now checks the actual backend
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/api/health || exit 1
+
+# Use dumb-init to properly handle signals and reap zombie processes
+# This is critical for graceful shutdowns on Railway
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# Start the Node.js server (which serves both API + frontend)
+CMD ["node", "server/server.js"]
