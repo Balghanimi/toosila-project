@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/yourusername/toosila#readme",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "typescript": "^5.9.3"
   }
 }
