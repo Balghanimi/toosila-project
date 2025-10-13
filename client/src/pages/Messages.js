@@ -7,8 +7,7 @@ import ChatInterface from '../components/Chat/ChatInterface';
 
 const Messages = () => {
   const { user, isAuthenticated } = useAuth();
-  const { conversations, loading, fetchConversations } = useMessages();
-  const { showSuccess, showError } = useNotifications();
+  const { conversations, fetchConversations } = useMessages();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [isAnimated, setIsAnimated] = useState(false);
 

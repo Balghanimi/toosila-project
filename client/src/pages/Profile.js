@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 
@@ -24,7 +24,7 @@ const Profile = () => {
     setError('');
 
     try {
-      const response = await authAPI.updateProfile({
+      await authAPI.updateProfile({
         isDriver: !currentUser.isDriver
       });
 

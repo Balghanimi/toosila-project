@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { useMessages } from '../context/MessagesContext';
-import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 
 // Simple outline SVG icons
@@ -41,8 +39,6 @@ const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { getTotalUnreadCount } = useMessages();
-  const { user } = useAuth();
   const { unreadMessages } = useNotifications();
   const currentPath = location.pathname;
 

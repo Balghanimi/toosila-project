@@ -78,6 +78,11 @@ export const NotificationProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [currentUser, fetchUnreadCount]);
 
+  // Remove toast
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
   // Show toast notification
   const showToast = useCallback((message, type = 'info', duration = 5000) => {
     const id = Date.now();
@@ -91,12 +96,7 @@ export const NotificationProvider = ({ children }) => {
     }, duration);
 
     return id;
-  }, []);
-
-  // Remove toast
-  const removeToast = useCallback((id) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
+  }, [removeToast]);
 
   // Helper methods for different toast types
   const showSuccess = useCallback((message) => showToast(message, 'success'), [showToast]);

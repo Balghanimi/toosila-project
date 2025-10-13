@@ -68,15 +68,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Helper function to save users to localStorage
-  const saveAllUsers = (users) => {
-    localStorage.setItem('users', JSON.stringify(users));
-  };
-
-  // Helper function to generate user ID
-  const generateUserId = () => {
-    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  };
 
   // Register function - API-based
   const register = async (userData) => {

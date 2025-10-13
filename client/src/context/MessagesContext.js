@@ -37,6 +37,21 @@ export const MessagesProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  // Fetch unread count
+  const fetchUnreadCount = useCallback(async () => {
+    if (!currentUser) {
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      const response = await messagesAPI.getUnreadCount();
+      setUnreadCount(response.count || 0);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  }, [currentUser]);
+
   // Fetch specific conversation messages
   const fetchConversation = useCallback(async (userId) => {
     if (!currentUser) return;
@@ -62,22 +77,7 @@ export const MessagesProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
-
-  // Fetch unread count
-  const fetchUnreadCount = useCallback(async () => {
-    if (!currentUser) {
-      setUnreadCount(0);
-      return;
-    }
-
-    try {
-      const response = await messagesAPI.getUnreadCount();
-      setUnreadCount(response.count || 0);
-    } catch (error) {
-      console.error('Error fetching unread count:', error);
-    }
-  }, [currentUser]);
+  }, [currentUser, fetchUnreadCount]);
 
   // Load conversations on mount
   useEffect(() => {

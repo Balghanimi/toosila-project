@@ -15,10 +15,6 @@ const Home = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  const goToTestAPI = () => {
-    navigate('/test-api');
-  };
-
   useEffect(() => {
     setIsAnimated(true);
     // Set default time to current time + 1 hour

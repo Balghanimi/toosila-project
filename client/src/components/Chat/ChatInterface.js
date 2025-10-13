@@ -12,7 +12,7 @@ const ChatInterface = ({
   tripInfo,
   onClose
 }) => {
-  const { sendMessage, currentConversation, fetchConversation, loading } = useMessages();
+  const { sendMessage, currentConversation, fetchConversation } = useMessages();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const [isLoading, setIsLoading] = useState(false);

@@ -19,6 +19,7 @@ export default function Bookings() {
       return;
     }
     fetchBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, activeTab, navigate]);
 
   const fetchBookings = async () => {

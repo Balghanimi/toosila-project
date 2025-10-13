@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import MessageSearch from './MessageSearch';
 
 const ConversationList = ({ onSelectConversation, selectedConversation }) => {
-  const { conversations, loading, fetchConversations } = useMessages();
+  const { conversations, fetchConversations } = useMessages();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -351,7 +351,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation }) => {
           onSelectMessage={(result) => {
             // Handle message selection
             if (result.conversationKey) {
-              const [userId, otherUserId, tripId] = result.conversationKey.split('_');
+              const [, otherUserId, tripId] = result.conversationKey.split('_');
               const conversation = {
                 tripId,
                 otherUserId,
