@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessagesContext';
-import { useNotifications } from '../context/NotificationContext';
 import ConversationList from '../components/Chat/ConversationList';
 import ChatInterface from '../components/Chat/ChatInterface';
 
