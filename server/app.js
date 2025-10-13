@@ -95,8 +95,8 @@ if (config.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../build')));
 
   // Handle React client-side routing - catch all non-API routes
-  // Express 5: Use named parameter for catch-all routes
-  app.get('/:any*', (req, res) => {
+  // Express 5: Use splat parameter for catch-all routes
+  app.get('/*splat', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }
