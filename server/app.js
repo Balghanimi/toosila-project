@@ -95,7 +95,8 @@ if (config.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../build')));
 
   // Handle React client-side routing - catch all non-API routes
-  app.get('*', (req, res) => {
+  // Express 5 requires named parameters for wildcards
+  app.get('/(.*)', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }
