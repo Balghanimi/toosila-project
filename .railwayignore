@@ -1,0 +1,26 @@
+# Railway ignore file to prevent Railpack from being used
+# This ensures Railway uses our Dockerfile instead
+
+# Ignore Railpack detection
+railpack-plan.json
+railpack-plan.json.bak
+
+# Ignore build artifacts that shouldn't be deployed
+client/build
+client/node_modules
+server/node_modules
+node_modules
+
+# Ignore development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore test files
+client/tests
+client/test-results
+client/playwright-report
+
+# Ignore backup files
+client/backup-*
