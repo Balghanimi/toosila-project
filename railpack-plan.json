@@ -1,5 +1,0 @@
-{
-  "$schema": "https://schema.railpack.com",
-  "disabled": true,
-  "reason": "Using Dockerfile for custom build process"
-}
