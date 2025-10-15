@@ -1,10 +1,6 @@
 # Railway ignore file to prevent Railpack from being used
 # This ensures Railway uses our Dockerfile instead
 
-# Force Railway to use Dockerfile by ignoring package.json in root
-package.json
-package-lock.json
-
 # Ignore build artifacts that shouldn't be deployed
 client/build
 client/node_modules
