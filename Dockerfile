@@ -1,7 +1,7 @@
 # ========================================
 # Dockerfile محسّن لتطبيق Toosila
 # Railway Deployment - Express يخدم React
-# Force rebuild: 2025-10-13
+# Force rebuild: 2025-10-16
 # ========================================
 
 # ==================== المرحلة 1: بناء الواجهة الأمامية ====================
@@ -10,11 +10,10 @@ FROM node:22-alpine AS frontend-builder
 WORKDIR /app/client
 
 # نسخ ملفات package أولاً (للاستفادة من cache)
-COPY client/package.json ./
+COPY client/package.json client/package-lock.json ./
 
 # تثبيت جميع التبعيات (بما في ذلك devDependencies للبناء)
-# استخدام npm install بدلاً من npm ci لأن package-lock.json غير موجود
-RUN npm install
+RUN npm ci
 
 # نسخ كود المصدر
 COPY client/ ./
