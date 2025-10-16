@@ -1,14 +1,14 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-// Railway Database Configuration
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:password@containers-us-west-xxx.railway.app:xxxx/railway';
-
+// Database Configuration
 const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 });
 
 // Test database connection
