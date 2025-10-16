@@ -13,7 +13,8 @@
       "Bash(npm ci:*)",
       "Bash(rm:*)",
       "Bash(npm cache clean:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []
