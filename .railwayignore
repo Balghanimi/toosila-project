@@ -1,7 +1,15 @@
-# Ignore root package files - Dockerfile handles dependencies
+# Force Railway to use Dockerfile instead of auto-detection
 package.json
 package-lock.json
 node_modules/
+
+# Ignore client and server package files to prevent auto-detection
+client/package.json
+client/package-lock.json
+client/node_modules/
+server/package.json
+server/package-lock.json
+server/node_modules/
 
 # Ignore development files
 .git/
@@ -14,3 +22,7 @@ playwright-report/
 
 # Ignore backup directories
 client/backup-*/
+
+# Ignore any railpack or nixpacks files
+railpack-plan.json
+nixpacks.toml
