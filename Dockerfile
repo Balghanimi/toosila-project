@@ -56,9 +56,12 @@ ENV NODE_ENV=production
 # Note: PORT is set by Railway dynamically - do not hardcode it here
 EXPOSE 3000
 
+# Make startup script executable
+RUN chmod +x server/start.sh
+
 # فحص صحة التطبيق
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/api/health || exit 1
 
-# بدء الخادم مباشرةً (بدون shell script)
-CMD ["node", "server/server.js"]
+# بدء الخادم مع migrations (يشغل migrations ثم server)
+CMD ["sh", "server/start.sh"]
