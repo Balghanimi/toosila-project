@@ -4,6 +4,9 @@
 
 echo "🚀 Starting Toosila Backend..."
 
+# Change to server directory
+cd /app/server
+
 # Run database migrations
 echo "📊 Running database migrations..."
 node scripts/setup-database.js

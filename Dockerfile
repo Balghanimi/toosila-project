@@ -43,7 +43,7 @@ WORKDIR /app
 # نسخ تبعيات الخادم من المرحلة السابقة
 COPY --from=backend-deps /app/server/node_modules ./server/node_modules
 
-# نسخ كود الخادم
+# نسخ كود الخادم (بما في ذلك scripts/, config/, routes/, controllers/, models/)
 COPY server/ ./server/
 
 # نسخ بناء الواجهة الأمامية
