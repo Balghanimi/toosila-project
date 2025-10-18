@@ -90,6 +90,15 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/stats', statsRoutes);
 
+// Backward compatibility: Register routes without /api prefix
+app.use('/auth', authRoutes);
+app.use('/offers', offersRoutes);
+app.use('/demands', demandsRoutes);
+app.use('/bookings', bookingsRoutes);
+app.use('/messages', messagesRoutes);
+app.use('/ratings', ratingsRoutes);
+app.use('/stats', statsRoutes);
+
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../build')));
