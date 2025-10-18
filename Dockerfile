@@ -51,9 +51,9 @@ COPY --from=frontend-builder /app/client/build ./build
 
 # تعيين متغيرات البيئة
 ENV NODE_ENV=production
-ENV PORT=3000
 
 # فتح المنفذ (Railway سيستبدله تلقائياً)
+# Note: PORT is set by Railway dynamically - do not hardcode it here
 EXPOSE 3000
 
 # فحص صحة التطبيق
