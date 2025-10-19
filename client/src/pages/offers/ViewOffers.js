@@ -78,17 +78,8 @@ export default function ViewOffers() {
   };
 
   const handleClearFilters = () => {
-    setFilters({
-      fromCity: '',
-      toCity: '',
-      departureDate: '',
-      minPrice: '',
-      maxPrice: '',
-      minSeats: '',
-      sortBy: 'date'
-    });
-    setShowAdvancedFilters(false);
-    fetchOffers();
+    // العودة للصفحة الرئيسية عند مسح الفلتر
+    navigate('/');
   };
 
   const formatDate = (dateString) => {

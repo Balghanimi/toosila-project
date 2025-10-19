@@ -38,17 +38,36 @@ export default function PostDemand() {
       const dayAfter = new Date();
       dayAfter.setDate(dayAfter.getDate() + 2);
 
-      setFormData(prev => ({
-        ...prev,
+      const newFormData = {
         fromCity: location.state.fromCity || '',
         toCity: location.state.toCity || '',
-        earliestDate: location.state.departureDate || prev.earliestDate,
-        earliestTime: location.state.departureTime || prev.earliestTime,
+        earliestDate: location.state.departureDate || '',
+        earliestTime: location.state.departureTime || '',
         latestDate: dayAfter.toISOString().split('T')[0],
         latestTime: '20:00',
         seats: location.state.seats || '1',
         budgetMax: location.state.price || ''
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        ...newFormData
       }));
+
+      // إذا كانت جميع البيانات المطلوبة موجودة، نشر الطلب تلقائياً
+      const isComplete = newFormData.fromCity &&
+                        newFormData.toCity &&
+                        newFormData.earliestDate &&
+                        newFormData.earliestTime &&
+                        newFormData.budgetMax &&
+                        newFormData.fromCity !== newFormData.toCity;
+
+      if (isComplete) {
+        // تأخير بسيط للسماح للمستخدم برؤية البيانات
+        setTimeout(() => {
+          submitDemand(newFormData);
+        }, 500);
+      }
     } else {
       // Set default dates if no data passed
       const tomorrow = new Date();
@@ -64,7 +83,8 @@ export default function PostDemand() {
         latestTime: '20:00'
       }));
     }
-  }, [currentUser, navigate, location.state]);
+    // eslint-disable-next-line
+  }, [currentUser, navigate]);
 
   // Check if user is a passenger (not driver)
   if (currentUser && currentUser.isDriver) {
@@ -180,26 +200,23 @@ export default function PostDemand() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
+  // دالة منفصلة للنشر يمكن استدعاؤها من useEffect أو من الزر
+  const submitDemand = async (data = formData) => {
     setIsSubmitting(true);
     setError('');
 
     try {
       // Combine date and time into ISO format
-      const earliestDateTime = new Date(`${formData.earliestDate}T${formData.earliestTime}:00`);
-      const latestDateTime = new Date(`${formData.latestDate}T${formData.latestTime}:00`);
+      const earliestDateTime = new Date(`${data.earliestDate}T${data.earliestTime}:00`);
+      const latestDateTime = new Date(`${data.latestDate}T${data.latestTime}:00`);
 
       const demandData = {
-        fromCity: formData.fromCity,
-        toCity: formData.toCity,
+        fromCity: data.fromCity,
+        toCity: data.toCity,
         earliestTime: earliestDateTime.toISOString(),
         latestTime: latestDateTime.toISOString(),
-        seats: parseInt(formData.seats),
-        budgetMax: parseFloat(formData.budgetMax)
+        seats: parseInt(data.seats),
+        budgetMax: parseFloat(data.budgetMax)
       };
 
       await demandsAPI.create(demandData);
@@ -212,9 +229,16 @@ export default function PostDemand() {
     } catch (err) {
       console.error('Error creating demand:', err);
       setError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
-    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    await submitDemand();
   };
 
   if (success) {

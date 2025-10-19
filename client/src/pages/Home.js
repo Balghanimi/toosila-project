@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
@@ -14,6 +15,7 @@ const Home = () => {
   const [isSwapping, setIsSwapping] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     setIsAnimated(true);
@@ -156,12 +158,12 @@ const Home = () => {
             zIndex: 0
           }} />
 
-          {/* Mode Toggle - 3 Options */}
+          {/* Mode Toggle - Smart based on user role */}
           <div style={{
             position: 'relative',
             zIndex: 1,
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: currentUser?.isDriver ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
             gap: 'var(--space-1)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
@@ -188,44 +190,52 @@ const Home = () => {
             >
               🔍 {t('findRide')}
             </button>
-            <button
-              onClick={() => setMode('offer')}
-              style={{
-                padding: 'var(--space-3) var(--space-2)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background: mode === 'offer' ? 'var(--primary)' : 'transparent',
-                color: mode === 'offer' ? 'var(--text-white)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                boxShadow: mode === 'offer' ? 'var(--shadow-md)' : 'none',
-                transform: mode === 'offer' ? 'scale(1.02)' : 'scale(1)',
-                fontFamily: '"Cairo", sans-serif'
-              }}
-            >
-              🚗 {t('offerRide')}
-            </button>
-            <button
-              onClick={() => setMode('demand')}
-              style={{
-                padding: 'var(--space-3) var(--space-2)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background: mode === 'demand' ? '#3b82f6' : 'transparent',
-                color: mode === 'demand' ? 'white' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                boxShadow: mode === 'demand' ? 'var(--shadow-md)' : 'none',
-                transform: mode === 'demand' ? 'scale(1.02)' : 'scale(1)',
-                fontFamily: '"Cairo", sans-serif'
-              }}
-            >
-              💺 طلب رحلة
-            </button>
+
+            {/* Show offer button only for drivers */}
+            {currentUser?.isDriver && (
+              <button
+                onClick={() => setMode('offer')}
+                style={{
+                  padding: 'var(--space-3) var(--space-2)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-sm)',
+                  background: mode === 'offer' ? 'var(--primary)' : 'transparent',
+                  color: mode === 'offer' ? 'var(--text-white)' : 'var(--text-secondary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  boxShadow: mode === 'offer' ? 'var(--shadow-md)' : 'none',
+                  transform: mode === 'offer' ? 'scale(1.02)' : 'scale(1)',
+                  fontFamily: '"Cairo", sans-serif'
+                }}
+              >
+                🚗 {t('offerRide')}
+              </button>
+            )}
+
+            {/* Show demand button only for passengers */}
+            {!currentUser?.isDriver && (
+              <button
+                onClick={() => setMode('demand')}
+                style={{
+                  padding: 'var(--space-3) var(--space-2)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-sm)',
+                  background: mode === 'demand' ? '#3b82f6' : 'transparent',
+                  color: mode === 'demand' ? 'white' : 'var(--text-secondary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  boxShadow: mode === 'demand' ? 'var(--shadow-md)' : 'none',
+                  transform: mode === 'demand' ? 'scale(1.02)' : 'scale(1)',
+                  fontFamily: '"Cairo", sans-serif'
+                }}
+              >
+                💺 طلب رحلة
+              </button>
+            )}
           </div>
 
           {/* Location Inputs */}

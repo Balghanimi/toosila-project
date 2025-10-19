@@ -33,15 +33,34 @@ export default function PostOfferModern() {
 
     // استقبال البيانات من الصفحة الرئيسية إذا كانت موجودة
     if (location.state) {
-      setFormData(prev => ({
-        ...prev,
+      const newFormData = {
         fromCity: location.state.fromCity || '',
         toCity: location.state.toCity || '',
-        departureDate: location.state.departureDate || prev.departureDate,
-        departureTime: location.state.departureTime || prev.departureTime,
+        departureDate: location.state.departureDate || '',
+        departureTime: location.state.departureTime || '',
         seats: location.state.seats || '1',
         price: location.state.price || ''
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        ...newFormData
       }));
+
+      // إذا كانت جميع البيانات المطلوبة موجودة، نشر الرحلة تلقائياً
+      const isComplete = newFormData.fromCity &&
+                        newFormData.toCity &&
+                        newFormData.departureDate &&
+                        newFormData.departureTime &&
+                        newFormData.price &&
+                        newFormData.fromCity !== newFormData.toCity;
+
+      if (isComplete) {
+        // تأخير بسيط للسماح للمستخدم برؤية البيانات
+        setTimeout(() => {
+          submitOffer(newFormData);
+        }, 500);
+      }
     } else {
       // Set default date to tomorrow if no data passed
       const tomorrow = new Date();
@@ -53,7 +72,8 @@ export default function PostOfferModern() {
         departureTime: '08:00'
       }));
     }
-  }, [currentUser, navigate, location.state]);
+    // eslint-disable-next-line
+  }, [currentUser, navigate]);
 
   // Check if user is a driver
   if (currentUser && !currentUser.isDriver) {
@@ -157,24 +177,21 @@ export default function PostOfferModern() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
+  // دالة منفصلة للنشر يمكن استدعاؤها من useEffect أو من الزر
+  const submitOffer = async (data = formData) => {
     setIsSubmitting(true);
     setError('');
 
     try {
       // Combine date and time into ISO format
-      const departureDateTime = new Date(`${formData.departureDate}T${formData.departureTime}:00`);
+      const departureDateTime = new Date(`${data.departureDate}T${data.departureTime}:00`);
 
       const offerData = {
-        fromCity: formData.fromCity,
-        toCity: formData.toCity,
+        fromCity: data.fromCity,
+        toCity: data.toCity,
         departureTime: departureDateTime.toISOString(),
-        seats: parseInt(formData.seats),
-        price: parseFloat(formData.price)
+        seats: parseInt(data.seats),
+        price: parseFloat(data.price)
       };
 
       await offersAPI.create(offerData);
@@ -187,9 +204,16 @@ export default function PostOfferModern() {
     } catch (err) {
       console.error('Error creating offer:', err);
       setError(err.message || 'حدث خطأ أثناء نشر الرحلة. حاول مرة أخرى.');
-    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    await submitOffer();
   };
 
   if (success) {
