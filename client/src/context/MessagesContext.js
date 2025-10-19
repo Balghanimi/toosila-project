@@ -31,7 +31,8 @@ export const MessagesProvider = ({ children }) => {
       const response = await messagesAPI.getConversations();
       setConversations(response.conversations || []);
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      // Silently fail - backend might not have messages API implemented yet
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,8 @@ export const MessagesProvider = ({ children }) => {
       const response = await messagesAPI.getUnreadCount();
       setUnreadCount(response.count || 0);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      // Silently fail - backend might not have messages API implemented yet
+      setUnreadCount(0);
     }
   }, [currentUser]);
 

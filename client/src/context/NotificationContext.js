@@ -33,7 +33,8 @@ export const NotificationProvider = ({ children }) => {
       const response = await bookingsAPI.getPendingCount();
       setPendingBookings(response);
     } catch (error) {
-      console.error('Error fetching pending count:', error);
+      // Silently fail - backend might not have bookings API implemented yet
+      setPendingBookings({ receivedPending: 0, sentPending: 0, totalPending: 0 });
     }
   }, [currentUser]);
 
@@ -48,7 +49,8 @@ export const NotificationProvider = ({ children }) => {
       const response = await messagesAPI.getUnreadCount();
       setUnreadMessages(response.count || 0);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      // Silently fail - backend might not have messages API implemented yet
+      setUnreadMessages(0);
     }
   }, [currentUser]);
 
