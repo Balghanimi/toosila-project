@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { demandsAPI } from '../../services/api';
 
@@ -23,6 +23,7 @@ export default function PostDemand() {
   const [errors, setErrors] = useState({});
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!currentUser) {
@@ -31,20 +32,39 @@ export default function PostDemand() {
     }
 
     setIsAnimated(true);
-    // Set default dates
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dayAfter = new Date();
-    dayAfter.setDate(dayAfter.getDate() + 2);
 
-    setFormData(prev => ({
-      ...prev,
-      earliestDate: tomorrow.toISOString().split('T')[0],
-      earliestTime: '08:00',
-      latestDate: dayAfter.toISOString().split('T')[0],
-      latestTime: '20:00'
-    }));
-  }, [currentUser, navigate]);
+    // استقبال البيانات من الصفحة الرئيسية إذا كانت موجودة
+    if (location.state) {
+      const dayAfter = new Date();
+      dayAfter.setDate(dayAfter.getDate() + 2);
+
+      setFormData(prev => ({
+        ...prev,
+        fromCity: location.state.fromCity || '',
+        toCity: location.state.toCity || '',
+        earliestDate: location.state.departureDate || prev.earliestDate,
+        earliestTime: location.state.departureTime || prev.earliestTime,
+        latestDate: dayAfter.toISOString().split('T')[0],
+        latestTime: '20:00',
+        seats: location.state.seats || '1',
+        budgetMax: location.state.price || ''
+      }));
+    } else {
+      // Set default dates if no data passed
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dayAfter = new Date();
+      dayAfter.setDate(dayAfter.getDate() + 2);
+
+      setFormData(prev => ({
+        ...prev,
+        earliestDate: tomorrow.toISOString().split('T')[0],
+        earliestTime: '08:00',
+        latestDate: dayAfter.toISOString().split('T')[0],
+        latestTime: '20:00'
+      }));
+    }
+  }, [currentUser, navigate, location.state]);
 
   // Check if user is a passenger (not driver)
   if (currentUser && currentUser.isDriver) {

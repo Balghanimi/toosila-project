@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { offersAPI } from '../../services/api';
 
@@ -21,6 +21,7 @@ export default function PostOfferModern() {
   const [errors, setErrors] = useState({});
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!currentUser) {
@@ -29,16 +30,30 @@ export default function PostOfferModern() {
     }
 
     setIsAnimated(true);
-    // Set default date to tomorrow
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    setFormData(prev => ({
-      ...prev,
-      departureDate: tomorrow.toISOString().split('T')[0],
-      departureTime: '08:00'
-    }));
-  }, [currentUser, navigate]);
+    // استقبال البيانات من الصفحة الرئيسية إذا كانت موجودة
+    if (location.state) {
+      setFormData(prev => ({
+        ...prev,
+        fromCity: location.state.fromCity || '',
+        toCity: location.state.toCity || '',
+        departureDate: location.state.departureDate || prev.departureDate,
+        departureTime: location.state.departureTime || prev.departureTime,
+        seats: location.state.seats || '1',
+        price: location.state.price || ''
+      }));
+    } else {
+      // Set default date to tomorrow if no data passed
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      setFormData(prev => ({
+        ...prev,
+        departureDate: tomorrow.toISOString().split('T')[0],
+        departureTime: '08:00'
+      }));
+    }
+  }, [currentUser, navigate, location.state]);
 
   // Check if user is a driver
   if (currentUser && !currentUser.isDriver) {

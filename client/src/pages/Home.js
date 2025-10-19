@@ -42,7 +42,28 @@ const Home = () => {
 
       navigate('/offers', { state: searchParams });
     } else {
-      navigate('/post-offer');
+      // تمرير بيانات النموذج إلى صفحة نشر العرض
+      let offerDate;
+      if (selectedDate === 'today') {
+        offerDate = new Date().toISOString().split('T')[0];
+      } else if (selectedDate === 'tomorrow') {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        offerDate = tomorrow.toISOString().split('T')[0];
+      } else {
+        offerDate = selectedDate;
+      }
+
+      const offerData = {
+        fromCity: pickupLocation,
+        toCity: dropLocation,
+        departureDate: offerDate,
+        departureTime: departureTime,
+        seats: availableSeats,
+        price: pricePerSeat
+      };
+
+      navigate('/post-offer', { state: offerData });
     }
   };
 
