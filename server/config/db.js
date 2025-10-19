@@ -2,20 +2,34 @@ require('dotenv').config();
 const { Pool } = require('pg');
 
 // Database Configuration
-// Support both DATABASE_URL (Railway) and individual env vars (local development)
-const poolConfig = process.env.DATABASE_URL
-  ? {
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false }
-    }
-  : {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-    };
+// Priority: DATABASE_URL (Railway/Production) > Individual env vars (Local development)
+let poolConfig;
+
+if (process.env.DATABASE_URL) {
+  // Railway/Production: Use DATABASE_URL
+  console.log('📦 Using DATABASE_URL for database connection');
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  };
+} else {
+  // Local development: Use individual env vars
+  console.log('🔧 Using individual env vars for database connection');
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'toosila',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
+  };
+  console.log('🔧 Connecting to:', {
+    host: poolConfig.host,
+    port: poolConfig.port,
+    database: poolConfig.database,
+    user: poolConfig.user
+  });
+}
 
 const pool = new Pool(poolConfig);
 
