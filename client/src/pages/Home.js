@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
+// قائمة المدن العراقية
+const IRAQI_CITIES = [
+  'بغداد', 'البصرة', 'الموصل', 'أربيل', 'كركوك', 'النجف', 'كربلاء',
+  'السليمانية', 'الديوانية', 'العمارة', 'الحلة', 'الرمادي', 'الناصرية',
+  'الكوت', 'الديوانية', 'بعقوبة', 'سامراء', 'الفلوجة', 'زاخو', 'دهوك',
+  'تكريت', 'المدائن', 'الكاظمية', 'الأعظمية', 'الكرخ', 'الرصافة'
+];
+
 const Home = () => {
   const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
   const [pickupLocation, setPickupLocation] = useState('');
@@ -13,6 +21,10 @@ const Home = () => {
   const [pricePerSeat, setPricePerSeat] = useState('');
   const [isAnimated, setIsAnimated] = useState(false);
   const [isSwapping, setIsSwapping] = useState(false);
+  const [pickupSuggestions, setPickupSuggestions] = useState([]);
+  const [dropSuggestions, setDropSuggestions] = useState([]);
+  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
+  const [showDropSuggestions, setShowDropSuggestions] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
@@ -24,6 +36,16 @@ const Home = () => {
     now.setHours(now.getHours() + 1);
     const timeString = now.toTimeString().slice(0, 5);
     setDepartureTime(timeString);
+
+    // Close suggestions when clicking outside
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('input')) {
+        setShowPickupSuggestions(false);
+        setShowDropSuggestions(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleNext = () => {
@@ -81,6 +103,42 @@ const Home = () => {
       setDropLocation(pickupLocation);
       setIsSwapping(false);
     }, 200);
+  };
+
+  const handlePickupChange = (value) => {
+    setPickupLocation(value);
+    if (value.trim()) {
+      const filtered = IRAQI_CITIES.filter(city =>
+        city.includes(value.trim())
+      );
+      setPickupSuggestions(filtered);
+      setShowPickupSuggestions(filtered.length > 0);
+    } else {
+      setShowPickupSuggestions(false);
+    }
+  };
+
+  const handleDropChange = (value) => {
+    setDropLocation(value);
+    if (value.trim()) {
+      const filtered = IRAQI_CITIES.filter(city =>
+        city.includes(value.trim())
+      );
+      setDropSuggestions(filtered);
+      setShowDropSuggestions(filtered.length > 0);
+    } else {
+      setShowDropSuggestions(false);
+    }
+  };
+
+  const selectPickupCity = (city) => {
+    setPickupLocation(city);
+    setShowPickupSuggestions(false);
+  };
+
+  const selectDropCity = (city) => {
+    setDropLocation(city);
+    setShowDropSuggestions(false);
   };
 
   const getCurrentDate = () => {
@@ -267,24 +325,76 @@ const Home = () => {
                 flexShrink: 0,
                 boxShadow: '0 0 0 3px rgba(52, 199, 89, 0.2)'
               }} />
-              <input
-                type="text"
-                placeholder={t('pickupLocation')}
-                value={pickupLocation}
-                onChange={(e) => setPickupLocation(e.target.value)}
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: 'var(--text-base)',
-                  color: 'var(--text-primary)',
-                  background: 'transparent',
-                  direction: 'rtl',
-                  textAlign: 'start',
-                  fontFamily: '"Cairo", sans-serif',
-                  fontWeight: '500'
-                }}
-              />
+              <div style={{ flex: 1, position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder={t('pickupLocation')}
+                  value={pickupLocation}
+                  onChange={(e) => handlePickupChange(e.target.value)}
+                  onFocus={() => {
+                    if (pickupLocation.trim()) {
+                      const filtered = IRAQI_CITIES.filter(city => city.includes(pickupLocation.trim()));
+                      if (filtered.length > 0) {
+                        setPickupSuggestions(filtered);
+                        setShowPickupSuggestions(true);
+                      }
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    outline: 'none',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--text-primary)',
+                    background: 'transparent',
+                    direction: 'rtl',
+                    textAlign: 'start',
+                    fontFamily: '"Cairo", sans-serif',
+                    fontWeight: '500'
+                  }}
+                />
+                {/* Suggestions Dropdown */}
+                {showPickupSuggestions && pickupSuggestions.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    left: 0,
+                    background: 'var(--surface-primary)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    marginTop: 'var(--space-1)',
+                    boxShadow: 'var(--shadow-lg)',
+                    zIndex: 1000,
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}>
+                    {pickupSuggestions.map((city, index) => (
+                      <div
+                        key={index}
+                        onClick={() => selectPickupCity(city)}
+                        style={{
+                          padding: 'var(--space-3)',
+                          cursor: 'pointer',
+                          borderBottom: index < pickupSuggestions.length - 1 ? '1px solid var(--border-light)' : 'none',
+                          direction: 'rtl',
+                          fontFamily: '"Cairo", sans-serif',
+                          transition: 'var(--transition)',
+                          background: 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'var(--surface-secondary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'transparent';
+                        }}
+                      >
+                        {city}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Swap Button */}
@@ -331,7 +441,8 @@ const Home = () => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              padding: 'var(--space-4)'
+              padding: 'var(--space-4)',
+              position: 'relative'
             }}>
               <div style={{
                 width: '12px',
@@ -341,24 +452,76 @@ const Home = () => {
                 marginLeft: 'var(--space-3)',
                 flexShrink: 0
               }} />
-              <input
-                type="text"
-                placeholder={t('dropLocation')}
-                value={dropLocation}
-                onChange={(e) => setDropLocation(e.target.value)}
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: 'var(--text-base)',
-                  color: 'var(--text-primary)',
-                  background: 'transparent',
-                  direction: 'rtl',
-                  textAlign: 'start',
-                  fontFamily: '"Cairo", sans-serif',
-                  fontWeight: '500'
-                }}
-              />
+              <div style={{ flex: 1, position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder={t('dropLocation')}
+                  value={dropLocation}
+                  onChange={(e) => handleDropChange(e.target.value)}
+                  onFocus={() => {
+                    if (dropLocation.trim()) {
+                      const filtered = IRAQI_CITIES.filter(city => city.includes(dropLocation.trim()));
+                      if (filtered.length > 0) {
+                        setDropSuggestions(filtered);
+                        setShowDropSuggestions(true);
+                      }
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    outline: 'none',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--text-primary)',
+                    background: 'transparent',
+                    direction: 'rtl',
+                    textAlign: 'start',
+                    fontFamily: '"Cairo", sans-serif',
+                    fontWeight: '500'
+                  }}
+                />
+                {/* Suggestions Dropdown */}
+                {showDropSuggestions && dropSuggestions.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    left: 0,
+                    background: 'var(--surface-primary)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    marginTop: 'var(--space-1)',
+                    boxShadow: 'var(--shadow-lg)',
+                    zIndex: 1000,
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}>
+                    {dropSuggestions.map((city, index) => (
+                      <div
+                        key={index}
+                        onClick={() => selectDropCity(city)}
+                        style={{
+                          padding: 'var(--space-3)',
+                          cursor: 'pointer',
+                          borderBottom: index < dropSuggestions.length - 1 ? '1px solid var(--border-light)' : 'none',
+                          direction: 'rtl',
+                          fontFamily: '"Cairo", sans-serif',
+                          transition: 'var(--transition)',
+                          background: 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'var(--surface-secondary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'transparent';
+                        }}
+                      >
+                        {city}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -699,7 +862,10 @@ const Home = () => {
           {/* Next Button */}
           <button
             onClick={handleNext}
-            disabled={!pickupLocation || !dropLocation}
+            disabled={
+              !pickupLocation || !dropLocation ||
+              (mode !== 'find' && (!departureTime || !pricePerSeat))
+            }
             style={{
               position: 'relative',
               zIndex: 1,
@@ -708,7 +874,7 @@ const Home = () => {
               fontSize: 'var(--text-lg)',
               fontWeight: '700',
               marginBottom: 'var(--space-6)',
-              background: (pickupLocation && dropLocation)
+              background: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat)))
                 ? mode === 'demand'
                   ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
                   : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
@@ -716,21 +882,21 @@ const Home = () => {
               color: 'var(--text-white)',
               border: 'none',
               borderRadius: 'var(--radius-lg)',
-              cursor: (pickupLocation && dropLocation) ? 'pointer' : 'not-allowed',
+              cursor: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'pointer' : 'not-allowed',
               transition: 'var(--transition)',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: (pickupLocation && dropLocation) ? 'var(--shadow-lg)' : 'none',
-              transform: (pickupLocation && dropLocation) ? 'translateY(0)' : 'translateY(1px)',
-              opacity: (pickupLocation && dropLocation) ? 1 : 0.6
+              boxShadow: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'var(--shadow-lg)' : 'none',
+              transform: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'translateY(0)' : 'translateY(1px)',
+              opacity: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 1 : 0.6
             }}
             onMouseEnter={(e) => {
-              if (pickupLocation && dropLocation) {
+              if (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
                 e.target.style.transform = 'translateY(-2px)';
                 e.target.style.boxShadow = 'var(--shadow-xl)';
               }
             }}
             onMouseLeave={(e) => {
-              if (pickupLocation && dropLocation) {
+              if (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
                 e.target.style.transform = 'translateY(0)';
                 e.target.style.boxShadow = 'var(--shadow-lg)';
               }
