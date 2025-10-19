@@ -34,7 +34,7 @@ export default function PostDemand() {
     setIsAnimated(true);
 
     // استقبال البيانات من الصفحة الرئيسية إذا كانت موجودة
-    if (location.state) {
+    if (location.state && location.state.fromCity && location.state.toCity) {
       const dayAfter = new Date();
       dayAfter.setDate(dayAfter.getDate() + 2);
 
@@ -83,19 +83,10 @@ export default function PostDemand() {
         console.log('PostDemand - Data incomplete, showing form');
       }
     } else {
-      // Set default dates if no data passed
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const dayAfter = new Date();
-      dayAfter.setDate(dayAfter.getDate() + 2);
-
-      setFormData(prev => ({
-        ...prev,
-        earliestDate: tomorrow.toISOString().split('T')[0],
-        earliestTime: '08:00',
-        latestDate: dayAfter.toISOString().split('T')[0],
-        latestTime: '20:00'
-      }));
+      // إذا لم تكن هناك بيانات من الصفحة الرئيسية، ارجع للصفحة الرئيسية
+      console.log('PostDemand - No data from home page, redirecting...');
+      navigate('/', { replace: true });
+      return;
     }
     // eslint-disable-next-line
   }, [currentUser, navigate]);

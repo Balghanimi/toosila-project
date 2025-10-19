@@ -32,7 +32,7 @@ export default function PostOfferModern() {
     setIsAnimated(true);
 
     // استقبال البيانات من الصفحة الرئيسية إذا كانت موجودة
-    if (location.state) {
+    if (location.state && location.state.fromCity && location.state.toCity) {
       const newFormData = {
         fromCity: location.state.fromCity || '',
         toCity: location.state.toCity || '',
@@ -62,15 +62,9 @@ export default function PostOfferModern() {
         }, 500);
       }
     } else {
-      // Set default date to tomorrow if no data passed
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      setFormData(prev => ({
-        ...prev,
-        departureDate: tomorrow.toISOString().split('T')[0],
-        departureTime: '08:00'
-      }));
+      // إذا لم تكن هناك بيانات من الصفحة الرئيسية، ارجع للصفحة الرئيسية
+      navigate('/', { replace: true });
+      return;
     }
     // eslint-disable-next-line
   }, [currentUser, navigate]);
