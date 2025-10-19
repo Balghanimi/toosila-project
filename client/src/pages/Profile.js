@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 
 const Profile = () => {
   const { currentUser, setCurrentUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -55,20 +57,53 @@ const Profile = () => {
     <div className="container" style={{ paddingTop: 'var(--space-6)', paddingBottom: '100px' }}>
       {/* Profile Header */}
       <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-        <div style={{
-          width: '100px',
-          height: '100px',
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto var(--space-4) auto',
-          boxShadow: 'var(--shadow-xl)',
-          border: '4px solid var(--surface-primary)',
-          fontSize: '3rem'
-        }}>
+        <div
+          onClick={() => navigate(currentUser.isDriver ? '/post-offer' : '/')}
+          style={{
+            width: '100px',
+            height: '100px',
+            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto var(--space-4) auto',
+            boxShadow: 'var(--shadow-xl)',
+            border: '4px solid var(--surface-primary)',
+            fontSize: '3rem',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            position: 'relative'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(52, 199, 89, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+            e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+          }}
+          title={currentUser.isDriver ? 'انقر لنشر رحلة' : 'انقر للبحث عن رحلة'}
+        >
           {currentUser.isDriver ? '🚗' : '🧑‍💼'}
+          {/* Click hint badge */}
+          <div style={{
+            position: 'absolute',
+            bottom: '-5px',
+            right: '-5px',
+            width: '30px',
+            height: '30px',
+            background: 'white',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1rem',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            animation: 'bounce 2s infinite'
+          }}>
+            ✨
+          </div>
         </div>
 
         <h1 style={{
@@ -137,6 +172,187 @@ const Profile = () => {
           {error}
         </div>
       )}
+
+      {/* Quick Actions Card - Role-based */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+        borderRadius: 'var(--radius-xl)',
+        padding: 'var(--space-6)',
+        boxShadow: 'var(--shadow-xl)',
+        border: 'none',
+        marginBottom: 'var(--space-6)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background Pattern */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-20%',
+          width: '200px',
+          height: '200px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h2 style={{
+            fontSize: 'var(--text-xl)',
+            fontWeight: '700',
+            color: 'white',
+            marginBottom: 'var(--space-2)',
+            fontFamily: '"Cairo", sans-serif',
+            textAlign: 'center'
+          }}>
+            ⚡ إجراءات سريعة
+          </h2>
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.9)',
+            fontSize: 'var(--text-sm)',
+            fontFamily: '"Cairo", sans-serif',
+            marginBottom: 'var(--space-5)',
+            textAlign: 'center'
+          }}>
+            {currentUser.isDriver ? 'ابدأ بنشر رحلتك الآن' : 'ابحث عن رحلتك المثالية'}
+          </p>
+
+          {/* Quick Action Button - Driver */}
+          {currentUser.isDriver ? (
+            <button
+              onClick={() => navigate('/post-offer')}
+              style={{
+                width: '100%',
+                padding: 'var(--space-5)',
+                background: 'white',
+                color: 'var(--primary)',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-3)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+              }}
+            >
+              <span style={{ fontSize: '2rem' }}>🚗</span>
+              <span>نشر رحلة جديدة</span>
+            </button>
+          ) : (
+            /* Quick Actions for Passenger */
+            <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+              <button
+                onClick={() => navigate('/')}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-4)',
+                  background: 'white',
+                  color: 'var(--primary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>🔍</span>
+                <span>البحث عن رحلة</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/post-demand')}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-4)',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  border: '2px solid white',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>💺</span>
+                <span>نشر طلب رحلة</span>
+              </button>
+            </div>
+          )}
+
+          {/* View My Posts/Requests */}
+          <button
+            onClick={() => navigate(currentUser.isDriver ? '/offers' : '/demands')}
+            style={{
+              width: '100%',
+              padding: 'var(--space-3)',
+              background: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+              transition: 'all 0.3s ease',
+              marginTop: 'var(--space-3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.target.style.borderColor = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'transparent';
+              e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            }}
+          >
+            {currentUser.isDriver ? '📋 عرض رحلاتي' : '📋 عرض طلباتي'}
+          </button>
+        </div>
+      </div>
 
       {/* Role Switcher Card */}
       <div style={{
@@ -310,6 +526,21 @@ const Profile = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-8px,0);
+          }
+          70% {
+            transform: translate3d(0,-4px,0);
+          }
+          90% {
+            transform: translate3d(0,-2px,0);
+          }
         }
       `}</style>
     </div>
