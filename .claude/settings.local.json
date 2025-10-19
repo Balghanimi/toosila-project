@@ -14,7 +14,10 @@
       "Bash(rm:*)",
       "Bash(npm cache clean:*)",
       "Bash(git restore:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(Remove-Item -Force package-lock.json)",
+      "Bash(ipconfig /flushdns)",
+      "Bash(powershell.exe -Command \"ipconfig /flushdns\")"
     ],
     "deny": [],
     "ask": []

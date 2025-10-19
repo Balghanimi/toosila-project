@@ -55,6 +55,7 @@ export default function PostDemand() {
       }));
 
       // إذا كانت جميع البيانات المطلوبة موجودة، نشر الطلب تلقائياً
+      console.log('PostDemand - Checking data completeness:', newFormData);
       const isComplete = newFormData.fromCity &&
                         newFormData.toCity &&
                         newFormData.earliestDate &&
@@ -62,11 +63,24 @@ export default function PostDemand() {
                         newFormData.budgetMax &&
                         newFormData.fromCity !== newFormData.toCity;
 
+      console.log('PostDemand - Is complete?', isComplete);
+      console.log('PostDemand - Breakdown:', {
+        fromCity: !!newFormData.fromCity,
+        toCity: !!newFormData.toCity,
+        earliestDate: !!newFormData.earliestDate,
+        earliestTime: !!newFormData.earliestTime,
+        budgetMax: !!newFormData.budgetMax,
+        notSameCity: newFormData.fromCity !== newFormData.toCity
+      });
+
       if (isComplete) {
+        console.log('PostDemand - Auto-submitting demand...');
         // تأخير بسيط للسماح للمستخدم برؤية البيانات
         setTimeout(() => {
           submitDemand(newFormData);
         }, 500);
+      } else {
+        console.log('PostDemand - Data incomplete, showing form');
       }
     } else {
       // Set default dates if no data passed

@@ -92,6 +92,7 @@ const Home = () => {
         price: pricePerSeat
       };
 
+      console.log('Home - Sending demand data:', demandData);
       navigate('/post-demand', { state: demandData });
     }
   };
@@ -304,7 +305,7 @@ const Home = () => {
             borderRadius: 'var(--radius-lg)',
             border: '2px solid var(--border-light)',
             marginBottom: 'var(--space-6)',
-            overflow: 'hidden',
+            overflow: 'visible',
             transition: 'var(--transition)',
             boxShadow: 'var(--shadow-sm)'
           }}>
@@ -364,8 +365,8 @@ const Home = () => {
                     border: '2px solid var(--border-light)',
                     borderRadius: 'var(--radius)',
                     marginTop: 'var(--space-1)',
-                    boxShadow: 'var(--shadow-lg)',
-                    zIndex: 1000,
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+                    zIndex: 9999,
                     maxHeight: '200px',
                     overflowY: 'auto'
                   }}>
@@ -491,8 +492,8 @@ const Home = () => {
                     border: '2px solid var(--border-light)',
                     borderRadius: 'var(--radius)',
                     marginTop: 'var(--space-1)',
-                    boxShadow: 'var(--shadow-lg)',
-                    zIndex: 1000,
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+                    zIndex: 9999,
                     maxHeight: '200px',
                     overflowY: 'auto'
                   }}>
