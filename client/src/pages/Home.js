@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
 const Home = () => {
-  const [mode, setMode] = useState('find'); // 'find' or 'offer'
+  const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropLocation, setDropLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState('today');
@@ -25,45 +25,50 @@ const Home = () => {
   }, []);
 
   const handleNext = () => {
+    // Calculate date
+    let calculatedDate;
+    if (selectedDate === 'today') {
+      calculatedDate = new Date().toISOString().split('T')[0];
+    } else if (selectedDate === 'tomorrow') {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      calculatedDate = tomorrow.toISOString().split('T')[0];
+    } else {
+      calculatedDate = selectedDate;
+    }
+
     if (mode === 'find') {
       // إرسال معايير البحث إلى صفحة العروض
       const searchParams = {};
       if (pickupLocation) searchParams.fromCity = pickupLocation;
       if (dropLocation) searchParams.toCity = dropLocation;
-      if (selectedDate && selectedDate !== 'today' && selectedDate !== 'tomorrow') {
-        searchParams.departureDate = selectedDate;
-      } else if (selectedDate === 'today') {
-        searchParams.departureDate = new Date().toISOString().split('T')[0];
-      } else if (selectedDate === 'tomorrow') {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        searchParams.departureDate = tomorrow.toISOString().split('T')[0];
-      }
+      if (calculatedDate) searchParams.departureDate = calculatedDate;
 
       navigate('/offers', { state: searchParams });
-    } else {
+    } else if (mode === 'offer') {
       // تمرير بيانات النموذج إلى صفحة نشر العرض
-      let offerDate;
-      if (selectedDate === 'today') {
-        offerDate = new Date().toISOString().split('T')[0];
-      } else if (selectedDate === 'tomorrow') {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        offerDate = tomorrow.toISOString().split('T')[0];
-      } else {
-        offerDate = selectedDate;
-      }
-
       const offerData = {
         fromCity: pickupLocation,
         toCity: dropLocation,
-        departureDate: offerDate,
+        departureDate: calculatedDate,
         departureTime: departureTime,
         seats: availableSeats,
         price: pricePerSeat
       };
 
       navigate('/post-offer', { state: offerData });
+    } else if (mode === 'demand') {
+      // تمرير بيانات النموذج إلى صفحة نشر الطلب
+      const demandData = {
+        fromCity: pickupLocation,
+        toCity: dropLocation,
+        departureDate: calculatedDate,
+        departureTime: departureTime,
+        seats: availableSeats,
+        price: pricePerSeat
+      };
+
+      navigate('/post-demand', { state: demandData });
     }
   };
 
@@ -151,11 +156,12 @@ const Home = () => {
             zIndex: 0
           }} />
 
-          {/* Mode Toggle */}
+          {/* Mode Toggle - 3 Options */}
           <div style={{
             position: 'relative',
             zIndex: 1,
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 'var(--space-1)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
@@ -166,13 +172,12 @@ const Home = () => {
             <button
               onClick={() => setMode('find')}
               style={{
-                flex: 1,
-                padding: 'var(--space-3) var(--space-4)',
+                padding: 'var(--space-3) var(--space-2)',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
                 background: mode === 'find' ? 'var(--surface-primary)' : 'transparent',
                 color: mode === 'find' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-base)',
+                fontSize: 'var(--text-sm)',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
@@ -181,18 +186,17 @@ const Home = () => {
                 fontFamily: '"Cairo", sans-serif'
               }}
             >
-              {t('findRide')}
+              🔍 {t('findRide')}
             </button>
             <button
               onClick={() => setMode('offer')}
               style={{
-                flex: 1,
-                padding: 'var(--space-3) var(--space-4)',
+                padding: 'var(--space-3) var(--space-2)',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
                 background: mode === 'offer' ? 'var(--primary)' : 'transparent',
                 color: mode === 'offer' ? 'var(--text-white)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-base)',
+                fontSize: 'var(--text-sm)',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
@@ -201,7 +205,26 @@ const Home = () => {
                 fontFamily: '"Cairo", sans-serif'
               }}
             >
-              {t('offerRide')}
+              🚗 {t('offerRide')}
+            </button>
+            <button
+              onClick={() => setMode('demand')}
+              style={{
+                padding: 'var(--space-3) var(--space-2)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                background: mode === 'demand' ? '#3b82f6' : 'transparent',
+                color: mode === 'demand' ? 'white' : 'var(--text-secondary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+                boxShadow: mode === 'demand' ? 'var(--shadow-md)' : 'none',
+                transform: mode === 'demand' ? 'scale(1.02)' : 'scale(1)',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              💺 طلب رحلة
             </button>
           </div>
 
@@ -675,8 +698,10 @@ const Home = () => {
               fontSize: 'var(--text-lg)',
               fontWeight: '700',
               marginBottom: 'var(--space-6)',
-              background: (pickupLocation && dropLocation) 
-                ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+              background: (pickupLocation && dropLocation)
+                ? mode === 'demand'
+                  ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                  : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
                 : 'var(--text-muted)',
               color: 'var(--text-white)',
               border: 'none',
@@ -701,7 +726,7 @@ const Home = () => {
               }
             }}
           >
-            {t('next')}
+            {mode === 'find' ? '🔍 البحث' : mode === 'offer' ? '🚗 التالي' : '💺 التالي'}
           </button>
         </div>
 
