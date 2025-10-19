@@ -96,13 +96,13 @@ const BottomNav = () => {
     // Navigate to the primary path for each section
     const navigationMap = {
       'carpool': '/',
-      'rides': '/demands',
+      'dashboard': '/dashboard',
       'messages': '/messages',
       'profile': '/profile'
     };
-    
+
     const targetPath = navigationMap[item.key];
-    if (targetPath && targetPath !== currentPath) {
+    if (targetPath) {
       navigate(targetPath);
     }
   };
