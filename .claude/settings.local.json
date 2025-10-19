@@ -17,7 +17,8 @@
       "Bash(npm uninstall:*)",
       "Bash(Remove-Item -Force package-lock.json)",
       "Bash(ipconfig /flushdns)",
-      "Bash(powershell.exe -Command \"ipconfig /flushdns\")"
+      "Bash(powershell.exe -Command \"ipconfig /flushdns\")",
+      "Bash(npm run build)"
     ],
     "deny": [],
     "ask": []
