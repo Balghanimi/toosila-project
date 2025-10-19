@@ -43,7 +43,7 @@ const getUserStats = asyncHandler(async (req, res) => {
     `SELECT COUNT(*) as total
      FROM bookings b
      INNER JOIN offers o ON b.offer_id = o.id
-     WHERE (o.driver_id = $1 OR b.user_id = $1) AND b.status = 'confirmed'`,
+     WHERE (o.driver_id = $1 OR b.passenger_id = $1) AND b.status = 'confirmed'`,
     [userId]
   );
 
@@ -58,7 +58,7 @@ const getUserStats = asyncHandler(async (req, res) => {
 
   // Get pending bookings as passenger
   const pendingAsPassengerResult = await query(
-    'SELECT COUNT(*) as total FROM bookings WHERE user_id = $1 AND status = \'pending\'',
+    'SELECT COUNT(*) as total FROM bookings WHERE passenger_id = $1 AND status = \'pending\'',
     [userId]
   );
 
@@ -98,7 +98,7 @@ const getRecentActivity = asyncHandler(async (req, res) => {
     `SELECT b.*, o.from_city, o.to_city, o.departure_time, u.name as passenger_name
      FROM bookings b
      INNER JOIN offers o ON b.offer_id = o.id
-     INNER JOIN users u ON b.user_id = u.id
+     INNER JOIN users u ON b.passenger_id = u.id
      WHERE o.driver_id = $1
      ORDER BY b.created_at DESC
      LIMIT 5`,

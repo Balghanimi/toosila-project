@@ -17,7 +17,7 @@ const createBooking = asyncHandler(async (req, res) => {
   }
 
   // Check if user is not booking their own offer
-  if (offer.userId === req.user.id) {
+  if (offer.driverId === req.user.id) {
     throw new AppError('You cannot book your own offer', 400);
   }
 
@@ -40,11 +40,8 @@ const createBooking = asyncHandler(async (req, res) => {
   }
 
   const booking = await Booking.create({
-    userId: req.user.id,
-    offerId,
-    startDate,
-    endDate,
-    message
+    passengerId: req.user.id,
+    offerId
   });
 
   res.status(201).json({
@@ -66,9 +63,9 @@ const getBookings = asyncHandler(async (req, res) => {
 
   const filters = {};
   if (status) filters.status = status;
-  if (userId) filters.userId = parseInt(userId);
+  if (userId) filters.passengerId = parseInt(userId);
   if (offerId) filters.offerId = parseInt(offerId);
-  if (offerOwnerId) filters.offerOwnerId = parseInt(offerOwnerId);
+  if (offerOwnerId) filters.driverId = parseInt(offerOwnerId);
 
   const result = await Booking.findAll(parseInt(page), parseInt(limit), filters);
   
@@ -85,10 +82,10 @@ const getBookingById = asyncHandler(async (req, res) => {
   }
 
   // Check if user has access to this booking
-  if (booking.userId !== req.user.id && req.user.role !== 'admin') {
+  if (booking.passengerId !== req.user.id && req.user.role !== 'admin') {
     // Check if user is the offer owner
     const offer = await Offer.findById(booking.offerId);
-    if (!offer || offer.userId !== req.user.id) {
+    if (!offer || offer.driverId !== req.user.id) {
       throw new AppError('Access denied', 403);
     }
   }
@@ -110,7 +107,7 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
 
   // Check if user is the offer owner or admin
   const offer = await Offer.findById(booking.offerId);
-  if (!offer || (offer.userId !== req.user.id && req.user.role !== 'admin')) {
+  if (!offer || (offer.driverId !== req.user.id && req.user.role !== 'admin')) {
     throw new AppError('You can only update bookings for your offers', 403);
   }
 
@@ -138,7 +135,7 @@ const cancelBooking = asyncHandler(async (req, res) => {
   }
 
   // Check if user owns the booking
-  if (booking.userId !== req.user.id && req.user.role !== 'admin') {
+  if (booking.passengerId !== req.user.id && req.user.role !== 'admin') {
     throw new AppError('You can only cancel your own bookings', 403);
   }
 
@@ -159,22 +156,22 @@ const cancelBooking = asyncHandler(async (req, res) => {
   });
 });
 
-// Get user's bookings
+// Get user's bookings (as passenger)
 const getUserBookings = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
-  const userId = req.params.userId || req.user.id;
+  const passengerId = req.params.userId || req.user.id;
 
-  const result = await Booking.findByUserId(userId, parseInt(page), parseInt(limit));
-  
+  const result = await Booking.getSentBookings(passengerId, parseInt(page), parseInt(limit));
+
   res.json(result);
 });
 
-// Get bookings for user's offers
+// Get bookings for user's offers (as driver)
 const getOfferBookings = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
-  const result = await Booking.findByOfferOwnerId(req.user.id, parseInt(page), parseInt(limit));
-  
+  const result = await Booking.getReceivedBookings(req.user.id, parseInt(page), parseInt(limit));
+
   res.json(result);
 });
 
@@ -211,7 +208,7 @@ const getUserBookingStats = asyncHandler(async (req, res) => {
       COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_bookings,
       AVG(total_price) as average_booking_value
     FROM bookings
-    WHERE user_id = $1
+    WHERE passenger_id = $1
   `, [req.user.id]);
 
   res.json({
@@ -228,14 +225,14 @@ const getPendingCount = asyncHandler(async (req, res) => {
     SELECT COUNT(*) as count
     FROM bookings b
     INNER JOIN offers o ON b.offer_id = o.id
-    WHERE o.user_id = $1 AND b.status = 'pending'
+    WHERE o.driver_id = $1 AND b.status = 'pending'
   `, [req.user.id]);
 
   // Count bookings I made (as passenger) that are pending
   const sentResult = await query(`
     SELECT COUNT(*) as count
     FROM bookings
-    WHERE user_id = $1 AND status = 'pending'
+    WHERE passenger_id = $1 AND status = 'pending'
   `, [req.user.id]);
 
   res.json({
