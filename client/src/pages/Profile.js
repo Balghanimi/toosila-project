@@ -289,7 +289,7 @@ const Profile = () => {
               </button>
 
               <button
-                onClick={() => navigate('/post-demand')}
+                onClick={() => navigate('/', { state: { mode: 'demand' } })}
                 style={{
                   width: '100%',
                   padding: 'var(--space-4)',

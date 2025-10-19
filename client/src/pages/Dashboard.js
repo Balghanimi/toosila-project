@@ -380,7 +380,7 @@ const Dashboard = () => {
             </button>
 
             <button
-              onClick={() => navigate('/post-demand')}
+              onClick={() => navigate('/', { state: { mode: 'demand' } })}
               style={{
                 padding: 'var(--space-4)',
                 background: 'var(--surface-secondary)',

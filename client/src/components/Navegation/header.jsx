@@ -24,7 +24,6 @@ const Header = ({ title = 'توصيلة' }) => {
       '/': 'توصيلة',
       '/post-offer': 'انشر رحلة',
       '/offers': 'العروض المتاحة',
-      '/post-demand': 'طلب مقعد',
       '/demands': 'الطلبات المتاحة',
       '/ratings': 'إدارة التقييمات',
       '/rating-stats': 'إحصائيات التقييمات',
@@ -155,7 +154,7 @@ const Header = ({ title = 'توصيلة' }) => {
                   <div className={styles.drawerSection}>قسم الركاب</div>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/post-demand'); toggleDrawer(); }}
+                    onClick={() => { navigate('/', { state: { mode: 'demand' } }); toggleDrawer(); }}
                   >
                     🙋 نشر طلب رحلة
                   </button>

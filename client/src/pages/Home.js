@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { demandsAPI } from '../services/api';
 
 // قائمة المدن العراقية
 const IRAQI_CITIES = [
@@ -25,12 +26,23 @@ const Home = () => {
   const [dropSuggestions, setDropSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
   const [showDropSuggestions, setShowDropSuggestions] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
 
   useEffect(() => {
     setIsAnimated(true);
+
+    // Check if we need to set mode from navigation state
+    if (location.state?.mode) {
+      setMode(location.state.mode);
+      // Clear the state after using it
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+
     // Set default time to current time + 1 hour
     const now = new Date();
     now.setHours(now.getHours() + 1);
@@ -46,9 +58,10 @@ const Home = () => {
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Calculate date
     let calculatedDate;
     if (selectedDate === 'today') {
@@ -82,18 +95,37 @@ const Home = () => {
 
       navigate('/post-offer', { state: offerData });
     } else if (mode === 'demand') {
-      // تمرير بيانات النموذج إلى صفحة نشر الطلب
-      const demandData = {
-        fromCity: pickupLocation,
-        toCity: dropLocation,
-        departureDate: calculatedDate,
-        departureTime: departureTime,
-        seats: availableSeats,
-        price: pricePerSeat
-      };
+      // نشر الطلب مباشرة من الصفحة الرئيسية
+      setIsSubmitting(true);
+      setSubmitError('');
 
-      console.log('Home - Sending demand data:', demandData);
-      navigate('/post-demand', { state: demandData });
+      try {
+        // إنشاء تاريخ البداية والنهاية
+        const earliestDateTime = new Date(`${calculatedDate}T${departureTime}:00`);
+
+        // تاريخ النهاية: يومين بعد تاريخ البداية
+        const latestDateTime = new Date(earliestDateTime);
+        latestDateTime.setDate(latestDateTime.getDate() + 2);
+
+        const demandData = {
+          fromCity: pickupLocation,
+          toCity: dropLocation,
+          earliestTime: earliestDateTime.toISOString(),
+          latestTime: latestDateTime.toISOString(),
+          seats: parseInt(availableSeats),
+          budgetMax: parseFloat(pricePerSeat)
+        };
+
+        console.log('Home - Creating demand:', demandData);
+        await demandsAPI.create(demandData);
+
+        // التوجيه إلى صفحة الطلبات بعد النجاح
+        navigate('/demands');
+      } catch (err) {
+        console.error('Error creating demand:', err);
+        setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -191,6 +223,24 @@ const Home = () => {
           </p>
         </div>
 
+        {/* Error Message */}
+        {submitError && (
+          <div style={{
+            background: '#fee2e2',
+            border: '2px solid #ef4444',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-4)',
+            color: '#991b1b',
+            fontFamily: '"Cairo", sans-serif',
+            fontSize: 'var(--text-base)',
+            textAlign: 'center',
+            fontWeight: '600'
+          }}>
+            ⚠️ {submitError}
+          </div>
+        )}
+
         {/* Main Card */}
         <div style={{
           background: 'var(--surface-primary)',
@@ -203,7 +253,7 @@ const Home = () => {
           position: 'relative',
           overflow: 'hidden'
         }}>
-          
+
           {/* Background Pattern */}
           <div style={{
             position: 'absolute',
@@ -864,6 +914,7 @@ const Home = () => {
           <button
             onClick={handleNext}
             disabled={
+              isSubmitting ||
               !pickupLocation || !dropLocation ||
               (mode !== 'find' && (!departureTime || !pricePerSeat))
             }
@@ -875,36 +926,61 @@ const Home = () => {
               fontSize: 'var(--text-lg)',
               fontWeight: '700',
               marginBottom: 'var(--space-6)',
-              background: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat)))
-                ? mode === 'demand'
+              background: (isSubmitting || !pickupLocation || !dropLocation || (mode !== 'find' && (!departureTime || !pricePerSeat)))
+                ? 'var(--text-muted)'
+                : mode === 'demand'
                   ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-                  : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                : 'var(--text-muted)',
+                  : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
               color: 'var(--text-white)',
               border: 'none',
               borderRadius: 'var(--radius-lg)',
-              cursor: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'pointer' : 'not-allowed',
+              cursor: (isSubmitting || !pickupLocation || !dropLocation || (mode !== 'find' && (!departureTime || !pricePerSeat))) ? 'not-allowed' : 'pointer',
               transition: 'var(--transition)',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'var(--shadow-lg)' : 'none',
-              transform: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 'translateY(0)' : 'translateY(1px)',
-              opacity: (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) ? 1 : 0.6
+              boxShadow: (isSubmitting || !pickupLocation || !dropLocation || (mode !== 'find' && (!departureTime || !pricePerSeat))) ? 'none' : 'var(--shadow-lg)',
+              transform: (isSubmitting || !pickupLocation || !dropLocation || (mode !== 'find' && (!departureTime || !pricePerSeat))) ? 'translateY(1px)' : 'translateY(0)',
+              opacity: (isSubmitting || !pickupLocation || !dropLocation || (mode !== 'find' && (!departureTime || !pricePerSeat))) ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)'
             }}
             onMouseEnter={(e) => {
-              if (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
+              if (!isSubmitting && pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
                 e.target.style.transform = 'translateY(-2px)';
                 e.target.style.boxShadow = 'var(--shadow-xl)';
               }
             }}
             onMouseLeave={(e) => {
-              if (pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
+              if (!isSubmitting && pickupLocation && dropLocation && (mode === 'find' || (departureTime && pricePerSeat))) {
                 e.target.style.transform = 'translateY(0)';
                 e.target.style.boxShadow = 'var(--shadow-lg)';
               }
             }}
           >
-            {mode === 'find' ? '🔍 البحث' : mode === 'offer' ? '🚗 التالي' : '💺 التالي'}
+            {isSubmitting ? (
+              <>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                جاري النشر...
+              </>
+            ) : (
+              mode === 'find' ? '🔍 البحث' : mode === 'offer' ? '🚗 التالي' : '💺 نشر الطلب'
+            )}
           </button>
+
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
         </div>
 
         {/* Trust Section */}

@@ -20,7 +20,6 @@ import Dashboard from './pages/Dashboard';
 import PostOfferModern from './pages/offers/PostOfferModern';
 import ViewOffers from './pages/offers/ViewOffers';
 // الطلبات
-import PostDemand from './pages/demands/PostDemand';
 import ViewDemands from './pages/demands/ViewDemands';
 // إدارة التقييمات
 import RatingManagement from './pages/RatingManagement';
@@ -60,7 +59,6 @@ export default function App() {
                     <Route path="/post-offer" element={<PostOfferModern />} />
                     <Route path="/offers" element={<ViewOffers />} />
                     {/* مسارات الطلبات */}
-                    <Route path="/post-demand" element={<PostDemand />} />
                     <Route path="/demands" element={<ViewDemands />} />
                     
                     {/* إدارة التقييمات */}

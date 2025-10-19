@@ -267,7 +267,7 @@ export default function ViewDemands() {
               marginBottom: 'var(--space-4)'
             }}>لم نعثر على طلبات تطابق بحثك</p>
             {currentUser && !currentUser.isDriver && (
-              <button onClick={() => navigate('/post-demand')} style={{
+              <button onClick={() => navigate('/', { state: { mode: 'demand' } })} style={{
                   padding: 'var(--space-3) var(--space-6)', background: 'var(--primary)',
                   color: 'white', border: 'none', borderRadius: 'var(--radius-lg)',
                   fontSize: 'var(--text-base)', fontWeight: '600', cursor: 'pointer',
