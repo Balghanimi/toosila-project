@@ -23,7 +23,7 @@ const config = {
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3001',
   corsOrigin: process.env.NODE_ENV === 'production'
-    ? process.env.CORS_ORIGIN
+    ? (process.env.CORS_ORIGIN || 'https://toosila-frontend-production.up.railway.app')
     : (process.env.CORS_ORIGIN || 'http://localhost:3000'),
   
   // Email configuration (if needed)
