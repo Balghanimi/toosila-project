@@ -108,8 +108,8 @@ const Home = () => {
         latestDateTime.setDate(latestDateTime.getDate() + 2);
 
         const demandData = {
-          fromCity: pickupLocation,
-          toCity: dropLocation,
+          fromCity: pickupLocation.trim(),
+          toCity: dropLocation.trim(),
           earliestTime: earliestDateTime.toISOString(),
           latestTime: latestDateTime.toISOString(),
           seats: parseInt(availableSeats),
