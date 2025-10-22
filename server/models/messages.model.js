@@ -173,16 +173,19 @@ class Message {
     );
 
     const countResult = await query(
-      `SELECT COUNT(DISTINCT ride_type, ride_id) as count
-       FROM messages
-       WHERE ride_id IN (
-         SELECT DISTINCT ride_id FROM messages
-         WHERE sender_id = $1 OR ride_id IN (
-           SELECT id FROM offers WHERE driver_id = $1
-           UNION
-           SELECT id FROM demands WHERE passenger_id = $1
+      `SELECT COUNT(*) as count
+       FROM (
+         SELECT DISTINCT ride_type, ride_id
+         FROM messages
+         WHERE ride_id IN (
+           SELECT DISTINCT ride_id FROM messages
+           WHERE sender_id = $1 OR ride_id IN (
+             SELECT id FROM offers WHERE driver_id = $1
+             UNION
+             SELECT id FROM demands WHERE passenger_id = $1
+           )
          )
-       )`,
+       ) AS distinct_conversations`,
       [userId]
     );
 
