@@ -122,25 +122,26 @@ const validateOfferUpdate = [
 
 // Demand validation rules
 const validateDemandCreation = [
-  body('title')
-    .trim()
-    .isLength({ min: 5, max: 100 })
-    .withMessage('Title must be between 5 and 100 characters'),
-  body('description')
-    .trim()
-    .isLength({ min: 20, max: 1000 })
-    .withMessage('Description must be between 20 and 1000 characters'),
-  body('maxPrice')
-    .optional()
-    .isFloat({ min: 0 })
-    .withMessage('Max price must be a positive number'),
-  body('category')
-    .isIn(['transportation', 'accommodation', 'food', 'services', 'other'])
-    .withMessage('Please select a valid category'),
-  body('location')
+  body('fromCity')
     .trim()
     .isLength({ min: 2, max: 100 })
-    .withMessage('Location must be between 2 and 100 characters'),
+    .withMessage('From city must be between 2 and 100 characters'),
+  body('toCity')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('To city must be between 2 and 100 characters'),
+  body('earliestTime')
+    .isISO8601()
+    .withMessage('Please provide a valid earliest time'),
+  body('latestTime')
+    .isISO8601()
+    .withMessage('Please provide a valid latest time'),
+  body('seats')
+    .isInt({ min: 1, max: 7 })
+    .withMessage('Seats must be between 1 and 7'),
+  body('budgetMax')
+    .isFloat({ min: 0 })
+    .withMessage('Budget max must be a positive number'),
   handleValidationErrors
 ];
 

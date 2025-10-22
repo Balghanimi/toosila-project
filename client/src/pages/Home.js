@@ -588,13 +588,14 @@ const Home = () => {
             }}>
               📅 تاريخ ووقت المغادرة
             </h3>
-            
+
             <div style={{
               background: 'var(--surface-secondary)',
               borderRadius: 'var(--radius-lg)',
               padding: 'var(--space-4)',
               border: '1px solid var(--border-light)',
-              marginBottom: 'var(--space-4)'
+              marginBottom: 'var(--space-4)',
+              position: 'relative'
             }}>
               <div style={{
                 display: 'flex',
@@ -644,7 +645,7 @@ const Home = () => {
               </div>
 
               {/* Hidden datetime inputs */}
-              <div id="datetime-inputs" style={{ display: 'none' }}>
+              <div id="datetime-inputs" style={{ display: 'none', position: 'relative', zIndex: 100 }}>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
