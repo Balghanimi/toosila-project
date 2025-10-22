@@ -23,7 +23,19 @@ const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || data.message || 'حدث خطأ');
+      // Log full error response for debugging
+      console.error('API Error Response:', data);
+
+      // Extract error message - data.error is a string, not an object
+      let errorMessage = data.error || data.message || 'حدث خطأ';
+
+      // If there are validation details, include them
+      if (data.details && data.details.length > 0) {
+        const detailMessages = data.details.map(d => `${d.field}: ${d.message}`).join(', ');
+        errorMessage = `${errorMessage} - ${detailMessages}`;
+      }
+
+      throw new Error(errorMessage);
     }
 
     return data;

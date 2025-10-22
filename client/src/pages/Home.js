@@ -117,12 +117,17 @@ const Home = () => {
         };
 
         console.log('Home - Creating demand:', demandData);
-        await demandsAPI.create(demandData);
+        const result = await demandsAPI.create(demandData);
+        console.log('Home - Demand created successfully:', result);
 
         // التوجيه إلى صفحة الطلبات بعد النجاح
         navigate('/demands');
       } catch (err) {
         console.error('Error creating demand:', err);
+        console.error('Error details:', {
+          message: err.message,
+          stack: err.stack
+        });
         setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
         setIsSubmitting(false);
       }
