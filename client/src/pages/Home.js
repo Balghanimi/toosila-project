@@ -907,11 +907,18 @@ const Home = () => {
                 }}
               >
                 <option value="" disabled>اضغط للتحديد</option>
+                <option value="5000">5,000 د.ع</option>
                 <option value="10000">10,000 د.ع</option>
                 <option value="15000">15,000 د.ع</option>
                 <option value="20000">20,000 د.ع</option>
                 <option value="25000">25,000 د.ع</option>
                 <option value="30000">30,000 د.ع</option>
+                <option value="40000">40,000 د.ع</option>
+                <option value="50000">50,000 د.ع</option>
+                <option value="75000">75,000 د.ع</option>
+                <option value="100000">100,000 د.ع</option>
+                <option value="150000">150,000 د.ع</option>
+                <option value="200000">200,000 د.ع</option>
               </select>
             </div>
           </div>

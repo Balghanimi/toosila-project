@@ -107,7 +107,7 @@ const getRecentActivity = asyncHandler(async (req, res) => {
 
   // Get recent offers
   const offersResult = await query(
-    `SELECT id, from_city, to_city, departure_time, available_seats, price, created_at
+    `SELECT id, from_city, to_city, departure_time, seats, price, created_at
      FROM offers
      WHERE driver_id = $1
      ORDER BY created_at DESC

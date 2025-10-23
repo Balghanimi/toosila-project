@@ -82,7 +82,7 @@ class Offer {
     }
 
     if (filters.minSeats) {
-      whereClause += ` AND o.available_seats >= $${paramCount}`;
+      whereClause += ` AND o.seats >= $${paramCount}`;
       values.push(filters.minSeats);
       paramCount++;
     }
@@ -101,7 +101,7 @@ class Offer {
           orderBy = 'u.rating_avg DESC NULLS LAST';
           break;
         case 'seats':
-          orderBy = 'o.available_seats DESC';
+          orderBy = 'o.seats DESC';
           break;
         case 'date':
         default:
