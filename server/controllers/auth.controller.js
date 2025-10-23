@@ -35,7 +35,7 @@ const register = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { id: user.id, email: user.email },
       config.JWT_SECRET,
       { expiresIn: config.JWT_EXPIRES_IN }
     );
@@ -90,7 +90,7 @@ const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { id: user.id, email: user.email },
       config.JWT_SECRET,
       { expiresIn: config.JWT_EXPIRES_IN }
     );
@@ -120,7 +120,7 @@ const login = async (req, res) => {
 // Get user profile
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -158,7 +158,7 @@ const updateProfile = async (req, res) => {
     if (name !== undefined) updateData.name = name;
     if (languagePreference !== undefined) updateData.language_preference = languagePreference;
 
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -243,7 +243,7 @@ const changePassword = async (req, res) => {
 // Get user statistics
 const getUserStats = async (req, res) => {
   try {
-    const stats = await User.getStats(req.user.userId);
+    const stats = await User.getStats(req.user.id);
     res.json({
       success: true,
       data: {
