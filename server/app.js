@@ -19,6 +19,7 @@ const bookingsRoutes = require('./routes/bookings.routes');
 const messagesRoutes = require('./routes/messages.routes');
 const ratingsRoutes = require('./routes/ratings.routes');
 const statsRoutes = require('./routes/stats.routes');
+const citiesRoutes = require('./routes/cities.routes');
 
 const app = express();
 
@@ -89,6 +90,7 @@ app.use('/api/bookings', bookingsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/cities', citiesRoutes);
 
 // Backward compatibility: Register routes without /api prefix
 app.use('/auth', authRoutes);
@@ -98,6 +100,7 @@ app.use('/bookings', bookingsRoutes);
 app.use('/messages', messagesRoutes);
 app.use('/ratings', ratingsRoutes);
 app.use('/stats', statsRoutes);
+app.use('/cities', citiesRoutes);
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {

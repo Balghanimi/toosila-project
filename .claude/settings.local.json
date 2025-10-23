@@ -18,7 +18,9 @@
       "Bash(Remove-Item -Force package-lock.json)",
       "Bash(ipconfig /flushdns)",
       "Bash(powershell.exe -Command \"ipconfig /flushdns\")",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(cat server/.gitignore)",
+      "Bash(find \"c:\\Users\\a2z\\toosila-project\\client\\src\" -type f ( -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.jsx\" -o -name \"*.js\" ))"
     ],
     "deny": [],
     "ask": []

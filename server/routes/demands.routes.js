@@ -27,10 +27,12 @@ const {
 router.get('/', validatePagination, getDemands);
 router.get('/search', validatePagination, searchDemands);
 router.get('/categories', getCategories);
-router.get('/:id', validateId, getDemandById);
 
 // Protected routes
 router.use(authenticateToken); // All routes below require authentication
+
+// Protected routes that need authentication
+router.get('/:id', validateId, getDemandById);
 
 // Demand management routes
 router.post('/', moderateLimiter, validateDemandCreation, createDemand);

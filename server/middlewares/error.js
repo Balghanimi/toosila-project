@@ -62,8 +62,7 @@ const errorHandler = (err, req, res, next) => {
     const column = err.column || 'unknown';
     error = {
       message: `Required field missing: ${column}`,
-      status: 400,
-      details: err.detail || `Column '${column}' cannot be null`
+      status: 400
     };
   }
 

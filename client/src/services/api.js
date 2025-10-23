@@ -30,7 +30,7 @@ const apiRequest = async (endpoint, options = {}) => {
       let errorMessage = data.error || data.message || 'حدث خطأ';
 
       // If there are validation details, include them
-      if (data.details && data.details.length > 0) {
+      if (data.details && Array.isArray(data.details) && data.details.length > 0) {
         const detailMessages = data.details.map(d => `${d.field}: ${d.message}`).join(', ');
         errorMessage = `${errorMessage} - ${detailMessages}`;
       }
@@ -202,6 +202,18 @@ export const statsAPI = {
   },
   getRecentActivity: async () => {
     return apiRequest('/stats/recent-activity', { method: 'GET' });
+  },
+};
+
+export const citiesAPI = {
+  getAll: async () => {
+    return apiRequest('/cities', { method: 'GET' });
+  },
+  add: async (cityName) => {
+    return apiRequest('/cities', {
+      method: 'POST',
+      body: JSON.stringify({ name: cityName }),
+    });
   },
 };
 

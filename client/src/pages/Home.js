@@ -2,15 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { demandsAPI } from '../services/api';
-
-// قائمة المدن العراقية
-const IRAQI_CITIES = [
-  'بغداد', 'البصرة', 'الموصل', 'أربيل', 'كركوك', 'النجف', 'كربلاء',
-  'السليمانية', 'الديوانية', 'العمارة', 'الحلة', 'الرمادي', 'الناصرية',
-  'الكوت', 'الديوانية', 'بعقوبة', 'سامراء', 'الفلوجة', 'زاخو', 'دهوك',
-  'تكريت', 'المدائن', 'الكاظمية', 'الأعظمية', 'الكرخ', 'الرصافة'
-];
+import { demandsAPI, citiesAPI } from '../services/api';
 
 const Home = () => {
   const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
@@ -28,10 +20,26 @@ const Home = () => {
   const [showDropSuggestions, setShowDropSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [availableCities, setAvailableCities] = useState([]); // Cities from database
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
+
+  // Fetch cities from database on component mount
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await citiesAPI.getAll();
+        setAvailableCities(response.cities || []);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        // Fallback to empty array if API fails
+        setAvailableCities([]);
+      }
+    };
+    fetchCities();
+  }, []);
 
   useEffect(() => {
     setIsAnimated(true);
@@ -100,6 +108,10 @@ const Home = () => {
       setSubmitError('');
 
       try {
+        // Save cities to database if they're new
+        await saveNewCityIfNeeded(pickupLocation);
+        await saveNewCityIfNeeded(dropLocation);
+
         // إنشاء تاريخ البداية والنهاية
         const earliestDateTime = new Date(`${calculatedDate}T${departureTime}:00`);
 
@@ -146,7 +158,7 @@ const Home = () => {
   const handlePickupChange = (value) => {
     setPickupLocation(value);
     if (value.trim()) {
-      const filtered = IRAQI_CITIES.filter(city =>
+      const filtered = availableCities.filter(city =>
         city.includes(value.trim())
       );
       setPickupSuggestions(filtered);
@@ -159,7 +171,7 @@ const Home = () => {
   const handleDropChange = (value) => {
     setDropLocation(value);
     if (value.trim()) {
-      const filtered = IRAQI_CITIES.filter(city =>
+      const filtered = availableCities.filter(city =>
         city.includes(value.trim())
       );
       setDropSuggestions(filtered);
@@ -177,6 +189,32 @@ const Home = () => {
   const selectDropCity = (city) => {
     setDropLocation(city);
     setShowDropSuggestions(false);
+  };
+
+  // Auto-save new city to database when user enters it
+  const saveNewCityIfNeeded = async (cityName) => {
+    if (!cityName || cityName.trim().length < 2) return;
+
+    const trimmedCity = cityName.trim();
+
+    // Check if city already exists in our list (case-insensitive)
+    const cityExists = availableCities.some(
+      city => city.toLowerCase() === trimmedCity.toLowerCase()
+    );
+
+    if (!cityExists) {
+      try {
+        const response = await citiesAPI.add(trimmedCity);
+        if (!response.alreadyExists) {
+          // Add to local state immediately for better UX
+          setAvailableCities(prev => [...prev, trimmedCity].sort());
+          console.log('تم إضافة مدينة جديدة:', trimmedCity);
+        }
+      } catch (error) {
+        console.error('Error saving city:', error);
+        // Don't show error to user - silent fail is OK for this feature
+      }
+    }
   };
 
   const getCurrentDate = () => {
