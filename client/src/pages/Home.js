@@ -975,6 +975,45 @@ const Home = () => {
             )}
           </button>
 
+          {/* Browse Available Offers Button - For passengers in find mode */}
+          {mode === 'find' && (
+            <button
+              onClick={() => navigate('/offers')}
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                width: '100%',
+                padding: 'var(--space-4)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-6)',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: 'var(--text-white)',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'var(--shadow-md)';
+              }}
+            >
+              <span>🚗</span>
+              <span>تصفح الرحلات المتاحة</span>
+            </button>
+          )}
+
           <style>{`
             @keyframes spin {
               0% { transform: rotate(0deg); }
