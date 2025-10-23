@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 
 export default function Login({ onSwitchToRegister, onClose }) {
   const { login, loading, error } = useAuth();
+  const { showSuccess } = useNotifications();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -21,6 +23,9 @@ export default function Login({ onSwitchToRegister, onClose }) {
     e.preventDefault();
     const result = await login(formData);
     if (result.success) {
+      // Show welcome message with user role
+      const userRole = result.user.isDriver ? 'سائق' : 'راكب';
+      showSuccess(`مرحباً ${result.user.name}! تم تسجيل دخولك ك${userRole} 🎉`);
       onClose();
     }
   };

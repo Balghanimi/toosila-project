@@ -285,27 +285,7 @@ const Home = () => {
             padding: 'var(--space-1)',
             boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)'
           }}>
-            <button
-              onClick={() => setMode('find')}
-              style={{
-                padding: 'var(--space-3) var(--space-2)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background: mode === 'find' ? 'var(--surface-primary)' : 'transparent',
-                color: mode === 'find' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                boxShadow: mode === 'find' ? 'var(--shadow-sm)' : 'none',
-                transform: mode === 'find' ? 'scale(1.02)' : 'scale(1)',
-                fontFamily: '"Cairo", sans-serif'
-              }}
-            >
-              🔍 {t('findRide')}
-            </button>
-
-            {/* Show offer button only for drivers */}
+            {/* Show offer button first for drivers */}
             {currentUser?.isDriver && (
               <button
                 onClick={() => setMode('offer')}
@@ -328,7 +308,7 @@ const Home = () => {
               </button>
             )}
 
-            {/* Show demand button only for passengers */}
+            {/* Show demand button first for passengers */}
             {!currentUser?.isDriver && (
               <button
                 onClick={() => setMode('demand')}
@@ -350,6 +330,26 @@ const Home = () => {
                 💺 طلب رحلة
               </button>
             )}
+
+            <button
+              onClick={() => setMode('find')}
+              style={{
+                padding: 'var(--space-3) var(--space-2)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                background: mode === 'find' ? 'var(--surface-primary)' : 'transparent',
+                color: mode === 'find' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+                boxShadow: mode === 'find' ? 'var(--shadow-sm)' : 'none',
+                transform: mode === 'find' ? 'scale(1.02)' : 'scale(1)',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              🔍 {t('findRide')}
+            </button>
           </div>
 
           {/* Location Inputs */}
