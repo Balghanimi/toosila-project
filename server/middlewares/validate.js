@@ -70,53 +70,51 @@ const validateUserUpdate = [
   handleValidationErrors
 ];
 
-// Offer validation rules
+// Offer validation rules (for ride sharing offers)
 const validateOfferCreation = [
-  body('title')
+  body('fromCity')
     .trim()
-    .isLength({ min: 5, max: 100 })
-    .withMessage('Title must be between 5 and 100 characters'),
-  body('description')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('From city must be between 2 and 100 characters'),
+  body('toCity')
     .trim()
-    .isLength({ min: 20, max: 1000 })
-    .withMessage('Description must be between 20 and 1000 characters'),
+    .isLength({ min: 2, max: 100 })
+    .withMessage('To city must be between 2 and 100 characters'),
+  body('departureTime')
+    .isISO8601()
+    .withMessage('Please provide a valid departure time'),
+  body('seats')
+    .isInt({ min: 1, max: 7 })
+    .withMessage('Seats must be between 1 and 7'),
   body('price')
     .isFloat({ min: 0 })
     .withMessage('Price must be a positive number'),
-  body('category')
-    .isIn(['transportation', 'accommodation', 'food', 'services', 'other'])
-    .withMessage('Please select a valid category'),
-  body('location')
-    .trim()
-    .isLength({ min: 2, max: 100 })
-    .withMessage('Location must be between 2 and 100 characters'),
   handleValidationErrors
 ];
 
 const validateOfferUpdate = [
-  body('title')
+  body('fromCity')
     .optional()
     .trim()
-    .isLength({ min: 5, max: 100 })
-    .withMessage('Title must be between 5 and 100 characters'),
-  body('description')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('From city must be between 2 and 100 characters'),
+  body('toCity')
     .optional()
     .trim()
-    .isLength({ min: 20, max: 1000 })
-    .withMessage('Description must be between 20 and 1000 characters'),
+    .isLength({ min: 2, max: 100 })
+    .withMessage('To city must be between 2 and 100 characters'),
+  body('departureTime')
+    .optional()
+    .isISO8601()
+    .withMessage('Please provide a valid departure time'),
+  body('seats')
+    .optional()
+    .isInt({ min: 1, max: 7 })
+    .withMessage('Seats must be between 1 and 7'),
   body('price')
     .optional()
     .isFloat({ min: 0 })
     .withMessage('Price must be a positive number'),
-  body('category')
-    .optional()
-    .isIn(['transportation', 'accommodation', 'food', 'services', 'other'])
-    .withMessage('Please select a valid category'),
-  body('location')
-    .optional()
-    .trim()
-    .isLength({ min: 2, max: 100 })
-    .withMessage('Location must be between 2 and 100 characters'),
   handleValidationErrors
 ];
 
