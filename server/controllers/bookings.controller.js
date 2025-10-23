@@ -4,8 +4,8 @@ const { asyncHandler, AppError } = require('../middlewares/error');
 
 // Create a new booking
 const createBooking = asyncHandler(async (req, res) => {
-  const { offerId, startDate, endDate, message } = req.body;
-  
+  const { offerId, seats = 1, message } = req.body;
+
   // Check if offer exists and is active
   const offer = await Offer.findById(offerId);
   if (!offer) {
@@ -21,27 +21,28 @@ const createBooking = asyncHandler(async (req, res) => {
     throw new AppError('You cannot book your own offer', 400);
   }
 
-  // Check for overlapping bookings
+  // Check if enough seats are available
   const { query } = require('../config/db');
-  const overlappingBookings = await query(
-    `SELECT * FROM bookings 
-     WHERE offer_id = $1 
-     AND status IN ('pending', 'confirmed')
-     AND (
-       (start_date <= $2 AND end_date >= $2) OR
-       (start_date <= $3 AND end_date >= $3) OR
-       (start_date >= $2 AND end_date <= $3)
-     )`,
-    [offerId, startDate, endDate]
+  const bookedSeats = await query(
+    `SELECT COALESCE(SUM(seats), 0) as total_booked
+     FROM bookings
+     WHERE offer_id = $1
+     AND status IN ('pending', 'confirmed')`,
+    [offerId]
   );
 
-  if (overlappingBookings.rows.length > 0) {
-    throw new AppError('This offer is not available for the selected dates', 400);
+  const totalBooked = parseInt(bookedSeats.rows[0].total_booked) || 0;
+  const availableSeats = offer.seats - totalBooked;
+
+  if (seats > availableSeats) {
+    throw new AppError(`Only ${availableSeats} seat(s) available`, 400);
   }
 
   const booking = await Booking.create({
     passengerId: req.user.id,
-    offerId
+    offerId,
+    seats,
+    message
   });
 
   res.status(201).json({

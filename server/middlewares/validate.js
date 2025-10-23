@@ -148,13 +148,10 @@ const validateBookingCreation = [
   body('offerId')
     .isInt({ min: 1 })
     .withMessage('Please provide a valid offer ID'),
-  body('startDate')
-    .isISO8601()
-    .withMessage('Please provide a valid start date'),
-  body('endDate')
+  body('seats')
     .optional()
-    .isISO8601()
-    .withMessage('Please provide a valid end date'),
+    .isInt({ min: 1, max: 7 })
+    .withMessage('Seats must be between 1 and 7'),
   body('message')
     .optional()
     .trim()

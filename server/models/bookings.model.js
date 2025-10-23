@@ -5,6 +5,8 @@ class Booking {
     this.id = data.id;
     this.offerId = data.offer_id;
     this.passengerId = data.passenger_id;
+    this.seats = data.seats || 1;
+    this.message = data.message;
     this.status = data.status;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
@@ -12,12 +14,12 @@ class Booking {
 
   // Create a new booking
   static async create(bookingData) {
-    const { offerId, passengerId } = bookingData;
+    const { offerId, passengerId, seats = 1, message } = bookingData;
     const result = await query(
-      `INSERT INTO bookings (offer_id, passenger_id, status)
-       VALUES ($1, $2, 'pending')
+      `INSERT INTO bookings (offer_id, passenger_id, seats, message, status)
+       VALUES ($1, $2, $3, $4, 'pending')
        RETURNING *`,
-      [offerId, passengerId]
+      [offerId, passengerId, seats, message || null]
     );
     return new Booking(result.rows[0]);
   }
