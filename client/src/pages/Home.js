@@ -811,14 +811,15 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Seats and Price */}
-          <div style={{
-            position: 'relative',
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 'var(--space-4)',
-            marginBottom: 'var(--space-6)'
-          }}>
+          {/* Seats and Price - Only show for offer and demand modes */}
+          {mode !== 'find' && (
+            <div style={{
+              position: 'relative',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-6)'
+            }}>
             <div>
               <label style={{
                 display: 'block',
@@ -908,7 +909,8 @@ const Home = () => {
                 }}
               />
             </div>
-          </div>
+            </div>
+          )}
 
           {/* Next Button */}
           <button
