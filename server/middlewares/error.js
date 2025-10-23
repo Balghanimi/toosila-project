@@ -1,6 +1,7 @@
 // Global error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error('Error:', err);
+  console.error('Error details:', { code: err.code, column: err.column, detail: err.detail });
 
   // Default error
   let error = {
@@ -58,9 +59,11 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.code === '23502') { // Not null violation
+    const column = err.column || 'unknown';
     error = {
-      message: 'Required field missing',
-      status: 400
+      message: `Required field missing: ${column}`,
+      status: 400,
+      details: err.detail || `Column '${column}' cannot be null`
     };
   }
 
