@@ -355,7 +355,6 @@ const Home = () => {
           {/* Location Inputs */}
           <div style={{
             position: 'relative',
-            zIndex: 1,
             background: 'var(--surface-secondary)',
             borderRadius: 'var(--radius-lg)',
             border: '2px solid var(--border-light)',
@@ -582,7 +581,7 @@ const Home = () => {
           </div>
 
           {/* Date and Time */}
-          <div style={{ position: 'relative', zIndex: 1, marginBottom: 'var(--space-6)' }}>
+          <div style={{ position: 'relative', marginBottom: 'var(--space-6)' }}>
             <h3 style={{
               fontSize: 'var(--text-lg)',
               fontWeight: '600',
@@ -815,7 +814,6 @@ const Home = () => {
           {/* Seats and Price */}
           <div style={{
             position: 'relative',
-            zIndex: 1,
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: 'var(--space-4)',
@@ -877,11 +875,15 @@ const Home = () => {
                 textAlign: 'start',
                 fontFamily: '"Cairo", sans-serif'
               }}>
-                السعر لكل مقعد
+                السعر لكل مقعد (د.ع)
               </label>
-              <select
+              <input
+                type="number"
                 value={pricePerSeat}
                 onChange={(e) => setPricePerSeat(e.target.value)}
+                placeholder="أدخل السعر"
+                min="1000"
+                step="1000"
                 style={{
                   width: '100%',
                   padding: 'var(--space-3)',
@@ -889,11 +891,10 @@ const Home = () => {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   background: 'var(--surface-primary)',
-                  color: pricePerSeat ? 'var(--text-primary)' : 'var(--text-muted)',
+                  color: 'var(--text-primary)',
                   direction: 'rtl',
                   fontFamily: '"Cairo", sans-serif',
                   fontWeight: '500',
-                  cursor: 'pointer',
                   transition: 'var(--transition)',
                   outline: 'none'
                 }}
@@ -905,21 +906,7 @@ const Home = () => {
                   e.target.style.borderColor = 'var(--border-light)';
                   e.target.style.boxShadow = 'none';
                 }}
-              >
-                <option value="" disabled>اضغط للتحديد</option>
-                <option value="5000">5,000 د.ع</option>
-                <option value="10000">10,000 د.ع</option>
-                <option value="15000">15,000 د.ع</option>
-                <option value="20000">20,000 د.ع</option>
-                <option value="25000">25,000 د.ع</option>
-                <option value="30000">30,000 د.ع</option>
-                <option value="40000">40,000 د.ع</option>
-                <option value="50000">50,000 د.ع</option>
-                <option value="75000">75,000 د.ع</option>
-                <option value="100000">100,000 د.ع</option>
-                <option value="150000">150,000 د.ع</option>
-                <option value="200000">200,000 د.ع</option>
-              </select>
+              />
             </div>
           </div>
 
