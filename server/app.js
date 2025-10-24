@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 
+// Version: 1.1.0 - Fixed booking system to support seats and message
+
 // Import configuration
 const config = require('./config/env');
 
