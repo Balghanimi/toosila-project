@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 export default function Settings() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { language, changeLanguage, t } = useLanguage();
+  const { language, changeLanguage } = useLanguage();
 
   const settingsGroups = [
     {
