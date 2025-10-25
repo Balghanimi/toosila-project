@@ -264,5 +264,57 @@ export const demandResponsesAPI = {
   },
 };
 
+// Notifications API
+export const notificationsAPI = {
+  // جلب إشعارات المستخدم مع pagination
+  getNotifications: async (limit = 20, offset = 0) => {
+    return apiRequest(`/notifications?limit=${limit}&offset=${offset}`, {
+      method: 'GET',
+    });
+  },
+
+  // جلب عدد الإشعارات غير المقروءة
+  getUnreadCount: async () => {
+    return apiRequest('/notifications/unread-count', {
+      method: 'GET',
+    });
+  },
+
+  // جلب الإشعارات غير المقروءة فقط
+  getUnread: async (limit = 20) => {
+    return apiRequest(`/notifications/unread?limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  // جلب الإشعارات حسب النوع
+  getByType: async (type, limit = 20) => {
+    return apiRequest(`/notifications/type/${type}?limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  // تحديد إشعار كمقروء
+  markAsRead: async (notificationId) => {
+    return apiRequest(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  // تحديد جميع الإشعارات كمقروءة
+  markAllAsRead: async () => {
+    return apiRequest('/notifications/mark-all-read', {
+      method: 'PATCH',
+    });
+  },
+
+  // حذف إشعار
+  delete: async (notificationId) => {
+    return apiRequest(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 export default apiRequest;
 
