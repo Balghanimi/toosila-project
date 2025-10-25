@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../services/api';
 
 const Profile = () => {
-  const { currentUser, setCurrentUser, logout } = useAuth();
+  const { currentUser, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [message, setMessage] = useState('');
@@ -26,24 +25,22 @@ const Profile = () => {
     setError('');
 
     try {
-      await authAPI.updateProfile({
+      const result = await updateProfile({
         isDriver: !currentUser.isDriver
       });
 
-      // Update current user in context
-      setCurrentUser({
-        ...currentUser,
-        isDriver: !currentUser.isDriver
-      });
+      if (result.success) {
+        setMessage(
+          currentUser.isDriver
+            ? 'تم التبديل إلى وضع الراكب بنجاح ✅'
+            : 'تم التبديل إلى وضع السائق بنجاح ✅'
+        );
 
-      setMessage(
-        currentUser.isDriver
-          ? 'تم التبديل إلى وضع الراكب بنجاح ✅'
-          : 'تم التبديل إلى وضع السائق بنجاح ✅'
-      );
-
-      // Clear message after 3 seconds
-      setTimeout(() => setMessage(''), 3000);
+        // Clear message after 3 seconds
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setError(result.error || 'حدث خطأ أثناء التحديث. حاول مرة أخرى.');
+      }
 
     } catch (err) {
       console.error('Error updating profile:', err);
