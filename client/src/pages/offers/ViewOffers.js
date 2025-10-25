@@ -94,7 +94,13 @@ export default function ViewOffers() {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'غير محدد';
+
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) return 'غير محدد';
+
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -114,7 +120,13 @@ export default function ViewOffers() {
   };
 
   const formatTime = (dateString) => {
+    if (!dateString) return '--:--';
+
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) return '--:--';
+
     return date.toLocaleTimeString('ar-EG', {
       hour: '2-digit',
       minute: '2-digit'
