@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const UserMenu = ({ onClose }) => {
   const [isAnimated, setIsAnimated] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsAnimated(true);
@@ -94,10 +96,10 @@ const UserMenu = ({ onClose }) => {
           marginBottom: 'var(--space-6)'
         }}>
           {[
-            { icon: '👤', label: 'الملف الشخصي', action: () => console.log('Profile') },
-            { icon: '🚗', label: 'رحلاتي', action: () => console.log('My rides') },
-            { icon: '⭐', label: 'التقييمات', action: () => console.log('Ratings') },
-            { icon: '⚙️', label: 'الإعدادات', action: () => console.log('Settings') },
+            { icon: '👤', label: 'الملف الشخصي', action: () => { navigate('/profile'); onClose(); } },
+            { icon: '🚗', label: 'رحلاتي', action: () => { navigate('/bookings'); onClose(); } },
+            { icon: '⭐', label: 'التقييمات', action: () => { navigate('/ratings'); onClose(); } },
+            { icon: '⚙️', label: 'الإعدادات', action: () => { navigate('/settings'); onClose(); } },
           ].map((item, index) => (
             <button
               key={index}

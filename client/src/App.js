@@ -15,6 +15,7 @@ import Home from './pages/Home';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
 import Bookings from './pages/Bookings';
+import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 // العروض
 import PostOfferModern from './pages/offers/PostOfferModern';
@@ -55,6 +56,7 @@ export default function App() {
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/bookings" element={<Bookings />} />
+                    <Route path="/settings" element={<Settings />} />
                     {/* مسارات العروض */}
                     <Route path="/post-offer" element={<PostOfferModern />} />
                     <Route path="/offers" element={<ViewOffers />} />
