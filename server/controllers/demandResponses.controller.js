@@ -2,6 +2,7 @@ const DemandResponse = require('../models/demandResponses.model');
 const Demand = require('../models/demands.model');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
+const { notifyDemandResponse, notifyResponseStatus } = require('../utils/notificationHelpers');
 
 /**
  * إنشاء رد جديد على طلب رحلة
@@ -60,6 +61,9 @@ const createDemandResponse = asyncHandler(async (req, res) => {
     availableSeats,
     message
   });
+
+  // إرسال إشعار للراكب
+  await notifyDemandResponse(demandId, driverId, req.user.name);
 
   res.status(201).json({
     success: true,
@@ -217,6 +221,11 @@ const updateResponseStatus = asyncHandler(async (req, res) => {
 
     // يمكن أيضاً تعطيل الطلب نفسه (اختياري)
     await Demand.update(response.demandId, { is_active: false });
+  }
+
+  // إرسال إشعار للسائق عند قبول/رفض رده (ليس عند الإلغاء)
+  if (status === 'accepted' || status === 'rejected') {
+    await notifyResponseStatus(id, status === 'accepted');
   }
 
   res.json({
