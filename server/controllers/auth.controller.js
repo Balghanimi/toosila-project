@@ -152,11 +152,12 @@ const getProfile = async (req, res) => {
 // Update user profile
 const updateProfile = async (req, res) => {
   try {
-    const { name, languagePreference } = req.body;
+    const { name, languagePreference, isDriver } = req.body;
     const updateData = {};
 
     if (name !== undefined) updateData.name = name;
     if (languagePreference !== undefined) updateData.language_preference = languagePreference;
+    if (isDriver !== undefined) updateData.is_driver = isDriver;
 
     const user = await User.findById(req.user.id);
     if (!user) {
