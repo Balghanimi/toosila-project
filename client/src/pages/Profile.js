@@ -32,12 +32,14 @@ const Profile = () => {
       if (result.success) {
         setMessage(
           currentUser.isDriver
-            ? 'تم التبديل إلى وضع الراكب بنجاح ✅'
-            : 'تم التبديل إلى وضع السائق بنجاح ✅'
+            ? 'تم التبديل إلى وضع الراكب بنجاح ✅ جاري تحديث الصفحة...'
+            : 'تم التبديل إلى وضع السائق بنجاح ✅ جاري تحديث الصفحة...'
         );
 
-        // Clear message after 3 seconds
-        setTimeout(() => setMessage(''), 3000);
+        // Reload page after 1.5 seconds to refresh user state
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         setError(result.error || 'حدث خطأ أثناء التحديث. حاول مرة أخرى.');
       }
