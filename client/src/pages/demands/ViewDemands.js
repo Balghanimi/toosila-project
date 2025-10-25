@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { demandsAPI } from '../../services/api';
+import { demandsAPI, demandResponsesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import DemandResponseForm from '../../components/DemandResponseForm';
+import DemandResponsesList from '../../components/DemandResponsesList';
 
 export default function ViewDemands() {
   const [demands, setDemands] = useState([]);
@@ -14,6 +16,13 @@ export default function ViewDemands() {
     toCity: '',
     earliestDate: ''
   });
+
+  // States for demand response functionality
+  const [selectedDemand, setSelectedDemand] = useState(null);
+  const [showResponseForm, setShowResponseForm] = useState(false);
+  const [showResponses, setShowResponses] = useState(false);
+  const [demandResponses, setDemandResponses] = useState([]);
+  const [responsesLoading, setResponsesLoading] = useState(false);
 
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -64,6 +73,53 @@ export default function ViewDemands() {
       day: 'numeric',
       month: 'short'
     });
+  };
+
+  const handleSendOffer = (demand, e) => {
+    e.stopPropagation();
+    setSelectedDemand(demand);
+    setShowResponseForm(true);
+  };
+
+  const handleViewResponses = async (demand, e) => {
+    e.stopPropagation();
+    setSelectedDemand(demand);
+    setShowResponses(true);
+    setResponsesLoading(true);
+
+    try {
+      const response = await demandResponsesAPI.getByDemandId(demand.id);
+      setDemandResponses(response.data.responses || []);
+    } catch (err) {
+      console.error('Error fetching responses:', err);
+      setError('حدث خطأ أثناء تحميل الردود');
+    } finally {
+      setResponsesLoading(false);
+    }
+  };
+
+  const handleResponseSuccess = () => {
+    setShowResponseForm(false);
+    setSelectedDemand(null);
+    alert('تم إرسال عرضك بنجاح! 🎉');
+  };
+
+  const handleResponseUpdate = async () => {
+    if (selectedDemand) {
+      try {
+        const response = await demandResponsesAPI.getByDemandId(selectedDemand.id);
+        setDemandResponses(response.data.responses || []);
+      } catch (err) {
+        console.error('Error refreshing responses:', err);
+      }
+    }
+  };
+
+  const closeModals = () => {
+    setShowResponseForm(false);
+    setShowResponses(false);
+    setSelectedDemand(null);
+    setDemandResponses([]);
   };
 
   const IRAQ_CITIES = [
@@ -322,13 +378,244 @@ export default function ViewDemands() {
                 <div style={{
                   padding: 'var(--space-3)', background: 'var(--surface-secondary)',
                   borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)',
-                  color: 'var(--text-secondary)', fontFamily: '"Cairo", sans-serif'
+                  color: 'var(--text-secondary)', fontFamily: '"Cairo", sans-serif',
+                  marginBottom: currentUser && currentUser.isDriver ? 'var(--space-3)' : '0'
                 }}>👤 الراكب: {demand.name || 'غير متوفر'}</div>
+
+                {/* Action buttons for drivers */}
+                {currentUser && currentUser.isDriver && (
+                  <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}>
+                    <button
+                      onClick={(e) => handleSendOffer(demand, e)}
+                      style={{
+                        flex: 1,
+                        padding: 'var(--space-3)',
+                        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        boxShadow: 'var(--shadow-sm)',
+                        transition: 'var(--transition)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                      }}
+                    >
+                      💼 إرسال عرض
+                    </button>
+                    <button
+                      onClick={(e) => handleViewResponses(demand, e)}
+                      style={{
+                        flex: 1,
+                        padding: 'var(--space-3)',
+                        background: 'var(--surface-secondary)',
+                        color: 'var(--text-primary)',
+                        border: '2px solid var(--border-light)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        transition: 'var(--transition)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-light)';
+                      }}
+                    >
+                      📋 عرض العروض
+                    </button>
+                  </div>
+                )}
+
+                {/* Action button for passengers to view responses on their own demands */}
+                {currentUser && !currentUser.isDriver && demand.passengerId === currentUser.id && (
+                  <button
+                    onClick={(e) => handleViewResponses(demand, e)}
+                    style={{
+                      width: '100%',
+                      marginTop: 'var(--space-3)',
+                      padding: 'var(--space-3)',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontFamily: '"Cairo", sans-serif',
+                      boxShadow: 'var(--shadow-sm)',
+                      transition: 'var(--transition)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.02)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                    }}
+                  >
+                    📋 عرض الردود ({demand.responseCount || 0})
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal for sending offer */}
+      {showResponseForm && selectedDemand && (
+        <div
+          onClick={closeModals}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 'var(--space-4)'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: 'var(--shadow-2xl)'
+            }}
+          >
+            <DemandResponseForm
+              demand={selectedDemand}
+              onSuccess={handleResponseSuccess}
+              onCancel={closeModals}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Modal for viewing responses */}
+      {showResponses && selectedDemand && (
+        <div
+          onClick={closeModals}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 'var(--space-4)'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              maxWidth: '800px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: 'var(--shadow-2xl)',
+              padding: 'var(--space-6)'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 'var(--space-4)',
+              paddingBottom: 'var(--space-4)',
+              borderBottom: '2px solid var(--border-light)'
+            }}>
+              <h2 style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: '700',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)'
+              }}>
+                📋 الردود على الطلب
+              </h2>
+              <button
+                onClick={closeModals}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: 'var(--text-2xl)',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)',
+                  padding: 'var(--space-2)',
+                  lineHeight: 1
+                }}
+              >
+                ✖️
+              </button>
+            </div>
+
+            <div style={{
+              background: 'var(--surface-secondary)',
+              borderRadius: 'var(--radius)',
+              padding: 'var(--space-4)',
+              marginBottom: 'var(--space-4)',
+              fontFamily: '"Cairo", sans-serif'
+            }}>
+              <div style={{ fontSize: 'var(--text-lg)', fontWeight: '600', marginBottom: 'var(--space-2)' }}>
+                {selectedDemand.fromCity} ← {selectedDemand.toCity}
+              </div>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                💺 {selectedDemand.seats} مقعد | 💰 {selectedDemand.budgetMax?.toLocaleString()} د.ع
+              </div>
+            </div>
+
+            {responsesLoading ? (
+              <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--text-secondary)' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid var(--border-light)',
+                  borderTop: '4px solid var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto var(--space-4) auto'
+                }} />
+                جاري تحميل الردود...
+              </div>
+            ) : (
+              <DemandResponsesList
+                responses={demandResponses}
+                isOwner={currentUser && selectedDemand.passengerId === currentUser.id}
+                onResponseUpdate={handleResponseUpdate}
+              />
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin {

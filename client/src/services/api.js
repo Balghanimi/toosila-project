@@ -217,5 +217,52 @@ export const citiesAPI = {
   },
 };
 
+// Demand Responses API
+export const demandResponsesAPI = {
+  // إنشاء رد على طلب (للسائقين)
+  create: async (responseData) => {
+    return apiRequest('/demand-responses', {
+      method: 'POST',
+      body: JSON.stringify(responseData),
+    });
+  },
+
+  // جلب جميع الردود على طلب معين
+  getByDemandId: async (demandId) => {
+    return apiRequest(`/demand-responses/demand/${demandId}`, {
+      method: 'GET',
+    });
+  },
+
+  // جلب ردود السائق الحالي
+  getMyResponses: async () => {
+    return apiRequest('/demand-responses/my-responses', {
+      method: 'GET',
+    });
+  },
+
+  // جلب رد واحد
+  getById: async (responseId) => {
+    return apiRequest(`/demand-responses/${responseId}`, {
+      method: 'GET',
+    });
+  },
+
+  // تحديث حالة رد (قبول/رفض/إلغاء)
+  updateStatus: async (responseId, status) => {
+    return apiRequest(`/demand-responses/${responseId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  // حذف رد
+  delete: async (responseId) => {
+    return apiRequest(`/demand-responses/${responseId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 export default apiRequest;
 
