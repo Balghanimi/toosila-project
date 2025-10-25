@@ -426,7 +426,7 @@ const Home = () => {
                   onChange={(e) => handlePickupChange(e.target.value)}
                   onFocus={() => {
                     if (pickupLocation.trim()) {
-                      const filtered = IRAQI_CITIES.filter(city => city.includes(pickupLocation.trim()));
+                      const filtered = availableCities.filter(city => city.includes(pickupLocation.trim()));
                       if (filtered.length > 0) {
                         setPickupSuggestions(filtered);
                         setShowPickupSuggestions(true);
@@ -553,7 +553,7 @@ const Home = () => {
                   onChange={(e) => handleDropChange(e.target.value)}
                   onFocus={() => {
                     if (dropLocation.trim()) {
-                      const filtered = IRAQI_CITIES.filter(city => city.includes(dropLocation.trim()));
+                      const filtered = availableCities.filter(city => city.includes(dropLocation.trim()));
                       if (filtered.length > 0) {
                         setDropSuggestions(filtered);
                         setShowDropSuggestions(true);
