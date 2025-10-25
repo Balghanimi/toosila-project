@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { offersAPI, bookingsAPI } from '../../services/api';
+import { offersAPI, demandsAPI, bookingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 
@@ -25,10 +25,13 @@ export default function ViewOffers() {
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  const { currentUser } = useAuth();
+  const { currentUser, user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Determine if user is a driver
+  const isDriver = user?.isDriver || currentUser?.isDriver || false;
 
   useEffect(() => {
     setIsAnimated(true);
@@ -54,11 +57,19 @@ export default function ViewOffers() {
     setError('');
 
     try {
-      const response = await offersAPI.getAll(filterParams);
-      setOffers(response.offers || []);
+      let response;
+      // If user is a driver, show demands (passenger requests)
+      // If user is a passenger, show offers (driver offers)
+      if (isDriver) {
+        response = await demandsAPI.getAll(filterParams);
+        setOffers(response.demands || []);
+      } else {
+        response = await offersAPI.getAll(filterParams);
+        setOffers(response.offers || []);
+      }
     } catch (err) {
-      console.error('Error fetching offers:', err);
-      setError('حدث خطأ أثناء تحميل العروض');
+      console.error('Error fetching offers/demands:', err);
+      setError(isDriver ? 'حدث خطأ أثناء تحميل الطلبات' : 'حدث خطأ أثناء تحميل العروض');
     } finally {
       setLoading(false);
     }
@@ -177,14 +188,14 @@ export default function ViewOffers() {
             marginBottom: 'var(--space-2)',
             fontFamily: '"Cairo", sans-serif'
           }}>
-            🚗 العروض المتاحة
+            {isDriver ? '📋 طلبات الركاب' : '🚗 العروض المتاحة'}
           </h1>
           <p style={{
             color: 'var(--text-secondary)',
             fontSize: 'var(--text-lg)',
             fontFamily: '"Cairo", sans-serif'
           }}>
-            ابحث عن رحلتك المثالية
+            {isDriver ? 'ابحث عن ركاب يحتاجون رحلة' : 'ابحث عن رحلتك المثالية'}
           </p>
         </div>
 
@@ -564,7 +575,9 @@ export default function ViewOffers() {
             borderRadius: 'var(--radius-xl)',
             boxShadow: 'var(--shadow-md)'
           }}>
-            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🚗</div>
+            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
+              {isDriver ? '📋' : '🚗'}
+            </div>
             <h3 style={{
               fontSize: 'var(--text-2xl)',
               fontWeight: '700',
@@ -572,14 +585,14 @@ export default function ViewOffers() {
               fontFamily: '"Cairo", sans-serif',
               color: 'var(--text-primary)'
             }}>
-              لا توجد عروض متاحة
+              {isDriver ? 'لا توجد طلبات متاحة' : 'لا توجد عروض متاحة'}
             </h3>
             <p style={{
               color: 'var(--text-secondary)',
               fontFamily: '"Cairo", sans-serif',
               marginBottom: 'var(--space-4)'
             }}>
-              لم نعثر على رحلات تطابق بحثك
+              {isDriver ? 'لم نعثر على طلبات تطابق بحثك' : 'لم نعثر على رحلات تطابق بحثك'}
             </p>
             {currentUser && currentUser.isDriver && (
               <button
