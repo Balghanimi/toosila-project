@@ -65,7 +65,7 @@ router.post(
   '/',
   protect,
   checkDriver,
-  validateCreateResponse,
+  ...validateCreateResponse,
   createDemandResponse
 );
 
@@ -112,7 +112,7 @@ router.get(
 router.patch(
   '/:id/status',
   protect,
-  validateUpdateStatus,
+  ...validateUpdateStatus,
   updateResponseStatus
 );
 
