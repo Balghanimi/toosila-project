@@ -10,6 +10,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { MessagesProvider } from './context/MessagesContext';
 import { BookingsProvider } from './context/BookingContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 // الصفحات
 import Home from './pages/Home';
 import Messages from './pages/Messages';
@@ -35,18 +36,20 @@ import RatingsByDate from './pages/RatingsByDate';
 import RatingsByComments from './pages/RatingsByComments';
 import RatingsByRating from './pages/RatingsByRating';
 import TestAPI from './pages/SimpleTestAPI';
+import NotificationsPage from './pages/NotificationsPage';
 import './App.css';
 
 export default function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <NotificationProvider>
-          <MessagesProvider>
-            <BookingsProvider>
-              <OffersProvider>
-                <DemandsProvider>
-                  <RatingProvider>
+        <NotificationsProvider>
+          <NotificationProvider>
+            <MessagesProvider>
+              <BookingsProvider>
+                <OffersProvider>
+                  <DemandsProvider>
+                    <RatingProvider>
                     <div>
                     <Header title="توصيلة" />
                     <main className="appContent">
@@ -77,7 +80,8 @@ export default function App() {
                     <Route path="/ratings-by-rating" element={<RatingsByRating />} />
                     {/* صفحة اختبار API */}
                     <Route path="/test-api" element={<TestAPI />} />
-                    
+                    {/* صفحة الإشعارات */}
+                    <Route path="/notifications" element={<NotificationsPage />} />
                   </Routes>
                 </main>
                 <BottomNav />
@@ -88,6 +92,7 @@ export default function App() {
         </BookingsProvider>
       </MessagesProvider>
     </NotificationProvider>
+  </NotificationsProvider>
   </AuthProvider>
 </LanguageProvider>
   );

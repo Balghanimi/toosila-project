@@ -4,6 +4,7 @@ import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotifications } from '../../context/NotificationContext';
+import NotificationBell from '../notifications/NotificationBell';
 import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
 
@@ -72,14 +73,18 @@ const Header = ({ title = 'توصيلة' }) => {
         
         <div className={styles.right}>
           <div className={styles.rightActions}>
-            <button 
+            <button
               className={styles.languageChip}
               onClick={toggleLanguage}
               aria-label="تغيير اللغة"
             >
               {language === 'ar' ? 'ع' : 'EN'}
             </button>
-            <button 
+
+            {/* Notification Bell - visible only for logged-in users */}
+            {isAuthenticated && <NotificationBell />}
+
+            <button
               className={styles.loginButton}
               onClick={handleAuthClick}
             >
