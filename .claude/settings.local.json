@@ -22,7 +22,11 @@
       "Bash(cat server/.gitignore)",
       "Bash(find \"c:\\Users\\a2z\\toosila-project\\client\\src\" -type f ( -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.jsx\" -o -name \"*.js\" ))",
       "Bash(railway:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)",
+      "Bash(while read file)"
     ],
     "deny": [],
     "ask": []
