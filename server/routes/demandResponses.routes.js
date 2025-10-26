@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middlewares/auth');
+const { authenticateToken } = require('../middlewares/auth');
 const { checkDriver } = require('../middlewares/checkDriver');
 const { body } = require('express-validator');
 const { handleValidationErrors } = require('../middlewares/validate');
@@ -63,7 +63,7 @@ const validateUpdateStatus = [
  */
 router.post(
   '/',
-  protect,
+  authenticateToken,
   checkDriver,
   ...validateCreateResponse,
   createDemandResponse
@@ -77,7 +77,7 @@ router.post(
  */
 router.get(
   '/my-responses',
-  protect,
+  authenticateToken,
   checkDriver,
   getMyResponses
 );
@@ -89,7 +89,7 @@ router.get(
  */
 router.get(
   '/demand/:demandId',
-  protect,
+  authenticateToken,
   getResponsesByDemand
 );
 
@@ -100,7 +100,7 @@ router.get(
  */
 router.get(
   '/:id',
-  protect,
+  authenticateToken,
   getResponseById
 );
 
@@ -111,7 +111,7 @@ router.get(
  */
 router.patch(
   '/:id/status',
-  protect,
+  authenticateToken,
   ...validateUpdateStatus,
   updateResponseStatus
 );
@@ -123,7 +123,7 @@ router.patch(
  */
 router.delete(
   '/:id',
-  protect,
+  authenticateToken,
   checkDriver,
   deleteDemandResponse
 );

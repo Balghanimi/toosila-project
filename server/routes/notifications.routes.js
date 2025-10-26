@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middlewares/authMiddleware');
+const { authenticateToken } = require('../middlewares/auth');
 const {
   getNotifications,
   getUnreadCount,
@@ -17,7 +17,7 @@ const {
 } = require('../controllers/notifications.controller');
 
 // جميع المسارات تتطلب المصادقة
-router.use(protect);
+router.use(authenticateToken);
 
 // GET /api/notifications - جلب إشعارات المستخدم مع pagination
 router.get('/', getNotifications);
