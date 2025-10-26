@@ -688,7 +688,7 @@ export default function ViewOffers() {
                     color: 'var(--primary)',
                     fontFamily: '"Cairo", sans-serif'
                   }}>
-                    {offer.price.toLocaleString()} د.ع
+                    {offer.price ? Number(offer.price).toLocaleString() : '0'} د.ع
                   </div>
                 </div>
 
@@ -820,7 +820,7 @@ export default function ViewOffers() {
                     fontFamily: '"Cairo", sans-serif'
                   }}
                 >
-                  💰 {selectedOffer.price.toLocaleString()} د.ع
+                  💰 {selectedOffer.price ? Number(selectedOffer.price).toLocaleString() : '0'} د.ع
                 </div>
               </div>
 

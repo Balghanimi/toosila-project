@@ -255,7 +255,7 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                     color: 'var(--primary)',
                     fontFamily: '"Cairo", sans-serif'
                   }}>
-                    {parseFloat(response.offerPrice).toLocaleString()} د.ع
+                    {response.offerPrice ? parseFloat(response.offerPrice).toLocaleString() : '0'} د.ع
                   </div>
                 </div>
 

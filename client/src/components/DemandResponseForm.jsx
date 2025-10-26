@@ -120,7 +120,7 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
             <div>
               <span style={{ color: 'var(--text-secondary)' }}>الميزانية القصوى:</span>
               <div style={{ fontWeight: '600', color: 'var(--primary)', marginTop: 'var(--space-1)' }}>
-                {demand.budgetMax.toLocaleString()} د.ع
+                {Number(demand.budgetMax).toLocaleString()} د.ع
               </div>
             </div>
           )}
@@ -170,7 +170,7 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               marginTop: 'var(--space-2)',
               fontFamily: '"Cairo", sans-serif'
             }}>
-              ⚠️ سعرك أعلى من الميزانية القصوى ({demand.budgetMax.toLocaleString()} د.ع)
+              ⚠️ سعرك أعلى من الميزانية القصوى ({Number(demand.budgetMax).toLocaleString()} د.ع)
             </div>
           )}
         </div>

@@ -373,7 +373,7 @@ export default function ViewDemands() {
                   <div style={{
                     fontSize: 'var(--text-2xl)', fontWeight: '800',
                     color: '#10b981', fontFamily: '"Cairo", sans-serif'
-                  }}>{demand.budgetMax.toLocaleString()} د.ع</div>
+                  }}>{demand.budgetMax ? Number(demand.budgetMax).toLocaleString() : '0'} د.ع</div>
                 </div>
                 <div style={{
                   padding: 'var(--space-3)', background: 'var(--surface-secondary)',
@@ -589,7 +589,7 @@ export default function ViewDemands() {
                 {selectedDemand.fromCity} ← {selectedDemand.toCity}
               </div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-                💺 {selectedDemand.seats} مقعد | 💰 {selectedDemand.budgetMax?.toLocaleString()} د.ع
+                💺 {selectedDemand.seats} مقعد | 💰 {selectedDemand.budgetMax ? Number(selectedDemand.budgetMax).toLocaleString() : '0'} د.ع
               </div>
             </div>
 
