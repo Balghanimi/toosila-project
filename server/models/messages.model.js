@@ -113,21 +113,21 @@ class Message {
     };
   }
 
-  // Get recent messages for a user
+  // Get recent messages for a user (optimized with CTE)
   static async getRecentForUser(userId, limit = 20) {
     const result = await query(
-      `SELECT DISTINCT ON (m.ride_type, m.ride_id) 
+      `WITH user_rides AS (
+         SELECT 'offer' as ride_type, id as ride_id FROM offers WHERE driver_id = $1
+         UNION ALL
+         SELECT 'demand' as ride_type, id as ride_id FROM demands WHERE passenger_id = $1
+         UNION ALL
+         SELECT 'offer' as ride_type, offer_id as ride_id FROM bookings WHERE passenger_id = $1
+       )
+       SELECT DISTINCT ON (m.ride_type, m.ride_id)
               m.*, u.name as sender_name
        FROM messages m
        JOIN users u ON m.sender_id = u.id
-       WHERE m.ride_id IN (
-         SELECT DISTINCT ride_id FROM messages 
-         WHERE sender_id = $1 OR ride_id IN (
-           SELECT id FROM offers WHERE driver_id = $1
-           UNION
-           SELECT id FROM demands WHERE passenger_id = $1
-         )
-       )
+       JOIN user_rides ur ON m.ride_type = ur.ride_type AND m.ride_id = ur.ride_id
        ORDER BY m.ride_type, m.ride_id, m.created_at DESC
        LIMIT $2`,
       [userId, limit]
@@ -145,47 +145,90 @@ class Message {
     return parseInt(result.rows[0].count);
   }
 
-  // Get conversation list for a user
+  // Get conversation list for a user (optimized with proper JOINs)
   static async getConversationList(userId, page = 1, limit = 20) {
     const offset = (page - 1) * limit;
 
     const result = await query(
-      `SELECT DISTINCT ON (m.ride_type, m.ride_id)
-              m.ride_type,
-              m.ride_id,
-              m.content as last_message,
-              m.created_at as last_message_time,
-              u.name as other_user_name,
-              u.id as other_user_id
-       FROM messages m
-       JOIN users u ON m.sender_id = u.id
-       WHERE m.ride_id IN (
-         SELECT DISTINCT ride_id FROM messages
-         WHERE sender_id = $1 OR ride_id IN (
-           SELECT id FROM offers WHERE driver_id = $1
-           UNION
-           SELECT id FROM demands WHERE passenger_id = $1
-         )
+      `WITH user_rides AS (
+         -- Get all rides where user is involved
+         SELECT 'offer' as ride_type, o.id as ride_id, o.driver_id as owner_id,
+                o.from_city, o.to_city, o.departure_time, o.price, o.seats
+         FROM offers o
+         WHERE o.driver_id = $1
+         UNION ALL
+         SELECT 'demand' as ride_type, d.id as ride_id, d.passenger_id as owner_id,
+                d.from_city, d.to_city, d.earliest_time as departure_time,
+                d.budget_max as price, d.seats
+         FROM demands d
+         WHERE d.passenger_id = $1
+         UNION ALL
+         -- Include offers where user sent a booking
+         SELECT 'offer' as ride_type, o.id as ride_id, o.driver_id as owner_id,
+                o.from_city, o.to_city, o.departure_time, o.price, o.seats
+         FROM offers o
+         WHERE o.id IN (SELECT offer_id FROM bookings WHERE passenger_id = $1)
+       ),
+       latest_messages AS (
+         SELECT DISTINCT ON (m.ride_type, m.ride_id)
+                m.ride_type,
+                m.ride_id,
+                m.content as last_message,
+                m.created_at as last_message_time,
+                m.sender_id as last_sender_id,
+                u.name as last_sender_name
+         FROM messages m
+         JOIN users u ON m.sender_id = u.id
+         WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
+         ORDER BY m.ride_type, m.ride_id, m.created_at DESC
        )
-       ORDER BY m.ride_type, m.ride_id, m.created_at DESC
+       SELECT lm.*,
+              ur.from_city,
+              ur.to_city,
+              ur.departure_time,
+              ur.price,
+              ur.seats,
+              ur.owner_id,
+              CASE
+                WHEN ur.owner_id = $1 THEN (
+                  SELECT u2.name FROM messages m2
+                  JOIN users u2 ON m2.sender_id = u2.id
+                  WHERE m2.ride_type = lm.ride_type
+                    AND m2.ride_id = lm.ride_id
+                    AND m2.sender_id != $1
+                  LIMIT 1
+                )
+                ELSE (SELECT name FROM users WHERE id = ur.owner_id)
+              END as other_user_name,
+              CASE
+                WHEN ur.owner_id = $1 THEN (
+                  SELECT m2.sender_id FROM messages m2
+                  WHERE m2.ride_type = lm.ride_type
+                    AND m2.ride_id = lm.ride_id
+                    AND m2.sender_id != $1
+                  LIMIT 1
+                )
+                ELSE ur.owner_id
+              END as other_user_id
+       FROM latest_messages lm
+       JOIN user_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
+       ORDER BY lm.last_message_time DESC
        LIMIT $2 OFFSET $3`,
       [userId, limit, offset]
     );
 
     const countResult = await query(
-      `SELECT COUNT(*) as count
-       FROM (
-         SELECT DISTINCT ride_type, ride_id
-         FROM messages
-         WHERE ride_id IN (
-           SELECT DISTINCT ride_id FROM messages
-           WHERE sender_id = $1 OR ride_id IN (
-             SELECT id FROM offers WHERE driver_id = $1
-             UNION
-             SELECT id FROM demands WHERE passenger_id = $1
-           )
-         )
-       ) AS distinct_conversations`,
+      `WITH user_rides AS (
+         SELECT 'offer' as ride_type, id as ride_id FROM offers WHERE driver_id = $1
+         UNION ALL
+         SELECT 'demand' as ride_type, id as ride_id FROM demands WHERE passenger_id = $1
+         UNION ALL
+         SELECT 'offer' as ride_type, offer_id as ride_id
+         FROM bookings WHERE passenger_id = $1
+       )
+       SELECT COUNT(DISTINCT (m.ride_type, m.ride_id)) as count
+       FROM messages m
+       WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)`,
       [userId]
     );
 
