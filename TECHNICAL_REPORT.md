@@ -1,8 +1,8 @@
 # تقرير فني شامل - تطبيق توصيلة (Toosila)
 ## Iraq Ride-Sharing Platform - Technical Report
 
-**تاريخ التقرير**: 27 أكتوبر 2025
-**الإصدار**: 1.3.0
+**تاريخ التقرير**: 28 أكتوبر 2025
+**الإصدار**: 1.4.0
 **حالة المشروع**: Production (Deployed on Railway - Optimized & Fully Functional)
 **اللغات المدعومة**: العربية، English
 
@@ -11,7 +11,7 @@
 ## 📋 جدول المحتويات
 
 1. [نظرة عامة على المشروع](#1-نظرة-عامة-على-المشروع)
-2. [التحديثات الأخيرة (27 أكتوبر 2025)](#2-التحديثات-الأخيرة-27-أكتوبر-2025)
+2. [التحديثات الأخيرة (28 أكتوبر 2025)](#2-التحديثات-الأخيرة-28-أكتوبر-2025)
 3. [البنية التقنية](#3-البنية-التقنية)
 4. [قاعدة البيانات](#4-قاعدة-البيانات)
 5. [الاختبارات والجودة](#5-الاختبارات-والجودة)
@@ -52,9 +52,94 @@
 
 ---
 
-## 2. التحديثات الأخيرة (27 أكتوبر 2025)
+## 2. التحديثات الأخيرة (28 أكتوبر 2025)
 
-### 2.1 إصلاحات حرجة تم تطبيقها
+### 🎉 الإصدار 1.4.0 - تحديثات كبيرة (28 أكتوبر 2025)
+
+#### ✅ المهمة 5: إكمال صفحة Settings (Commit: 701d46b)
+
+**الميزات المضافة**:
+- **Backend**: إضافة endpoints جديدة في auth.controller.js
+  - `updateEmail`: تحديث البريد الإلكتروني مع تحقق من كلمة المرور
+  - `deleteAccount`: حذف الحساب مع تأكيد مزدوج (password + "DELETE")
+- **Frontend Components**: إنشاء SettingsModals.jsx (450+ سطر)
+  - `ChangePasswordModal`: تغيير كلمة المرور مع validation كامل
+  - `UpdateEmailModal`: تحديث البريد مع تحقق من password
+  - `DeleteAccountModal`: حذف الحساب مع تأكيد "DELETE"
+- **Frontend API**: إضافة دوال في api.js للـ endpoints الجديدة
+- **Settings Page**: تكامل كامل مع الـ modals + success messages
+- **أمان**: password verification + cascade delete + rate limiting
+
+**التأثير**:
+- المستخدمون الآن يمكنهم إدارة حساباتهم بالكامل
+- حذف آمن للحسابات مع حذف تلقائي لجميع البيانات المرتبطة
+
+---
+
+#### ✅ المهمة 6: إضافة Pagination (Commit: 7486bc4)
+
+**الميزات المضافة**:
+- **ViewOffers.js**: إضافة pagination state + loadMore function + Load More button
+- **ViewDemands.js**: نفس النمط، pagination كامل
+- **Backend**: كان مكتملاً بالفعل (page/limit params في controllers)
+- **Features**:
+  - عرض "X من Y نتيجة"
+  - زر "تحميل المزيد" مع loading states
+  - Smooth transitions + hover effects
+  - يعمل للعروض والطلبات
+
+**التأثير**:
+- تحسين الأداء: تحميل 20 نتيجة فقط في البداية
+- تجربة مستخدم أفضل مع infinite scroll pattern
+
+---
+
+#### ✅ المهمة 7: نظام الإشعارات الفورية Socket.io (Commit: bc66aa4)
+
+**الميزات المضافة**:
+
+**Backend**:
+- **server/socket/index.js** (240 سطر):
+  - JWT authentication middleware للاتصالات
+  - تتبع المستخدمين النشطين بـ Map storage
+  - 5 event handlers: new-booking, booking-status-updated, new-message, new-demand-response, demand-response-status-updated
+  - Connection management مع auto-reconnection
+- **server/server.js**: تهيئة Socket.io وإتاحته عبر app.set('io')
+- **Controllers**: إضافة socket events في:
+  - bookings.controller.js
+  - messages.controller.js
+  - demandResponses.controller.js
+
+**Frontend**:
+- **client/src/context/SocketContext.jsx** (240 سطر):
+  - Auto-connect مع JWT authentication
+  - الاستماع لـ 5 أنواع events
+  - تخزين آخر 50 إشعار
+  - Browser notifications integration
+  - Notification sound playback
+  - Helper functions: markAsRead, markAllAsRead, clearAll
+- **client/src/App.js**: دمج SocketProvider
+- **NotificationBell.jsx**: دمج Socket notifications مع existing notifications
+
+**أنواع الإشعارات الفورية**:
+1. 🆕 حجز جديد على عرضك (للسائق)
+2. ✅ تم قبول حجزك (للراكب)
+3. ❌ تم رفض حجزك (للراكب)
+4. 💬 رسالة جديدة
+5. 🚗 عرض جديد على طلبك (للراكب)
+6. ✅ تم قبول عرضك (للسائق)
+7. ❌ تم رفض عرضك (للسائق)
+
+**التأثير**:
+- إشعارات فورية في الوقت الفعلي
+- تحسين التواصل بين السائقين والركاب
+- صوت تنبيه + browser notifications
+- تتبع الإشعارات غير المقروءة
+- مراقبة حالة الاتصال
+
+---
+
+### 2.1 إصلاحات حرجة سابقة (27 أكتوبر)
 
 #### ✅ إصلاح خطأ Middleware في Routes (Commit: a333c58)
 
@@ -384,17 +469,35 @@ idx_messages_ride_type_ride_id ON messages(ride_type, ride_id)
 
 | العنصر | قبل | بعد |
 |--------|-----|-----|
-| **إصدار التطبيق** | 1.0.0 | **1.3.0** |
-| **عدد جداول قاعدة البيانات** | 9 | 11 (أضيفت notifications, demand_responses) |
-| **Database Indexes** | أساسية فقط | **26 index محسّن** |
-| **Query Performance** | بطيء (N+1 problem) | **60-200x أسرع** |
-| **حالة الاختبارات** | لا يوجد | Jest مع 20+ test cases |
-| **حالة النشر** | أخطاء middleware | **مستقر ومحسّن** |
-| **أمان Frontend** | crashes محتملة | null checks آمنة |
-| **نظام الرد على الطلبات** | غير مُفعّل | ✅ مُفعّل بالكامل |
-| **عدد Commits اليوم** | - | **10 commits** |
+| **إصدار التطبيق** | 1.3.0 | **1.4.0** |
+| **عدد جداول قاعدة البيانات** | 11 | 11 |
+| **Database Indexes** | 26 index | **26 index محسّن** |
+| **Query Performance** | 60-200x أسرع | **60-200x أسرع** |
+| **حالة الاختبارات** | Jest مع 20+ test cases | Jest مع 20+ test cases |
+| **حالة النشر** | مستقر | **مستقر ومحسّن** |
+| **أمان Frontend** | null checks آمنة | null checks آمنة |
+| **نظام الرد على الطلبات** | ✅ مُفعّل | ✅ مُفعّل بالكامل |
+| **Pagination** | غير موجود | ✅ Load More للعروض والطلبات |
+| **Settings Page** | أساسي | ✅ كامل مع account management |
+| **Real-time Notifications** | غير موجود | ✅ Socket.io مع 7 أنواع إشعارات |
+| **عدد Commits اليوم** | - | **4 commits جديدة** |
 
-### 2.4 الـ Commits التفصيلية
+### 2.4 الـ Commits الجديدة (28 أكتوبر 2025)
+
+```bash
+# المهمة 5: Settings Page
+701d46b - feat: complete settings page with account management
+
+# المهمة 6: Pagination
+7486bc4 - feat: add pagination to offers and demands pages
+3cc3ac9 - docs: update MANAGER-PROMPTS.md with Tasks 5 & 6 completion
+
+# المهمة 7: Socket.io Real-time Notifications
+bc66aa4 - feat: add Socket.io real-time notifications system
+13c5207 - docs: update MANAGER-PROMPTS.md with Task 7 completion
+```
+
+### 2.5 الـ Commits السابقة (27 أكتوبر 2025)
 
 ```bash
 # إصلاحات حرجة
@@ -467,6 +570,7 @@ b1fd891 - perf: add database indexes migration and verification tools
 | **React** | 18.2.0 | مكتبة بناء واجهة المستخدم |
 | **React Router DOM** | 6.3.0 | التنقل بين الصفحات (SPA) |
 | **Context API** | Built-in | إدارة الحالة العامة |
+| **Socket.io Client** | 4.8.1 | الإشعارات الفورية (WebSocket) |
 | **CSS3** | - | التنسيقات (CSS Variables + Flexbox/Grid) |
 
 **Dependencies الرئيسية**:
@@ -475,7 +579,8 @@ b1fd891 - perf: add database indexes migration and verification tools
   "react": "^18.2.0",
   "react-dom": "^18.2.0",
   "react-router-dom": "^6.3.0",
-  "react-scripts": "5.0.1"
+  "react-scripts": "5.0.1",
+  "socket.io-client": "^4.8.1"
 }
 ```
 
@@ -486,6 +591,7 @@ b1fd891 - perf: add database indexes migration and verification tools
 | **Node.js** | 16+ | بيئة التشغيل |
 | **Express** | 5.1.0 | إطار عمل الخادم |
 | **PostgreSQL** | 14+ | قاعدة البيانات الرئيسية |
+| **Socket.io** | 4.8.1 | WebSocket للإشعارات الفورية |
 | **JWT** | 9.0.2 | المصادقة والتفويض |
 | **bcrypt** | 6.0.0 | تشفير كلمات المرور |
 | **express-validator** | 7.2.1 | التحقق من صحة المدخلات |
@@ -495,6 +601,7 @@ b1fd891 - perf: add database indexes migration and verification tools
 {
   "express": "^5.1.0",
   "pg": "^8.16.3",
+  "socket.io": "^4.8.1",
   "jsonwebtoken": "^9.0.2",
   "bcrypt": "^6.0.0",
   "helmet": "^8.1.0",
@@ -906,6 +1013,24 @@ npm run test:coverage
 
 **Endpoint**: `PUT /api/auth/profile`
 
+#### ✅ إعدادات الحساب (Settings - NEW in v1.4.0)
+- **تغيير كلمة المرور**: مع تحقق من كلمة المرور الحالية
+- **تحديث البريد الإلكتروني**: مع تحقق من كلمة المرور
+- **حذف الحساب**: مع تأكيد مزدوج (password + "DELETE")
+  - Cascade delete لجميع البيانات المرتبطة
+  - حذف آمن ونهائي
+
+**Endpoints**:
+- `PUT /api/auth/change-password`
+- `PUT /api/auth/update-email`
+- `DELETE /api/auth/delete-account`
+
+**UI Features**:
+- 3 modals منفصلة لكل عملية
+- Form validation كامل
+- Success/error messages
+- Loading states
+
 #### 🔒 أمان المصادقة
 - JWT Secret Key محمي في متغيرات البيئة
 - Token Expiry: 7 أيام
@@ -940,14 +1065,16 @@ npm run test:coverage
 - فلترة حسب السعر (نطاق)
 - فلترة حسب عدد المقاعد
 - ترتيب حسب: التاريخ، السعر، التقييم، المقاعد
+- **✅ Pagination** (NEW in v1.4.0): Load More مع عرض "X من Y نتيجة"
 
 **UI Features**:
 - بطاقات عرض احترافية
 - أيقونات توضيحية
 - حالة فارغة مناسبة
 - معالجة الأخطاء
+- زر "تحميل المزيد" مع loading states
 
-**Endpoint**: `GET /api/offers`
+**Endpoint**: `GET /api/offers?page=1&limit=20`
 
 #### ✅ إدارة العروض (Manage My Offers)
 - عرض عروض السائق الخاصة
@@ -1146,7 +1273,48 @@ if (requestedSeats > availableSeats) {
 - واجهة حديثة بتدرجات لونية
 - رسوم متحركة سلسة
 
-### 6.8 نظام المدن الديناميكي (Dynamic Cities)
+### 6.8 نظام الإشعارات الفورية (Real-time Notifications - NEW in v1.4.0)
+
+#### ✅ Socket.io Integration
+**إشعارات فورية في الوقت الفعلي**
+
+**Backend**:
+- **server/socket/index.js**: Socket server مع JWT authentication
+- تتبع المستخدمين النشطين (activeUsers Map)
+- 7 event handlers للإشعارات المختلفة
+- Auto-reconnection support
+
+**Frontend**:
+- **SocketContext.jsx**: Context API للإشعارات الفورية
+- Auto-connect عند تسجيل الدخول
+- Browser notifications integration
+- Notification sound playback
+- تخزين آخر 50 إشعار
+
+**أنواع الإشعارات (7 types)**:
+1. 🆕 **new-booking**: حجز جديد على عرضك (للسائق)
+2. ✅ **booking-status-updated**: تم قبول حجزك (للراكب)
+3. ❌ **booking-status-updated**: تم رفض حجزك (للراكب)
+4. 💬 **new-message**: رسالة جديدة
+5. 🚗 **new-demand-response**: عرض جديد على طلبك (للراكب)
+6. ✅ **demand-response-status-updated**: تم قبول عرضك (للسائق)
+7. ❌ **demand-response-status-updated**: تم رفض عرضك (للسائق)
+
+**Features**:
+- Real-time push notifications via WebSocket
+- Browser notifications (مع طلب الإذن)
+- صوت تنبيه عند استلام إشعار
+- Unread count tracking
+- Connection status monitoring
+- JWT-based authentication
+- Mark as read / Mark all as read
+- NotificationBell component مع badge
+
+**Endpoints**: WebSocket connection على نفس port الـ backend
+
+---
+
+### 6.9 نظام المدن الديناميكي (Dynamic Cities)
 
 #### ✅ إضافة مدينة تلقائياً
 - عند نشر عرض أو طلب، تُضاف المدن الجديدة تلقائياً إلى قاعدة البيانات
