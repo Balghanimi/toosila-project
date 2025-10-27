@@ -1,6 +1,7 @@
 const Booking = require('../models/bookings.model');
 const Offer = require('../models/offers.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
+const { notifyNewBooking, notifyBookingStatusUpdate } = require('../socket');
 
 // Create a new booking
 const createBooking = asyncHandler(async (req, res) => {
@@ -44,6 +45,17 @@ const createBooking = asyncHandler(async (req, res) => {
     seats,
     message
   });
+
+  // Send real-time notification to driver
+  const io = req.app.get('io');
+  if (io) {
+    notifyNewBooking(io, offer.driverId, {
+      ...booking.toJSON(),
+      fromCity: offer.fromCity,
+      toCity: offer.toCity,
+      passengerName: req.user.name
+    });
+  }
 
   res.status(201).json({
     message: 'Booking request sent successfully',
@@ -119,6 +131,17 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
   }
 
   const updatedBooking = await booking.updateStatus(status, totalPrice);
+
+  // Send real-time notification to passenger
+  const io = req.app.get('io');
+  if (io && (status === 'confirmed' || status === 'cancelled')) {
+    notifyBookingStatusUpdate(io, booking.passengerId, {
+      ...updatedBooking.toJSON(),
+      fromCity: offer.fromCity,
+      toCity: offer.toCity,
+      status: status
+    });
+  }
 
   res.json({
     message: 'Booking status updated successfully',

@@ -3,6 +3,7 @@ const Demand = require('../models/demands.model');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { notifyDemandResponse, notifyResponseStatus } = require('../utils/notificationHelpers');
+const { notifyNewDemandResponse, notifyDemandResponseStatusUpdate } = require('../socket');
 
 /**
  * إنشاء رد جديد على طلب رحلة
@@ -64,6 +65,17 @@ const createDemandResponse = asyncHandler(async (req, res) => {
 
   // إرسال إشعار للراكب
   await notifyDemandResponse(demandId, driverId, req.user.name);
+
+  // Send real-time notification to passenger via Socket.io
+  const io = req.app.get('io');
+  if (io) {
+    notifyNewDemandResponse(io, demand.passengerId, {
+      ...response.toJSON(),
+      fromCity: demand.fromCity,
+      toCity: demand.toCity,
+      driverName: req.user.name || `${req.user.firstName} ${req.user.lastName}`
+    });
+  }
 
   res.status(201).json({
     success: true,
@@ -226,6 +238,17 @@ const updateResponseStatus = asyncHandler(async (req, res) => {
   // إرسال إشعار للسائق عند قبول/رفض رده (ليس عند الإلغاء)
   if (status === 'accepted' || status === 'rejected') {
     await notifyResponseStatus(id, status === 'accepted');
+  }
+
+  // Send real-time notification to driver via Socket.io
+  const io = req.app.get('io');
+  if (io && (status === 'accepted' || status === 'rejected')) {
+    notifyDemandResponseStatusUpdate(io, response.driverId, {
+      ...updatedResponse.toJSON(),
+      fromCity: demand.fromCity,
+      toCity: demand.toCity,
+      status: status
+    });
   }
 
   res.json({

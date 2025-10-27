@@ -1,5 +1,6 @@
 const Message = require('../models/messages.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
+const { notifyNewMessage } = require('../socket');
 
 // Send a new message
 const sendMessage = asyncHandler(async (req, res) => {
@@ -22,6 +23,15 @@ const sendMessage = asyncHandler(async (req, res) => {
     recipientId,
     content
   });
+
+  // Send real-time notification to recipient
+  const io = req.app.get('io');
+  if (io) {
+    notifyNewMessage(io, recipientId, {
+      ...message.toJSON(),
+      senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`
+    });
+  }
 
   res.status(201).json({
     message: 'Message sent successfully',

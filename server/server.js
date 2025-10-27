@@ -3,6 +3,7 @@ require('dotenv').config();
 const app = require('./app');
 const config = require('./config/env');
 const { pool } = require('./config/db');
+const { initializeSocket } = require('./socket');
 
 // Start server
 const PORT = config.PORT;
@@ -13,6 +14,13 @@ const server = app.listen(PORT, () => {
   console.log(`🌍 Environment: ${config.NODE_ENV}`);
   console.log(`📊 Database: ${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`);
 });
+
+// Initialize Socket.io
+const io = initializeSocket(server);
+console.log('🔌 Socket.io initialized for real-time notifications');
+
+// Make io instance available globally for controllers
+app.set('io', io);
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {

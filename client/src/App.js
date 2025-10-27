@@ -11,6 +11,7 @@ import { MessagesProvider } from './context/MessagesContext';
 import { BookingsProvider } from './context/BookingContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { NotificationsProvider } from './context/NotificationsContext';
+import { SocketProvider } from './context/SocketContext';
 // الصفحات
 import Home from './pages/Home';
 import Messages from './pages/Messages';
@@ -43,11 +44,12 @@ export default function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <NotificationsProvider>
-          <NotificationProvider>
-            <MessagesProvider>
-              <BookingsProvider>
-                <OffersProvider>
+        <SocketProvider>
+          <NotificationsProvider>
+            <NotificationProvider>
+              <MessagesProvider>
+                <BookingsProvider>
+                  <OffersProvider>
                   <DemandsProvider>
                     <RatingProvider>
                     <div>
@@ -93,6 +95,7 @@ export default function App() {
       </MessagesProvider>
     </NotificationProvider>
   </NotificationsProvider>
+  </SocketProvider>
   </AuthProvider>
 </LanguageProvider>
   );

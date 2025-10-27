@@ -1,14 +1,16 @@
 /**
  * NotificationBell Component
- * أيقونة الجرس في Navbar
+ * أيقونة الجرس في Navbar مع دعم الإشعارات الفورية
  */
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNotifications } from '../../context/NotificationsContext';
+import { useSocket } from '../../context/SocketContext';
 import NotificationDropdown from './NotificationDropdown';
 
 function NotificationBell() {
   const { unreadCount } = useNotifications();
+  const { unreadCount: socketUnreadCount, isConnected } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -69,8 +71,22 @@ function NotificationBell() {
           🔔
         </span>
 
-        {/* Badge العدد */}
-        {unreadCount > 0 && (
+        {/* Connection Status Indicator (small dot if not connected) */}
+        {!isConnected && (
+          <span style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#f59e0b',
+            border: '2px solid white'
+          }} />
+        )}
+
+        {/* Badge العدد - combined from both contexts */}
+        {(unreadCount + socketUnreadCount) > 0 && (
           <span
             style={{
               position: 'absolute',
@@ -89,10 +105,10 @@ function NotificationBell() {
               padding: '0 4px',
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               fontFamily: '"Cairo", sans-serif',
-              animation: unreadCount > 0 ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
+              animation: (unreadCount + socketUnreadCount) > 0 ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
             }}
           >
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {(unreadCount + socketUnreadCount) > 9 ? '9+' : (unreadCount + socketUnreadCount)}
           </span>
         )}
       </button>
