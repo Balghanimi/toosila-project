@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL ||
 const apiRequest = async (endpoint, options = {}) => {
   try {
     const token = localStorage.getItem('token');
-    
+
     const headers = {
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -19,6 +19,15 @@ const apiRequest = async (endpoint, options = {}) => {
       ...options,
       headers,
     });
+
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      // Server returned HTML or other non-JSON response (likely an error page)
+      const text = await response.text();
+      console.error('Non-JSON response from server:', text.substring(0, 200));
+      throw new Error('الخادم غير متاح حالياً، يرجى المحاولة لاحقاً');
+    }
 
     const data = await response.json();
 
