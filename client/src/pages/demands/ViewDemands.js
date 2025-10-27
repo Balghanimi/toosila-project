@@ -11,6 +11,12 @@ export default function ViewDemands() {
   const [error, setError] = useState('');
   const [isAnimated, setIsAnimated] = useState(false);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [filters, setFilters] = useState({
     fromCity: '',
     toCity: '',
@@ -38,13 +44,50 @@ export default function ViewDemands() {
     setError('');
 
     try {
+      // Add page and limit to params
+      filterParams.page = 1;
+      filterParams.limit = 20;
+
       const response = await demandsAPI.getAll(filterParams);
       setDemands(response.demands || []);
+
+      // Save pagination data
+      setTotal(response.total || 0);
+      setTotalPages(response.totalPages || 1);
+      setPage(1);
     } catch (err) {
       console.error('Error fetching demands:', err);
       setError('حدث خطأ أثناء تحميل الطلبات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load More function
+  const loadMore = async () => {
+    if (loadingMore || page >= totalPages) return;
+
+    setLoadingMore(true);
+    try {
+      const filterParams = {};
+      if (filters.fromCity) filterParams.fromCity = filters.fromCity;
+      if (filters.toCity) filterParams.toCity = filters.toCity;
+      if (filters.earliestDate) filterParams.earliestDate = filters.earliestDate;
+
+      filterParams.page = page + 1;
+      filterParams.limit = 20;
+
+      const response = await demandsAPI.getAll(filterParams);
+      setDemands(prev => [...prev, ...(response.demands || [])]);
+
+      setPage(page + 1);
+      setTotal(response.total || 0);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('Error loading more:', err);
+      setError('فشل تحميل المزيد');
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -472,6 +515,69 @@ export default function ViewDemands() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Info and Load More Button */}
+        {!loading && demands.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--space-4)',
+            marginTop: 'var(--space-6)',
+            padding: 'var(--space-4)',
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-light)'
+          }}>
+            <p style={{
+              fontSize: 'var(--text-base)',
+              fontWeight: '600',
+              color: 'var(--text-secondary)',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0
+            }}>
+              عرض {demands.length} من {total} نتيجة
+            </p>
+
+            {page < totalPages && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{
+                  padding: 'var(--space-3) var(--space-6)',
+                  background: loadingMore
+                    ? 'var(--surface-secondary)'
+                    : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                  color: loadingMore ? 'var(--text-secondary)' : 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                  boxShadow: loadingMore ? 'none' : 'var(--shadow-md)',
+                  transition: 'var(--transition)',
+                  opacity: loadingMore ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!loadingMore) {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loadingMore) {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'var(--shadow-md)';
+                  }
+                }}
+              >
+                {loadingMore ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
+              </button>
+            )}
           </div>
         )}
       </div>

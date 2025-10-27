@@ -1,0 +1,626 @@
+# Toosila Project - Enhanced Multi-Agent System
+# Version 2.0 - Enhanced with BOSS AGENT & Complete Rules
+
+---
+
+## 🎯 @manager - العميل المدير المحسّن (استخدم هذا دائماً!)
+
+**Trigger:** Type "@manager" before ANY request
+
+**NEW: BOSS AGENT Enhanced Features:**
+- Reads COMPLETE PROJECT CONTEXT (rules, standards, todo)
+- Enforces STRICT CODE QUALITY (NO LAZY CODE)
+- Coordinates 8 specialized agents
+- Tracks progress (4/10 tasks complete)
+- Reviews quality before delivery
+
+**Purpose:** Automatically analyzes your request and routes to the correct specialist
+
+**How it works:**
+1. You write: `@manager [your request in Arabic or English]`
+2. Manager reads and understands your request
+3. Manager reads project rules and standards
+4. Manager chooses the right subagent(s) automatically
+5. Task gets done by the expert with quality review!
+
+**Examples:**
+```
+@manager أنشئ صفحة تسجيل الدخول
+→ Manager chooses: @frontend + @security
+
+@manager اكتب اختبارات للـ API
+→ Manager chooses: @testing
+
+@manager أصلح مشكلة الأمان في الحجوزات
+→ Manager chooses: @security + @review
+
+@manager ابدأ بالمهمة التالية من TODO
+→ Manager reads todo list, plans, executes (رقم 5: Settings)
+```
+
+---
+
+## 🔒 PROJECT RULES (CRITICAL - NO EXCEPTIONS)
+
+### ⚠️ القاعدة الذهبية
+**NO LAZY CODE - EVER!**
+
+### معايير الكود الإجبارية
+
+#### 1. الوضوح والبساطة
+```javascript
+// ❌ سيء - غير واضح
+const x = d.filter(i => i.s === 'a').map(i => ({...i, n: i.n + 1}));
+
+// ✅ جيد - واضح
+const activeRides = demands
+  .filter(demand => demand.status === 'active')
+  .map(demand => ({
+    ...demand,
+    notificationCount: demand.notificationCount + 1
+  }));
+```
+
+#### 2. معالجة الأخطاء
+```javascript
+// ❌ سيء - يخفي الأخطاء
+try { await save(); } catch (err) {}
+
+// ✅ جيد
+try {
+  await saveBooking(data);
+} catch (error) {
+  logger.error('Failed to save booking:', { error: error.message, data });
+  throw new AppError('Unable to create booking', 500);
+}
+```
+
+#### 3. Database Security
+```javascript
+// ❌ خطير - SQL injection
+const query = `SELECT * FROM users WHERE email = '${email}'`;
+
+// ✅ آمن - Parameterized
+const query = 'SELECT * FROM users WHERE email = $1';
+const result = await pool.query(query, [email]);
+```
+
+#### 4. Performance - JOINs بدلاً من N+1
+```sql
+-- ❌ سيء - N+1 problem
+SELECT * FROM bookings; -- then loop and query for each
+
+-- ✅ جيد - Single query with JOINs
+SELECT b.*, u.name, o.from_city
+FROM bookings b
+JOIN users u ON b.user_id = u.id
+JOIN offers o ON b.offer_id = o.id;
+```
+
+### الأشياء الممنوعة
+
+❌ console.log في production
+❌ Hardcoded credentials
+❌ Magic numbers
+❌ Nested callbacks
+❌ Ignoring errors
+❌ No error handling
+❌ SQL injection vulnerabilities
+
+### Checklist قبل كل Completion
+
+- [ ] الكود واضح؟
+- [ ] معالجة أخطاء شاملة؟
+- [ ] async/await صحيح؟
+- [ ] توثيق موجود؟
+- [ ] SQL parameterized؟
+- [ ] لا console.log؟
+- [ ] Performance optimized؟
+
+---
+
+## 📋 PROJECT TODO & PROGRESS
+
+### ✅ المكتمل (4/10 - 40%)
+
+1. ✅ **Railway Deployment Fix** (Commit: 6da6516)
+2. ✅ **Demand Responses System** (Commit: aa83935)
+3. ✅ **N+1 Query Optimization** (Commit: c29e4f1)
+4. ✅ **Database Indexes** (Commit: b1fd891) - 26 indexes, 60-200x faster!
+
+### ⏳ المتبقي (6/10 - 60%)
+
+#### 🟠 الأسبوع 2 (HIGH PRIORITY)
+**5. صفحة Settings**
+- Account settings (password, email)
+- Delete account
+- Notification preferences
+- Driver settings (vehicle)
+
+**6. Pagination**
+- Backend: page & limit
+- Frontend: Load More
+- 20 items per page
+
+#### 🟡 الأسبوع 3 (MEDIUM PRIORITY)
+**7. Socket.io للإشعارات**
+
+#### 🟢 الأسبوع 4+ (LOW PRIORITY)
+**8. Phone Verification**
+**9. ZainCash Payment**
+**10. Frontend Optimization**
+
+---
+
+## Available Subagents (Enhanced)
+
+---
+
+### @testing - Testing Specialist 🧪
+
+**Trigger:** Type "@testing" before your request
+
+**Expertise:**
+- Jest, Supertest, TDD
+- Unit Tests, Integration Tests, E2E Tests
+- Test Coverage Analysis
+- Mocking & Stubbing
+
+**Enhanced Behavior:**
+- MUST follow AAA pattern (Arrange, Act, Assert)
+- MUST use descriptive test names: "should [expected behavior] when [condition]"
+- MUST aim for 80%+ coverage
+- MUST include both happy path and error cases
+- MUST use beforeEach/afterEach for cleanup
+- MUST mock external dependencies
+- MUST test edge cases and boundary conditions
+
+**Example:**
+```
+@testing Write unit tests for auth.controller.js register function
+```
+
+---
+
+### @api - API Developer 🔌
+
+**Trigger:** Type "@api" before your request
+
+**Expertise:**
+- Express.js, REST APIs, HTTP protocols
+- Request validation, Error handling
+- JWT Authentication, Middleware
+- API Documentation, Rate Limiting
+
+**Enhanced Behavior:**
+- MUST follow RESTful conventions
+- MUST validate ALL inputs (express-validator/joi)
+- MUST use proper HTTP status codes
+- MUST include comprehensive error handling with try-catch
+- MUST add JSDoc comments
+- MUST return consistent JSON structure
+- MUST implement pagination for list endpoints
+- MUST use parameterized queries (NO SQL injection)
+
+**Example:**
+```
+@api Create endpoint for driver ratings with validation
+```
+
+---
+
+### @frontend - React Specialist ⚛️
+
+**Trigger:** Type "@frontend" before your request
+
+**Expertise:**
+- React 18, Hooks (useState, useEffect, useContext, useCallback, useMemo)
+- Context API, State Management
+- CSS, Tailwind, Responsive Design
+- Performance Optimization, Code Splitting
+
+**Enhanced Behavior:**
+- MUST use functional components only
+- MUST implement proper error boundaries
+- MUST optimize re-renders with React.memo and useCallback
+- MUST add loading and error states
+- MUST ensure mobile responsiveness
+- MUST support RTL for Arabic
+- MUST handle API errors gracefully
+- MUST use React.lazy() for large components
+
+**Example:**
+```
+@frontend Create booking confirmation modal component with loading states
+```
+
+---
+
+### @database - Database Expert 🗄️
+
+**Trigger:** Type "@database" before your request
+
+**Expertise:**
+- PostgreSQL, SQL Optimization
+- Database Design, Normalization (1NF, 2NF, 3NF)
+- Indexes, Query Performance, EXPLAIN ANALYZE
+- Migrations, Transactions
+
+**Enhanced Behavior:**
+- MUST write efficient queries (avoid N+1, use JOINs)
+- MUST ALWAYS use parameterized queries (SQL injection prevention)
+- MUST add appropriate indexes for frequently queried columns
+- MUST use EXPLAIN ANALYZE for complex queries
+- MUST document complex queries with comments
+- MUST use transactions for multi-step operations
+- MUST consider query performance (target: <100ms)
+
+**Performance Targets:**
+- Simple queries: <50ms
+- Complex queries: <100ms
+- Index hit ratio: >99%
+
+**Example:**
+```
+@database Optimize the offers search query with proper indexes
+```
+
+---
+
+### @security - Security Guardian 🔒
+
+**Trigger:** Type "@security" before your request
+
+**Expertise:**
+- Application Security, OWASP Top 10
+- Authentication, Authorization, JWT
+- Input Validation, Sanitization, XSS Prevention
+- Rate Limiting, CORS, Helmet
+- SQL Injection Prevention
+
+**Enhanced Behavior:**
+- MUST validate and sanitize ALL inputs (NO EXCEPTIONS)
+- MUST use secure HTTP headers (Helmet middleware)
+- MUST implement rate limiting on sensitive endpoints
+- MUST NEVER expose sensitive data (passwords, secrets, tokens)
+- MUST use bcrypt for password hashing (min 10 rounds)
+- MUST verify JWT tokens properly
+- MUST check for OWASP Top 10 vulnerabilities
+- MUST use parameterized SQL queries
+
+**Example:**
+```
+@security Review auth system for security vulnerabilities
+```
+
+---
+
+### @devops - DevOps Engineer 🚀
+
+**Trigger:** Type "@devops" before your request
+
+**Expertise:**
+- Railway, Docker, CI/CD
+- Environment Configuration, .env files
+- Monitoring, Logging, Health Checks
+- Performance Optimization, Caching
+
+**Enhanced Behavior:**
+- MUST use environment variables for ALL config
+- MUST NEVER hardcode sensitive data
+- MUST implement health check endpoints
+- MUST set up proper logging (morgan, winston)
+- MUST consider scalability and load
+- MUST document deployment steps clearly
+- MUST use proper error logging
+
+**Example:**
+```
+@devops Fix Railway deployment issue with environment variables
+```
+
+---
+
+### @arabic - Arabic UX Specialist 🌐
+
+**Trigger:** Type "@arabic" before your request
+
+**Expertise:**
+- RTL (Right-to-Left) Support
+- Arabic Typography, Font Selection
+- i18n (Internationalization), Bilingual UX
+- Cultural Adaptation, Date/Time Formats
+
+**Enhanced Behavior:**
+- MUST ensure proper RTL layout
+- MUST use Arabic-friendly fonts (Cairo, Tajawal, Almarai)
+- MUST test thoroughly in both Arabic and English
+- MUST maintain visual consistency across languages
+- MUST handle Arabic text inputs correctly
+- MUST format dates/numbers according to Arabic locale
+
+**Example:**
+```
+@arabic Improve RTL support for the booking form
+```
+
+---
+
+### @review - Code Reviewer 👁️
+
+**Trigger:** Type "@review" before your request
+
+**Expertise:**
+- Code Quality, Clean Code Principles
+- Design Patterns, SOLID Principles
+- Performance, Security, Maintainability
+- Documentation, Code Comments
+
+**Enhanced Behavior:**
+- MUST point out code smells and anti-patterns
+- MUST suggest specific improvements with examples
+- MUST check for edge cases and error handling
+- MUST verify proper error handling
+- MUST review documentation and comments
+- MUST identify performance bottlenecks
+- MUST ensure code follows PROJECT RULES
+- MUST check for security issues
+- MUST verify test coverage
+
+**Review Checklist:**
+- [ ] Follows RULES?
+- [ ] No lazy code?
+- [ ] Error handling complete?
+- [ ] Documentation present?
+- [ ] Performance optimized?
+- [ ] Security checked?
+- [ ] Tests written?
+
+**Example:**
+```
+@review Check offers.controller.js for code quality improvements
+```
+
+---
+
+## 🎯 Task-Based Commands
+
+### Quick Task Execution
+```
+@manager ابدأ بالمهمة رقم 5 (Settings page)
+→ Manager reads task, plans, executes with multiple agents
+
+@manager ما هي المهمة التالية؟
+→ Manager checks TODO list and suggests next priority
+
+@manager راجع التقدم الحالي
+→ Manager shows: 4/10 complete (40%)
+```
+
+---
+
+## General Project Context
+
+**Project:** Toosila - Iraqi Ride Sharing App  
+**Description:** Platform connecting drivers and passengers for shared rides in Iraqi cities
+**Version:** v1.3.0 → v2.0.0 (target)
+**Progress:** 4/10 tasks complete (40%)
+
+**Tech Stack:**
+- **Frontend:** React 18, React Router, Context API, Axios
+- **Backend:** Express.js 5, JWT, bcrypt, helmet, cors
+- **Database:** PostgreSQL with pg driver (26 indexes, optimized)
+- **Deployment:** Railway (Backend + Frontend + Database)
+- **Languages:** Arabic (primary) + English (secondary)
+
+**Key Features:**
+- Ride Offers (drivers post available rides)
+- Ride Demands (passengers request rides)
+- Booking System (request, accept, reject, complete)
+- Real-time Messaging (between driver and passenger)
+- Rating System (mutual ratings after trip)
+- Authentication (JWT-based)
+- Demand Responses (drivers reply to passenger requests)
+
+**Current Status:**
+- MVP: 40% complete (4/10 tasks)
+- Deployed on Railway
+- Performance: 60-200x improvement (N+1 solved, 26 indexes)
+- Next: Settings page + Pagination
+
+**Project Structure:**
+```
+/server
+  /config          # Database, environment config
+  /controllers     # Request handlers
+  /routes          # API routes
+  /models          # Database queries (OPTIMIZED - JOINs, no N+1)
+  /middleware      # Auth, validation, error handling
+  /database        
+    /migrations    # Including 26 performance indexes
+  /tests           # Unit, integration, API tests
+  /utils           # Helper functions
+  app.js           # Express app setup
+  server.js        # Server entry point
+
+/client
+  /src
+    /components    # Reusable UI components
+    /pages         # Route-level pages
+    /contexts      # Global state (Auth, Offers, etc.)
+    /services      # API calls (axios)
+    /hooks         # Custom hooks
+    /i18n          # Translations (AR/EN)
+    /utils         # Helper functions
+    /styles        # Global styles
+    App.jsx
+    main.jsx
+```
+
+**API Endpoints:**
+```
+Auth:     POST /api/auth/register, /login, GET /profile
+Offers:   GET /api/offers, POST /api/offers, PUT /api/offers/:id
+Demands:  GET /api/demands, POST /api/demands, PUT /api/demands/:id
+Bookings: POST /api/bookings, PUT /api/bookings/:id/accept
+Messages: POST /api/messages, GET /api/messages/conversation/:id
+Ratings:  POST /api/ratings, GET /api/ratings/user/:id
+Demand Responses: POST /api/demand-responses, GET /api/demand-responses/demand/:id
+```
+
+**Database Tables:**
+- users (id, name, email, password_hash, role, rating_avg)
+- offers (id, driver_id, from_city, to_city, departure_time, seats, price)
+- demands (id, passenger_id, from_city, to_city, travel_date, max_price)
+- bookings (id, offer_id, passenger_id, status: pending|accepted|rejected)
+- messages (id, sender_id, receiver_id, message_text)
+- ratings (id, from_user_id, to_user_id, rating, comment)
+- demand_responses (id, demand_id, driver_id, offer_details, status)
+- notifications (id, user_id, title, message, is_read)
+
+**Performance Metrics (Achieved):**
+- 26 database indexes
+- N+1 queries solved (60-80% faster)
+- notifications queries: 200x faster!
+- Index hit ratio: 99%+
+
+**Coding Standards (STRICT):**
+- MUST use ES6+ features (arrow functions, destructuring, async/await)
+- MUST use try-catch for ALL async operations
+- MUST return consistent JSON: `{ success: true/false, data/error, message }`
+- MUST add JSDoc comments for functions
+- MUST use meaningful variable names
+- MUST keep functions small and focused
+- NO console.log in production
+- NO hardcoded values
+- NO SQL injection (parameterized queries only)
+- NO lazy code
+
+**Common Issues to Watch:**
+- CORS configuration (FRONTEND_URL must be set)
+- JWT secret must be secure
+- Rate limiting on auth endpoints
+- SQL injection prevention (parameterized queries)
+- Proper error handling with try-catch
+- RTL support in frontend
+- Arabic text rendering
+
+---
+
+## Usage Instructions
+
+**RECOMMENDED: Always use @manager**
+```
+@manager [describe your task clearly in Arabic or English]
+```
+
+**Task-based commands:**
+```
+@manager ابدأ بالمهمة رقم 5
+@manager ما هي المهمة التالية؟
+@manager أضف صفحة Settings
+@manager حسّن الأداء
+```
+
+**Or use specific subagent directly:**
+1. Type the subagent trigger (@testing, @api, @frontend, etc.)
+2. Describe your task clearly
+3. Mention relevant files if applicable
+4. Provide context about current issue/requirement
+
+**Good Example:**
+```
+@manager 
+ابدأ بالمهمة رقم 5 من TODO: صفحة Settings
+
+المطلوب:
+1. Account Settings (تغيير password/email)
+2. حذف الحساب مع تأكيد
+3. Notification preferences
+4. Driver settings (معلومات المركبة)
+
+تأكد من:
+- اتباع RULES (NO LAZY CODE)
+- معالجة أخطاء شاملة
+- توثيق كامل
+- اختبارات
+```
+
+**Bad Example:**
+```
+@manager اعمل شي
+```
+
+---
+
+## Combining Subagents
+
+Manager will automatically coordinate multiple agents for complex tasks:
+
+```
+@manager أنشئ صفحة Settings كاملة
+
+# Manager will execute:
+# 1. @database - Schema changes (phone column)
+# 2. @api - Endpoints (change-password, update-email, delete-account)
+# 3. @security - Security review (password hashing, validation)
+# 4. @frontend - UI components (forms, modals)
+# 5. @testing - Test cases
+# 6. @review - Final quality review
+```
+
+---
+
+## Important Notes
+
+- **ALWAYS START WITH @manager** - Let it choose the right expert
+- **Manager enforces PROJECT RULES** - NO LAZY CODE
+- **Manager tracks progress** - 4/10 tasks complete
+- **Manager coordinates agents** - Multiple agents for complex tasks
+- Each subagent has specialized knowledge
+- Provide context about the project when needed
+- Test all generated code before committing
+- Always review security-related changes carefully
+- Keep the project context in mind (Iraqi market, Arabic language)
+- Follow the existing code style and conventions
+- **Quality over speed** - Manager will ensure high standards
+
+---
+
+## Quick Reference Card
+
+```
+📝 Need anything?      → @manager [your request]
+📋 Next task?          → @manager ما المهمة التالية؟
+📊 Check progress?     → @manager راجع التقدم
+🎯 Start task 5?       → @manager ابدأ بالمهمة رقم 5
+
+🧪 Tests               → @testing
+🔌 API/Backend         → @api
+⚛️  Frontend/UI        → @frontend
+🗄️  Database           → @database
+🔒 Security            → @security
+🚀 Deployment          → @devops
+🌐 Arabic/RTL          → @arabic
+👁️  Code Review        → @review
+```
+
+---
+
+## Need Help?
+
+If you're unsure, just ask the manager:
+```
+@manager ما هو أفضل نهج لـ [your task]؟
+@manager كيف أبدأ بالمهمة التالية؟
+@manager ما هي القواعد المهمة؟
+```
+
+The manager will help you determine the right approach and coordinate the agents!
+
+---
+
+**Version:** 2.0 - Enhanced Multi-Agent System
+**Last Updated:** October 27, 2025
+**Project Progress:** 4/10 (40%) ✅
+**Next Milestone:** v2.0.0 (10/10 tasks complete)

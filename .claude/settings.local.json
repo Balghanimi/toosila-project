@@ -26,7 +26,10 @@
       "Bash(for:*)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
-      "Bash(while read file)"
+      "Bash(while read file)",
+      "Bash(timeout 10 node:*)",
+      "Bash(mkdir:*)",
+      "Read(//c/Users/a2z/Downloads/**)"
     ],
     "deny": [],
     "ask": []

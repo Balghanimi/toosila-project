@@ -13,6 +13,12 @@ export default function ViewOffers() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [bookingMessage, setBookingMessage] = useState('');
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Filters
   const [filters, setFilters] = useState({
     fromCity: '',
@@ -57,6 +63,10 @@ export default function ViewOffers() {
     setError('');
 
     try {
+      // Add page and limit to params
+      filterParams.page = 1;
+      filterParams.limit = 20;
+
       let response;
       // If user is a driver, show demands (passenger requests)
       // If user is a passenger, show offers (driver offers)
@@ -67,11 +77,54 @@ export default function ViewOffers() {
         response = await offersAPI.getAll(filterParams);
         setOffers(response.offers || []);
       }
+
+      // Save pagination data
+      setTotal(response.total || 0);
+      setTotalPages(response.totalPages || 1);
+      setPage(1);
     } catch (err) {
       console.error('Error fetching offers/demands:', err);
       setError(isDriver ? 'حدث خطأ أثناء تحميل الطلبات' : 'حدث خطأ أثناء تحميل العروض');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load More function
+  const loadMore = async () => {
+    if (loadingMore || page >= totalPages) return;
+
+    setLoadingMore(true);
+    try {
+      const filterParams = {};
+      if (filters.fromCity) filterParams.fromCity = filters.fromCity;
+      if (filters.toCity) filterParams.toCity = filters.toCity;
+      if (filters.departureDate) filterParams.departureDate = filters.departureDate;
+      if (filters.minPrice) filterParams.minPrice = filters.minPrice;
+      if (filters.maxPrice) filterParams.maxPrice = filters.maxPrice;
+      if (filters.minSeats) filterParams.minSeats = filters.minSeats;
+      if (filters.sortBy) filterParams.sortBy = filters.sortBy;
+
+      filterParams.page = page + 1;
+      filterParams.limit = 20;
+
+      let response;
+      if (isDriver) {
+        response = await demandsAPI.getAll(filterParams);
+        setOffers(prev => [...prev, ...(response.demands || [])]);
+      } else {
+        response = await offersAPI.getAll(filterParams);
+        setOffers(prev => [...prev, ...(response.offers || [])]);
+      }
+
+      setPage(page + 1);
+      setTotal(response.total || 0);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('Error loading more:', err);
+      showError('فشل تحميل المزيد');
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -739,6 +792,69 @@ export default function ViewOffers() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Info and Load More Button */}
+        {!loading && offers.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--space-4)',
+            marginTop: 'var(--space-6)',
+            padding: 'var(--space-4)',
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-light)'
+          }}>
+            <p style={{
+              fontSize: 'var(--text-base)',
+              fontWeight: '600',
+              color: 'var(--text-secondary)',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0
+            }}>
+              عرض {offers.length} من {total} نتيجة
+            </p>
+
+            {page < totalPages && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{
+                  padding: 'var(--space-3) var(--space-6)',
+                  background: loadingMore
+                    ? 'var(--surface-secondary)'
+                    : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                  color: loadingMore ? 'var(--text-secondary)' : 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                  boxShadow: loadingMore ? 'none' : 'var(--shadow-md)',
+                  transition: 'var(--transition)',
+                  opacity: loadingMore ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!loadingMore) {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loadingMore) {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'var(--shadow-md)';
+                  }
+                }}
+              >
+                {loadingMore ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
+              </button>
+            )}
           </div>
         )}
 
