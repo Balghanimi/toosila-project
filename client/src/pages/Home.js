@@ -83,13 +83,19 @@ const Home = () => {
     }
 
     if (mode === 'find') {
-      // إرسال معايير البحث إلى صفحة العروض
+      // إرسال معايير البحث
       const searchParams = {};
       if (pickupLocation) searchParams.fromCity = pickupLocation;
       if (dropLocation) searchParams.toCity = dropLocation;
       if (calculatedDate) searchParams.departureDate = calculatedDate;
 
-      navigate('/offers', { state: searchParams });
+      // إذا كان المستخدم سائق، اذهب إلى صفحة الطلبات (demands)
+      // إذا كان راكب، اذهب إلى صفحة العروض (offers)
+      if (currentUser && currentUser.isDriver) {
+        navigate('/demands', { state: searchParams });
+      } else {
+        navigate('/offers', { state: searchParams });
+      }
     } else if (mode === 'offer') {
       // تمرير بيانات النموذج إلى صفحة نشر العرض
       const offerData = {
