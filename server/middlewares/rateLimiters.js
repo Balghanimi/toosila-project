@@ -5,9 +5,11 @@ const config = require('../config/env');
 const isDev = config.NODE_ENV === 'development';
 
 // General API rate limiter
+// Increased limits for production to handle multiple concurrent requests per user
+// Each page load can trigger 5-10 API calls (offers, messages, notifications, bookings, etc.)
 const generalLimiter = rateLimit({
   windowMs: isDev ? 5 * 60 * 1000 : parseInt(config.RATE_LIMIT_WINDOW_MS), // 5 min in dev, config in prod
-  max: isDev ? 100 : parseInt(config.RATE_LIMIT_MAX_REQUESTS), // 100 in dev, config in prod
+  max: isDev ? 200 : (parseInt(config.RATE_LIMIT_MAX_REQUESTS) || 500), // 200 in dev, 500 in prod (default)
   message: {
     error: 'Too many requests',
     message: isDev ? 'Too many requests (dev mode)' : 'Too many requests from this IP, please try again later.',
@@ -15,6 +17,8 @@ const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip failed requests (4xx/5xx) to not penalize users for errors
+  skipFailedRequests: true,
 });
 
 // Auth rate limiter - more flexible in development

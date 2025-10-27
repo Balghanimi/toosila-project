@@ -37,8 +37,10 @@ const config = {
   UPLOAD_PATH: process.env.UPLOAD_PATH || './uploads',
   
   // Rate limiting
+  // Increased to 500 requests per 15 minutes to handle multiple concurrent API calls per user
+  // Each page load triggers 5-10 requests (offers, messages, notifications, bookings, etc.)
   RATE_LIMIT_WINDOW_MS: process.env.RATE_LIMIT_WINDOW_MS || 900000, // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS || 100,
+  RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS || 500,
   
   // Pagination
   DEFAULT_PAGE_SIZE: process.env.DEFAULT_PAGE_SIZE || 10,
