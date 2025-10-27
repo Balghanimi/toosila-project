@@ -8,6 +8,8 @@ const {
   getProfile,
   updateProfile,
   changePassword,
+  updateEmail,
+  deleteAccount,
   getUserStats,
   getAllUsers,
   getUserById,
@@ -36,6 +38,8 @@ router.use(authenticateToken); // All routes below require authentication
 router.get('/profile', getProfile);
 router.put('/profile', validateUserUpdate, updateProfile);
 router.put('/change-password', passwordResetLimiter, changePassword);
+router.put('/update-email', passwordResetLimiter, updateEmail);
+router.delete('/delete-account', passwordResetLimiter, deleteAccount);
 router.get('/stats', getUserStats);
 
 // Admin routes

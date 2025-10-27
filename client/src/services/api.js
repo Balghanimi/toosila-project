@@ -91,10 +91,24 @@ export const authAPI = {
     });
   },
 
-  changePassword: async (oldPassword, newPassword) => {
+  changePassword: async (currentPassword, newPassword) => {
     return apiRequest('/auth/change-password', {
       method: 'PUT',
-      body: JSON.stringify({ oldPassword, newPassword }),
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  updateEmail: async (newEmail, password) => {
+    return apiRequest('/auth/update-email', {
+      method: 'PUT',
+      body: JSON.stringify({ newEmail, password }),
+    });
+  },
+
+  deleteAccount: async (password, confirmation) => {
+    return apiRequest('/auth/delete-account', {
+      method: 'DELETE',
+      body: JSON.stringify({ password, confirmation }),
     });
   },
 };

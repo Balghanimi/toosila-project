@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { ChangePasswordModal, UpdateEmailModal, DeleteAccountModal } from '../components/SettingsModals';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user: currentUser } = useAuth();
   const { language, changeLanguage } = useLanguage();
+
+  // Modals state
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showUpdateEmailModal, setShowUpdateEmailModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const settingsGroups = [
     {
@@ -32,26 +39,27 @@ export default function Settings() {
         {
           icon: '📧',
           label: 'البريد الإلكتروني',
-          value: user?.email || 'غير محدد',
-          action: () => navigate('/profile')
+          value: currentUser?.email || 'غير محدد',
+          action: () => setShowUpdateEmailModal(true)
         },
         {
-          icon: '📱',
-          label: 'رقم الهاتف',
-          value: user?.phone || 'غير محدد',
-          action: () => navigate('/profile')
+          icon: '🔑',
+          label: 'تغيير كلمة المرور',
+          value: '',
+          action: () => setShowChangePasswordModal(true)
         },
         {
-          icon: '🏙️',
-          label: 'المدينة',
-          value: user?.city || 'غير محددة',
-          action: () => navigate('/profile')
+          icon: '🗑️',
+          label: 'حذف الحساب',
+          value: '',
+          action: () => setShowDeleteAccountModal(true),
+          danger: true
         }
       ]
     },
     {
       title: '🚗 إعدادات السائق',
-      items: user?.isDriver ? [
+      items: currentUser?.isDriver ? [
         {
           icon: '🚙',
           label: 'معلومات السيارة',
@@ -195,7 +203,7 @@ export default function Settings() {
                       <span style={{
                         fontSize: 'var(--text-base)',
                         fontWeight: '500',
-                        color: 'var(--text-primary)'
+                        color: item.danger ? '#dc2626' : 'var(--text-primary)'
                       }}>
                         {item.label}
                       </span>
@@ -215,6 +223,72 @@ export default function Settings() {
             </div>
           )
         ))}
+
+        {/* Success Message */}
+        {successMessage && (
+          <div style={{
+            position: 'fixed',
+            top: '100px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#10b981',
+            color: 'white',
+            padding: '16px 24px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            zIndex: 10000,
+            fontFamily: '"Cairo", sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            animation: 'slideDown 0.3s ease-out'
+          }}>
+            {successMessage}
+          </div>
+        )}
+
+        {/* Modals */}
+        {showChangePasswordModal && (
+          <ChangePasswordModal
+            onClose={() => setShowChangePasswordModal(false)}
+            onSuccess={(msg) => {
+              setSuccessMessage(msg);
+              setTimeout(() => setSuccessMessage(''), 3000);
+            }}
+          />
+        )}
+
+        {showUpdateEmailModal && (
+          <UpdateEmailModal
+            onClose={() => setShowUpdateEmailModal(false)}
+            onSuccess={(msg) => {
+              setSuccessMessage(msg);
+              setTimeout(() => setSuccessMessage(''), 3000);
+            }}
+          />
+        )}
+
+        {showDeleteAccountModal && (
+          <DeleteAccountModal
+            onClose={() => setShowDeleteAccountModal(false)}
+            onSuccess={(msg) => {
+              setSuccessMessage(msg);
+              setTimeout(() => setSuccessMessage(''), 3000);
+            }}
+          />
+        )}
+
+        <style>{`
+          @keyframes slideDown {
+            from {
+              transform: translate(-50%, -20px);
+              opacity: 0;
+            }
+            to {
+              transform: translate(-50%, 0);
+              opacity: 1;
+            }
+          }
+        `}</style>
       </div>
     </div>
   );

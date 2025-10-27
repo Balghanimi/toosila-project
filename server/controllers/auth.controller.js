@@ -366,12 +366,136 @@ const deactivateUser = async (req, res) => {
   }
 };
 
+// Update email
+const updateEmail = async (req, res) => {
+  try {
+    const { newEmail, password } = req.body;
+    const userId = req.user.id;
+
+    // Verify password first
+    const user = await User.findByEmailWithPassword(req.user.email);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found'
+        }
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_PASSWORD',
+          message: 'Password is incorrect'
+        }
+      });
+    }
+
+    // Check if new email already exists
+    const existingUser = await User.findByEmail(newEmail);
+    if (existingUser && existingUser.id !== userId) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'EMAIL_EXISTS',
+          message: 'Email already in use'
+        }
+      });
+    }
+
+    // Update email
+    await user.update({ email: newEmail });
+
+    res.json({
+      success: true,
+      message: 'Email updated successfully',
+      data: {
+        email: newEmail
+      }
+    });
+  } catch (error) {
+    console.error('Update email error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'EMAIL_UPDATE_FAILED',
+        message: 'Failed to update email'
+      }
+    });
+  }
+};
+
+// Delete account
+const deleteAccount = async (req, res) => {
+  try {
+    const { password, confirmation } = req.body;
+    const userId = req.user.id;
+
+    // Verify confirmation text
+    if (confirmation !== 'DELETE') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_CONFIRMATION',
+          message: 'Please type DELETE to confirm'
+        }
+      });
+    }
+
+    // Verify password
+    const user = await User.findByEmailWithPassword(req.user.email);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found'
+        }
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_PASSWORD',
+          message: 'Password is incorrect'
+        }
+      });
+    }
+
+    // Delete user (CASCADE will delete related records)
+    await user.delete();
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'ACCOUNT_DELETE_FAILED',
+        message: 'Failed to delete account'
+      }
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getProfile,
   updateProfile,
   changePassword,
+  updateEmail,
+  deleteAccount,
   getUserStats,
   getAllUsers,
   getUserById,
