@@ -347,136 +347,147 @@ const Dashboard = () => {
             gap: 'var(--space-3)'
           }}>
 
-            <button
-              onClick={() => navigate('/post-offer')}
-              style={{
-                padding: 'var(--space-4)',
-                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                fontFamily: '"Cairo", sans-serif',
-                boxShadow: 'var(--shadow-sm)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = 'var(--shadow-md)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'var(--shadow-sm)';
-              }}
-            >
-              <span style={{ fontSize: '1.5rem' }}>🚗</span>
-              نشر رحلة جديدة
-            </button>
+            {/* للسائقين: تصفح الطلبات أولاً (الأهم!) */}
+            {currentUser?.isDriver && (
+              <button
+                onClick={() => navigate('/demands')}
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  fontFamily: '"Cairo", sans-serif',
+                  boxShadow: 'var(--shadow-sm)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = 'var(--shadow-md)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'var(--shadow-sm)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>🔍</span>
+                تصفح الطلبات
+              </button>
+            )}
 
-            <button
-              onClick={() => navigate('/', { state: { mode: 'demand' } })}
-              style={{
-                padding: 'var(--space-4)',
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-primary)',
-                border: '2px solid var(--border-light)',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                fontFamily: '"Cairo", sans-serif',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--primary)';
-                e.target.style.color = 'var(--primary)';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'var(--border-light)';
-                e.target.style.color = 'var(--text-primary)';
-                e.target.style.transform = 'translateY(0)';
-              }}
-            >
-              <span style={{ fontSize: '1.5rem' }}>👤</span>
-              نشر طلب رحلة
-            </button>
+            {/* للركاب: تصفح العروض أولاً */}
+            {!currentUser?.isDriver && (
+              <button
+                onClick={() => navigate('/offers')}
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  fontFamily: '"Cairo", sans-serif',
+                  boxShadow: 'var(--shadow-sm)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = 'var(--shadow-md)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'var(--shadow-sm)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>🔍</span>
+                تصفح العروض
+              </button>
+            )}
 
-            <button
-              onClick={() => navigate('/offers')}
-              style={{
-                padding: 'var(--space-4)',
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-primary)',
-                border: '2px solid var(--border-light)',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                fontFamily: '"Cairo", sans-serif',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--primary)';
-                e.target.style.color = 'var(--primary)';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'var(--border-light)';
-                e.target.style.color = 'var(--text-primary)';
-                e.target.style.transform = 'translateY(0)';
-              }}
-            >
-              <span style={{ fontSize: '1.5rem' }}>🔍</span>
-              تصفح العروض
-            </button>
+            {/* للسائقين: نشر رحلة جديدة (ثانوي) */}
+            {currentUser?.isDriver && (
+              <button
+                onClick={() => navigate('/post-offer')}
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '2px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  fontFamily: '"Cairo", sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.color = 'var(--primary)';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'var(--border-light)';
+                  e.target.style.color = 'var(--text-primary)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>🚗</span>
+                نشر رحلة جديدة
+              </button>
+            )}
 
-            <button
-              onClick={() => navigate('/demands')}
-              style={{
-                padding: 'var(--space-4)',
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-primary)',
-                border: '2px solid var(--border-light)',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'var(--transition)',
-                fontFamily: '"Cairo", sans-serif',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = 'var(--primary)';
-                e.target.style.color = 'var(--primary)';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'var(--border-light)';
-                e.target.style.color = 'var(--text-primary)';
-                e.target.style.transform = 'translateY(0)';
-              }}
-            >
-              <span style={{ fontSize: '1.5rem' }}>📝</span>
-              تصفح الطلبات
-            </button>
+            {/* للركاب: نشر طلب رحلة (ثانوي) */}
+            {!currentUser?.isDriver && (
+              <button
+                onClick={() => navigate('/', { state: { mode: 'demand' } })}
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '2px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                  fontFamily: '"Cairo", sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.color = 'var(--primary)';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'var(--border-light)';
+                  e.target.style.color = 'var(--text-primary)';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>👤</span>
+                نشر طلب رحلة
+              </button>
+            )}
           </div>
         </div>
 
