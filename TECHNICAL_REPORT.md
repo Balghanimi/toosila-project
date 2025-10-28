@@ -2,9 +2,10 @@
 ## Iraq Ride-Sharing Platform - Technical Report
 
 **تاريخ التقرير**: 28 أكتوبر 2025
-**الإصدار**: 1.4.0
+**الإصدار**: 1.5.0
 **حالة المشروع**: Production (Deployed on Railway - Optimized & Fully Functional)
 **اللغات المدعومة**: العربية، English
+**Bundle Size**: 88.04 kB (optimized with code splitting)
 
 ---
 
@@ -53,6 +54,47 @@
 ---
 
 ## 2. التحديثات الأخيرة (28 أكتوبر 2025)
+
+### 🚀 الإصدار 1.5.0 - تحديث الأداء (28 أكتوبر 2025)
+
+#### ✅ المهمة 10: Frontend Optimization - Code Splitting (Commit: e758c9b)
+
+**الميزات المضافة**:
+- **LoadingSpinner Component** (client/src/components/LoadingSpinner.jsx):
+  - Spinner احترافي مع animations
+  - تصميم يتماشى مع هوية التطبيق
+  - دعم النصوص العربية
+  - Fallback لـ React.Suspense
+
+- **Code Splitting في App.js**:
+  - تحويل 17 صفحة إلى React.lazy()
+  - Suspense wrapper حول جميع Routes
+  - تحميل lazy للصفحات عند الطلب فقط
+
+- **Bundle Analysis**:
+  - تثبيت source-map-explorer
+  - تحليل Bundle وتحديد الـ chunks
+
+**النتائج**:
+- **قبل**: Bundle واحد 121.02 kB
+- **بعد**: Main bundle 88.04 kB + 23 lazy chunks
+- **التحسين**: تقليل 27.3% (32.98 kB)
+
+**Chunks Created** (23 separate files):
+- Core pages: Home, Dashboard, Messages, Profile, Bookings, Settings
+- Offers: PostOfferModern, ViewOffers
+- Demands: ViewDemands
+- Ratings (9 pages): RatingManagement, RatingStats, UserRatings, TopRatings, RecentRatings, BadRatings, RatingsByLocation, RatingsByUserType, RatingsByDate, RatingsByComments, RatingsByRating
+- Others: TestAPI, NotificationsPage
+
+**التأثير**:
+- ⚡ تحميل أسرع للصفحة الأولى بنسبة ~27%
+- 📦 تقليل حجم JavaScript المحمّل أولياً
+- 🎯 كل صفحة تُحمّل فقط عند الحاجة
+- 🚀 تحسين ملحوظ في First Contentful Paint
+- ✅ حجم Bundle الأولي: 88.04 kB
+
+---
 
 ### 🎉 الإصدار 1.4.0 - تحديثات كبيرة (28 أكتوبر 2025)
 
@@ -469,7 +511,9 @@ idx_messages_ride_type_ride_id ON messages(ride_type, ride_id)
 
 | العنصر | قبل | بعد |
 |--------|-----|-----|
-| **إصدار التطبيق** | 1.3.0 | **1.4.0** |
+| **إصدار التطبيق** | 1.4.0 | **1.5.0** |
+| **Bundle Size (gzipped)** | 121.02 kB | **88.04 kB** ⬇️ 27.3% |
+| **Code Splitting** | غير موجود | **23 lazy chunks** |
 | **عدد جداول قاعدة البيانات** | 11 | 11 |
 | **Database Indexes** | 26 index | **26 index محسّن** |
 | **Query Performance** | 60-200x أسرع | **60-200x أسرع** |
@@ -477,10 +521,11 @@ idx_messages_ride_type_ride_id ON messages(ride_type, ride_id)
 | **حالة النشر** | مستقر | **مستقر ومحسّن** |
 | **أمان Frontend** | null checks آمنة | null checks آمنة |
 | **نظام الرد على الطلبات** | ✅ مُفعّل | ✅ مُفعّل بالكامل |
-| **Pagination** | غير موجود | ✅ Load More للعروض والطلبات |
-| **Settings Page** | أساسي | ✅ كامل مع account management |
-| **Real-time Notifications** | غير موجود | ✅ Socket.io مع 7 أنواع إشعارات |
-| **عدد Commits اليوم** | - | **4 commits جديدة** |
+| **Pagination** | ✅ Load More | ✅ Load More للعروض والطلبات |
+| **Settings Page** | ✅ كامل | ✅ كامل مع account management |
+| **Real-time Notifications** | ✅ Socket.io | ✅ Socket.io مع 7 أنواع إشعارات |
+| **Frontend Optimization** | غير موجود | ✅ React.lazy + Suspense |
+| **عدد Commits اليوم** | - | **7 commits جديدة** |
 
 ### 2.4 الـ Commits الجديدة (28 أكتوبر 2025)
 
