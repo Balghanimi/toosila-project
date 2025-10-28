@@ -64,7 +64,7 @@ const createDemandResponse = asyncHandler(async (req, res) => {
   });
 
   // إرسال إشعار للراكب
-  await notifyDemandResponse(demandId, driverId, req.user.name);
+  await notifyDemandResponse(demandId, driverId, req.user.name || 'سائق');
 
   // Send real-time notification to passenger via Socket.io
   const io = req.app.get('io');
