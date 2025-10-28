@@ -216,18 +216,28 @@ export default function ViewOffers() {
       return;
     }
 
-    // Convert to integer to match backend validation
-    const offerIdInt = parseInt(offerId, 10);
-
-    if (isNaN(offerIdInt) || offerIdInt < 1) {
-      showError('خطأ: معرّف العرض غير صالح');
-      console.error('Invalid offerId:', offerId, 'parsed as:', offerIdInt);
-      return;
+    // Validate offerId - can be either integer or UUID string
+    // If it's a UUID (contains hyphens), keep it as string
+    // If it's a number string, convert to integer
+    let validOfferId;
+    if (typeof offerId === 'string' && offerId.includes('-')) {
+      // It's a UUID - keep as string
+      validOfferId = offerId;
+    } else {
+      // Try to convert to integer
+      validOfferId = parseInt(offerId, 10);
+      if (isNaN(validOfferId) || validOfferId < 1) {
+        showError('خطأ: معرّف العرض غير صالح');
+        console.error('Invalid offerId:', offerId);
+        return;
+      }
     }
+
+    console.log('Valid Offer ID to send:', validOfferId);
 
     try {
       await bookingsAPI.create({
-        offerId: offerIdInt,
+        offerId: validOfferId,
         message: bookingMessage,
         seats: 1 // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
       });

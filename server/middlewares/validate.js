@@ -146,8 +146,19 @@ const validateDemandCreation = [
 // Booking validation rules
 const validateBookingCreation = [
   body('offerId')
-    .isInt({ min: 1 })
-    .withMessage('Please provide a valid offer ID'),
+    .custom((value) => {
+      // Accept either integer or UUID string
+      if (typeof value === 'number' && value > 0) {
+        return true;
+      }
+      if (typeof value === 'string') {
+        // Check if it's a UUID (has hyphens) or a number string
+        if (value.includes('-') || (!isNaN(value) && parseInt(value, 10) > 0)) {
+          return true;
+        }
+      }
+      throw new Error('Please provide a valid offer ID');
+    }),
   body('seats')
     .optional()
     .isInt({ min: 1, max: 7 })
