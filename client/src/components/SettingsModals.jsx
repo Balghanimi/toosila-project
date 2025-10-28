@@ -387,3 +387,155 @@ function Alert({ type, message }) {
     </div>
   );
 }
+
+// User Type Modal
+export function UserTypeModal({ onClose, onSuccess }) {
+  const [selectedType, setSelectedType] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Get current user from localStorage
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const currentIsDriver = currentUser.isDriver || false;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (selectedType === null) {
+      setError('يرجى اختيار نوع الحساب');
+      return;
+    }
+
+    const newIsDriver = selectedType === 'driver';
+
+    // Check if there's no change
+    if (newIsDriver === currentIsDriver) {
+      onSuccess('لم يتم إجراء أي تغيير');
+      setTimeout(onClose, 1500);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authAPI.updateProfile({ isDriver: newIsDriver });
+
+      // Update localStorage
+      const updatedUser = { ...currentUser, isDriver: newIsDriver };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      const userType = newIsDriver ? 'سائق 🚗' : 'راكب 👤';
+      onSuccess(`تم تحديث نوع الحساب إلى ${userType} بنجاح ✅`);
+
+      setTimeout(() => {
+        onClose();
+        window.location.reload();
+      }, 1500);
+    } catch (err) {
+      setError(err.message || 'فشل تحديث نوع الحساب');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal title={currentIsDriver ? '🚗 → 👤 تغيير إلى راكب' : '👤 → 🚗 تغيير إلى سائق'} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        {error && <Alert type="error" message={error} />}
+
+        <div style={{
+          background: '#eff6ff',
+          border: '1px solid #bfdbfe',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '20px'
+        }}>
+          <p style={{
+            color: '#1e40af',
+            fontSize: '14px',
+            fontFamily: '"Cairo", sans-serif',
+            margin: 0,
+            lineHeight: 1.6
+          }}>
+            💡 <strong>ملاحظة:</strong> يمكنك التبديل بين نوعي الحساب في أي وقت. نوع حسابك الحالي: <strong>{currentIsDriver ? 'سائق 🚗' : 'راكب 👤'}</strong>
+          </p>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '12px',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            اختر نوع الحساب الجديد:
+          </label>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              type="button"
+              onClick={() => setSelectedType('passenger')}
+              style={{
+                flex: 1,
+                padding: '16px',
+                border: `2px solid ${selectedType === 'passenger' ? '#3b82f6' : '#e5e7eb'}`,
+                borderRadius: '12px',
+                background: selectedType === 'passenger' ? '#eff6ff' : 'white',
+                color: selectedType === 'passenger' ? '#1d4ed8' : '#6b7280',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              <span style={{ fontSize: '32px' }}>👤</span>
+              <span>راكب</span>
+              {!currentIsDriver && (
+                <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedType('driver')}
+              style={{
+                flex: 1,
+                padding: '16px',
+                border: `2px solid ${selectedType === 'driver' ? '#10b981' : '#e5e7eb'}`,
+                borderRadius: '12px',
+                background: selectedType === 'driver' ? '#ecfdf5' : 'white',
+                color: selectedType === 'driver' ? '#047857' : '#6b7280',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              <span style={{ fontSize: '32px' }}>🚗</span>
+              <span>سائق</span>
+              {currentIsDriver && (
+                <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <Button type="submit" loading={loading}>
+          تأكيد التغيير
+        </Button>
+      </form>
+    </Modal>
+  );
+}

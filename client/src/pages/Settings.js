@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { ChangePasswordModal, UpdateEmailModal, DeleteAccountModal } from '../components/SettingsModals';
+import { ChangePasswordModal, UpdateEmailModal, DeleteAccountModal, UserTypeModal } from '../components/SettingsModals';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export default function Settings() {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateEmailModal, setShowUpdateEmailModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
   const settingsGroups = [
@@ -36,6 +37,13 @@ export default function Settings() {
     {
       title: '👤 إعدادات الحساب',
       items: [
+        {
+          icon: currentUser?.isDriver ? '🚗' : '👤',
+          label: 'نوع الحساب',
+          value: currentUser?.isDriver ? 'سائق' : 'راكب',
+          action: () => setShowUserTypeModal(true),
+          highlight: true
+        },
         {
           icon: '📧',
           label: 'البريد الإلكتروني',
@@ -270,6 +278,16 @@ export default function Settings() {
         {showDeleteAccountModal && (
           <DeleteAccountModal
             onClose={() => setShowDeleteAccountModal(false)}
+            onSuccess={(msg) => {
+              setSuccessMessage(msg);
+              setTimeout(() => setSuccessMessage(''), 3000);
+            }}
+          />
+        )}
+
+        {showUserTypeModal && (
+          <UserTypeModal
+            onClose={() => setShowUserTypeModal(false)}
             onSuccess={(msg) => {
               setSuccessMessage(msg);
               setTimeout(() => setSuccessMessage(''), 3000);
