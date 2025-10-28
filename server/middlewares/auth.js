@@ -79,10 +79,12 @@ const requireOwnership = (resourceUserIdField = 'user_id') => {
 // Generate access token
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { 
-      id: user.id, 
-      email: user.email, 
-      role: user.role 
+    {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      isDriver: user.isDriver || user.is_driver || false,
+      role: user.role
     },
     config.JWT_SECRET,
     { expiresIn: config.JWT_EXPIRES_IN }

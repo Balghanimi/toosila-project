@@ -73,7 +73,7 @@ const createDemandResponse = asyncHandler(async (req, res) => {
       ...response.toJSON(),
       fromCity: demand.fromCity,
       toCity: demand.toCity,
-      driverName: req.user.name || `${req.user.firstName} ${req.user.lastName}`
+      driverName: req.user.name || 'سائق'
     });
   }
 
