@@ -7,7 +7,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    userType: 'passenger' // default to passenger
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -142,6 +143,67 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* User Type Selector */}
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px'
+          }}>
+            أريد التسجيل كـ
+          </label>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, userType: 'passenger' }))}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                border: `2px solid ${formData.userType === 'passenger' ? '#3b82f6' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                background: formData.userType === 'passenger' ? '#eff6ff' : 'white',
+                color: formData.userType === 'passenger' ? '#1d4ed8' : '#6b7280',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>👤</span>
+              راكب
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, userType: 'driver' }))}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                border: `2px solid ${formData.userType === 'driver' ? '#10b981' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                background: formData.userType === 'driver' ? '#ecfdf5' : 'white',
+                color: formData.userType === 'driver' ? '#047857' : '#6b7280',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>🚗</span>
+              سائق
+            </button>
+          </div>
+        </div>
+
         {/* Name Input */}
         <div>
           <label style={{

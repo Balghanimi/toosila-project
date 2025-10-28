@@ -62,7 +62,7 @@ export const authAPI = {
         name: userData.name.trim(),
         email: userData.email.toLowerCase().trim(),
         password: userData.password,
-        isDriver: false, // Default to passenger, can be changed later in profile
+        isDriver: userData.userType === 'driver', // Use selected userType from form
         languagePreference: 'ar'
       }),
     });

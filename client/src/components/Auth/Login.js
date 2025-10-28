@@ -7,8 +7,7 @@ export default function Login({ onSwitchToRegister, onClose }) {
   const { showSuccess } = useNotifications();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    userType: 'passenger' // default to passenger
+    password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -96,67 +95,6 @@ export default function Login({ onSwitchToRegister, onClose }) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* User Type Selector */}
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
-            نوع المستخدم
-          </label>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'passenger' }))}
-              style={{
-                flex: 1,
-                padding: '12px 16px',
-                border: `2px solid ${formData.userType === 'passenger' ? '#3b82f6' : '#e5e7eb'}`,
-                borderRadius: '8px',
-                background: formData.userType === 'passenger' ? '#eff6ff' : 'white',
-                color: formData.userType === 'passenger' ? '#1d4ed8' : '#6b7280',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>👤</span>
-              راكب
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'driver' }))}
-              style={{
-                flex: 1,
-                padding: '12px 16px',
-                border: `2px solid ${formData.userType === 'driver' ? '#10b981' : '#e5e7eb'}`,
-                borderRadius: '8px',
-                background: formData.userType === 'driver' ? '#ecfdf5' : 'white',
-                color: formData.userType === 'driver' ? '#047857' : '#6b7280',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>🚗</span>
-              سائق
-            </button>
-          </div>
-        </div>
-
         {/* Email/Phone Input */}
         <div>
           <label style={{
@@ -267,44 +205,41 @@ export default function Login({ onSwitchToRegister, onClose }) {
       <div style={{
         marginTop: '24px',
         padding: '16px',
-        background: formData.userType === 'driver' ? '#ecfdf5' : '#f0f9ff',
+        background: '#f0f9ff',
         borderRadius: '8px',
-        border: `1px solid ${formData.userType === 'driver' ? '#10b981' : '#0ea5e9'}`
+        border: '1px solid #0ea5e9'
       }}>
         <h4 style={{
           margin: '0 0 12px 0',
           fontSize: '14px',
           fontWeight: '600',
-          color: formData.userType === 'driver' ? '#047857' : '#0369a1'
+          color: '#0369a1'
         }}>
-          🧪 مستخدم تجريبي ({formData.userType === 'driver' ? 'سائق' : 'راكب'}):
+          🧪 مستخدمين تجريبيين:
         </h4>
         <div style={{
           fontSize: '13px',
-          color: formData.userType === 'driver' ? '#047857' : '#0369a1',
-          lineHeight: '1.6'
+          color: '#0369a1',
+          lineHeight: '1.8'
         }}>
-          {formData.userType === 'driver' ? (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '18px' }}>🚗</span>
-                <strong>سائق:</strong> driver@test.com
-              </div>
-              <div style={{ marginTop: '4px', paddingRight: '26px' }}>
-                (أي كلمة مرور)
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '18px' }}>👤</span>
-                <strong>راكب:</strong> passenger@test.com
-              </div>
-              <div style={{ marginTop: '4px', paddingRight: '26px' }}>
-                (أي كلمة مرور)
-              </div>
-            </>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '18px' }}>👤</span>
+            <strong>راكب:</strong> passenger@test.com (أي كلمة مرور)
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '18px' }}>🚗</span>
+            <strong>سائق:</strong> driver@test.com (أي كلمة مرور)
+          </div>
+        </div>
+        <div style={{
+          marginTop: '12px',
+          paddingTop: '12px',
+          borderTop: '1px solid #bae6fd',
+          fontSize: '12px',
+          color: '#0369a1',
+          fontStyle: 'italic'
+        }}>
+          💡 نوع المستخدم يتم تحديده عند التسجيل
         </div>
       </div>
 
