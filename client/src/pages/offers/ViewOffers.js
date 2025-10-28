@@ -205,9 +205,29 @@ export default function ViewOffers() {
   const handleConfirmBooking = async () => {
     if (!selectedOffer) return;
 
+    console.log('Selected Offer:', selectedOffer);
+    console.log('Offer ID:', selectedOffer.id);
+
+    // Make sure we have a valid offerId
+    const offerId = selectedOffer.id || selectedOffer.offerId;
+
+    if (!offerId) {
+      showError('خطأ: معرّف العرض غير موجود');
+      return;
+    }
+
+    // Convert to integer to match backend validation
+    const offerIdInt = parseInt(offerId, 10);
+
+    if (isNaN(offerIdInt) || offerIdInt < 1) {
+      showError('خطأ: معرّف العرض غير صالح');
+      console.error('Invalid offerId:', offerId, 'parsed as:', offerIdInt);
+      return;
+    }
+
     try {
       await bookingsAPI.create({
-        offerId: selectedOffer.id,
+        offerId: offerIdInt,
         message: bookingMessage,
         seats: 1 // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
       });
