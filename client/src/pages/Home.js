@@ -1021,10 +1021,17 @@ const Home = () => {
             )}
           </button>
 
-          {/* Browse Available Offers Button - For passengers in find mode */}
+          {/* Browse Available Offers/Demands Button - Changes based on user type */}
           {mode === 'find' && (
             <button
-              onClick={() => navigate('/offers')}
+              onClick={() => {
+                // Drivers see demands, passengers see offers
+                if (currentUser && currentUser.isDriver) {
+                  navigate('/demands');
+                } else {
+                  navigate('/offers');
+                }
+              }}
               style={{
                 position: 'relative',
                 zIndex: 1,
@@ -1055,8 +1062,13 @@ const Home = () => {
                 e.target.style.boxShadow = 'var(--shadow-md)';
               }}
             >
-              <span>🚗</span>
-              <span>تصفح الرحلات المتاحة</span>
+              <span>{currentUser && currentUser.isDriver ? '💺' : '🚗'}</span>
+              <span>
+                {currentUser && currentUser.isDriver
+                  ? 'تصفح الطلبات المتاحة'
+                  : 'تصفح الرحلات المتاحة'
+                }
+              </span>
             </button>
           )}
 
