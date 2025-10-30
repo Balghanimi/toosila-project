@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users.model');
 const config = require('../config/env');
+const { generateAccessToken } = require('../middlewares/auth');
 
 // Register a new user
 const register = async (req, res) => {
@@ -33,12 +34,8 @@ const register = async (req, res) => {
       languagePreference
     });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      config.JWT_SECRET,
-      { expiresIn: config.JWT_EXPIRES_IN }
-    );
+    // Generate JWT token with all user fields
+    const token = generateAccessToken(user);
 
     res.status(201).json({
       success: true,
@@ -88,12 +85,8 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      config.JWT_SECRET,
-      { expiresIn: config.JWT_EXPIRES_IN }
-    );
+    // Generate JWT token with all user fields
+    const token = generateAccessToken(user);
 
     // Remove password hash from response
     const { password_hash, ...userWithoutPassword } = user;
