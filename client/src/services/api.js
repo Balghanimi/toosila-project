@@ -35,8 +35,18 @@ const apiRequest = async (endpoint, options = {}) => {
       // Log full error response for debugging
       console.error('API Error Response:', data);
 
-      // Extract error message - data.error is a string, not an object
-      let errorMessage = data.error || data.message || 'حدث خطأ';
+      // Extract error message - handle both object and string formats
+      let errorMessage = 'حدث خطأ';
+
+      if (typeof data.error === 'object' && data.error !== null) {
+        // Backend sends error as object: { code: '...', message: '...' }
+        errorMessage = data.error.message || data.message || errorMessage;
+      } else if (typeof data.error === 'string') {
+        // Backend sends error as string
+        errorMessage = data.error;
+      } else if (data.message) {
+        errorMessage = data.message;
+      }
 
       // If there are validation details, include them
       if (data.details && Array.isArray(data.details) && data.details.length > 0) {
