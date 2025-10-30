@@ -263,6 +263,38 @@ const Header = ({ title = 'توصيلة' }) => {
                   يرجى تسجيل الدخول لرؤية القائمة الكاملة
                 </p>
               )}
+
+              {/* قسم الاتصال بنا */}
+              <div className={styles.drawerSection}>اتصل بنا</div>
+              <div style={{
+                padding: 'var(--space-4)',
+                background: 'var(--surface-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-sm)',
+                color: 'var(--text-secondary)',
+                lineHeight: '1.8'
+              }}>
+                <div style={{ marginBottom: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <span>📧</span>
+                  <a href="mailto:support@toosila.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                    support@toosila.com
+                  </a>
+                </div>
+                <div style={{ marginBottom: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <span>📱</span>
+                  <a href="tel:+9647700000000" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                    +964 770 000 0000
+                  </a>
+                </div>
+                <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border-light)' }}>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => { navigate('/messages'); toggleDrawer(); }}
+                  >
+                    💬 مراسلة الدعم الفني
+                  </button>
+                </div>
+              </div>
             </div>
           </nav>
         </div>

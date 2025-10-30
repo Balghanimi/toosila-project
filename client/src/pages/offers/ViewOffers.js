@@ -188,13 +188,14 @@ export default function ViewOffers() {
 
   const handleBookNow = (offer) => {
     if (!currentUser) {
-      alert('يجب تسجيل الدخول أولاً');
-      navigate('/');
+      showError('⚠️ يجب تسجيل الدخول أولاً للحجز');
+      // Scroll to top to show login button
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (currentUser.isDriver) {
-      alert('لا يمكن للسائقين حجز رحلات. قم بالتبديل إلى وضع الراكب من الملف الشخصي');
+      showError('⚠️ لا يمكن للسائقين حجز رحلات. هذا الحساب مسجل كسائق');
       return;
     }
 
@@ -340,7 +341,9 @@ export default function ViewOffers() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -371,7 +374,9 @@ export default function ViewOffers() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -404,7 +409,9 @@ export default function ViewOffers() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               />
             </div>
