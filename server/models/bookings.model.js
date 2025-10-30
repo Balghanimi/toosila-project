@@ -127,6 +127,15 @@ class Booking {
     return new Booking(result.rows[0]);
   }
 
+  // Update booking status
+  async updateStatus(status, totalPrice = null) {
+    const updateData = { status };
+    if (totalPrice !== null) {
+      updateData.total_price = totalPrice;
+    }
+    return this.update(updateData);
+  }
+
   // Get bookings sent by passenger
   static async getSentBookings(passengerId, page = 1, limit = 10) {
     const offset = (page - 1) * limit;
