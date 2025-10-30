@@ -249,7 +249,9 @@ export default function ViewDemands() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -278,7 +280,9 @@ export default function ViewDemands() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -309,7 +313,9 @@ export default function ViewDemands() {
                   borderRadius: 'var(--radius)',
                   fontSize: 'var(--text-base)',
                   fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)'
+                  background: 'var(--surface-primary)',
+                  textAlign: 'center',
+                  direction: 'rtl'
                 }}
               />
             </div>
