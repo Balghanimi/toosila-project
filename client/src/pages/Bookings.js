@@ -150,15 +150,56 @@ export default function Bookings() {
               fontFamily: '"Cairo", sans-serif'
             }}
           >
-            <div>📅 {new Date(booking.offer?.departureTime).toLocaleDateString('ar-EG')}</div>
-            <div>🕐 {new Date(booking.offer?.departureTime).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
-            <div>💺 {booking.offer?.seats} مقعد</div>
-            <div>💰 {booking.totalPrice || booking.offer?.price} د.ع</div>
-            {isReceived ? (
-              <div>👤 الراكب: {booking.user?.name}</div>
-            ) : (
-              <div>🚗 السائق: {booking.offer?.driver?.name}</div>
-            )}
+            <div>📅 {booking.offer?.departureTime ? new Date(booking.offer.departureTime).toLocaleDateString('ar-EG') : 'غير محدد'}</div>
+            <div>🕐 {booking.offer?.departureTime ? new Date(booking.offer.departureTime).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '--:--'}</div>
+            <div>💺 {booking.offer?.seats || '--'} مقعد</div>
+            <div>💰 {booking.totalPrice || booking.offer?.price || '0'} د.ع</div>
+          </div>
+
+          {/* Passenger/Driver Details Card */}
+          <div
+            style={{
+              background: isReceived ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius)',
+              marginBottom: 'var(--space-3)',
+              border: `2px solid ${isReceived ? '#3b82f6' : '#10b981'}`
+            }}
+          >
+            <div
+              style={{
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                color: isReceived ? '#1e40af' : '#047857',
+                marginBottom: 'var(--space-2)',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              {isReceived ? '👤 معلومات الراكب' : '🚗 معلومات السائق'}
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gap: 'var(--space-1)',
+                fontSize: 'var(--text-sm)',
+                color: 'var(--text-secondary)',
+                fontFamily: '"Cairo", sans-serif'
+              }}
+            >
+              {isReceived ? (
+                <>
+                  <div><strong>الاسم:</strong> {booking.user?.name || 'غير متوفر'}</div>
+                  {booking.user?.email && <div><strong>البريد:</strong> {booking.user.email}</div>}
+                  {booking.user?.phone && <div><strong>الهاتف:</strong> {booking.user.phone}</div>}
+                </>
+              ) : (
+                <>
+                  <div><strong>الاسم:</strong> {booking.offer?.driver?.name || 'غير متوفر'}</div>
+                  {booking.offer?.driver?.email && <div><strong>البريد:</strong> {booking.offer.driver.email}</div>}
+                  {booking.offer?.driver?.phone && <div><strong>الهاتف:</strong> {booking.offer.driver.phone}</div>}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Message */}
@@ -179,15 +220,55 @@ export default function Bookings() {
           )}
 
           {/* Actions */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            {canConfirm && (
-              <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {/* Primary Actions Row */}
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              {canConfirm && (
+                <>
+                  <button
+                    onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                    style={{
+                      flex: 1,
+                      padding: 'var(--space-3)',
+                      background: 'var(--primary)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontFamily: '"Cairo", sans-serif'
+                    }}
+                  >
+                    ✅ قبول
+                  </button>
+                  <button
+                    onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                    style={{
+                      flex: 1,
+                      padding: 'var(--space-3)',
+                      background: '#dc2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontFamily: '"Cairo", sans-serif'
+                    }}
+                  >
+                    ❌ رفض
+                  </button>
+                </>
+              )}
+
+              {!isReceived && canCancel && (
                 <button
-                  onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                  onClick={() => handleCancel(booking.id)}
                   style={{
                     flex: 1,
                     padding: 'var(--space-3)',
-                    background: 'var(--primary)',
+                    background: '#ef4444',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius)',
@@ -197,67 +278,34 @@ export default function Bookings() {
                     fontFamily: '"Cairo", sans-serif'
                   }}
                 >
-                  ✅ قبول
+                  إلغاء الحجز
                 </button>
-                <button
-                  onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3)',
-                    background: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}
-                >
-                  ❌ رفض
-                </button>
-              </>
-            )}
+              )}
+            </div>
 
-            {!isReceived && canCancel && (
-              <button
-                onClick={() => handleCancel(booking.id)}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: '#ef4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: '"Cairo", sans-serif'
-                }}
-              >
-                إلغاء الحجز
-              </button>
-            )}
-
-            {booking.status === 'confirmed' && (
-              <button
-                onClick={() => navigate(`/messages`)}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: '"Cairo", sans-serif'
-                }}
-              >
-                💬 مراسلة
-              </button>
-            )}
+            {/* Message Button - Always Visible */}
+            <button
+              onClick={() => {
+                const recipientId = isReceived ? booking.user?.id : booking.offer?.driver?.id;
+                const recipientName = isReceived ? booking.user?.name : booking.offer?.driver?.name;
+                navigate(`/messages`, { state: { recipientId, recipientName } });
+              }}
+              style={{
+                width: '100%',
+                padding: 'var(--space-3)',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              💬 مراسلة {isReceived ? 'الراكب' : 'السائق'}
+            </button>
           </div>
         </div>
       </div>
