@@ -343,6 +343,7 @@ export default function ViewOffers() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
+                  textAlignLast: 'center',
                   direction: 'rtl'
                 }}
               >
@@ -376,6 +377,7 @@ export default function ViewOffers() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
+                  textAlignLast: 'center',
                   direction: 'rtl'
                 }}
               >

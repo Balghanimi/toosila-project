@@ -251,6 +251,7 @@ export default function ViewDemands() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
+                  textAlignLast: 'center',
                   direction: 'rtl'
                 }}
               >
@@ -282,6 +283,7 @@ export default function ViewDemands() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
+                  textAlignLast: 'center',
                   direction: 'rtl'
                 }}
               >
