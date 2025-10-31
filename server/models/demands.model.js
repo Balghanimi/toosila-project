@@ -98,7 +98,7 @@ class Demand {
        LEFT JOIN demand_responses dr ON d.id = dr.demand_id
        ${whereClause}
        GROUP BY d.id, u.name, u.rating_avg, u.rating_count
-       ORDER BY d.earliest_time ASC
+       ORDER BY d.created_at DESC
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
       values
     );
@@ -157,9 +157,9 @@ class Demand {
     const offset = (page - 1) * limit;
     
     const result = await query(
-      `SELECT * FROM demands 
-       WHERE passenger_id = $1 
-       ORDER BY earliest_time ASC
+      `SELECT * FROM demands
+       WHERE passenger_id = $1
+       ORDER BY created_at DESC
        LIMIT $2 OFFSET $3`,
       [passengerId, limit, offset]
     );
@@ -186,9 +186,9 @@ class Demand {
       `SELECT d.*, u.name, u.rating_avg, u.rating_count
        FROM demands d
        JOIN users u ON d.passenger_id = u.id
-       WHERE d.is_active = true 
+       WHERE d.is_active = true
        AND (d.from_city ILIKE $1 OR d.to_city ILIKE $1)
-       ORDER BY d.earliest_time ASC
+       ORDER BY d.created_at DESC
        LIMIT $2 OFFSET $3`,
       [`%${searchTerm}%`, limit, offset]
     );

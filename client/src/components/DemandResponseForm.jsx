@@ -158,7 +158,9 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               borderRadius: 'var(--radius)',
               fontSize: 'var(--text-base)',
               fontFamily: '"Cairo", sans-serif',
-              transition: 'var(--transition)'
+              transition: 'var(--transition)',
+              textAlign: 'center',
+              direction: 'ltr'
             }}
             onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
             onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}
@@ -203,7 +205,9 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               borderRadius: 'var(--radius)',
               fontSize: 'var(--text-base)',
               fontFamily: '"Cairo", sans-serif',
-              transition: 'var(--transition)'
+              transition: 'var(--transition)',
+              textAlign: 'center',
+              direction: 'ltr'
             }}
             onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
             onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}
