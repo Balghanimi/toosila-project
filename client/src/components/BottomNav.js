@@ -53,8 +53,8 @@ const BottomNav = () => {
       paths: ['/', '/offers', '/post-offer']
     },
     {
-      key: 'dashboard',
-      label: 'لوحة التحكم',
+      key: 'mytrips',
+      label: 'رحلاتي',
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -63,7 +63,7 @@ const BottomNav = () => {
           <rect x="3" y="14" width="7" height="7" rx="1"/>
         </svg>
       ),
-      paths: ['/dashboard', '/bookings']
+      paths: ['/bookings', '/dashboard']
     },
     {
       key: 'messages',
@@ -96,7 +96,7 @@ const BottomNav = () => {
     // Navigate to the primary path for each section
     const navigationMap = {
       'carpool': '/',
-      'dashboard': '/dashboard',
+      'mytrips': '/bookings',
       'messages': '/messages',
       'profile': '/profile'
     };
