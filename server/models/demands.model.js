@@ -13,6 +13,12 @@ class Demand {
     this.isActive = data.is_active;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
+
+    // Additional fields from JOIN queries
+    if (data.name) this.name = data.name;
+    if (data.rating_avg) this.ratingAvg = parseFloat(data.rating_avg);
+    if (data.rating_count) this.ratingCount = parseInt(data.rating_count);
+    if (data.response_count !== undefined) this.responseCount = parseInt(data.response_count);
   }
 
   // Create a new demand
@@ -85,10 +91,13 @@ class Demand {
     values.push(limit, offset);
 
     const result = await query(
-      `SELECT d.*, u.name, u.rating_avg, u.rating_count
+      `SELECT d.*, u.name, u.rating_avg, u.rating_count,
+              COUNT(dr.id) as response_count
        FROM demands d
        JOIN users u ON d.passenger_id = u.id
+       LEFT JOIN demand_responses dr ON d.id = dr.demand_id
        ${whereClause}
+       GROUP BY d.id, u.name, u.rating_avg, u.rating_count
        ORDER BY d.earliest_time ASC
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
       values
@@ -213,7 +222,12 @@ class Demand {
       budgetMax: this.budgetMax,
       isActive: this.isActive,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
+      // Additional fields
+      ...(this.name && { name: this.name }),
+      ...(this.ratingAvg && { ratingAvg: this.ratingAvg }),
+      ...(this.ratingCount && { ratingCount: this.ratingCount }),
+      ...(this.responseCount !== undefined && { responseCount: this.responseCount })
     };
   }
 }
