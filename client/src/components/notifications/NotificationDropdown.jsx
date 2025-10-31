@@ -38,20 +38,55 @@ function NotificationDropdown({ onClose, dropdownRef }) {
       // الانتقال حسب نوع الإشعار
       const routes = {
         demand_response: () => {
-          // السائق رد على طلبك
-          navigate('/demands');
+          // السائق رد على طلبك - انتقل إلى الطلبات وافتح modal العروض
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
         },
         response_accepted: () => {
-          // تم قبول ردك
-          navigate('/demands');
+          // تم قبول ردك - انتقل إلى الطلبات
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
         },
         response_rejected: () => {
-          // تم رفض ردك
-          navigate('/demands');
+          // تم رفض ردك - انتقل إلى الطلبات
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
         },
         booking_created: () => {
-          // راكب حجز رحلتك
-          navigate('/my-offers');
+          // راكب حجز رحلتك - انتقل إلى عروضي
+          if (notification.relatedId) {
+            navigate('/offers', {
+              state: {
+                openOfferId: notification.relatedId
+              }
+            });
+          } else {
+            navigate('/offers');
+          }
         },
         booking_accepted: () => {
           // تم قبول حجزك

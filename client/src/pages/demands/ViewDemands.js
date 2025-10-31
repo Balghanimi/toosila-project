@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { demandsAPI, demandResponsesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import DemandResponseForm from '../../components/DemandResponseForm';
@@ -32,12 +32,28 @@ export default function ViewDemands() {
 
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setIsAnimated(true);
     fetchDemands();
     // eslint-disable-next-line
   }, []);
+
+  // Handle notification navigation
+  useEffect(() => {
+    if (location.state?.openDemandId && location.state?.action === 'viewResponses') {
+      // Find the demand in the list
+      const demand = demands.find(d => d.id === location.state.openDemandId);
+      if (demand) {
+        // Open the responses modal
+        handleViewResponses(demand, { stopPropagation: () => {} });
+      }
+      // Clear the state to prevent reopening on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line
+  }, [location.state, demands]);
 
   const fetchDemands = async (filterParams = {}) => {
     setLoading(true);
