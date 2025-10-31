@@ -1,0 +1,45 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- خلفية دائرية بتدرج أخضر -->
+  <circle cx="96" cy="96" r="96" fill="url(#gradient1)"/>
+
+  <!-- تدرج اللون الأخضر -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- سيارة مبسطة -->
+  <g transform="translate(45, 75)">
+    <!-- جسم السيارة -->
+    <rect x="8" y="15" width="90" height="30" rx="6" fill="white" opacity="0.95"/>
+
+    <!-- نافذة السيارة -->
+    <path d="M 22 15 L 34 4 L 67 4 L 79 15 Z" fill="white" opacity="0.7"/>
+
+    <!-- العجلات -->
+    <circle cx="26" cy="49" r="9" fill="#1f2937"/>
+    <circle cx="26" cy="49" r="6" fill="#374151"/>
+    <circle cx="79" cy="49" r="9" fill="#1f2937"/>
+    <circle cx="79" cy="49" r="6" fill="#374151"/>
+
+    <!-- خطوط السرعة -->
+    <line x1="4" y1="22" x2="0" y2="22" stroke="white" stroke-width="1.5" opacity="0.6" stroke-linecap="round"/>
+    <line x1="6" y1="30" x2="0" y2="30" stroke="white" stroke-width="1.5" opacity="0.5" stroke-linecap="round"/>
+    <line x1="4" y1="38" x2="0" y2="38" stroke="white" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- نجمة التقييم -->
+  <g transform="translate(135, 60)">
+    <circle cx="0" cy="0" r="13" fill="url(#gradient2)"/>
+    <path d="M 0 -7.5 L 2 -2 L 7.5 -2 L 3 1.5 L 5 7.5 L 0 4 L -5 7.5 L -3 1.5 L -7.5 -2 L -2 -2 Z" fill="white"/>
+  </g>
+
+  <!-- حرف T بالعربي (توصيلة) -->
+  <text x="96" y="157" font-family="Arial, sans-serif" font-size="45" font-weight="bold" fill="white" text-anchor="middle">ت</text>
+</svg>

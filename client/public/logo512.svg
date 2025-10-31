@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- خلفية دائرية بتدرج أخضر -->
+  <circle cx="256" cy="256" r="256" fill="url(#gradient1)"/>
+
+  <!-- تدرج اللون الأخضر -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- سيارة مبسطة -->
+  <g transform="translate(120, 200)">
+    <!-- جسم السيارة -->
+    <rect x="20" y="40" width="240" height="80" rx="15" fill="white" opacity="0.95"/>
+
+    <!-- نافذة السيارة -->
+    <path d="M 60 40 L 90 10 L 180 10 L 210 40 Z" fill="white" opacity="0.7"/>
+
+    <!-- العجلات -->
+    <circle cx="70" cy="130" r="25" fill="#1f2937"/>
+    <circle cx="70" cy="130" r="15" fill="#374151"/>
+    <circle cx="210" cy="130" r="25" fill="#1f2937"/>
+    <circle cx="210" cy="130" r="15" fill="#374151"/>
+
+    <!-- خطوط السرعة -->
+    <line x1="10" y1="60" x2="0" y2="60" stroke="white" stroke-width="4" opacity="0.6" stroke-linecap="round"/>
+    <line x1="15" y1="80" x2="0" y2="80" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+    <line x1="10" y1="100" x2="0" y2="100" stroke="white" stroke-width="4" opacity="0.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- نجمة التقييم -->
+  <g transform="translate(360, 160)">
+    <circle cx="0" cy="0" r="35" fill="url(#gradient2)"/>
+    <path d="M 0 -20 L 5 -5 L 20 -5 L 8 5 L 13 20 L 0 10 L -13 20 L -8 5 L -20 -5 L -5 -5 Z" fill="white"/>
+  </g>
+
+  <!-- حرف T بالعربي (توصيلة) -->
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="white" text-anchor="middle">ت</text>
+</svg>
