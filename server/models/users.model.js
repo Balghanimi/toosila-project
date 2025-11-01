@@ -9,6 +9,10 @@ class User {
     this.languagePreference = data.language_preference;
     this.ratingAvg = parseFloat(data.rating_avg) || 0.00;
     this.ratingCount = data.rating_count || 0;
+    this.isVerified = data.is_verified || false;
+    this.verificationStatus = data.verification_status || 'unverified';
+    this.verificationDate = data.verification_date;
+    this.verifiedBy = data.verified_by;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
