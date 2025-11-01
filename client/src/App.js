@@ -13,7 +13,9 @@ import { BookingsProvider } from './context/BookingContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { NotificationsProvider } from './context/NotificationsContext';
 import { SocketProvider } from './context/SocketContext';
+import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
+import './styles/enhancements.css';
 
 // Lazy load all pages for code splitting
 const Home = lazy(() => import('./pages/Home'));
@@ -47,16 +49,17 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <NotificationsProvider>
-            <NotificationProvider>
-              <MessagesProvider>
-                <BookingsProvider>
-                  <OffersProvider>
-                  <DemandsProvider>
-                    <RatingProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <NotificationsProvider>
+              <NotificationProvider>
+                <MessagesProvider>
+                  <BookingsProvider>
+                    <OffersProvider>
+                    <DemandsProvider>
+                      <RatingProvider>
                     <div>
                     <Header title="توصيلة" />
                     <main className="appContent">
@@ -95,15 +98,16 @@ export default function App() {
                 </main>
                 <BottomNav />
                 </div>
-              </RatingProvider>
-            </DemandsProvider>
-          </OffersProvider>
-        </BookingsProvider>
-      </MessagesProvider>
-    </NotificationProvider>
-  </NotificationsProvider>
-  </SocketProvider>
-  </AuthProvider>
-</LanguageProvider>
+                </RatingProvider>
+              </DemandsProvider>
+            </OffersProvider>
+          </BookingsProvider>
+        </MessagesProvider>
+      </NotificationProvider>
+    </NotificationsProvider>
+    </SocketProvider>
+    </AuthProvider>
+  </LanguageProvider>
+  </ThemeProvider>
   );
 }

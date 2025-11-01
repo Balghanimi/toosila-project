@@ -7,6 +7,7 @@ import { useNotifications } from '../../context/NotificationContext';
 import NotificationBell from '../notifications/NotificationBell';
 import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
+import ThemeToggle from '../ThemeToggle';
 
 const Header = ({ title = 'توصيلة' }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -73,6 +74,9 @@ const Header = ({ title = 'توصيلة' }) => {
         
         <div className={styles.right}>
           <div className={styles.rightActions}>
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             <button
               className={styles.languageChip}
               onClick={toggleLanguage}

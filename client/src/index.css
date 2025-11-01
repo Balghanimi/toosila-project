@@ -5,24 +5,12 @@
   --primary-hover: #2CAB4E;
   --primary-light: #9CE7A8;
   --primary-dark: #1F8A35;
-  
-  /* Text Colors */
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
-  --text-light: #D1D5DB;
-  --text-white: #FFFFFF;
-  
-  /* Surface Colors */
-  --surface-primary: #FFFFFF;
-  --surface-secondary: #F9FAFB;
-  --surface-tertiary: #F3F4F6;
-  --surface-overlay: rgba(0, 0, 0, 0.5);
-  
-  /* Border Colors */
-  --border-light: #E5E7EB;
-  --border-medium: #D1D5DB;
-  --border-dark: #9CA3AF;
+
+  /* Success/Error/Warning */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
   
   /* Spacing Scale */
   --space-1: 4px;
@@ -63,6 +51,67 @@
   
   /* Focus Ring */
   --focus-ring: 0 0 0 3px rgba(52, 199, 89, 0.2);
+
+  /* Transition */
+  --transition: all 0.3s ease;
+}
+
+/* Light Mode (Default) */
+body.light-mode {
+  /* Text Colors */
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --text-light: #D1D5DB;
+  --text-white: #FFFFFF;
+
+  /* Surface Colors */
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F9FAFB;
+  --surface-tertiary: #F3F4F6;
+  --surface-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Border Colors */
+  --border-light: #E5E7EB;
+  --border-medium: #D1D5DB;
+  --border-dark: #9CA3AF;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode */
+body.dark-mode {
+  /* Text Colors */
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
+  --text-light: #6B7280;
+  --text-white: #FFFFFF;
+
+  /* Surface Colors */
+  --surface-primary: #0f172a;
+  --surface-secondary: #1e293b;
+  --surface-tertiary: #334155;
+  --surface-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Border Colors */
+  --border-light: #334155;
+  --border-medium: #475569;
+  --border-dark: #64748b;
+
+  /* Shadows - More prominent in dark mode */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 30px rgba(0, 0, 0, 0.6);
+
+  /* Adjust primary colors for better contrast */
+  --primary-light: #22c55e;
+  --primary-hover: #16a34a;
 }
 
 /* Base Styles */
@@ -83,6 +132,7 @@ body {
   direction: rtl;
   text-align: start;
   padding-bottom: 64px; /* Space for bottom navigation */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {
@@ -481,18 +531,18 @@ a:focus-visible {
   }
 }
 
-/* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-primary: #F9FAFB;
-    --text-secondary: #D1D5DB;
-    --text-muted: #9CA3AF;
-    --surface-primary: #111827;
-    --surface-secondary: #1F2937;
-    --surface-tertiary: #374151;
-    --border-light: #374151;
-    --border-medium: #4B5563;
-  }
+/* Enhanced card hover effects */
+.card {
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select, .card, .chip {
+  transition: var(--transition);
 }
 
 /* Focus management for accessibility */
