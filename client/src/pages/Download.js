@@ -5,8 +5,15 @@ import { useTheme } from '../context/ThemeContext';
 const Download = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showInstallInstructions, setShowInstallInstructions] = useState(false);
+
+  // Handle responsive resize
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Detect device type
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -41,13 +48,19 @@ const Download = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      paddingTop: isMobile ? 'var(--space-4)' : 'var(--space-6)',
-      paddingBottom: '100px',
+      paddingTop: isMobile ? '70px' : 'var(--space-6)',
+      paddingBottom: isMobile ? '90px' : '100px',
       background: isDarkMode
         ? 'linear-gradient(to bottom, rgba(52, 199, 89, 0.08) 0%, transparent 50%)'
         : 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)'
     }}>
-      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '0 var(--space-3)' : '0 var(--space-4)' }}>
+      <div className="container" style={{
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: isMobile ? '0 16px' : '0 var(--space-4)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
         {/* Header */}
         <div style={{
           background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
