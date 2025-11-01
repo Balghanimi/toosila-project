@@ -46,6 +46,7 @@ const RatingsByComments = lazy(() => import('./pages/RatingsByComments'));
 const RatingsByRating = lazy(() => import('./pages/RatingsByRating'));
 const TestAPI = lazy(() => import('./pages/SimpleTestAPI'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 export default function App() {
   return (
@@ -93,6 +94,8 @@ export default function App() {
                       <Route path="/test-api" element={<TestAPI />} />
                       {/* صفحة الإشعارات */}
                       <Route path="/notifications" element={<NotificationsPage />} />
+                      {/* صفحة سياسة الخصوصية */}
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     </Routes>
                   </Suspense>
                 </main>
