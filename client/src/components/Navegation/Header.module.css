@@ -1,4 +1,4 @@
-/* Header Component - Enhanced */
+/* Header Component - 3 Section Layout */
 .header {
   position: sticky;
   top: 0;
@@ -17,6 +17,7 @@
   font-family: 'Cairo', 'Tajawal', sans-serif;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: var(--space-4);
 }
 
 body.dark-mode .header {
@@ -25,52 +26,139 @@ body.dark-mode .header {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Layout Sections */
-.left {
-  width: 56px;
+/* Right Section: Logo + App Name */
+.logoSection {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  flex-shrink: 0;
 }
 
-.center {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 var(--space-4);
-}
-
-.right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-2);
-}
-
-.rightActions {
+.logoButton {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  outline: none;
 }
 
-/* Page Title - Enhanced */
-.title {
-  margin: 0;
+.logoButton:hover {
+  background: var(--surface-secondary);
+  transform: translateY(-1px);
+}
+
+.logoButton:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logoButton:hover .logo {
+  transform: scale(1.05);
+}
+
+.appName {
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--text-primary);
   font-family: 'Cairo', 'Tajawal', sans-serif;
-  direction: rtl;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
+}
+
+/* Center Section: Navigation Links */
+.centerNav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-4);
+}
+
+.navLink {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 500;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.navLink:hover {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.navLink:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.navLinkActive {
+  color: var(--primary);
+  font-weight: 600;
+  background: var(--primary-light);
+}
+
+.navLinkActive::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: var(--space-4);
+  left: var(--space-4);
+  height: 2px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.navBadge {
+  background: #dc2626;
+  color: white;
+  border-radius: var(--radius-full);
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+/* Left Section: User Actions */
+.actionsSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 /* Hamburger Button - Enhanced */
@@ -389,8 +477,23 @@ body.dark-mode .header {
     height: 56px;
   }
 
-  .title {
+  /* Hide center navigation on mobile */
+  .centerNav {
+    display: none;
+  }
+
+  /* Show hamburger menu on mobile */
+  .hamburgerButton {
+    display: flex;
+  }
+
+  .appName {
     font-size: var(--text-base);
+  }
+
+  .logo {
+    height: 28px;
+    width: 28px;
   }
 
   .languageChip {
@@ -419,13 +522,33 @@ body.dark-mode .header {
   }
 }
 
+/* Desktop: Hide hamburger, show navigation */
+@media (min-width: 769px) {
+  .hamburgerButton {
+    display: none;
+  }
+
+  .centerNav {
+    display: flex;
+  }
+}
+
 @media (max-width: 480px) {
   .header {
     padding: 0 var(--space-2);
   }
 
-  .rightActions {
+  .actionButtons {
     gap: var(--space-1);
+  }
+
+  .appName {
+    font-size: var(--text-sm);
+  }
+
+  .logo {
+    height: 24px;
+    width: 24px;
   }
 
   .languageChip {

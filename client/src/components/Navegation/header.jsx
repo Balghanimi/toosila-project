@@ -19,29 +19,6 @@ const Header = ({ title = 'توصيلة' }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Dynamic page titles based on routes
-  const getPageTitle = () => {
-    const path = location.pathname;
-    const titles = {
-      '/': 'توصيلة',
-      '/post-offer': 'انشر رحلة',
-      '/offers': 'العروض المتاحة',
-      '/demands': 'الطلبات المتاحة',
-      '/ratings': 'إدارة التقييمات',
-      '/rating-stats': 'إحصائيات التقييمات',
-      '/top-ratings': 'أفضل التقييمات',
-      '/recent-ratings': 'أحدث التقييمات',
-      '/bad-ratings': 'التقييمات السيئة',
-      '/ratings-by-location': 'التقييمات حسب الموقع',
-      '/ratings-by-user-type': 'التقييمات حسب نوع المستخدم',
-      '/ratings-by-date': 'التقييمات حسب التاريخ',
-      '/ratings-by-comments': 'التقييمات حسب التعليقات',
-      '/ratings-by-rating': 'التقييمات حسب الدرجة'
-    };
-    return titles[path] || title;
-  };
-
-
   const toggleDrawer = () => {
     setDrawerOpen(prev => !prev);
   };
@@ -54,26 +31,81 @@ const Header = ({ title = 'توصيلة' }) => {
     }
   };
 
+  // Check if current path is active
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
   return (
     <>
       <header className={styles.header}>
-        <div className={styles.left}>
-          <button 
-            className={styles.hamburgerButton} 
-            onClick={toggleDrawer}
-            aria-label="القائمة"
-            aria-expanded={drawerOpen}
+        {/* Right Section: Logo + App Name */}
+        <div className={styles.logoSection}>
+          <button
+            className={styles.logoButton}
+            onClick={() => navigate('/')}
+            aria-label="الصفحة الرئيسية"
           >
-            ☰
+            <img
+              src="/logo.svg"
+              alt="توصيلة"
+              className={styles.logo}
+            />
+            <span className={styles.appName}>توصيلة</span>
           </button>
         </div>
-        
-        <div className={styles.center}>
-          <h1 className={styles.title}>{getPageTitle()}</h1>
-        </div>
-        
-        <div className={styles.right}>
-          <div className={styles.rightActions}>
+
+        {/* Center Section: Navigation Links (Desktop only, authenticated users) */}
+        <nav className={styles.centerNav}>
+          {isAuthenticated && (
+            <>
+              <button
+                className={`${styles.navLink} ${isActive('/') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/')}
+              >
+                الرئيسية
+              </button>
+              <button
+                className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/offers')}
+              >
+                العروض
+              </button>
+              <button
+                className={`${styles.navLink} ${isActive('/demands') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/demands')}
+              >
+                الطلبات
+              </button>
+              <button
+                className={`${styles.navLink} ${isActive('/bookings') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/bookings')}
+              >
+                رحلاتي
+                {pendingBookings.totalPending > 0 && (
+                  <span className={styles.navBadge}>
+                    {pendingBookings.totalPending > 9 ? '9+' : pendingBookings.totalPending}
+                  </span>
+                )}
+              </button>
+              <button
+                className={`${styles.navLink} ${isActive('/messages') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/messages')}
+              >
+                الرسائل
+                {unreadMessages > 0 && (
+                  <span className={styles.navBadge}>
+                    {unreadMessages > 9 ? '9+' : unreadMessages}
+                  </span>
+                )}
+              </button>
+            </>
+          )}
+        </nav>
+
+        {/* Left Section: User Actions */}
+        <div className={styles.actionsSection}>
+          <div className={styles.actionButtons}>
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -95,7 +127,7 @@ const Header = ({ title = 'توصيلة' }) => {
               {isAuthenticated ? user.name : t('login')}
             </button>
             {isAuthenticated && (
-              <div 
+              <div
                 className={styles.userAvatar}
                 onClick={handleAuthClick}
                 role="button"
@@ -111,6 +143,16 @@ const Header = ({ title = 'توصيلة' }) => {
               </div>
             )}
           </div>
+
+          {/* Mobile Hamburger Menu */}
+          <button
+            className={styles.hamburgerButton}
+            onClick={toggleDrawer}
+            aria-label="القائمة"
+            aria-expanded={drawerOpen}
+          >
+            ☰
+          </button>
         </div>
       </header>
 
