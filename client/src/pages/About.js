@@ -236,6 +236,24 @@ const About = () => {
                   color: '#ef4444'
                 },
                 {
+                  icon: '🌿',
+                  title: 'صديق للبيئة',
+                  desc: 'تقليل الانبعاثات الكربونية من خلال مشاركة الرحلات',
+                  color: '#10b981'
+                },
+                {
+                  icon: '🚦',
+                  title: 'فك الاختناقات المرورية',
+                  desc: 'تقليل عدد السيارات على الطرق وتخفيف الازدحام',
+                  color: '#f59e0b'
+                },
+                {
+                  icon: '💰',
+                  title: 'توفير المال',
+                  desc: 'تقليل تكاليف السفر ومشاركة مصاريف الوقود',
+                  color: '#34c759'
+                },
+                {
                   icon: '💬',
                   title: 'رسائل فورية',
                   desc: 'تواصل مباشر وآمن بين السائقين والركاب',
@@ -245,7 +263,7 @@ const About = () => {
                   icon: '🔔',
                   title: 'إشعارات ذكية',
                   desc: 'تنبيهات فورية لحالة الحجوزات والرحلات',
-                  color: '#f59e0b'
+                  color: '#8b5cf6'
                 },
                 {
                   icon: '🌙',
@@ -399,6 +417,143 @@ const About = () => {
                   <li>استمتع برحلة آمنة ومريحة!</li>
                 </ol>
               </div>
+            </div>
+          </section>
+
+          {/* الفوائد البيئية والاقتصادية */}
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-3)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '1.5rem' : '2rem',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                borderRadius: '12px',
+                padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>🌍</div>
+              <h2 style={{
+                fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
+                fontWeight: '700',
+                color: isDarkMode ? '#ffffff' : '#1f2937',
+                margin: 0
+              }}>
+                تأثيرنا الإيجابي
+              </h2>
+            </div>
+
+            <div style={{ display: 'grid', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+              {[
+                {
+                  icon: '🌿',
+                  title: 'صديق للبيئة',
+                  items: [
+                    'تقليل الانبعاثات الكربونية من خلال تقليل عدد السيارات على الطرق',
+                    'المساهمة في مكافحة التغير المناخي',
+                    'تحسين جودة الهواء في المدن'
+                  ],
+                  color: '#10b981'
+                },
+                {
+                  icon: '🚦',
+                  title: 'فك الاختناقات المرورية',
+                  items: [
+                    'تقليل الازدحام في ساعات الذروة',
+                    'توفير الوقت للجميع على الطرق',
+                    'تحسين تدفق حركة المرور'
+                  ],
+                  color: '#f59e0b'
+                },
+                {
+                  icon: '💰',
+                  title: 'توفير المال',
+                  items: [
+                    'تقاسم تكاليف الوقود والصيانة',
+                    'تقليل هدر الأموال على وسائل النقل الفردية',
+                    'أسعار تنافسية مقارنة بالنقل التقليدي'
+                  ],
+                  color: '#34c759'
+                }
+              ].map((benefit, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: 'var(--space-5)',
+                    background: isDarkMode
+                      ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.08) 100%)'
+                      : 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%)',
+                    borderRadius: 'var(--radius-xl)',
+                    border: isDarkMode
+                      ? `2px solid ${benefit.color}40`
+                      : `2px solid ${benefit.color}20`,
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = benefit.color;
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = `0 10px 30px ${benefit.color}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = isDarkMode ? `${benefit.color}40` : `${benefit.color}20`;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-3)',
+                    marginBottom: 'var(--space-4)'
+                  }}>
+                    <div style={{
+                      fontSize: '2.5rem',
+                      minWidth: '50px',
+                      textAlign: 'center'
+                    }}>
+                      {benefit.icon}
+                    </div>
+                    <h3 style={{
+                      fontSize: 'var(--text-xl)',
+                      fontWeight: '700',
+                      color: isDarkMode ? benefit.color : benefit.color,
+                      margin: 0
+                    }}>
+                      {benefit.title}
+                    </h3>
+                  </div>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    display: 'grid',
+                    gap: 'var(--space-3)'
+                  }}>
+                    {benefit.items.map((item, i) => (
+                      <li key={i} style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 'var(--space-2)',
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : '#374151',
+                        fontSize: 'var(--text-base)',
+                        lineHeight: '1.6'
+                      }}>
+                        <span style={{
+                          color: benefit.color,
+                          fontWeight: '700',
+                          fontSize: '1.2rem',
+                          minWidth: '20px'
+                        }}>✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </section>
 
