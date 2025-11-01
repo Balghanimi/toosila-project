@@ -71,7 +71,6 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
   const handleNext = async () => {
     // Calculate date
     let calculatedDate;
@@ -312,7 +311,7 @@ const Home = () => {
           {/* Mode Toggle Buttons - Prominent Position */}
           <div style={{
             display: 'flex',
-            gap: 'var(--space-4)',
+            gap: 'var(--space-3)',
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 'var(--space-8)',
@@ -323,19 +322,19 @@ const Home = () => {
               <button
                 onClick={() => setMode('demand')}
                 style={{
-                  padding: '16px 40px',
+                  padding: '14px 32px',
                   border: mode === 'demand' ? 'none' : '2px solid var(--primary)',
-                  borderRadius: '16px',
+                  borderRadius: '14px',
                   background: mode === 'demand' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
                   color: mode === 'demand' ? 'white' : 'var(--primary)',
-                  fontSize: '18px',
+                  fontSize: '16px',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'demand' ? '0 8px 20px rgba(52, 199, 89, 0.3)' : 'none',
+                  boxShadow: mode === 'demand' ? '0 6px 16px rgba(52, 199, 89, 0.3)' : 'none',
                   transform: mode === 'demand' ? 'translateY(-2px)' : 'translateY(0)',
                   fontFamily: '"Cairo", sans-serif',
-                  minWidth: '180px'
+                  minWidth: '160px'
                 }}
                 onMouseEnter={(e) => {
                   if (mode !== 'demand') {
@@ -359,19 +358,19 @@ const Home = () => {
               <button
                 onClick={() => setMode('offer')}
                 style={{
-                  padding: '16px 40px',
+                  padding: '14px 32px',
                   border: mode === 'offer' ? 'none' : '2px solid var(--primary)',
-                  borderRadius: '16px',
+                  borderRadius: '14px',
                   background: mode === 'offer' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
                   color: mode === 'offer' ? 'white' : 'var(--primary)',
-                  fontSize: '18px',
+                  fontSize: '16px',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'offer' ? '0 8px 20px rgba(52, 199, 89, 0.3)' : 'none',
+                  boxShadow: mode === 'offer' ? '0 6px 16px rgba(52, 199, 89, 0.3)' : 'none',
                   transform: mode === 'offer' ? 'translateY(-2px)' : 'translateY(0)',
                   fontFamily: '"Cairo", sans-serif',
-                  minWidth: '180px'
+                  minWidth: '160px'
                 }}
                 onMouseEnter={(e) => {
                   if (mode !== 'offer') {
@@ -394,19 +393,19 @@ const Home = () => {
             <button
               onClick={() => setMode('find')}
               style={{
-                padding: '16px 40px',
+                padding: '14px 32px',
                 border: mode === 'find' ? 'none' : '2px solid #3b82f6',
-                borderRadius: '16px',
+                borderRadius: '14px',
                 background: mode === 'find' ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
                 color: mode === 'find' ? 'white' : '#3b82f6',
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: mode === 'find' ? '0 8px 20px rgba(59, 130, 246, 0.3)' : 'none',
+                boxShadow: mode === 'find' ? '0 6px 16px rgba(59, 130, 246, 0.3)' : 'none',
                 transform: mode === 'find' ? 'translateY(-2px)' : 'translateY(0)',
                 fontFamily: '"Cairo", sans-serif',
-                minWidth: '180px'
+                minWidth: '160px'
               }}
               onMouseEnter={(e) => {
                 if (mode !== 'find') {
@@ -422,6 +421,41 @@ const Home = () => {
               }}
             >
               🔍 ابحث عن رحلة
+            </button>
+
+            {/* تصفح الرحلات المتاحة Button */}
+            <button
+              onClick={() => {
+                // الذهاب مباشرة إلى صفحة العروض/الطلبات بدون فلتر
+                if (currentUser && currentUser.isDriver) {
+                  navigate('/demands');
+                } else {
+                  navigate('/offers');
+                }
+              }}
+              style={{
+                padding: '14px 32px',
+                border: '2px solid #8b5cf6',
+                borderRadius: '14px',
+                background: 'transparent',
+                color: '#8b5cf6',
+                fontSize: '16px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                minWidth: '160px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#8b5cf6';
+                e.target.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = '#8b5cf6';
+              }}
+            >
+              📋 تصفح الرحلات
             </button>
           </div>
 
@@ -1054,6 +1088,70 @@ const Home = () => {
             </div>
             </div>
           )}
+
+          {/* Submit Button */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 'var(--space-6)',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            <button
+              onClick={handleNext}
+              disabled={isSubmitting}
+              style={{
+                padding: '16px 48px',
+                fontSize: '18px',
+                fontWeight: '700',
+                background: isSubmitting ? '#9CA3AF' : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '16px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: isSubmitting ? 'none' : '0 8px 20px rgba(52, 199, 89, 0.3)',
+                minWidth: '200px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 12px 28px rgba(52, 199, 89, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 8px 20px rgba(52, 199, 89, 0.3)';
+                }
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <span style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '3px solid white',
+                    borderTopColor: 'transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite'
+                  }} />
+                  جاري المعالجة...
+                </>
+              ) : (
+                <>
+                  {mode === 'find' && '🔍 ابحث الآن'}
+                  {mode === 'offer' && '🚗 نشر العرض'}
+                  {mode === 'demand' && '💺 نشر الطلب'}
+                </>
+              )}
+            </button>
+          </div>
 
           <style>{`
             @keyframes spin {
