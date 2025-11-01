@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -32,6 +32,13 @@ const Icons = {
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
     </svg>
+  ),
+  more: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+    </svg>
   )
 };
 
@@ -41,9 +48,72 @@ const BottomNav = () => {
   const { t } = useLanguage();
   const { unreadMessages } = useNotifications();
   const currentPath = location.pathname;
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   // Get total unread message count (using NotificationContext polling instead)
   const totalUnreadCount = unreadMessages;
+
+  // More menu items
+  const MORE_MENU_ITEMS = [
+    {
+      key: 'settings',
+      label: 'الإعدادات',
+      icon: '⚙️',
+      action: () => navigate('/settings')
+    },
+    {
+      key: 'statistics',
+      label: 'الإحصائيات',
+      icon: '📊',
+      action: () => navigate('/rating-stats')
+    },
+    {
+      key: 'about',
+      label: 'حول التطبيق',
+      icon: 'ℹ️',
+      action: () => alert('توصيلة - تطبيق مشاركة الرحلات\nالإصدار 2.1.15')
+    },
+    {
+      key: 'contact',
+      label: 'اتصل بنا',
+      icon: '📞',
+      action: () => window.location.href = 'mailto:support@toosila.com'
+    },
+    {
+      key: 'help',
+      label: 'المساعدة',
+      icon: '❓',
+      action: () => alert('للمساعدة والدعم، يرجى التواصل معنا عبر البريد الإلكتروني أو من خلال قسم الإعدادات')
+    },
+    {
+      key: 'privacy',
+      label: 'سياسة الخصوصية',
+      icon: '🔒',
+      action: () => alert('سياسة الخصوصية:\n\nنحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. يتم تخزين البيانات بشكل آمن ومشفر.')
+    },
+    {
+      key: 'features',
+      label: 'الميزات',
+      icon: '💡',
+      action: () => alert('ميزات توصيلة:\n\n• مشاركة الرحلات الآمنة\n• نظام تقييم شامل\n• رسائل فورية\n• إشعارات ذكية\n• دعم الوضع المظلم')
+    },
+    {
+      key: 'share',
+      label: 'مشاركة التطبيق',
+      icon: '📤',
+      action: () => {
+        if (navigator.share) {
+          navigator.share({
+            title: 'تطبيق توصيلة',
+            text: 'جرب تطبيق توصيلة لمشاركة الرحلات!',
+            url: window.location.origin
+          });
+        } else {
+          alert('شارك توصيلة مع أصدقائك!');
+        }
+      }
+    }
+  ];
 
   const NAV_ITEMS = [
     {
@@ -77,6 +147,12 @@ const BottomNav = () => {
       icon: Icons.profile,
       paths: ['/profile', '/settings', '/ratings']
     },
+    {
+      key: 'more',
+      label: 'المزيد',
+      icon: Icons.more,
+      paths: []
+    }
   ];
 
   // Determine active item based on current path
@@ -93,6 +169,12 @@ const BottomNav = () => {
   const activeKey = getActiveKey();
 
   const handleNavigation = (item) => {
+    // Handle "More" button differently
+    if (item.key === 'more') {
+      setShowMoreMenu(!showMoreMenu);
+      return;
+    }
+
     // Navigate to the primary path for each section
     const navigationMap = {
       'carpool': '/',
@@ -118,27 +200,171 @@ const BottomNav = () => {
   }
 
   return (
-    <nav style={{
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      zIndex: 1000,
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      height: '72px',
-      padding: 'var(--space-2) 0',
-      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      borderTop: '2px solid transparent',
-      borderImage: 'linear-gradient(90deg, rgba(52, 199, 89, 0.3) 0%, rgba(52, 199, 89, 0.1) 50%, rgba(52, 199, 89, 0.3) 100%) 1',
-      boxShadow: '0 -8px 32px rgba(52, 199, 89, 0.08), 0 -2px 8px rgba(0, 0, 0, 0.05)',
-      direction: 'rtl',
-      fontFamily: '"Cairo", sans-serif'
-    }}>
-      {NAV_ITEMS.map((item, index) => {
-        const isActive = activeKey === item.key;
+    <>
+      {/* More Menu Modal */}
+      {showMoreMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            animation: 'fadeIn 0.2s ease'
+          }}
+          onClick={() => setShowMoreMenu(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '24px 24px 0 0',
+              padding: '24px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+              boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.2)',
+              animation: 'slideUp 0.3s ease',
+              fontFamily: '"Cairo", sans-serif',
+              direction: 'rtl'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              paddingBottom: '16px',
+              borderBottom: '2px solid #f0f0f0'
+            }}>
+              <h3 style={{
+                fontSize: '20px',
+                fontWeight: '800',
+                color: '#1a1a1a',
+                margin: 0
+              }}>
+                المزيد
+              </h3>
+              <button
+                onClick={() => setShowMoreMenu(false)}
+                style={{
+                  background: '#f3f4f6',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#6b7280'
+                }}
+              >
+                ✖
+              </button>
+            </div>
+
+            {/* Menu Items Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '16px',
+              marginBottom: '16px'
+            }}>
+              {MORE_MENU_ITEMS.map((menuItem) => (
+                <button
+                  key={menuItem.key}
+                  onClick={() => {
+                    menuItem.action();
+                    setShowMoreMenu(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '16px 8px',
+                    background: '#f9fafb',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    fontFamily: '"Cairo", sans-serif'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#34c759';
+                    e.currentTarget.style.borderColor = '#34c759';
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(52, 199, 89, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#f9fafb';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <div style={{ fontSize: '28px' }}>{menuItem.icon}</div>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    textAlign: 'center',
+                    lineHeight: '1.2'
+                  }}>
+                    {menuItem.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* App Version */}
+            <div style={{
+              textAlign: 'center',
+              padding: '16px',
+              background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+              borderRadius: '12px',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '600',
+              marginTop: '16px'
+            }}>
+              إصدار التطبيق 2.1.15 - 25/10/2024
+            </div>
+          </div>
+        </div>
+      )}
+
+      <nav style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        height: '72px',
+        padding: 'var(--space-2) 0',
+        background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '2px solid transparent',
+        borderImage: 'linear-gradient(90deg, rgba(52, 199, 89, 0.3) 0%, rgba(52, 199, 89, 0.1) 50%, rgba(52, 199, 89, 0.3) 100%) 1',
+        boxShadow: '0 -8px 32px rgba(52, 199, 89, 0.08), 0 -2px 8px rgba(0, 0, 0, 0.05)',
+        direction: 'rtl',
+        fontFamily: '"Cairo", sans-serif'
+      }}>
+        {NAV_ITEMS.map((item, index) => {
+          const isActive = item.key === 'more' ? showMoreMenu : activeKey === item.key;
         
         return (
           <button
@@ -303,6 +529,24 @@ const BottomNav = () => {
           }
         }
 
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+
         /* Dark mode support for bottom nav */
         body.dark-mode nav {
           background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%) !important;
@@ -310,7 +554,8 @@ const BottomNav = () => {
           box-shadow: 0 -8px 32px rgba(52, 199, 89, 0.12), 0 -2px 8px rgba(0, 0, 0, 0.3) !important;
         }
       `}</style>
-    </nav>
+      </nav>
+    </>
   );
 };
 
