@@ -18,7 +18,9 @@ const Home = () => {
   const [dropSuggestions, setDropSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
   const [showDropSuggestions, setShowDropSuggestions] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [submitError, setSubmitError] = useState('');
   const [availableCities, setAvailableCities] = useState([]); // Cities from database
   const navigate = useNavigate();
@@ -69,6 +71,7 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // eslint-disable-next-line no-unused-vars
   const handleNext = async () => {
     // Calculate date
     let calculatedDate;
