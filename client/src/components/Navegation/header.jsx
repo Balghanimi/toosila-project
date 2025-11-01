@@ -47,11 +47,10 @@ const Header = ({ title = 'توصيلة' }) => {
             aria-label="الصفحة الرئيسية"
           >
             <img
-              src="/logo.svg"
+              src="/toosila-logo-text.svg"
               alt="توصيلة"
-              className={styles.logo}
+              className={styles.logoText}
             />
-            <span className={styles.appName}>توصيلة</span>
           </button>
         </div>
 

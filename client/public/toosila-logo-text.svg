@@ -1,0 +1,93 @@
+<svg width="280" height="80" viewBox="0 0 280 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Primary green gradient for text -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#34C759;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#28a745;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Stronger green gradient for emphasis -->
+    <linearGradient id="textGradientStrong" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Wheel gradient -->
+    <radialGradient id="wheelGradient" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#4b5563;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1f2937;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Glass/windshield gradient -->
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759;stop-opacity:0.25" />
+      <stop offset="100%" style="stop-color:#34C759;stop-opacity:0.08" />
+    </linearGradient>
+  </defs>
+
+  <!-- Car body background - rounded rectangle behind text -->
+  <rect x="18" y="14" width="244" height="44" rx="10" fill="url(#textGradientStrong)" opacity="0.12"/>
+
+  <!-- Windshield/roof shape above text -->
+  <path d="M 45 14 L 68 3 L 192 3 L 215 14 Z" fill="url(#glassGradient)" stroke="#34C759" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Subtle car outline -->
+  <path d="M 25 20 L 45 14 L 68 3 L 192 3 L 215 14 L 235 20 L 250 35 L 250 48 L 245 55 L 35 55 L 30 48 L 30 35 Z"
+        fill="none" stroke="url(#textGradient)" stroke-width="1.5" opacity="0.2"/>
+
+  <!-- Arabic text "توصيلة" - positioned as car body -->
+  <text x="140" y="48" font-family="Cairo, Tajawal, Arial, sans-serif" font-size="40" font-weight="bold"
+        fill="url(#textGradientStrong)" text-anchor="middle" letter-spacing="-1.5">توصيلة</text>
+
+  <!-- Front headlight accent (right side in RTL) -->
+  <circle cx="235" cy="38" r="3.5" fill="#fbbf24" opacity="0.85">
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="235" cy="38" r="2" fill="#fef3c7"/>
+
+  <!-- Rear light accent (left side in RTL) -->
+  <circle cx="45" cy="38" r="3.5" fill="#ef4444" opacity="0.75"/>
+  <circle cx="45" cy="38" r="2" fill="#fecaca"/>
+
+  <!-- Speed/motion lines -->
+  <g opacity="0.5">
+    <line x1="15" y1="24" x2="3" y2="24" stroke="url(#textGradient)" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="18" y1="35" x2="3" y2="35" stroke="url(#textGradient)" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="15" y1="46" x2="3" y2="46" stroke="url(#textGradient)" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Front wheel (right in RTL) -->
+  <g transform="translate(215, 62)">
+    <!-- Outer tire -->
+    <circle cx="0" cy="0" r="15" fill="#1f2937" stroke="#111827" stroke-width="1"/>
+    <!-- Rim -->
+    <circle cx="0" cy="0" r="10" fill="url(#wheelGradient)"/>
+    <!-- Hub -->
+    <circle cx="0" cy="0" r="4.5" fill="#374151"/>
+    <circle cx="0" cy="0" r="2.5" fill="#6b7280"/>
+    <!-- Wheel spokes -->
+    <line x1="-7" y1="0" x2="7" y2="0" stroke="#9ca3af" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="-7" x2="0" y2="7" stroke="#9ca3af" stroke-width="1.5" opacity="0.7"/>
+    <line x1="-5" y1="-5" x2="5" y2="5" stroke="#9ca3af" stroke-width="1" opacity="0.5"/>
+    <line x1="-5" y1="5" x2="5" y2="-5" stroke="#9ca3af" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Rear wheel (left in RTL) -->
+  <g transform="translate(65, 62)">
+    <!-- Outer tire -->
+    <circle cx="0" cy="0" r="15" fill="#1f2937" stroke="#111827" stroke-width="1"/>
+    <!-- Rim -->
+    <circle cx="0" cy="0" r="10" fill="url(#wheelGradient)"/>
+    <!-- Hub -->
+    <circle cx="0" cy="0" r="4.5" fill="#374151"/>
+    <circle cx="0" cy="0" r="2.5" fill="#6b7280"/>
+    <!-- Wheel spokes -->
+    <line x1="-7" y1="0" x2="7" y2="0" stroke="#9ca3af" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="-7" x2="0" y2="7" stroke="#9ca3af" stroke-width="1.5" opacity="0.7"/>
+    <line x1="-5" y1="-5" x2="5" y2="5" stroke="#9ca3af" stroke-width="1" opacity="0.5"/>
+    <line x1="-5" y1="5" x2="5" y2="-5" stroke="#9ca3af" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Ground/road line -->
+  <line x1="25" y1="77" x2="255" y2="77" stroke="#d1d5db" stroke-width="1.5" opacity="0.3" stroke-dasharray="6,4" stroke-linecap="round"/>
+</svg>

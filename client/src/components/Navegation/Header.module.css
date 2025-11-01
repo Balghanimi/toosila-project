@@ -66,6 +66,18 @@ body.dark-mode .header {
   transform: scale(1.05);
 }
 
+/* New text-as-car logo */
+.logoText {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logoButton:hover .logoText {
+  transform: translateY(-1px);
+}
+
 .appName {
   font-size: var(--text-xl);
   font-weight: 700;
@@ -496,6 +508,10 @@ body.dark-mode .header {
     width: 28px;
   }
 
+  .logoText {
+    height: 40px;
+  }
+
   .languageChip {
     padding: var(--space-1) var(--space-2);
     font-size: 11px;
@@ -549,6 +565,10 @@ body.dark-mode .header {
   .logo {
     height: 24px;
     width: 24px;
+  }
+
+  .logoText {
+    height: 36px;
   }
 
   .languageChip {
