@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Profile = () => {
   const { currentUser, updateProfile, logout } = useAuth();
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [message, setMessage] = useState('');
@@ -56,19 +58,24 @@ const Profile = () => {
     <div className="container" style={{
       paddingTop: 'var(--space-6)',
       paddingBottom: '100px',
-      background: 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)',
+      background: isDarkMode
+        ? 'linear-gradient(to bottom, rgba(52, 199, 89, 0.08) 0%, transparent 50%)'
+        : 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)',
       minHeight: '100vh'
     }}>
       {/* Profile Header */}
       <div style={{
         textAlign: 'center',
         marginBottom: 'var(--space-8)',
-        background: 'white',
+        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
         borderRadius: 'var(--radius-2xl)',
         padding: 'var(--space-8) var(--space-4)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        boxShadow: isDarkMode
+          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+          : '0 4px 20px rgba(0, 0, 0, 0.08)',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none'
       }}>
         {/* Decorative background circles */}
         <div style={{
@@ -77,7 +84,9 @@ const Profile = () => {
           left: '-60px',
           width: '200px',
           height: '200px',
-          background: 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)',
+          background: isDarkMode
+            ? 'linear-gradient(135deg, rgba(52, 199, 89, 0.15) 0%, rgba(52, 199, 89, 0.08) 100%)'
+            : 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)',
           borderRadius: '50%',
           zIndex: 0
         }} />
@@ -87,7 +96,9 @@ const Profile = () => {
           right: '-80px',
           width: '250px',
           height: '250px',
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+          background: isDarkMode
+            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%)'
+            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
           borderRadius: '50%',
           zIndex: 0
         }} />
@@ -146,17 +157,16 @@ const Profile = () => {
           <h1 style={{
             fontSize: '2rem',
             fontWeight: '800',
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: isDarkMode ? '#ffffff' : '#1a1a1a',
             marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
+            fontFamily: '"Cairo", sans-serif',
+            textShadow: isDarkMode ? '0 2px 10px rgba(52, 199, 89, 0.3)' : 'none'
           }}>
             {currentUser.name}
           </h1>
 
           <p style={{
-            color: 'var(--text-secondary)',
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
             fontSize: 'var(--text-base)',
             fontFamily: '"Cairo", sans-serif',
             fontWeight: '500',
@@ -430,11 +440,13 @@ const Profile = () => {
 
       {/* Role Switcher Card */}
       <div style={{
-        background: 'white',
+        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
         borderRadius: 'var(--radius-2xl)',
         padding: 'var(--space-7)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: 'none',
+        boxShadow: isDarkMode
+          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+          : '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none',
         marginBottom: 'var(--space-6)',
         position: 'relative',
         overflow: 'hidden'
@@ -459,7 +471,7 @@ const Profile = () => {
           <h2 style={{
             fontSize: 'var(--text-xl)',
             fontWeight: '800',
-            color: 'var(--text-primary)',
+            color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
             fontFamily: '"Cairo", sans-serif',
             margin: 0
           }}>
@@ -468,7 +480,7 @@ const Profile = () => {
         </div>
 
         <p style={{
-          color: 'var(--text-secondary)',
+          color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
           fontSize: 'var(--text-base)',
           fontFamily: '"Cairo", sans-serif',
           marginBottom: 'var(--space-4)',
@@ -538,11 +550,13 @@ const Profile = () => {
 
       {/* Account Info */}
       <div style={{
-        background: 'white',
+        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
         borderRadius: 'var(--radius-2xl)',
         padding: 'var(--space-7)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: 'none',
+        boxShadow: isDarkMode
+          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+          : '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: isDarkMode ? '1px solid rgba(59, 130, 246, 0.2)' : 'none',
         marginBottom: 'var(--space-6)',
         position: 'relative',
         overflow: 'hidden'
@@ -567,7 +581,7 @@ const Profile = () => {
           <h2 style={{
             fontSize: 'var(--text-xl)',
             fontWeight: '800',
-            color: 'var(--text-primary)',
+            color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
             fontFamily: '"Cairo", sans-serif',
             margin: 0
           }}>
@@ -578,75 +592,126 @@ const Profile = () => {
         <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
           <div style={{
             padding: 'var(--space-4)',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
             borderRadius: 'var(--radius-lg)',
             fontFamily: '"Cairo", sans-serif',
-            border: '2px solid rgba(59, 130, 246, 0.1)',
+            border: isDarkMode
+              ? '2px solid rgba(59, 130, 246, 0.25)'
+              : '2px solid rgba(59, 130, 246, 0.1)',
             transition: 'all 0.3s ease'
           }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(59, 130, 246, 0.5)'
+                : 'rgba(59, 130, 246, 0.3)';
               e.currentTarget.style.transform = 'translateX(-3px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.1)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(59, 130, 246, 0.25)'
+                : 'rgba(59, 130, 246, 0.1)';
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+            <div style={{
+              fontSize: 'var(--text-sm)',
+              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+              marginBottom: 'var(--space-2)',
+              fontWeight: '600'
+            }}>
               👤 الاسم
             </div>
-            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{
+              fontSize: 'var(--text-lg)',
+              fontWeight: '700',
+              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
+            }}>
               {currentUser.name}
             </div>
           </div>
 
           <div style={{
             padding: 'var(--space-4)',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
             borderRadius: 'var(--radius-lg)',
             fontFamily: '"Cairo", sans-serif',
-            border: '2px solid rgba(139, 92, 246, 0.1)',
+            border: isDarkMode
+              ? '2px solid rgba(139, 92, 246, 0.25)'
+              : '2px solid rgba(139, 92, 246, 0.1)',
             transition: 'all 0.3s ease'
           }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(139, 92, 246, 0.5)'
+                : 'rgba(139, 92, 246, 0.3)';
               e.currentTarget.style.transform = 'translateX(-3px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.1)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(139, 92, 246, 0.25)'
+                : 'rgba(139, 92, 246, 0.1)';
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+            <div style={{
+              fontSize: 'var(--text-sm)',
+              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+              marginBottom: 'var(--space-2)',
+              fontWeight: '600'
+            }}>
               ✉️ البريد الإلكتروني
             </div>
-            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{
+              fontSize: 'var(--text-lg)',
+              fontWeight: '700',
+              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
+            }}>
               {currentUser.email}
             </div>
           </div>
 
           <div style={{
             padding: 'var(--space-4)',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
             borderRadius: 'var(--radius-lg)',
             fontFamily: '"Cairo", sans-serif',
-            border: '2px solid rgba(59, 130, 246, 0.1)',
+            border: isDarkMode
+              ? '2px solid rgba(59, 130, 246, 0.25)'
+              : '2px solid rgba(59, 130, 246, 0.1)',
             transition: 'all 0.3s ease'
           }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(59, 130, 246, 0.5)'
+                : 'rgba(59, 130, 246, 0.3)';
               e.currentTarget.style.transform = 'translateX(-3px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.1)';
+              e.currentTarget.style.borderColor = isDarkMode
+                ? 'rgba(59, 130, 246, 0.25)'
+                : 'rgba(59, 130, 246, 0.1)';
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+            <div style={{
+              fontSize: 'var(--text-sm)',
+              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+              marginBottom: 'var(--space-2)',
+              fontWeight: '600'
+            }}>
               🎭 الدور الحالي
             </div>
-            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{
+              fontSize: 'var(--text-lg)',
+              fontWeight: '700',
+              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
+            }}>
               {currentUser.isDriver ? '🚗 سائق' : '🧑‍💼 راكب'}
             </div>
           </div>
@@ -659,32 +724,38 @@ const Profile = () => {
         style={{
           width: '100%',
           padding: 'var(--space-5)',
-          background: 'white',
-          color: '#dc2626',
-          border: '2px solid #fecaca',
+          background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
+          color: '#ef4444',
+          border: isDarkMode ? '2px solid rgba(239, 68, 68, 0.3)' : '2px solid #fecaca',
           borderRadius: 'var(--radius-xl)',
           fontSize: 'var(--text-lg)',
           fontWeight: '700',
           cursor: 'pointer',
           fontFamily: '"Cairo", sans-serif',
           transition: 'all 0.3s ease',
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+          boxShadow: isDarkMode
+            ? '0 2px 10px rgba(0, 0, 0, 0.3)'
+            : '0 2px 10px rgba(0, 0, 0, 0.05)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 'var(--space-2)'
         }}
         onMouseEnter={(e) => {
-          e.target.style.background = '#fee2e2';
-          e.target.style.borderColor = '#dc2626';
+          e.target.style.background = isDarkMode ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2';
+          e.target.style.borderColor = '#ef4444';
           e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.2)';
+          e.target.style.boxShadow = isDarkMode
+            ? '0 4px 15px rgba(239, 68, 68, 0.3)'
+            : '0 4px 15px rgba(220, 38, 38, 0.2)';
         }}
         onMouseLeave={(e) => {
-          e.target.style.background = 'white';
-          e.target.style.borderColor = '#fecaca';
+          e.target.style.background = isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white';
+          e.target.style.borderColor = isDarkMode ? 'rgba(239, 68, 68, 0.3)' : '#fecaca';
           e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
+          e.target.style.boxShadow = isDarkMode
+            ? '0 2px 10px rgba(0, 0, 0, 0.3)'
+            : '0 2px 10px rgba(0, 0, 0, 0.05)';
         }}
       >
         <span style={{ fontSize: '1.5rem' }}>🚪</span>
