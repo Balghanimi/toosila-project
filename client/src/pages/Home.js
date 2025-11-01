@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { demandsAPI, citiesAPI } from '../services/api';
+import { citiesAPI } from '../services/api';
 
 const Home = () => {
   const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
