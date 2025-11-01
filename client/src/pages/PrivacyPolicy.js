@@ -6,22 +6,25 @@ const PrivacyPolicy = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
 
+  // Responsive styles
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <div style={{
       minHeight: '100vh',
-      paddingTop: 'var(--space-6)',
+      paddingTop: isMobile ? 'var(--space-4)' : 'var(--space-6)',
       paddingBottom: '100px',
       background: isDarkMode
         ? 'linear-gradient(to bottom, rgba(59, 130, 246, 0.08) 0%, transparent 50%)'
         : 'linear-gradient(to bottom, rgba(59, 130, 246, 0.03) 0%, transparent 50%)'
     }}>
-      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 var(--space-4)' }}>
+      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: isMobile ? '0 var(--space-3)' : '0 var(--space-4)' }}>
         {/* Header */}
         <div style={{
           background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
-          borderRadius: 'var(--radius-2xl)',
-          padding: 'var(--space-8) var(--space-6)',
-          marginBottom: 'var(--space-6)',
+          borderRadius: isMobile ? 'var(--radius-xl)' : 'var(--radius-2xl)',
+          padding: isMobile ? 'var(--space-5) var(--space-4)' : 'var(--space-8) var(--space-6)',
+          marginBottom: isMobile ? 'var(--space-4)' : 'var(--space-6)',
           boxShadow: isDarkMode
             ? '0 4px 20px rgba(0, 0, 0, 0.4)'
             : '0 4px 20px rgba(0, 0, 0, 0.08)',
@@ -43,18 +46,18 @@ const PrivacyPolicy = () => {
             onClick={() => navigate(-1)}
             style={{
               position: 'absolute',
-              top: 'var(--space-4)',
-              right: 'var(--space-4)',
+              top: isMobile ? 'var(--space-3)' : 'var(--space-4)',
+              right: isMobile ? 'var(--space-3)' : 'var(--space-4)',
               background: isDarkMode ? 'rgba(59, 130, 246, 0.2)' : '#eff6ff',
               border: 'none',
               borderRadius: '50%',
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              fontSize: '20px',
+              fontSize: isMobile ? '22px' : '20px',
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
@@ -69,13 +72,13 @@ const PrivacyPolicy = () => {
             ←
           </button>
 
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-4)' }}>
+          <div style={{ textAlign: 'center', marginTop: isMobile ? 'var(--space-3)' : 'var(--space-4)' }}>
             <div style={{
-              fontSize: '4rem',
-              marginBottom: 'var(--space-4)'
+              fontSize: isMobile ? '2.5rem' : '4rem',
+              marginBottom: isMobile ? 'var(--space-3)' : 'var(--space-4)'
             }}>🔒</div>
             <h1 style={{
-              fontSize: '2.5rem',
+              fontSize: isMobile ? '1.75rem' : '2.5rem',
               fontWeight: '800',
               color: isDarkMode ? '#ffffff' : '#1a1a1a',
               marginBottom: 'var(--space-3)',
@@ -84,7 +87,7 @@ const PrivacyPolicy = () => {
               سياسة الخصوصية
             </h1>
             <p style={{
-              fontSize: 'var(--text-lg)',
+              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
               color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6b7280',
               fontFamily: '"Cairo", sans-serif',
               marginBottom: 'var(--space-2)'
@@ -109,8 +112,8 @@ const PrivacyPolicy = () => {
         {/* Content Sections */}
         <div style={{
           background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
-          borderRadius: 'var(--radius-2xl)',
-          padding: 'var(--space-8) var(--space-6)',
+          borderRadius: isMobile ? 'var(--radius-xl)' : 'var(--radius-2xl)',
+          padding: isMobile ? 'var(--space-5) var(--space-4)' : 'var(--space-8) var(--space-6)',
           boxShadow: isDarkMode
             ? '0 4px 20px rgba(0, 0, 0, 0.4)'
             : '0 4px 20px rgba(0, 0, 0, 0.08)',
@@ -128,16 +131,16 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
                 borderRadius: '12px',
-                padding: 'var(--space-3)',
+                padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>📱</div>
               <h2 style={{
-                fontSize: 'var(--text-2xl)',
+                fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
                 fontWeight: '700',
                 color: isDarkMode ? '#ffffff' : '#1f2937',
                 margin: 0
@@ -164,16 +167,16 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 borderRadius: '12px',
-                padding: 'var(--space-3)',
+                padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>📊</div>
               <h2 style={{
-                fontSize: 'var(--text-2xl)',
+                fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
                 fontWeight: '700',
                 color: isDarkMode ? '#ffffff' : '#1f2937',
                 margin: 0
@@ -271,16 +274,16 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                 borderRadius: '12px',
-                padding: 'var(--space-3)',
+                padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>🎯</div>
               <h2 style={{
-                fontSize: 'var(--text-2xl)',
+                fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
                 fontWeight: '700',
                 color: isDarkMode ? '#ffffff' : '#1f2937',
                 margin: 0
@@ -320,7 +323,7 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 borderRadius: '12px',
                 padding: 'var(--space-3)',
@@ -373,7 +376,7 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 borderRadius: '12px',
                 padding: 'var(--space-3)',
@@ -427,7 +430,7 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
                 borderRadius: '12px',
                 padding: 'var(--space-3)',
@@ -483,7 +486,7 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem',
+                fontSize: isMobile ? '1.5rem' : '2rem',
                 background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
                 borderRadius: '12px',
                 padding: 'var(--space-3)',
@@ -532,10 +535,10 @@ const PrivacyPolicy = () => {
               marginBottom: 'var(--space-4)'
             }}>
               <div style={{
-                fontSize: '2rem'
+                fontSize: isMobile ? '1.5rem' : '2rem'
               }}>📧</div>
               <h2 style={{
-                fontSize: 'var(--text-2xl)',
+                fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
                 fontWeight: '700',
                 color: isDarkMode ? '#10b981' : '#047857',
                 margin: 0
@@ -589,15 +592,15 @@ const PrivacyPolicy = () => {
           {/* ملاحظة ختامية */}
           <div style={{
             marginTop: 'var(--space-8)',
-            padding: 'var(--space-6)',
+            padding: isMobile ? 'var(--space-4)' : 'var(--space-6)',
             background: isDarkMode ? 'rgba(245, 158, 11, 0.1)' : '#fef3c7',
             borderRadius: 'var(--radius-lg)',
             border: isDarkMode ? '1px solid rgba(245, 158, 11, 0.3)' : '2px solid #f59e0b',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>✨</div>
+            <div style={{ fontSize: isMobile ? '2rem' : '3rem', marginBottom: 'var(--space-3)' }}>✨</div>
             <p style={{
-              fontSize: 'var(--text-lg)',
+              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
               fontWeight: '600',
               color: isDarkMode ? '#f59e0b' : '#92400e',
               marginBottom: 'var(--space-2)'

@@ -53,6 +53,10 @@ const BottomNav = () => {
   // Get total unread message count (using NotificationContext polling instead)
   const totalUnreadCount = unreadMessages;
 
+  // Responsive detection
+  const isMobile = window.innerWidth <= 768;
+  const isSmallMobile = window.innerWidth <= 375;
+
   // More menu items
   const MORE_MENU_ITEMS = [
     {
@@ -275,8 +279,8 @@ const BottomNav = () => {
             {/* Menu Items Grid */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '16px',
+              gridTemplateColumns: isSmallMobile ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)',
+              gap: isSmallMobile ? '12px' : '16px',
               marginBottom: '16px'
             }}>
               {MORE_MENU_ITEMS.map((menuItem) => (
@@ -291,14 +295,16 @@ const BottomNav = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
-                    padding: '16px 8px',
+                    gap: isSmallMobile ? '6px' : '8px',
+                    padding: isSmallMobile ? '14px 6px' : '16px 8px',
                     background: '#f9fafb',
                     border: '2px solid #e5e7eb',
-                    borderRadius: '16px',
+                    borderRadius: isSmallMobile ? '12px' : '16px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    fontFamily: '"Cairo", sans-serif'
+                    fontFamily: '"Cairo", sans-serif',
+                    minHeight: '44px',
+                    minWidth: '44px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = '#34c759';
@@ -313,9 +319,9 @@ const BottomNav = () => {
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
-                  <div style={{ fontSize: '28px' }}>{menuItem.icon}</div>
+                  <div style={{ fontSize: isSmallMobile ? '24px' : '28px' }}>{menuItem.icon}</div>
                   <span style={{
-                    fontSize: '11px',
+                    fontSize: isSmallMobile ? '10px' : '11px',
                     fontWeight: '600',
                     color: '#374151',
                     textAlign: 'center',
