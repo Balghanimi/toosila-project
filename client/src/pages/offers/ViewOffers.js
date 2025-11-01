@@ -922,12 +922,13 @@ export default function ViewOffers() {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(0, 0, 0, 0.5)',
+              background: 'rgba(0, 0, 0, 0.6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1000,
-              padding: 'var(--space-4)'
+              padding: 'var(--space-4)',
+              overflowY: 'auto'
             }}
             onClick={() => setShowBookingModal(false)}
           >
@@ -938,7 +939,10 @@ export default function ViewOffers() {
                 padding: 'var(--space-6)',
                 maxWidth: '500px',
                 width: '100%',
-                boxShadow: 'var(--shadow-xl)'
+                boxShadow: 'var(--shadow-xl)',
+                margin: 'auto',
+                maxHeight: '90vh',
+                overflowY: 'auto'
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -955,6 +959,70 @@ export default function ViewOffers() {
                 🎫 تأكيد الحجز
               </h2>
 
+              {/* Driver Information */}
+              {selectedOffer.name && (
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                    marginBottom: 'var(--space-4)',
+                    color: 'white',
+                    boxShadow: 'var(--shadow-md)'
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      opacity: 0.9
+                    }}
+                  >
+                    معلومات السائق
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 'var(--space-1)'
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: '700',
+                        fontFamily: '"Cairo", sans-serif'
+                      }}
+                    >
+                      👤 {selectedOffer.name}
+                    </div>
+                    {selectedOffer.ratingAvg && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--space-1)',
+                          fontSize: 'var(--text-base)',
+                          fontWeight: '600',
+                          fontFamily: '"Cairo", sans-serif'
+                        }}
+                      >
+                        ⭐ {Number(selectedOffer.ratingAvg).toFixed(1)}
+                        {selectedOffer.ratingCount && (
+                          <span style={{ fontSize: 'var(--text-sm)', opacity: 0.9 }}>
+                            ({selectedOffer.ratingCount})
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Trip Details */}
               <div
                 style={{
                   background: 'var(--surface-secondary)',
@@ -982,6 +1050,16 @@ export default function ViewOffers() {
                   }}
                 >
                   📅 {formatDate(selectedOffer.departureTime)} - 🕐 {formatTime(selectedOffer.departureTime)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-secondary)',
+                    fontFamily: '"Cairo", sans-serif',
+                    marginBottom: 'var(--space-2)'
+                  }}
+                >
+                  💺 {selectedOffer.seats} مقعد متاح
                 </div>
                 <div
                   style={{

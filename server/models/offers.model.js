@@ -12,6 +12,10 @@ class Offer {
     this.isActive = data.is_active;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
+    // Driver information (if joined)
+    this.name = data.name;
+    this.ratingAvg = data.rating_avg;
+    this.ratingCount = data.rating_count;
   }
 
   // Create a new offer
@@ -261,7 +265,10 @@ class Offer {
       price: this.price,
       isActive: this.isActive,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
+      name: this.name,
+      ratingAvg: this.ratingAvg,
+      ratingCount: this.ratingCount
     };
   }
 }
