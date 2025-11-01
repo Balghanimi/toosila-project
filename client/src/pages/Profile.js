@@ -53,89 +53,138 @@ const Profile = () => {
   };
 
   return (
-    <div className="container" style={{ paddingTop: 'var(--space-6)', paddingBottom: '100px' }}>
+    <div className="container" style={{
+      paddingTop: 'var(--space-6)',
+      paddingBottom: '100px',
+      background: 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)',
+      minHeight: '100vh'
+    }}>
       {/* Profile Header */}
-      <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-        <div
-          onClick={() => navigate(currentUser.isDriver ? '/post-offer' : '/')}
-          style={{
-            width: '100px',
-            height: '100px',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto var(--space-4) auto',
-            boxShadow: 'var(--shadow-xl)',
-            border: '4px solid var(--surface-primary)',
-            fontSize: '3rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            position: 'relative'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(52, 199, 89, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
-            e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
-          }}
-          title={currentUser.isDriver ? 'انقر لنشر رحلة' : 'انقر للبحث عن رحلة'}
-        >
-          {currentUser.isDriver ? '🚗' : '🧑‍💼'}
-          {/* Click hint badge */}
-          <div style={{
-            position: 'absolute',
-            bottom: '-5px',
-            right: '-5px',
-            width: '30px',
-            height: '30px',
-            background: 'white',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1rem',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-            animation: 'bounce 2s infinite'
-          }}>
-            ✨
-          </div>
-        </div>
-
-        <h1 style={{
-          fontSize: 'var(--text-3xl)',
-          fontWeight: '800',
-          color: 'var(--text-primary)',
-          marginBottom: 'var(--space-2)',
-          fontFamily: '"Cairo", sans-serif'
-        }}>
-          {currentUser.name}
-        </h1>
-
-        <p style={{
-          color: 'var(--text-secondary)',
-          fontSize: 'var(--text-lg)',
-          fontFamily: '"Cairo", sans-serif',
-          fontWeight: '500'
-        }}>
-          {currentUser.email}
-        </p>
-
+      <div style={{
+        textAlign: 'center',
+        marginBottom: 'var(--space-8)',
+        background: 'white',
+        borderRadius: 'var(--radius-2xl)',
+        padding: 'var(--space-8) var(--space-4)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative background circles */}
         <div style={{
-          display: 'inline-block',
-          marginTop: 'var(--space-3)',
-          padding: 'var(--space-2) var(--space-4)',
-          background: currentUser.isDriver ? '#dbeafe' : '#f0fdf4',
-          color: currentUser.isDriver ? '#1e40af' : '#15803d',
-          borderRadius: 'var(--radius-lg)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: '600',
-          fontFamily: '"Cairo", sans-serif'
-        }}>
-          {currentUser.isDriver ? '🚗 سائق' : '🧑‍💼 راكب'}
+          position: 'absolute',
+          top: '-60px',
+          left: '-60px',
+          width: '200px',
+          height: '200px',
+          background: 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-80px',
+          right: '-80px',
+          width: '250px',
+          height: '250px',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div
+            onClick={() => navigate(currentUser.isDriver ? '/post-offer' : '/')}
+            style={{
+              width: '120px',
+              height: '120px',
+              background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto var(--space-4) auto',
+              boxShadow: '0 10px 30px rgba(52, 199, 89, 0.3)',
+              border: '5px solid white',
+              fontSize: '4rem',
+              cursor: 'pointer',
+              transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.15) rotate(5deg)';
+              e.currentTarget.style.boxShadow = '0 20px 50px rgba(52, 199, 89, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(52, 199, 89, 0.3)';
+            }}
+            title={currentUser.isDriver ? 'انقر لنشر رحلة' : 'انقر للبحث عن رحلة'}
+          >
+            {currentUser.isDriver ? '🚗' : '🧑‍💼'}
+            {/* Click hint badge */}
+            <div style={{
+              position: 'absolute',
+              bottom: '0',
+              right: '0',
+              width: '36px',
+              height: '36px',
+              background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.2rem',
+              boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+              animation: 'bounce 2s infinite',
+              border: '3px solid white'
+            }}>
+              ✨
+            </div>
+          </div>
+
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: 'var(--space-2)',
+            fontFamily: '"Cairo", sans-serif'
+          }}>
+            {currentUser.name}
+          </h1>
+
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontSize: 'var(--text-base)',
+            fontFamily: '"Cairo", sans-serif',
+            fontWeight: '500',
+            marginBottom: 'var(--space-3)'
+          }}>
+            {currentUser.email}
+          </p>
+
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            padding: 'var(--space-2) var(--space-5)',
+            background: currentUser.isDriver
+              ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+              : 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+            color: 'white',
+            borderRadius: '50px',
+            fontSize: 'var(--text-sm)',
+            fontWeight: '700',
+            fontFamily: '"Cairo", sans-serif',
+            boxShadow: currentUser.isDriver
+              ? '0 4px 15px rgba(59, 130, 246, 0.3)'
+              : '0 4px 15px rgba(52, 199, 89, 0.3)'
+          }}>
+            <span style={{ fontSize: '1.2rem' }}>{currentUser.isDriver ? '🚗' : '🧑‍💼'}</span>
+            <span>{currentUser.isDriver ? 'سائق' : 'راكب'}</span>
+          </div>
         </div>
       </div>
 
@@ -174,10 +223,10 @@ const Profile = () => {
 
       {/* Quick Actions Card - Role-based */}
       <div style={{
-        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-6)',
-        boxShadow: 'var(--shadow-xl)',
+        background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+        borderRadius: 'var(--radius-2xl)',
+        padding: 'var(--space-7)',
+        boxShadow: '0 10px 40px rgba(52, 199, 89, 0.3)',
         border: 'none',
         marginBottom: 'var(--space-6)',
         position: 'relative',
@@ -188,30 +237,49 @@ const Profile = () => {
           position: 'absolute',
           top: '-50%',
           right: '-20%',
-          width: '200px',
-          height: '200px',
-          background: 'rgba(255, 255, 255, 0.1)',
+          width: '250px',
+          height: '250px',
+          background: 'rgba(255, 255, 255, 0.12)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-30%',
+          left: '-10%',
+          width: '180px',
+          height: '180px',
+          background: 'rgba(255, 255, 255, 0.08)',
           borderRadius: '50%',
           zIndex: 0
         }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{
-            fontSize: 'var(--text-xl)',
-            fontWeight: '700',
-            color: 'white',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif',
-            textAlign: 'center'
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-3)'
           }}>
-            ⚡ إجراءات سريعة
-          </h2>
+            <span style={{ fontSize: '2rem' }}>⚡</span>
+            <h2 style={{
+              fontSize: 'var(--text-2xl)',
+              fontWeight: '800',
+              color: 'white',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0
+            }}>
+              إجراءات سريعة
+            </h2>
+          </div>
           <p style={{
-            color: 'rgba(255, 255, 255, 0.9)',
-            fontSize: 'var(--text-sm)',
+            color: 'rgba(255, 255, 255, 0.95)',
+            fontSize: 'var(--text-base)',
             fontFamily: '"Cairo", sans-serif',
-            marginBottom: 'var(--space-5)',
-            textAlign: 'center'
+            marginBottom: 'var(--space-6)',
+            textAlign: 'center',
+            fontWeight: '500'
           }}>
             {currentUser.isDriver ? 'ابدأ بنشر رحلتك الآن' : 'ابحث عن رحلتك المثالية'}
           </p>
@@ -224,15 +292,15 @@ const Profile = () => {
                 width: '100%',
                 padding: 'var(--space-5)',
                 background: 'white',
-                color: 'var(--primary)',
+                color: '#34c759',
                 border: 'none',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-lg)',
-                fontWeight: '700',
+                borderRadius: 'var(--radius-xl)',
+                fontSize: 'var(--text-xl)',
+                fontWeight: '800',
                 cursor: 'pointer',
                 fontFamily: '"Cairo", sans-serif',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-                transition: 'all 0.3s ease',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.25)',
+                transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -240,50 +308,50 @@ const Profile = () => {
                 marginBottom: 'var(--space-3)'
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-3px)';
-                e.target.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.3)';
+                e.target.style.transform = 'translateY(-4px) scale(1.02)';
+                e.target.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.35)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+                e.target.style.transform = 'translateY(0) scale(1)';
+                e.target.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.25)';
               }}
             >
-              <span style={{ fontSize: '2rem' }}>🚗</span>
+              <span style={{ fontSize: '2.5rem' }}>🚗</span>
               <span>نشر رحلة جديدة</span>
             </button>
           ) : (
             /* Quick Actions for Passenger */
-            <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+            <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
               <button
                 onClick={() => navigate('/')}
                 style={{
                   width: '100%',
-                  padding: 'var(--space-4)',
+                  padding: 'var(--space-5)',
                   background: 'white',
-                  color: 'var(--primary)',
+                  color: '#34c759',
                   border: 'none',
-                  borderRadius: 'var(--radius-lg)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '700',
+                  borderRadius: 'var(--radius-xl)',
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '800',
                   cursor: 'pointer',
                   fontFamily: '"Cairo", sans-serif',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-                  transition: 'all 0.3s ease',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.25)',
+                  transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 'var(--space-2)'
+                  gap: 'var(--space-3)'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.3)';
+                  e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                  e.target.style.boxShadow = '0 12px 35px rgba(0, 0, 0, 0.35)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.25)';
                 }}
               >
-                <span style={{ fontSize: '1.5rem' }}>🔍</span>
+                <span style={{ fontSize: '2rem' }}>🔍</span>
                 <span>البحث عن رحلة</span>
               </button>
 
@@ -291,32 +359,32 @@ const Profile = () => {
                 onClick={() => navigate('/', { state: { mode: 'demand' } })}
                 style={{
                   width: '100%',
-                  padding: 'var(--space-4)',
-                  background: 'rgba(255, 255, 255, 0.2)',
+                  padding: 'var(--space-5)',
+                  background: 'rgba(255, 255, 255, 0.25)',
                   color: 'white',
-                  border: '2px solid white',
-                  borderRadius: 'var(--radius-lg)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '700',
+                  border: '3px solid white',
+                  borderRadius: 'var(--radius-xl)',
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '800',
                   cursor: 'pointer',
                   fontFamily: '"Cairo", sans-serif',
                   backdropFilter: 'blur(10px)',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 'var(--space-2)'
+                  gap: 'var(--space-3)'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.35)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.25)';
                 }}
               >
-                <span style={{ fontSize: '1.5rem' }}>💺</span>
+                <span style={{ fontSize: '2rem' }}>💺</span>
                 <span>نشر طلب رحلة</span>
               </button>
             </div>
@@ -327,50 +395,77 @@ const Profile = () => {
             onClick={() => navigate(currentUser.isDriver ? '/offers' : '/demands')}
             style={{
               width: '100%',
-              padding: 'var(--space-3)',
+              padding: 'var(--space-4)',
               background: 'transparent',
               color: 'white',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: 'var(--radius)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: '600',
+              border: '2px solid rgba(255, 255, 255, 0.4)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 'var(--text-base)',
+              fontWeight: '700',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
               transition: 'all 0.3s ease',
-              marginTop: 'var(--space-3)'
+              marginTop: 'var(--space-4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)'
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.target.style.background = 'rgba(255, 255, 255, 0.15)';
               e.target.style.borderColor = 'white';
+              e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
               e.target.style.background = 'transparent';
-              e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
-            {currentUser.isDriver ? '📋 عرض رحلاتي' : '📋 عرض طلباتي'}
+            <span style={{ fontSize: '1.3rem' }}>📋</span>
+            <span>{currentUser.isDriver ? 'عرض رحلاتي' : 'عرض طلباتي'}</span>
           </button>
         </div>
       </div>
 
       {/* Role Switcher Card */}
       <div style={{
-        background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-6)',
-        boxShadow: 'var(--shadow-lg)',
-        border: '1px solid var(--border-light)',
-        marginBottom: 'var(--space-6)'
+        background: 'white',
+        borderRadius: 'var(--radius-2xl)',
+        padding: 'var(--space-7)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: 'none',
+        marginBottom: 'var(--space-6)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <h2 style={{
-          fontSize: 'var(--text-xl)',
-          fontWeight: '700',
-          color: 'var(--text-primary)',
-          marginBottom: 'var(--space-4)',
-          fontFamily: '"Cairo", sans-serif'
+        {/* Decorative gradient bar */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #34c759 0%, #3b82f6 100%)'
+        }} />
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+          marginBottom: 'var(--space-4)'
         }}>
-          🔄 تبديل الدور
-        </h2>
+          <span style={{ fontSize: '1.8rem' }}>🔄</span>
+          <h2 style={{
+            fontSize: 'var(--text-xl)',
+            fontWeight: '800',
+            color: 'var(--text-primary)',
+            fontFamily: '"Cairo", sans-serif',
+            margin: 0
+          }}>
+            تبديل الدور
+          </h2>
+        </div>
 
         <p style={{
           color: 'var(--text-secondary)',
@@ -390,23 +485,35 @@ const Profile = () => {
           disabled={isUpdating}
           style={{
             width: '100%',
-            padding: 'var(--space-4)',
+            padding: 'var(--space-5)',
             background: isUpdating
-              ? 'var(--text-muted)'
-              : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+              ? '#d1d5db'
+              : 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
             color: 'white',
             border: 'none',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-xl)',
             fontSize: 'var(--text-lg)',
-            fontWeight: '700',
+            fontWeight: '800',
             cursor: isUpdating ? 'not-allowed' : 'pointer',
             fontFamily: '"Cairo", sans-serif',
-            boxShadow: isUpdating ? 'none' : 'var(--shadow-md)',
-            transition: 'var(--transition)',
+            boxShadow: isUpdating ? 'none' : '0 6px 20px rgba(52, 199, 89, 0.3)',
+            transition: 'all 0.3s ease',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--space-2)'
+            gap: 'var(--space-3)'
+          }}
+          onMouseEnter={(e) => {
+            if (!isUpdating) {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 25px rgba(52, 199, 89, 0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isUpdating) {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 6px 20px rgba(52, 199, 89, 0.3)';
+            }
           }}
         >
           {isUpdating ? (
@@ -431,62 +538,115 @@ const Profile = () => {
 
       {/* Account Info */}
       <div style={{
-        background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-6)',
-        boxShadow: 'var(--shadow-md)',
-        border: '1px solid var(--border-light)',
-        marginBottom: 'var(--space-6)'
+        background: 'white',
+        borderRadius: 'var(--radius-2xl)',
+        padding: 'var(--space-7)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: 'none',
+        marginBottom: 'var(--space-6)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <h2 style={{
-          fontSize: 'var(--text-xl)',
-          fontWeight: '700',
-          color: 'var(--text-primary)',
-          marginBottom: 'var(--space-4)',
-          fontFamily: '"Cairo", sans-serif'
-        }}>
-          📋 معلومات الحساب
-        </h2>
+        {/* Decorative gradient bar */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)'
+        }} />
 
-        <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
-          <div style={{
-            padding: 'var(--space-3)',
-            background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius)',
-            fontFamily: '"Cairo", sans-serif'
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+          marginBottom: 'var(--space-5)'
+        }}>
+          <span style={{ fontSize: '1.8rem' }}>📋</span>
+          <h2 style={{
+            fontSize: 'var(--text-xl)',
+            fontWeight: '800',
+            color: 'var(--text-primary)',
+            fontFamily: '"Cairo", sans-serif',
+            margin: 0
           }}>
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
-              الاسم
+            معلومات الحساب
+          </h2>
+        </div>
+
+        <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+          <div style={{
+            padding: 'var(--space-4)',
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            borderRadius: 'var(--radius-lg)',
+            fontFamily: '"Cairo", sans-serif',
+            border: '2px solid rgba(59, 130, 246, 0.1)',
+            transition: 'all 0.3s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.transform = 'translateX(-3px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.1)';
+              e.currentTarget.style.transform = 'translateX(0)';
+            }}
+          >
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+              👤 الاسم
             </div>
-            <div style={{ fontSize: 'var(--text-base)', fontWeight: '600', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
               {currentUser.name}
             </div>
           </div>
 
           <div style={{
-            padding: 'var(--space-3)',
-            background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
-              البريد الإلكتروني
+            padding: 'var(--space-4)',
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            borderRadius: 'var(--radius-lg)',
+            fontFamily: '"Cairo", sans-serif',
+            border: '2px solid rgba(139, 92, 246, 0.1)',
+            transition: 'all 0.3s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+              e.currentTarget.style.transform = 'translateX(-3px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.1)';
+              e.currentTarget.style.transform = 'translateX(0)';
+            }}
+          >
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+              ✉️ البريد الإلكتروني
             </div>
-            <div style={{ fontSize: 'var(--text-base)', fontWeight: '600', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
               {currentUser.email}
             </div>
           </div>
 
           <div style={{
-            padding: 'var(--space-3)',
-            background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
-              الدور الحالي
+            padding: 'var(--space-4)',
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+            borderRadius: 'var(--radius-lg)',
+            fontFamily: '"Cairo", sans-serif',
+            border: '2px solid rgba(59, 130, 246, 0.1)',
+            transition: 'all 0.3s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.transform = 'translateX(-3px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.1)';
+              e.currentTarget.style.transform = 'translateX(0)';
+            }}
+          >
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)', fontWeight: '600' }}>
+              🎭 الدور الحالي
             </div>
-            <div style={{ fontSize: 'var(--text-base)', fontWeight: '600', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--text-primary)' }}>
               {currentUser.isDriver ? '🚗 سائق' : '🧑‍💼 راكب'}
             </div>
           </div>
@@ -498,27 +658,37 @@ const Profile = () => {
         onClick={logout}
         style={{
           width: '100%',
-          padding: 'var(--space-4)',
-          background: 'var(--surface-secondary)',
+          padding: 'var(--space-5)',
+          background: 'white',
           color: '#dc2626',
           border: '2px solid #fecaca',
-          borderRadius: 'var(--radius-lg)',
-          fontSize: 'var(--text-base)',
-          fontWeight: '600',
+          borderRadius: 'var(--radius-xl)',
+          fontSize: 'var(--text-lg)',
+          fontWeight: '700',
           cursor: 'pointer',
           fontFamily: '"Cairo", sans-serif',
-          transition: 'var(--transition)'
+          transition: 'all 0.3s ease',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'var(--space-2)'
         }}
         onMouseEnter={(e) => {
           e.target.style.background = '#fee2e2';
           e.target.style.borderColor = '#dc2626';
+          e.target.style.transform = 'translateY(-2px)';
+          e.target.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.2)';
         }}
         onMouseLeave={(e) => {
-          e.target.style.background = 'var(--surface-secondary)';
+          e.target.style.background = 'white';
           e.target.style.borderColor = '#fecaca';
+          e.target.style.transform = 'translateY(0)';
+          e.target.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
         }}
       >
-        🚪 تسجيل الخروج
+        <span style={{ fontSize: '1.5rem' }}>🚪</span>
+        <span>تسجيل الخروج</span>
       </button>
 
       <style>{`
