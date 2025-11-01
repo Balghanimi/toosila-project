@@ -19,23 +19,34 @@ const Contact = () => {
       title: 'الهاتف',
       value: '0780887488',
       link: 'tel:+9640780887488',
-      description: 'اتصل بنا مباشرة'
+      description: 'اتصل بنا مباشرة',
+      external: false
     },
     {
       icon: '💬',
       title: 'واتساب',
       value: '0780887488',
       link: 'https://wa.me/9640780887488',
-      description: 'راسلنا عبر الواتساب'
+      description: 'راسلنا عبر الواتساب',
+      external: true
     },
     {
       icon: '✈️',
       title: 'تيليجرام',
       value: '@AAL_GHANIMI',
       link: 'https://t.me/AAL_GHANIMI',
-      description: 'تواصل معنا على تيليجرام'
+      description: 'تواصل معنا على تيليجرام',
+      external: true
     }
   ];
+
+  const handleContactClick = (method) => {
+    if (method.external) {
+      window.open(method.link, '_blank', 'noopener,noreferrer');
+    } else {
+      window.location.href = method.link;
+    }
+  };
 
   return (
     <div style={{
@@ -247,11 +258,16 @@ const Contact = () => {
 
           <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
             {contactMethods.map((method, index) => (
-              <a
+              <div
                 key={index}
-                href={method.link}
-                target="_blank"
-                rel="noopener noreferrer"
+                onClick={() => handleContactClick(method)}
+                role="button"
+                tabIndex={0}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleContactClick(method);
+                  }
+                }}
                 style={{
                   padding: isMobile ? 'var(--space-4)' : 'var(--space-5)',
                   background: isDarkMode
@@ -321,7 +337,7 @@ const Contact = () => {
                 }}>
                   ←
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
