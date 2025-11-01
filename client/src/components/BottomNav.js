@@ -74,7 +74,7 @@ const BottomNav = () => {
       key: 'about',
       label: 'حول التطبيق',
       icon: 'ℹ️',
-      action: () => alert('توصيلة - تطبيق مشاركة الرحلات\nالإصدار 2.1.15')
+      action: () => navigate('/about')
     },
     {
       key: 'contact',
