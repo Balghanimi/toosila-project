@@ -95,13 +95,13 @@ export default function Settings() {
           icon: '🔒',
           label: 'سياسة الخصوصية',
           value: '',
-          action: () => console.log('Privacy')
+          action: () => navigate('/privacy-policy')
         },
         {
           icon: 'ℹ️',
           label: 'عن التطبيق',
-          value: 'v1.0.0',
-          action: () => console.log('About')
+          value: 'v2.1.15',
+          action: () => navigate('/about')
         }
       ]
     }
