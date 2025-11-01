@@ -17,34 +17,38 @@ const UserMenu = ({ onClose }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: 'var(--space-4)',
-      paddingTop: '80px',
-      backdropFilter: 'blur(8px)',
-      opacity: isAnimated ? 1 : 0,
-      transition: 'opacity 0.3s ease-out'
-    }}>
-      <div style={{
-        background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-6)',
-        maxWidth: '320px',
-        width: '100%',
-        boxShadow: 'var(--shadow-2xl)',
-        border: '1px solid var(--border-light)',
-        transform: isAnimated ? 'translateY(0)' : 'translateY(-20px)',
-        transition: 'transform 0.3s ease-out'
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: 'var(--space-4)',
+        paddingTop: '80px',
+        backdropFilter: 'blur(8px)',
+        opacity: isAnimated ? 1 : 0,
+        transition: 'opacity 0.3s ease-out'
       }}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--surface-primary)',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'var(--space-6)',
+          maxWidth: '320px',
+          width: '100%',
+          boxShadow: 'var(--shadow-2xl)',
+          border: '1px solid var(--border-light)',
+          transform: isAnimated ? 'translateY(0)' : 'translateY(-20px)',
+          transition: 'transform 0.3s ease-out'
+        }}>
         {/* User Info */}
         <div style={{
           textAlign: 'center',
@@ -166,19 +170,6 @@ const UserMenu = ({ onClose }) => {
           <span>🚪</span>
           تسجيل الخروج
         </button>
-
-        {/* Close overlay */}
-        <div 
-          onClick={onClose}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: -1
-          }}
-        />
       </div>
     </div>
   );

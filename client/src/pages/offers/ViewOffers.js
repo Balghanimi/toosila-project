@@ -302,7 +302,8 @@ export default function ViewOffers() {
           padding: 'var(--space-6)',
           marginBottom: 'var(--space-6)',
           boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--border-light)'
+          border: '1px solid var(--border-light)',
+          overflow: 'visible'
         }}>
           <h3 style={{
             fontSize: 'var(--text-lg)',
@@ -346,7 +347,9 @@ export default function ViewOffers() {
                   textAlignLast: 'center',
                   direction: 'rtl',
                   paddingLeft: 'var(--space-3)',
-                  paddingRight: 'var(--space-3)'
+                  paddingRight: 'var(--space-3)',
+                  position: 'relative',
+                  zIndex: 10
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -382,7 +385,9 @@ export default function ViewOffers() {
                   textAlignLast: 'center',
                   direction: 'rtl',
                   paddingLeft: 'var(--space-3)',
-                  paddingRight: 'var(--space-3)'
+                  paddingRight: 'var(--space-3)',
+                  position: 'relative',
+                  zIndex: 10
                 }}
               >
                 <option value="">جميع المدن</option>
