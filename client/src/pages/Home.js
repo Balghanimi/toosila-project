@@ -28,6 +28,13 @@ const Home = () => {
   const { t } = useLanguage();
   const { currentUser } = useAuth();
 
+  // Clear error message when user starts filling the form
+  useEffect(() => {
+    if (submitError && (pickupLocation || dropLocation || selectedDate)) {
+      setSubmitError('');
+    }
+  }, [pickupLocation, dropLocation, selectedDate, submitError]);
+
   // Fetch cities from database on component mount
   useEffect(() => {
     const fetchCities = async () => {
@@ -85,11 +92,17 @@ const Home = () => {
     }
 
     if (mode === 'find') {
-      // إرسال معايير البحث
+      // إرسال معايير البحث - يمكن البحث بحقل واحد على الأقل
       const searchParams = {};
       if (pickupLocation) searchParams.fromCity = pickupLocation;
       if (dropLocation) searchParams.toCity = dropLocation;
       if (calculatedDate) searchParams.departureDate = calculatedDate;
+
+      // التحقق من وجود حقل واحد على الأقل للبحث
+      if (!pickupLocation && !dropLocation && !calculatedDate) {
+        setSubmitError('يرجى اختيار نقطة الانطلاق أو نقطة الوصول أو التاريخ على الأقل للبحث');
+        return;
+      }
 
       // إذا كان المستخدم سائق، اذهب إلى صفحة الطلبات (demands)
       // إذا كان راكب، اذهب إلى صفحة العروض (offers)
@@ -1092,7 +1105,8 @@ const Home = () => {
           {/* Submit Button */}
           <div style={{
             display: 'flex',
-            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
             marginTop: 'var(--space-6)',
             position: 'relative',
             zIndex: 1
@@ -1151,6 +1165,24 @@ const Home = () => {
                 </>
               )}
             </button>
+
+            {/* Error Message */}
+            {submitError && (
+              <div style={{
+                marginTop: 'var(--space-3)',
+                padding: 'var(--space-3) var(--space-4)',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid var(--error)',
+                borderRadius: '12px',
+                color: 'var(--error)',
+                fontSize: '14px',
+                fontFamily: '"Cairo", sans-serif',
+                textAlign: 'center',
+                maxWidth: '400px'
+              }}>
+                ⚠️ {submitError}
+              </div>
+            )}
           </div>
 
           <style>{`
