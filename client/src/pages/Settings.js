@@ -86,6 +86,12 @@ export default function Settings() {
       title: '📋 أخرى',
       items: [
         {
+          icon: '📞',
+          label: 'اتصل بنا',
+          value: '',
+          action: () => navigate('/contact')
+        },
+        {
           icon: '📜',
           label: 'الشروط والأحكام',
           value: '',

@@ -50,6 +50,7 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const About = lazy(() => import('./pages/About'));
 const Download = lazy(() => import('./pages/Download'));
+const Contact = lazy(() => import('./pages/Contact'));
 
 export default function App() {
   return (
@@ -103,6 +104,8 @@ export default function App() {
                       <Route path="/about" element={<About />} />
                       {/* صفحة تحميل التطبيق */}
                       <Route path="/download" element={<Download />} />
+                      {/* صفحة اتصل بنا */}
+                      <Route path="/contact" element={<Contact />} />
                     </Routes>
                   </Suspense>
                 </main>
