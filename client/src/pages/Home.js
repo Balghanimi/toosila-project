@@ -18,8 +18,6 @@ const Home = () => {
   const [dropSuggestions, setDropSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
   const [showDropSuggestions, setShowDropSuggestions] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
   const [availableCities, setAvailableCities] = useState([]); // Cities from database
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,89 +67,6 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleNext = async () => {
-    // Calculate date
-    let calculatedDate;
-    if (selectedDate === 'today') {
-      calculatedDate = new Date().toISOString().split('T')[0];
-    } else if (selectedDate === 'tomorrow') {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      calculatedDate = tomorrow.toISOString().split('T')[0];
-    } else {
-      calculatedDate = selectedDate;
-    }
-
-    if (mode === 'find') {
-      // إرسال معايير البحث
-      const searchParams = {};
-      if (pickupLocation) searchParams.fromCity = pickupLocation;
-      if (dropLocation) searchParams.toCity = dropLocation;
-      if (calculatedDate) searchParams.departureDate = calculatedDate;
-
-      // إذا كان المستخدم سائق، اذهب إلى صفحة الطلبات (demands)
-      // إذا كان راكب، اذهب إلى صفحة العروض (offers)
-      if (currentUser && currentUser.isDriver) {
-        navigate('/demands', { state: searchParams });
-      } else {
-        navigate('/offers', { state: searchParams });
-      }
-    } else if (mode === 'offer') {
-      // تمرير بيانات النموذج إلى صفحة نشر العرض
-      const offerData = {
-        fromCity: pickupLocation,
-        toCity: dropLocation,
-        departureDate: calculatedDate,
-        departureTime: departureTime,
-        seats: availableSeats,
-        price: pricePerSeat
-      };
-
-      navigate('/post-offer', { state: offerData });
-    } else if (mode === 'demand') {
-      // نشر الطلب مباشرة من الصفحة الرئيسية
-      setIsSubmitting(true);
-      setSubmitError('');
-
-      try {
-        // Save cities to database if they're new
-        await saveNewCityIfNeeded(pickupLocation);
-        await saveNewCityIfNeeded(dropLocation);
-
-        // إنشاء تاريخ البداية والنهاية
-        const earliestDateTime = new Date(`${calculatedDate}T${departureTime}:00`);
-
-        // تاريخ النهاية: يومين بعد تاريخ البداية
-        const latestDateTime = new Date(earliestDateTime);
-        latestDateTime.setDate(latestDateTime.getDate() + 2);
-
-        const demandData = {
-          fromCity: pickupLocation.trim(),
-          toCity: dropLocation.trim(),
-          earliestTime: earliestDateTime.toISOString(),
-          latestTime: latestDateTime.toISOString(),
-          seats: parseInt(availableSeats),
-          budgetMax: parseFloat(pricePerSeat)
-        };
-
-        console.log('Home - Creating demand:', demandData);
-        const result = await demandsAPI.create(demandData);
-        console.log('Home - Demand created successfully:', result);
-
-        // التوجيه إلى صفحة الطلبات بعد النجاح
-        navigate('/demands');
-      } catch (err) {
-        console.error('Error creating demand:', err);
-        console.error('Error details:', {
-          message: err.message,
-          stack: err.stack
-        });
-        setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
-        setIsSubmitting(false);
-      }
-    }
-  };
-
   const swapLocations = () => {
     setIsSwapping(true);
     setTimeout(() => {
@@ -195,32 +110,6 @@ const Home = () => {
   const selectDropCity = (city) => {
     setDropLocation(city);
     setShowDropSuggestions(false);
-  };
-
-  // Auto-save new city to database when user enters it
-  const saveNewCityIfNeeded = async (cityName) => {
-    if (!cityName || cityName.trim().length < 2) return;
-
-    const trimmedCity = cityName.trim();
-
-    // Check if city already exists in our list (case-insensitive)
-    const cityExists = availableCities.some(
-      city => city.toLowerCase() === trimmedCity.toLowerCase()
-    );
-
-    if (!cityExists) {
-      try {
-        const response = await citiesAPI.add(trimmedCity);
-        if (!response.alreadyExists) {
-          // Add to local state immediately for better UX
-          setAvailableCities(prev => [...prev, trimmedCity].sort());
-          console.log('تم إضافة مدينة جديدة:', trimmedCity);
-        }
-      } catch (error) {
-        console.error('Error saving city:', error);
-        // Don't show error to user - silent fail is OK for this feature
-      }
-    }
   };
 
   const getCurrentDate = () => {
@@ -332,24 +221,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
-        {/* Error Message */}
-        {submitError && (
-          <div style={{
-            background: '#fee2e2',
-            border: '2px solid #ef4444',
-            borderRadius: 'var(--radius-lg)',
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-4)',
-            color: '#991b1b',
-            fontFamily: '"Cairo", sans-serif',
-            fontSize: 'var(--text-base)',
-            textAlign: 'center',
-            fontWeight: '600'
-          }}>
-            ⚠️ {submitError}
-          </div>
-        )}
 
         {/* Main Card - Enhanced */}
         <div id="booking-form" style={{
