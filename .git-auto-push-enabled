@@ -1,0 +1,6 @@
+# Auto-push enabled
+This file indicates that automatic git push is enabled after every commit.
+
+The post-commit hook will automatically push changes to the remote repository after each successful commit.
+
+To disable: Remove or rename .git/hooks/post-commit
