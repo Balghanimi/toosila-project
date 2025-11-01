@@ -27,6 +27,16 @@ const Home = () => {
   const location = useLocation();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Handle mobile detection on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Clear error message when user starts filling the form
   useEffect(() => {
@@ -1196,13 +1206,14 @@ const Home = () => {
         {/* Trust Section - Enhanced */}
         <div style={{
           background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          borderRadius: '24px',
-          padding: 'var(--space-8)',
+          borderRadius: isMobile ? '16px' : '24px',
+          padding: isMobile ? 'var(--space-4)' : 'var(--space-8)',
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
-          gap: 'var(--space-6)',
+          gap: isMobile ? 'var(--space-3)' : 'var(--space-6)',
           color: 'white',
-          boxShadow: '0 20px 60px rgba(52, 199, 89, 0.3)',
+          boxShadow: isMobile ? '0 10px 30px rgba(52, 199, 89, 0.25)' : '0 20px 60px rgba(52, 199, 89, 0.3)',
           position: 'relative',
           overflow: 'hidden',
           transition: 'all 0.3s ease',
@@ -1246,16 +1257,16 @@ const Home = () => {
           <div style={{
             position: 'relative',
             zIndex: 1,
-            fontSize: '4rem',
+            fontSize: isMobile ? '2.5rem' : '4rem',
             flexShrink: 0,
             animation: 'float 3s ease-in-out infinite'
           }}>
             🛡️
           </div>
 
-          <div style={{ position: 'relative', zIndex: 1, textAlign: 'start', flex: 1 }}>
+          <div style={{ position: 'relative', zIndex: 1, textAlign: isMobile ? 'center' : 'start', flex: 1 }}>
             <div style={{
-              fontSize: 'clamp(18px, 4vw, 22px)',
+              fontSize: isMobile ? 'clamp(16px, 3.5vw, 18px)' : 'clamp(18px, 4vw, 22px)',
               fontWeight: '800',
               marginBottom: 'var(--space-2)',
               fontFamily: '"Cairo", sans-serif'
@@ -1263,7 +1274,7 @@ const Home = () => {
               تعرف على المزيد حول سياسة الاسترداد
             </div>
             <div style={{
-              fontSize: 'clamp(14px, 3vw, 16px)',
+              fontSize: isMobile ? 'clamp(13px, 2.5vw, 14px)' : 'clamp(14px, 3vw, 16px)',
               opacity: 0.95,
               fontFamily: '"Cairo", sans-serif',
               fontWeight: '500',
@@ -1273,15 +1284,17 @@ const Home = () => {
             </div>
           </div>
 
-          <div style={{
-            position: 'relative',
-            zIndex: 1,
-            fontSize: 'var(--text-2xl)',
-            opacity: 0.8,
-            transition: 'all 0.3s ease'
-          }}>
-            ←
-          </div>
+          {!isMobile && (
+            <div style={{
+              position: 'relative',
+              zIndex: 1,
+              fontSize: 'var(--text-2xl)',
+              opacity: 0.8,
+              transition: 'all 0.3s ease'
+            }}>
+              ←
+            </div>
+          )}
         </div>
 
         {/* Add floating animation keyframes */}
