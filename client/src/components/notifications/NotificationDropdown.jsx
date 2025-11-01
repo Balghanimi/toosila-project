@@ -77,16 +77,13 @@ function NotificationDropdown({ onClose, dropdownRef }) {
           }
         },
         booking_created: () => {
-          // راكب حجز رحلتك - انتقل إلى عروضي
-          if (notification.relatedId) {
-            navigate('/offers', {
-              state: {
-                openOfferId: notification.relatedId
-              }
-            });
-          } else {
-            navigate('/offers');
-          }
+          // راكب حجز رحلتك - انتقل إلى صفحة الحجوزات
+          navigate('/bookings', {
+            state: {
+              tab: 'received', // عرض تبويب الحجوزات المستلمة
+              highlightBookingId: notification.relatedId
+            }
+          });
         },
         booking_accepted: () => {
           // تم قبول حجزك

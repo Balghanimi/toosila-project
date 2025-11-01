@@ -344,7 +344,9 @@ export default function ViewOffers() {
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
                   textAlignLast: 'center',
-                  direction: 'rtl'
+                  direction: 'rtl',
+                  paddingLeft: 'var(--space-3)',
+                  paddingRight: 'var(--space-3)'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -378,7 +380,9 @@ export default function ViewOffers() {
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
                   textAlignLast: 'center',
-                  direction: 'rtl'
+                  direction: 'rtl',
+                  paddingLeft: 'var(--space-3)',
+                  paddingRight: 'var(--space-3)'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -413,7 +417,9 @@ export default function ViewOffers() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
-                  direction: 'rtl'
+                  direction: 'rtl',
+                  paddingLeft: 'var(--space-3)',
+                  paddingRight: 'var(--space-3)'
                 }}
               />
             </div>
@@ -493,7 +499,8 @@ export default function ViewOffers() {
                       borderRadius: 'var(--radius)',
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)'
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center'
                     }}
                   />
                 </div>
@@ -523,7 +530,8 @@ export default function ViewOffers() {
                       borderRadius: 'var(--radius)',
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)'
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center'
                     }}
                   />
                 </div>
@@ -554,7 +562,8 @@ export default function ViewOffers() {
                       borderRadius: 'var(--radius)',
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)'
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center'
                     }}
                   />
                 </div>
@@ -581,7 +590,9 @@ export default function ViewOffers() {
                       borderRadius: 'var(--radius)',
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)'
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center',
+                      textAlignLast: 'center'
                     }}
                   >
                     <option value="date">التاريخ (الأقرب أولاً)</option>
@@ -1004,7 +1015,8 @@ export default function ViewOffers() {
                     borderRadius: 'var(--radius)',
                     fontSize: 'var(--text-base)',
                     fontFamily: '"Cairo", sans-serif',
-                    resize: 'vertical'
+                    resize: 'vertical',
+                    textAlign: 'center'
                   }}
                 />
               </div>

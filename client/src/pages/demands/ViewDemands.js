@@ -276,7 +276,8 @@ export default function ViewDemands() {
                   backgroundRepeat: 'no-repeat',
                   backgroundPosition: 'left 10px center',
                   backgroundSize: '20px',
-                  paddingLeft: '40px'
+                  paddingLeft: '40px',
+                  paddingRight: '40px'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -316,7 +317,8 @@ export default function ViewDemands() {
                   backgroundRepeat: 'no-repeat',
                   backgroundPosition: 'left 10px center',
                   backgroundSize: '20px',
-                  paddingLeft: '40px'
+                  paddingLeft: '40px',
+                  paddingRight: '40px'
                 }}
               >
                 <option value="">جميع المدن</option>
@@ -349,7 +351,9 @@ export default function ViewDemands() {
                   fontFamily: '"Cairo", sans-serif',
                   background: 'var(--surface-primary)',
                   textAlign: 'center',
-                  direction: 'rtl'
+                  direction: 'rtl',
+                  paddingLeft: 'var(--space-3)',
+                  paddingRight: 'var(--space-3)'
                 }}
               />
             </div>

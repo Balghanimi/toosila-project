@@ -34,10 +34,51 @@ function NotificationsPage() {
 
       // الانتقال حسب نوع الإشعار
       const routes = {
-        demand_response: () => navigate('/demands'),
-        response_accepted: () => navigate('/demands'),
-        response_rejected: () => navigate('/demands'),
-        booking_created: () => navigate('/my-offers'),
+        demand_response: () => {
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
+        },
+        response_accepted: () => {
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
+        },
+        response_rejected: () => {
+          if (notification.relatedId) {
+            navigate('/demands', {
+              state: {
+                openDemandId: notification.relatedId,
+                action: 'viewResponses'
+              }
+            });
+          } else {
+            navigate('/demands');
+          }
+        },
+        booking_created: () => {
+          // راكب حجز رحلتك - انتقل إلى صفحة الحجوزات
+          navigate('/bookings', {
+            state: {
+              tab: 'received', // عرض تبويب الحجوزات المستلمة
+              highlightBookingId: notification.relatedId
+            }
+          });
+        },
         booking_accepted: () => navigate('/bookings'),
         booking_rejected: () => navigate('/bookings'),
         new_message: () => navigate('/messages'),

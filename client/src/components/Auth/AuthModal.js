@@ -22,15 +22,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '20px',
-      backdropFilter: 'blur(4px)'
+      padding: '20px 20px 100px 20px',
+      backdropFilter: 'blur(4px)',
+      overflowY: 'auto'
     }}>
-      <div 
+      <div
         style={{
           width: '100%',
           maxWidth: mode === 'register' ? '480px' : '440px',
+          maxHeight: 'calc(100vh - 120px)',
+          overflowY: 'auto',
           animation: 'fadeInScale 0.3s ease-out',
-          transformOrigin: 'center'
+          transformOrigin: 'center',
+          margin: 'auto'
         }}
         onClick={(e) => e.stopPropagation()}
       >

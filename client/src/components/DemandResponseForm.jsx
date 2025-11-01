@@ -249,7 +249,8 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               fontSize: 'var(--text-base)',
               fontFamily: '"Cairo", sans-serif',
               resize: 'vertical',
-              transition: 'var(--transition)'
+              transition: 'var(--transition)',
+              textAlign: 'center'
             }}
             onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
             onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}

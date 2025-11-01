@@ -328,6 +328,40 @@ Create rating
 #### GET `/ratings/user/:userId`
 Get user ratings
 
+## 🪝 Git Hooks - Automated Testing
+
+This project includes **automated testing** via Git hooks. Tests run automatically before each commit!
+
+### Quick Start
+```bash
+# Normal commit - tests run automatically
+git commit -m "feat: add new feature"
+
+# Skip tests once (if needed)
+git commit --no-verify -m "WIP: work in progress"
+
+# Skip tests always (not recommended)
+export SKIP_TESTS_ON_COMMIT=1  # Linux/Mac
+$env:SKIP_TESTS_ON_COMMIT = "1"  # PowerShell
+```
+
+### What Gets Tested?
+- ✅ Backend tests (Jest)
+- ✅ Frontend tests (React Testing Library)
+
+### Options
+```bash
+# Test backend only
+export TEST_MODE=backend
+
+# Test frontend only
+export TEST_MODE=frontend
+```
+
+📖 **Full Guide**: See [GIT-HOOKS-GUIDE.md](GIT-HOOKS-GUIDE.md) for complete documentation
+
+---
+
 ## 🧪 Testing the Application
 
 ### 1. Test API Connection

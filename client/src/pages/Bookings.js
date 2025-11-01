@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { bookingsAPI } from '../services/api';
 
 export default function Bookings() {
-  const [activeTab, setActiveTab] = useState('received'); // 'received' or 'sent'
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'received'); // 'received' or 'sent'
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [highlightedBooking, setHighlightedBooking] = useState(location.state?.highlightBookingId || null);
   const { currentUser } = useAuth();
   const { showSuccess, showError, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
@@ -21,6 +23,24 @@ export default function Bookings() {
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, activeTab, navigate]);
+
+  // Clear highlighted booking after 3 seconds
+  useEffect(() => {
+    if (highlightedBooking) {
+      const timer = setTimeout(() => {
+        setHighlightedBooking(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedBooking]);
+
+  // Clear location state after using it
+  useEffect(() => {
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -94,18 +114,23 @@ export default function Bookings() {
     const isReceived = activeTab === 'received';
     const canConfirm = isReceived && booking.status === 'pending';
     const canCancel = booking.status === 'pending' || booking.status === 'confirmed';
+    const isHighlighted = highlightedBooking && booking.id === highlightedBooking;
 
     return (
       <div
         key={booking.id}
         style={{
-          background: 'var(--surface-primary)',
+          background: isHighlighted
+            ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)'
+            : 'var(--surface-primary)',
           borderRadius: 'var(--radius-lg)',
           padding: 'var(--space-4)',
           marginBottom: 'var(--space-4)',
-          boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--border-light)',
-          position: 'relative'
+          boxShadow: isHighlighted ? 'var(--shadow-xl)' : 'var(--shadow-md)',
+          border: isHighlighted ? '3px solid #f59e0b' : '1px solid var(--border-light)',
+          position: 'relative',
+          transition: 'all 0.3s ease',
+          animation: isHighlighted ? 'pulse 1.5s ease-in-out infinite' : 'none'
         }}
       >
         {/* Status Badge */}
@@ -466,6 +491,17 @@ export default function Bookings() {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.1), 0 4px 6px -2px rgba(245, 158, 11, 0.05);
+          }
+          50% {
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.3), 0 10px 10px -5px rgba(245, 158, 11, 0.15);
+          }
         }
       `}</style>
     </div>
