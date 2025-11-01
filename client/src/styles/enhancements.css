@@ -20,6 +20,14 @@
   background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
 }
 
+/* ===== Gradient Text ===== */
+.gradient-text-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ===== Glass Effect ===== */
 .glass {
   background: rgba(255, 255, 255, 0.1);
@@ -415,4 +423,80 @@ body.dark-mode ::-webkit-scrollbar-thumb {
   font-size: 14px;
   color: var(--text-muted);
   font-family: 'Cairo', sans-serif;
+}
+
+/* ===== Hero Section Utilities ===== */
+.hero-title {
+  font-size: clamp(36px, 8vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Cairo', sans-serif;
+}
+
+.hero-subtitle {
+  font-size: clamp(18px, 4vw, 24px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-weight: 500;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* ===== CTA Button Styles ===== */
+.cta-primary {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 10px 30px rgba(52, 199, 89, 0.3);
+  min-width: 180px;
+}
+
+.cta-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(52, 199, 89, 0.4);
+}
+
+.cta-secondary {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Cairo', sans-serif;
+  min-width: 180px;
+}
+
+.cta-secondary:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(52, 199, 89, 0.3);
+}
+
+/* ===== Background Blur Circles ===== */
+.bg-blur-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+body.dark-mode .bg-blur-circle {
+  opacity: 0.15;
 }

@@ -1,4 +1,4 @@
-/* Header Component */
+/* Header Component - Enhanced */
 .header {
   position: sticky;
   top: 0;
@@ -6,15 +6,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
-  padding: 0 var(--space-4);
-  background: var(--surface-primary);
+  height: 64px;
+  padding: 0 var(--space-6);
+  background: rgba(255, 255, 255, 0.95);
   color: var(--text-primary);
-  border-bottom: 1px solid var(--border-light);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   direction: rtl;
   font-family: 'Cairo', 'Tajawal', sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode .header {
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom-color: rgba(51, 65, 85, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Layout Sections */
@@ -46,11 +54,11 @@
   gap: var(--space-2);
 }
 
-/* Page Title */
+/* Page Title - Enhanced */
 .title {
   margin: 0;
-  font-size: var(--text-lg);
-  font-weight: 600;
+  font-size: var(--text-xl);
+  font-weight: 700;
   color: var(--text-primary);
   font-family: 'Cairo', 'Tajawal', sans-serif;
   direction: rtl;
@@ -58,29 +66,50 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
-/* Hamburger Button */
+/* Hamburger Button - Enhanced */
 .hamburgerButton {
   appearance: none;
   border: none;
   background: transparent;
   padding: var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: var(--text-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: var(--text-xl);
   color: var(--text-primary);
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
+  position: relative;
+}
+
+.hamburgerButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--primary-light);
+  opacity: 0;
+  border-radius: var(--radius);
+  transition: opacity 0.3s ease;
 }
 
 .hamburgerButton:hover {
   background: var(--surface-secondary);
+  transform: translateY(-1px);
+}
+
+.hamburgerButton:hover::before {
+  opacity: 0.1;
 }
 
 .hamburgerButton:focus-visible {
@@ -88,7 +117,7 @@
 }
 
 .hamburgerButton:active {
-  transform: scale(0.95);
+  transform: scale(0.95) translateY(0);
 }
 
 /* Language Toggle Chip */
@@ -127,37 +156,54 @@
   transform: scale(0.95);
 }
 
-/* Login Button */
+/* Login Button - Enhanced */
 .loginButton {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: var(--text-white);
   border: none;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-lg);
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Cairo', 'Tajawal', sans-serif;
   direction: rtl;
   text-align: center;
-  height: 36px;
-  min-width: 80px;
+  height: 40px;
+  min-width: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.loginButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .loginButton:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.35);
+}
+
+.loginButton:hover::before {
+  left: 100%;
 }
 
 .loginButton:focus-visible {
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--focus-ring), 0 4px 12px rgba(52, 199, 89, 0.35);
 }
 
 .loginButton:active {

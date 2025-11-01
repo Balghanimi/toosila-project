@@ -234,42 +234,193 @@ const Home = () => {
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      paddingBottom: '80px'
+      paddingBottom: '80px',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Background decorative elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-10%',
+        right: '-5%',
+        width: '300px',
+        height: '300px',
+        background: 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(31, 138, 53, 0.05) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-10%',
+        left: '-5%',
+        width: '250px',
+        height: '250px',
+        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+
       <div className="container" style={{
-        paddingTop: 'var(--space-6)',
+        paddingTop: 'var(--space-8)',
         transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
         opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
+        zIndex: 1
       }}>
-        
-        {/* Hero Section */}
+
+        {/* Hero Section - Enhanced */}
         <div style={{
           textAlign: 'center',
-          marginBottom: 'var(--space-8)',
-          paddingTop: 'var(--space-4)'
+          marginBottom: 'var(--space-12)',
+          paddingTop: 'var(--space-6)',
+          paddingBottom: 'var(--space-8)',
+          position: 'relative'
         }}>
           <h1 style={{
-            fontSize: 'clamp(28px, 6vw, 40px)',
+            fontSize: 'clamp(36px, 8vw, 56px)',
             fontWeight: '800',
             color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
+            marginBottom: 'var(--space-4)',
             background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            letterSpacing: '-1px',
+            lineHeight: '1.1'
           }}>
             توصيلة
           </h1>
           <p style={{
-            fontSize: 'var(--text-lg)',
+            fontSize: 'clamp(18px, 4vw, 24px)',
             color: 'var(--text-secondary)',
-            margin: '0 auto var(--space-6) auto',
-            maxWidth: '320px',
-            lineHeight: '1.5'
+            margin: '0 auto var(--space-8) auto',
+            maxWidth: '500px',
+            lineHeight: '1.6',
+            fontWeight: '500'
           }}>
-            رحلات مشتركة آمنة وموثوقة
+            رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
           </p>
+
+          {/* Two-button CTA pattern */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-4)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 'var(--space-6)',
+            flexWrap: 'wrap'
+          }}>
+            <button
+              onClick={() => {
+                if (currentUser?.isDriver) {
+                  setMode('offer');
+                } else {
+                  setMode('demand');
+                }
+                // Scroll to the form section
+                setTimeout(() => {
+                  const formElement = document.getElementById('booking-form');
+                  if (formElement) {
+                    formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}
+              style={{
+                padding: 'var(--space-4) var(--space-8)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: '0 10px 30px rgba(52, 199, 89, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                minWidth: '180px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 15px 40px rgba(52, 199, 89, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 10px 30px rgba(52, 199, 89, 0.3)';
+              }}
+            >
+              {currentUser?.isDriver ? '🚗 انشر رحلة' : '💺 اطلب رحلة'}
+            </button>
+
+            <button
+              onClick={() => {
+                setMode('find');
+                setTimeout(() => {
+                  const formElement = document.getElementById('booking-form');
+                  if (formElement) {
+                    formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}
+              style={{
+                padding: 'var(--space-4) var(--space-8)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                background: 'transparent',
+                color: 'var(--primary)',
+                border: '2px solid var(--primary)',
+                borderRadius: 'var(--radius-lg)',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                minWidth: '180px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--primary)';
+                e.target.style.color = 'white';
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 10px 30px rgba(52, 199, 89, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--primary)';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              🔍 ابحث عن رحلة
+            </button>
+          </div>
+
+          {/* Trust indicators */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-muted)',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: '20px' }}>✓</span>
+              <span>آمن وموثوق</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: '20px' }}>✓</span>
+              <span>أسعار معقولة</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: '20px' }}>✓</span>
+              <span>تقييمات موثقة</span>
+            </div>
+          </div>
         </div>
 
         {/* Error Message */}
@@ -290,17 +441,18 @@ const Home = () => {
           </div>
         )}
 
-        {/* Main Card */}
-        <div style={{
+        {/* Main Card - Enhanced */}
+        <div id="booking-form" style={{
           background: 'var(--surface-primary)',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--space-6)',
-          boxShadow: 'var(--shadow-xl)',
+          borderRadius: '24px',
+          padding: 'var(--space-8)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12)',
           border: '1px solid var(--border-light)',
-          marginBottom: 'var(--space-6)',
+          marginBottom: 'var(--space-8)',
           backdropFilter: 'blur(10px)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          transition: 'all 0.3s ease'
         }}>
 
           {/* Background Pattern */}
@@ -316,36 +468,47 @@ const Home = () => {
             zIndex: 0
           }} />
 
-          {/* Mode Toggle - Smart based on user role */}
+          {/* Mode Toggle - Smart based on user role - Enhanced */}
           <div style={{
             position: 'relative',
             zIndex: 1,
             display: 'grid',
             gridTemplateColumns: currentUser?.isDriver ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
-            gap: 'var(--space-1)',
-            marginBottom: 'var(--space-6)',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-8)',
             background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius)',
-            padding: 'var(--space-1)',
-            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)'
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-2)',
+            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
+            border: '1px solid var(--border-light)'
           }}>
             {/* Show offer button first for drivers */}
             {currentUser?.isDriver && (
               <button
                 onClick={() => setMode('offer')}
                 style={{
-                  padding: 'var(--space-3) var(--space-2)',
+                  padding: 'var(--space-4)',
                   border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  background: mode === 'offer' ? 'var(--primary)' : 'transparent',
-                  color: mode === 'offer' ? 'var(--text-white)' : 'var(--text-secondary)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
+                  borderRadius: 'var(--radius)',
+                  background: mode === 'offer' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
+                  color: mode === 'offer' ? 'white' : 'var(--text-secondary)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
                   cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  boxShadow: mode === 'offer' ? 'var(--shadow-md)' : 'none',
-                  transform: mode === 'offer' ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: mode === 'offer' ? '0 4px 12px rgba(52, 199, 89, 0.3)' : 'none',
+                  transform: mode === 'offer' ? 'scale(1)' : 'scale(0.98)',
                   fontFamily: '"Cairo", sans-serif'
+                }}
+                onMouseEnter={(e) => {
+                  if (mode !== 'offer') {
+                    e.target.style.background = 'var(--surface-tertiary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (mode !== 'offer') {
+                    e.target.style.background = 'transparent';
+                  }
                 }}
               >
                 🚗 {t('offerRide')}
@@ -357,18 +520,28 @@ const Home = () => {
               <button
                 onClick={() => setMode('demand')}
                 style={{
-                  padding: 'var(--space-3) var(--space-2)',
+                  padding: 'var(--space-4)',
                   border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  background: mode === 'demand' ? '#3b82f6' : 'transparent',
+                  borderRadius: 'var(--radius)',
+                  background: mode === 'demand' ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
                   color: mode === 'demand' ? 'white' : 'var(--text-secondary)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
                   cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  boxShadow: mode === 'demand' ? 'var(--shadow-md)' : 'none',
-                  transform: mode === 'demand' ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: mode === 'demand' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none',
+                  transform: mode === 'demand' ? 'scale(1)' : 'scale(0.98)',
                   fontFamily: '"Cairo", sans-serif'
+                }}
+                onMouseEnter={(e) => {
+                  if (mode !== 'demand') {
+                    e.target.style.background = 'var(--surface-tertiary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (mode !== 'demand') {
+                    e.target.style.background = 'transparent';
+                  }
                 }}
               >
                 💺 طلب رحلة
@@ -378,34 +551,44 @@ const Home = () => {
             <button
               onClick={() => setMode('find')}
               style={{
-                padding: 'var(--space-3) var(--space-2)',
+                padding: 'var(--space-4)',
                 border: 'none',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 background: mode === 'find' ? 'var(--surface-primary)' : 'transparent',
                 color: mode === 'find' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
+                fontSize: 'var(--text-base)',
+                fontWeight: '700',
                 cursor: 'pointer',
-                transition: 'var(--transition)',
-                boxShadow: mode === 'find' ? 'var(--shadow-sm)' : 'none',
-                transform: mode === 'find' ? 'scale(1.02)' : 'scale(1)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: mode === 'find' ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none',
+                transform: mode === 'find' ? 'scale(1)' : 'scale(0.98)',
                 fontFamily: '"Cairo", sans-serif'
+              }}
+              onMouseEnter={(e) => {
+                if (mode !== 'find') {
+                  e.target.style.background = 'var(--surface-tertiary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (mode !== 'find') {
+                  e.target.style.background = 'transparent';
+                }
               }}
             >
               🔍 {t('findRide')}
             </button>
           </div>
 
-          {/* Location Inputs */}
+          {/* Location Inputs - Enhanced */}
           <div style={{
             position: 'relative',
             background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: '16px',
             border: '2px solid var(--border-light)',
-            marginBottom: 'var(--space-6)',
+            marginBottom: 'var(--space-8)',
             overflow: 'visible',
-            transition: 'var(--transition)',
-            boxShadow: 'var(--shadow-sm)'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
           }}>
             {/* Pickup Location */}
             <div style={{
@@ -1080,60 +1263,108 @@ const Home = () => {
           `}</style>
         </div>
 
-        {/* Trust Section */}
+        {/* Trust Section - Enhanced */}
         <div style={{
           background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--space-6)',
+          borderRadius: '24px',
+          padding: 'var(--space-8)',
           display: 'flex',
           alignItems: 'center',
-          gap: 'var(--space-4)',
-          color: 'var(--text-white)',
-          boxShadow: 'var(--shadow-xl)',
+          gap: 'var(--space-6)',
+          color: 'white',
+          boxShadow: '0 20px 60px rgba(52, 199, 89, 0.3)',
           position: 'relative',
-          overflow: 'hidden'
-        }}>
-          
-          {/* Background Pattern */}
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-4px)';
+          e.currentTarget.style.boxShadow = '0 25px 70px rgba(52, 199, 89, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 20px 60px rgba(52, 199, 89, 0.3)';
+        }}
+        >
+
+          {/* Background Pattern - Enhanced */}
           <div style={{
             position: 'absolute',
-            top: '-20%',
-            left: '-20%',
-            width: '120px',
-            height: '120px',
+            top: '-30%',
+            left: '-15%',
+            width: '200px',
+            height: '200px',
             background: 'rgba(255, 255, 255, 0.1)',
             borderRadius: '50%',
-            zIndex: 0
+            zIndex: 0,
+            filter: 'blur(40px)'
           }} />
-          
+
+          <div style={{
+            position: 'absolute',
+            bottom: '-20%',
+            right: '-10%',
+            width: '150px',
+            height: '150px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: '50%',
+            zIndex: 0,
+            filter: 'blur(40px)'
+          }} />
+
           <div style={{
             position: 'relative',
             zIndex: 1,
-            fontSize: '3rem',
-            flexShrink: 0
+            fontSize: '4rem',
+            flexShrink: 0,
+            animation: 'float 3s ease-in-out infinite'
           }}>
             🛡️
           </div>
-          
-          <div style={{ position: 'relative', zIndex: 1, textAlign: 'start' }}>
+
+          <div style={{ position: 'relative', zIndex: 1, textAlign: 'start', flex: 1 }}>
             <div style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              marginBottom: 'var(--space-1)',
+              fontSize: 'clamp(18px, 4vw, 22px)',
+              fontWeight: '800',
+              marginBottom: 'var(--space-2)',
               fontFamily: '"Cairo", sans-serif'
             }}>
               تعرف على المزيد حول سياسة الاسترداد
             </div>
             <div style={{
-              fontSize: 'var(--text-base)',
-              opacity: 0.9,
+              fontSize: 'clamp(14px, 3vw, 16px)',
+              opacity: 0.95,
               fontFamily: '"Cairo", sans-serif',
-              fontWeight: '500'
+              fontWeight: '500',
+              lineHeight: '1.6'
             }}>
-              وكيف نحمي أموالك
+              وكيف نحمي أموالك وبياناتك الشخصية
             </div>
           </div>
+
+          <div style={{
+            position: 'relative',
+            zIndex: 1,
+            fontSize: 'var(--text-2xl)',
+            opacity: 0.8,
+            transition: 'all 0.3s ease'
+          }}>
+            ←
+          </div>
         </div>
+
+        {/* Add floating animation keyframes */}
+        <style>{`
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-10px);
+            }
+          }
+        `}</style>
       </div>
     </div>
   );
