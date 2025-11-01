@@ -19,7 +19,7 @@ const Contact = () => {
       title: 'الهاتف',
       value: '0780887488',
       link: 'tel:+9640780887488',
-      description: 'اتصل بنا مباشرة',
+      description: isMobile ? 'اتصل بنا مباشرة' : 'انقر لنسخ الرقم',
       external: false
     },
     {
@@ -40,11 +40,35 @@ const Contact = () => {
     }
   ];
 
-  const handleContactClick = (method) => {
-    if (method.external) {
-      window.open(method.link, '_blank', 'noopener,noreferrer');
-    } else {
-      window.location.href = method.link;
+  const handleContactClick = async (method) => {
+    console.log('Contact clicked:', method.title, method.link);
+
+    // For phone numbers on desktop, copy to clipboard and show message
+    if (method.title === 'الهاتف' && window.innerWidth > 768) {
+      try {
+        await navigator.clipboard.writeText(method.value);
+        alert(`تم نسخ الرقم: ${method.value}\nيمكنك الآن لصقه في تطبيق الاتصال`);
+        return;
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+
+    try {
+      if (method.external) {
+        console.log('Opening external link:', method.link);
+        const newWindow = window.open(method.link, '_blank', 'noopener,noreferrer');
+        if (!newWindow) {
+          console.error('Pop-up blocked! Trying alternative method...');
+          window.location.href = method.link;
+        }
+      } else {
+        console.log('Opening tel link:', method.link);
+        window.location.href = method.link;
+      }
+    } catch (error) {
+      console.error('Error opening contact:', error);
+      alert('حدث خطأ أثناء فتح الرابط. يرجى المحاولة مرة أخرى.');
     }
   };
 
