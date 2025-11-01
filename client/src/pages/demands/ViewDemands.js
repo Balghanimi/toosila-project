@@ -22,6 +22,7 @@ export default function ViewDemands() {
     toCity: '',
     earliestDate: ''
   });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // States for demand response functionality
   const [selectedDemand, setSelectedDemand] = useState(null);
@@ -181,10 +182,21 @@ export default function ViewDemands() {
     setDemandResponses([]);
   };
 
+  // Main cities (most popular routes)
+  const MAIN_CITIES = [
+    'بغداد - الكرخ',
+    'البصرة - المركز',
+    'النجف - المركز',
+    'أربيل - المركز',
+    'الموصل - المركز'
+  ];
+
+  // All Iraqi cities (for advanced filters)
   const IRAQ_CITIES = [
     'بغداد - الكرخ', 'بغداد - الرصافة', 'بغداد - الكرادة',
     'البصرة - المركز', 'أربيل - المركز', 'الموصل - المركز',
-    'كربلاء - المركز', 'النجف - المركز', 'السليمانية - المركز'
+    'كربلاء - المركز', 'النجف - المركز', 'السليمانية - المركز',
+    'دهوك - المركز', 'الناصرية - المركز'
   ];
 
   return (
@@ -238,7 +250,7 @@ export default function ViewDemands() {
             fontFamily: '"Cairo", sans-serif',
             color: 'var(--text-primary)'
           }}>
-            🔍 البحث والتصفية
+            🔍 البحث السريع
           </h3>
 
           <div style={{
@@ -255,7 +267,7 @@ export default function ViewDemands() {
                 marginBottom: 'var(--space-2)',
                 fontFamily: '"Cairo", sans-serif',
                 color: 'var(--text-secondary)'
-              }}>من</label>
+              }}>من (المدن الرئيسية)</label>
               <select
                 value={filters.fromCity}
                 onChange={(e) => setFilters({...filters, fromCity: e.target.value})}
@@ -283,8 +295,8 @@ export default function ViewDemands() {
                   zIndex: 10
                 }}
               >
-                <option value="">جميع المدن</option>
-                {IRAQ_CITIES.map(city => (
+                <option value="">جميع المدن الرئيسية</option>
+                {MAIN_CITIES.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
               </select>
@@ -298,7 +310,7 @@ export default function ViewDemands() {
                 marginBottom: 'var(--space-2)',
                 fontFamily: '"Cairo", sans-serif',
                 color: 'var(--text-secondary)'
-              }}>إلى</label>
+              }}>إلى (المدن الرئيسية)</label>
               <select
                 value={filters.toCity}
                 onChange={(e) => setFilters({...filters, toCity: e.target.value})}
@@ -326,8 +338,8 @@ export default function ViewDemands() {
                   zIndex: 10
                 }}
               >
-                <option value="">جميع المدن</option>
-                {IRAQ_CITIES.map(city => (
+                <option value="">جميع المدن الرئيسية</option>
+                {MAIN_CITIES.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
               </select>
@@ -361,6 +373,154 @@ export default function ViewDemands() {
                   paddingRight: 'var(--space-3)'
                 }}
               />
+            </div>
+          </div>
+
+          {/* Advanced Filters Toggle */}
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            style={{
+              width: '100%',
+              padding: 'var(--space-3)',
+              background: showAdvancedFilters
+                ? 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)'
+                : 'transparent',
+              color: 'var(--primary)',
+              border: '2px solid var(--border-light)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+              marginBottom: 'var(--space-4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              transition: 'all 0.3s ease',
+              boxShadow: showAdvancedFilters ? 'var(--shadow-sm)' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--primary)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-light)';
+              if (!showAdvancedFilters) {
+                e.currentTarget.style.background = 'transparent';
+              }
+            }}
+          >
+            <span>{showAdvancedFilters ? '🔼' : '🔽'}</span>
+            <span>{showAdvancedFilters ? 'إخفاء الفلاتر المتقدمة' : 'فلاتر متقدمة'}</span>
+          </button>
+
+          {/* Advanced Filters Section */}
+          <div style={{
+            maxHeight: showAdvancedFilters ? '1000px' : '0',
+            overflow: 'hidden',
+            transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out',
+            opacity: showAdvancedFilters ? 1 : 0,
+            marginBottom: showAdvancedFilters ? 'var(--space-4)' : 0
+          }}>
+            <div style={{
+              padding: 'var(--space-4)',
+              background: 'var(--surface-secondary)',
+              borderRadius: 'var(--radius-lg)',
+              border: '2px dashed var(--border-light)'
+            }}>
+              <h4 style={{
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                marginBottom: 'var(--space-4)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)'
+              }}>
+                <span>🎛️</span>
+                <span>خيارات البحث المتقدم</span>
+              </h4>
+
+              {/* Full City Lists */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                background: 'var(--surface-primary)',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border-light)'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    من (جميع المدن)
+                  </label>
+                  <select
+                    value={filters.fromCity}
+                    onChange={(e) => setFilters({...filters, fromCity: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center',
+                      textAlignLast: 'center',
+                      direction: 'rtl'
+                    }}
+                  >
+                    <option value="">جميع المدن</option>
+                    {IRAQ_CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    إلى (جميع المدن)
+                  </label>
+                  <select
+                    value={filters.toCity}
+                    onChange={(e) => setFilters({...filters, toCity: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-2)',
+                      border: '2px solid var(--border-light)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: '"Cairo", sans-serif',
+                      background: 'var(--surface-primary)',
+                      textAlign: 'center',
+                      textAlignLast: 'center',
+                      direction: 'rtl'
+                    }}
+                  >
+                    <option value="">جميع المدن</option>
+                    {IRAQ_CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
