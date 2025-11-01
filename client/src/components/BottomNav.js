@@ -54,7 +54,6 @@ const BottomNav = () => {
   const totalUnreadCount = unreadMessages;
 
   // Responsive detection
-  const isMobile = window.innerWidth <= 768;
   const isSmallMobile = window.innerWidth <= 375;
 
   // More menu items
