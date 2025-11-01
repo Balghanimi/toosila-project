@@ -276,9 +276,9 @@ const Home = () => {
         {/* Hero Section - Enhanced */}
         <div style={{
           textAlign: 'center',
-          marginBottom: 'var(--space-8)',
+          marginBottom: 'var(--space-12)',
           paddingTop: 'var(--space-6)',
-          paddingBottom: 'var(--space-4)',
+          paddingBottom: 'var(--space-8)',
           position: 'relative'
         }}>
           <h1 style={{
@@ -298,13 +298,105 @@ const Home = () => {
           <p style={{
             fontSize: 'clamp(18px, 4vw, 24px)',
             color: 'var(--text-secondary)',
-            margin: '0 auto var(--space-6) auto',
+            margin: '0 auto var(--space-8) auto',
             maxWidth: '500px',
             lineHeight: '1.6',
             fontWeight: '500'
           }}>
             رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
           </p>
+
+          {/* Two-button CTA pattern */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-4)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 'var(--space-6)',
+            flexWrap: 'wrap'
+          }}>
+            <button
+              onClick={() => {
+                if (currentUser?.isDriver) {
+                  setMode('offer');
+                } else {
+                  setMode('demand');
+                }
+                // Scroll to the form section
+                setTimeout(() => {
+                  const formElement = document.getElementById('booking-form');
+                  if (formElement) {
+                    formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}
+              style={{
+                padding: 'var(--space-4) var(--space-8)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: '0 10px 30px rgba(52, 199, 89, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                minWidth: '180px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 15px 40px rgba(52, 199, 89, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 10px 30px rgba(52, 199, 89, 0.3)';
+              }}
+            >
+              {currentUser?.isDriver ? '🚗 انشر رحلة' : '💺 اطلب رحلة'}
+            </button>
+
+            <button
+              onClick={() => {
+                setMode('find');
+                setTimeout(() => {
+                  const formElement = document.getElementById('booking-form');
+                  if (formElement) {
+                    formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}
+              style={{
+                padding: 'var(--space-4) var(--space-8)',
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                background: 'transparent',
+                color: 'var(--primary)',
+                border: '2px solid var(--primary)',
+                borderRadius: 'var(--radius-lg)',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: '"Cairo", sans-serif',
+                minWidth: '180px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--primary)';
+                e.target.style.color = 'white';
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 10px 30px rgba(52, 199, 89, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.color = 'var(--primary)';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              🔍 ابحث عن رحلة
+            </button>
+          </div>
 
           {/* Trust indicators */}
           <div style={{
