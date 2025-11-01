@@ -17,16 +17,16 @@ const Contact = () => {
     {
       icon: '📱',
       title: 'الهاتف',
-      value: '0780887488',
-      link: 'tel:+9640780887488',
+      value: '07808877488',
+      link: 'tel:+96407808877488',
       description: isMobile ? 'اتصل بنا مباشرة' : 'انقر لنسخ الرقم',
       external: false
     },
     {
       icon: '💬',
       title: 'واتساب',
-      value: '0780887488',
-      link: 'https://wa.me/9640780887488',
+      value: '07808877488',
+      link: 'https://wa.me/96407808877488',
       description: 'راسلنا عبر الواتساب',
       external: true
     },
