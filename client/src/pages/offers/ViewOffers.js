@@ -260,16 +260,64 @@ export default function ViewOffers() {
   ];
 
   return (
-    <div style={{
+    <div className="offers-page-background" style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      paddingBottom: '100px'
+      background: `
+        radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(52, 199, 89, 0.03) 0%, transparent 40%),
+        linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)
+      `,
+      paddingBottom: '100px',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Decorative geometric shapes */}
+      <div className="blur-circle-1" style={{
+        position: 'absolute',
+        top: '10%',
+        right: '5%',
+        width: '300px',
+        height: '300px',
+        background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      <div className="blur-circle-2" style={{
+        position: 'absolute',
+        bottom: '20%',
+        left: '10%',
+        width: '250px',
+        height: '250px',
+        background: 'radial-gradient(circle, rgba(52, 199, 89, 0.06) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(50px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+
+      {/* Subtle dot pattern overlay */}
+      <div className="dot-pattern" style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `radial-gradient(circle, rgba(52, 199, 89, 0.08) 1px, transparent 1px)`,
+        backgroundSize: '30px 30px',
+        opacity: 0.3,
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
       <div className="container" style={{
         paddingTop: 'var(--space-6)',
         transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
         opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s ease'
+        transition: 'all 0.6s ease',
+        position: 'relative',
+        zIndex: 1
       }}>
 
         {/* Header */}
@@ -287,9 +335,10 @@ export default function ViewOffers() {
             {isDriver ? '📋 طلبات الركاب' : '🚗 العروض المتاحة'}
           </h1>
           <p style={{
-            color: 'var(--text-secondary)',
+            color: 'var(--text-primary)',
             fontSize: 'var(--text-lg)',
-            fontFamily: '"Cairo", sans-serif'
+            fontFamily: '"Cairo", sans-serif',
+            fontWeight: '600'
           }}>
             {isDriver ? 'ابحث عن ركاب يحتاجون رحلة' : 'ابحث عن رحلتك المثالية'}
           </p>
@@ -1154,6 +1203,28 @@ export default function ViewOffers() {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        /* Dark mode background adjustments */
+        body.dark-mode .offers-page-background {
+          background:
+            radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.06) 0%, transparent 50%),
+            radial-gradient(circle at 40% 20%, rgba(52, 199, 89, 0.05) 0%, transparent 40%),
+            linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+        }
+
+        body.dark-mode .offers-page-background .dot-pattern {
+          background-image: radial-gradient(circle, rgba(52, 199, 89, 0.12) 1px, transparent 1px) !important;
+          opacity: 0.2 !important;
+        }
+
+        body.dark-mode .offers-page-background .blur-circle-1 {
+          background: radial-gradient(circle, rgba(52, 199, 89, 0.12) 0%, transparent 70%) !important;
+        }
+
+        body.dark-mode .offers-page-background .blur-circle-2 {
+          background: radial-gradient(circle, rgba(52, 199, 89, 0.10) 0%, transparent 70%) !important;
         }
       `}</style>
     </div>

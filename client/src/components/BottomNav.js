@@ -128,11 +128,12 @@ const BottomNav = () => {
       gridTemplateColumns: 'repeat(4, 1fr)',
       height: '72px',
       padding: 'var(--space-2) 0',
-      background: 'rgba(255, 255, 255, 0.95)',
+      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      borderTop: '1px solid var(--border-light)',
-      boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
+      borderTop: '2px solid transparent',
+      borderImage: 'linear-gradient(90deg, rgba(52, 199, 89, 0.3) 0%, rgba(52, 199, 89, 0.1) 50%, rgba(52, 199, 89, 0.3) 100%) 1',
+      boxShadow: '0 -8px 32px rgba(52, 199, 89, 0.08), 0 -2px 8px rgba(0, 0, 0, 0.05)',
       direction: 'rtl',
       fontFamily: '"Cairo", sans-serif'
     }}>
@@ -300,6 +301,13 @@ const BottomNav = () => {
             transform: scale(1);
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
           }
+        }
+
+        /* Dark mode support for bottom nav */
+        body.dark-mode nav {
+          background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%) !important;
+          border-image: linear-gradient(90deg, rgba(52, 199, 89, 0.4) 0%, rgba(52, 199, 89, 0.2) 50%, rgba(52, 199, 89, 0.4) 100%) 1 !important;
+          box-shadow: 0 -8px 32px rgba(52, 199, 89, 0.12), 0 -2px 8px rgba(0, 0, 0, 0.3) !important;
         }
       `}</style>
     </nav>
