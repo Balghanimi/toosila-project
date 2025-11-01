@@ -112,7 +112,7 @@ const getBookingById = asyncHandler(async (req, res) => {
 const updateBookingStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, totalPrice } = req.body;
-  
+
   const booking = await Booking.findById(id);
   if (!booking) {
     throw new AppError('Booking not found', 404);
@@ -128,6 +128,35 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
   const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
   if (!validStatuses.includes(status)) {
     throw new AppError('Invalid status', 400);
+  }
+
+  // If confirming booking, reduce available seats in offer
+  if (status === 'confirmed' && booking.status === 'pending') {
+    // Check if enough seats are still available
+    const { query } = require('../config/db');
+    const bookedSeats = await query(
+      `SELECT COALESCE(SUM(seats), 0) as total_booked
+       FROM bookings
+       WHERE offer_id = $1
+       AND status = 'confirmed'
+       AND id != $2`,
+      [booking.offerId, id]
+    );
+
+    const totalBooked = parseInt(bookedSeats.rows[0].total_booked) || 0;
+    const availableSeats = offer.seats - totalBooked;
+
+    if (booking.seats > availableSeats) {
+      throw new AppError(`Only ${availableSeats} seat(s) available`, 400);
+    }
+
+    // Reduce seats in offer
+    await offer.updateSeats(offer.seats - booking.seats);
+  }
+
+  // If cancelling a confirmed booking, restore seats to offer
+  if (status === 'cancelled' && booking.status === 'confirmed') {
+    await offer.updateSeats(offer.seats + booking.seats);
   }
 
   const updatedBooking = await booking.updateStatus(status, totalPrice);

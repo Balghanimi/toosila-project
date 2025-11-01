@@ -161,6 +161,15 @@ class Offer {
     return new Offer(result.rows[0]);
   }
 
+  // Update seats count
+  async updateSeats(newSeats) {
+    const result = await query(
+      'UPDATE offers SET seats = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [newSeats, this.id]
+    );
+    return new Offer(result.rows[0]);
+  }
+
   // Deactivate offer
   async deactivate() {
     const result = await query(
