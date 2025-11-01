@@ -131,7 +131,7 @@ body.dark-mode .header {
 .navLinkActive {
   color: var(--primary);
   font-weight: 600;
-  background: var(--primary-light);
+  background: transparent;
 }
 
 .navLinkActive::after {
