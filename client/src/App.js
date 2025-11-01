@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Navegation/header';
 import BottomNav from './components/BottomNav';
+import FloatingDownloadButton from './components/FloatingDownloadButton';
 import LoadingSpinner from './components/LoadingSpinner';
 import { OffersProvider } from './context/OffersContext';
 import { DemandsProvider } from './context/DemandsContext';
@@ -106,6 +107,7 @@ export default function App() {
                   </Suspense>
                 </main>
                 <BottomNav />
+                <FloatingDownloadButton />
                 </div>
                 </RatingProvider>
               </DemandsProvider>
