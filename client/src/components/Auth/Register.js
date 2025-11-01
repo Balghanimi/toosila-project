@@ -9,13 +9,15 @@ export default function Register({ onSwitchToLogin, onClose }) {
     password: '',
     confirmPassword: '',
     userType: 'passenger', // default to passenger
-    selfieImage: null
+    selfieImage: null,
+    acceptTerms: false
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [selfiePreview, setSelfiePreview] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const videoRef = React.useRef(null);
   const canvasRef = React.useRef(null);
 
@@ -130,6 +132,11 @@ export default function Register({ onSwitchToLogin, onClose }) {
     // Validate selfie for drivers only
     if (formData.userType === 'driver' && !formData.selfieImage) {
       errors.selfie = 'صورة السيلفي مطلوبة للسائقين';
+    }
+
+    // Validate terms acceptance
+    if (!formData.acceptTerms) {
+      errors.terms = 'يجب الموافقة على الشروط والأحكام للمتابعة';
     }
 
     setFormErrors(errors);
@@ -702,6 +709,71 @@ export default function Register({ onSwitchToLogin, onClose }) {
           )}
         </div>
 
+        {/* Terms and Conditions */}
+        <div>
+          <label style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            cursor: 'pointer',
+            padding: '16px',
+            background: formErrors.terms ? '#fef2f2' : '#f9fafb',
+            border: `2px solid ${formErrors.terms ? '#dc2626' : '#e5e7eb'}`,
+            borderRadius: '8px',
+            transition: 'all 0.2s ease'
+          }}>
+            <input
+              type="checkbox"
+              checked={formData.acceptTerms}
+              onChange={(e) => {
+                setFormData(prev => ({ ...prev, acceptTerms: e.target.checked }));
+                if (formErrors.terms) {
+                  setFormErrors(prev => ({ ...prev, terms: '' }));
+                }
+              }}
+              style={{
+                width: '20px',
+                height: '20px',
+                cursor: 'pointer',
+                flexShrink: 0,
+                marginTop: '2px'
+              }}
+            />
+            <span style={{
+              fontSize: '14px',
+              color: formErrors.terms ? '#dc2626' : '#374151',
+              lineHeight: '1.5'
+            }}>
+              أوافق على{' '}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowTerms(true);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#3b82f6',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  padding: 0
+                }}
+              >
+                الشروط والأحكام
+              </button>
+              {' '}وسياسة الخصوصية لتطبيق توصيلة
+            </span>
+          </label>
+          {formErrors.terms && (
+            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}>
+              {formErrors.terms}
+            </div>
+          )}
+        </div>
+
         {/* Submit Button */}
         <button
           type="submit"
@@ -722,6 +794,216 @@ export default function Register({ onSwitchToLogin, onClose }) {
           {loading ? 'جارٍ إنشاء الحساب...' : 'إنشاء حساب'}
         </button>
       </form>
+
+      {/* Terms and Conditions Modal */}
+      {showTerms && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '32px',
+            maxWidth: '600px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            position: 'relative',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setShowTerms(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                fontSize: '20px',
+                cursor: 'pointer',
+                color: '#6b7280',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              ✖
+            </button>
+
+            <h2 style={{
+              fontSize: '24px',
+              fontWeight: '700',
+              color: '#1f2937',
+              marginBottom: '24px',
+              textAlign: 'center'
+            }}>
+              الشروط والأحكام
+            </h2>
+
+            <div style={{
+              fontSize: '14px',
+              color: '#374151',
+              lineHeight: '1.8',
+              textAlign: 'right'
+            }}>
+              <section style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                  📱 مقدمة
+                </h3>
+                <p style={{ marginBottom: '12px' }}>
+                  مرحباً بك في تطبيق توصيلة! هذه الشروط والأحكام تحدد القواعد واللوائح الخاصة باستخدام خدماتنا.
+                  باستخدامك للتطبيق، فإنك توافق على الالتزام بهذه الشروط.
+                </p>
+              </section>
+
+              <section style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                  👥 شروط عامة لجميع المستخدمين
+                </h3>
+                <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
+                  <li>يجب أن يكون عمرك 18 عاماً على الأقل لاستخدام التطبيق</li>
+                  <li>يجب تقديم معلومات صحيحة ودقيقة عند التسجيل</li>
+                  <li>أنت مسؤول عن الحفاظ على سرية حسابك وكلمة المرور</li>
+                  <li>يُحظر استخدام التطبيق لأي أغراض غير قانونية أو غير أخلاقية</li>
+                  <li>نحتفظ بالحق في تعليق أو إنهاء حسابك في حالة انتهاك الشروط</li>
+                </ul>
+              </section>
+
+              {formData.userType === 'driver' && (
+                <section style={{ marginBottom: '24px', background: '#ecfdf5', padding: '16px', borderRadius: '8px', border: '2px solid #10b981' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#047857', marginBottom: '12px' }}>
+                    🚗 شروط خاصة بالسائقين
+                  </h3>
+                  <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
+                    <li><strong>رخصة القيادة:</strong> يجب أن تكون لديك رخصة قيادة سارية المفعول</li>
+                    <li><strong>المركبة:</strong> يجب أن تكون مركبتك في حالة جيدة ومستوفية لمعايير السلامة</li>
+                    <li><strong>التأمين:</strong> يجب أن يكون لديك تأمين ساري المفعول على المركبة</li>
+                    <li><strong>السلوك:</strong> الالتزام بالسلوك المهني واللباقة مع الركاب</li>
+                    <li><strong>صورة السيلفي:</strong> توافق على استخدام صورتك للتحقق من هويتك وزيادة أمان المنصة</li>
+                    <li><strong>المواعيد:</strong> الالتزام بالمواعيد المحددة للرحلات</li>
+                    <li><strong>النظافة:</strong> الحفاظ على نظافة المركبة</li>
+                    <li><strong>الأسعار:</strong> الالتزام بالأسعار المتفق عليها عبر التطبيق</li>
+                  </ul>
+                </section>
+              )}
+
+              {formData.userType === 'passenger' && (
+                <section style={{ marginBottom: '24px', background: '#eff6ff', padding: '16px', borderRadius: '8px', border: '2px solid #3b82f6' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1d4ed8', marginBottom: '12px' }}>
+                    👤 شروط خاصة بالركاب
+                  </h3>
+                  <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
+                    <li><strong>الحجز:</strong> تأكد من صحة معلومات الحجز قبل التأكيد</li>
+                    <li><strong>الدفع:</strong> الالتزام بدفع المبلغ المتفق عليه</li>
+                    <li><strong>الإلغاء:</strong> إلغاء الرحلة قبل الموعد المحدد بوقت كافٍ</li>
+                    <li><strong>السلوك:</strong> احترام السائق والمركبة</li>
+                    <li><strong>التقييم:</strong> تقديم تقييم عادل للرحلة</li>
+                  </ul>
+                </section>
+              )}
+
+              <section style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                  🔒 سياسة الخصوصية
+                </h3>
+                <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
+                  <li>نحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية</li>
+                  <li>يتم استخدام المعلومات فقط لتحسين الخدمة وتسهيل التواصل</li>
+                  <li>لن نشارك معلوماتك مع أطراف ثالثة دون موافقتك</li>
+                  <li>يتم تخزين البيانات بشكل آمن ومشفر</li>
+                  <li>لديك الحق في طلب حذف بياناتك في أي وقت</li>
+                </ul>
+              </section>
+
+              <section style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                  ⚠️ إخلاء المسؤولية
+                </h3>
+                <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
+                  <li>توصيلة هي منصة وساطة بين السائقين والركاب</li>
+                  <li>نحن غير مسؤولين عن أي أضرار أو حوادث تحدث أثناء الرحلة</li>
+                  <li>يتحمل السائق والراكب المسؤولية الكاملة عن سلامتهم</li>
+                  <li>ننصح بالتأكد من وجود تأمين مناسب</li>
+                </ul>
+              </section>
+
+              <section style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                  📞 التواصل والدعم
+                </h3>
+                <p>
+                  في حالة وجود أي استفسارات أو مشاكل، يمكنك التواصل معنا عبر التطبيق أو البريد الإلكتروني.
+                  نحن ملتزمون بتقديم أفضل خدمة ممكنة لك.
+                </p>
+              </section>
+
+              <section style={{
+                background: '#fef3c7',
+                padding: '16px',
+                borderRadius: '8px',
+                border: '2px solid #f59e0b',
+                marginTop: '24px'
+              }}>
+                <p style={{ fontWeight: '600', color: '#92400e', marginBottom: '8px' }}>
+                  ⚡ ملاحظة هامة:
+                </p>
+                <p style={{ color: '#92400e' }}>
+                  باستخدامك لتطبيق توصيلة، فإنك تقر بأنك قد قرأت وفهمت ووافقت على جميع هذه الشروط والأحكام.
+                  نحتفظ بالحق في تحديث هذه الشروط في أي وقت، وسيتم إخطارك بأي تغييرات جوهرية.
+                </p>
+              </section>
+
+              <div style={{
+                textAlign: 'center',
+                marginTop: '24px',
+                paddingTop: '24px',
+                borderTop: '1px solid #e5e7eb'
+              }}>
+                <p style={{ fontSize: '12px', color: '#6b7280' }}>
+                  آخر تحديث: نوفمبر 2025
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setFormData(prev => ({ ...prev, acceptTerms: true }));
+                setShowTerms(false);
+                if (formErrors.terms) {
+                  setFormErrors(prev => ({ ...prev, terms: '' }));
+                }
+              }}
+              style={{
+                width: '100%',
+                marginTop: '24px',
+                padding: '14px 24px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              ✅ قرأت وأوافق على الشروط
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Switch to Login */}
       <div style={{
