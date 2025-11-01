@@ -301,7 +301,7 @@ const Home = () => {
           <p style={{
             fontSize: 'clamp(18px, 4vw, 24px)',
             color: 'var(--text-secondary)',
-            margin: '0 auto var(--space-8) auto',
+            margin: '0 auto var(--space-6) auto',
             maxWidth: '500px',
             lineHeight: '1.6',
             fontWeight: '500'
@@ -309,7 +309,121 @@ const Home = () => {
             رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
           </p>
 
-          {/* Two-button CTA pattern */}
+          {/* Mode Toggle Buttons - Prominent Position */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-4)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 'var(--space-8)',
+            flexWrap: 'wrap'
+          }}>
+            {/* طلب رحلة Button */}
+            {!currentUser?.isDriver && (
+              <button
+                onClick={() => setMode('demand')}
+                style={{
+                  padding: '16px 40px',
+                  border: mode === 'demand' ? 'none' : '2px solid var(--primary)',
+                  borderRadius: '16px',
+                  background: mode === 'demand' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
+                  color: mode === 'demand' ? 'white' : 'var(--primary)',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: mode === 'demand' ? '0 8px 20px rgba(52, 199, 89, 0.3)' : 'none',
+                  transform: mode === 'demand' ? 'translateY(-2px)' : 'translateY(0)',
+                  fontFamily: '"Cairo", sans-serif',
+                  minWidth: '180px'
+                }}
+                onMouseEnter={(e) => {
+                  if (mode !== 'demand') {
+                    e.target.style.background = 'var(--primary)';
+                    e.target.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (mode !== 'demand') {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = 'var(--primary)';
+                  }
+                }}
+              >
+                💺 طلب رحلة
+              </button>
+            )}
+
+            {/* نشر عرض Button for drivers */}
+            {currentUser?.isDriver && (
+              <button
+                onClick={() => setMode('offer')}
+                style={{
+                  padding: '16px 40px',
+                  border: mode === 'offer' ? 'none' : '2px solid var(--primary)',
+                  borderRadius: '16px',
+                  background: mode === 'offer' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
+                  color: mode === 'offer' ? 'white' : 'var(--primary)',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: mode === 'offer' ? '0 8px 20px rgba(52, 199, 89, 0.3)' : 'none',
+                  transform: mode === 'offer' ? 'translateY(-2px)' : 'translateY(0)',
+                  fontFamily: '"Cairo", sans-serif',
+                  minWidth: '180px'
+                }}
+                onMouseEnter={(e) => {
+                  if (mode !== 'offer') {
+                    e.target.style.background = 'var(--primary)';
+                    e.target.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (mode !== 'offer') {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = 'var(--primary)';
+                  }
+                }}
+              >
+                🚗 نشر عرض
+              </button>
+            )}
+
+            {/* ابحث عن رحلة Button */}
+            <button
+              onClick={() => setMode('find')}
+              style={{
+                padding: '16px 40px',
+                border: mode === 'find' ? 'none' : '2px solid #3b82f6',
+                borderRadius: '16px',
+                background: mode === 'find' ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
+                color: mode === 'find' ? 'white' : '#3b82f6',
+                fontSize: '18px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: mode === 'find' ? '0 8px 20px rgba(59, 130, 246, 0.3)' : 'none',
+                transform: mode === 'find' ? 'translateY(-2px)' : 'translateY(0)',
+                fontFamily: '"Cairo", sans-serif',
+                minWidth: '180px'
+              }}
+              onMouseEnter={(e) => {
+                if (mode !== 'find') {
+                  e.target.style.background = '#3b82f6';
+                  e.target.style.color = 'white';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (mode !== 'find') {
+                  e.target.style.background = 'transparent';
+                  e.target.style.color = '#3b82f6';
+                }
+              }}
+            >
+              🔍 ابحث عن رحلة
+            </button>
+          </div>
 
           {/* Trust indicators */}
           <div style={{
@@ -380,117 +494,6 @@ const Home = () => {
             opacity: 0.1,
             zIndex: 0
           }} />
-
-          {/* Mode Toggle - Smart based on user role - Enhanced */}
-          <div style={{
-            position: 'relative',
-            zIndex: 1,
-            display: 'grid',
-            gridTemplateColumns: currentUser?.isDriver ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
-            gap: 'var(--space-2)',
-            marginBottom: 'var(--space-8)',
-            background: 'var(--surface-secondary)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 'var(--space-2)',
-            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
-            border: '1px solid var(--border-light)'
-          }}>
-            {/* Show offer button first for drivers */}
-            {currentUser?.isDriver && (
-              <button
-                onClick={() => setMode('offer')}
-                style={{
-                  padding: 'var(--space-4)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  background: mode === 'offer' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
-                  color: mode === 'offer' ? 'white' : 'var(--text-secondary)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'offer' ? '0 4px 12px rgba(52, 199, 89, 0.3)' : 'none',
-                  transform: mode === 'offer' ? 'scale(1)' : 'scale(0.98)',
-                  fontFamily: '"Cairo", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  if (mode !== 'offer') {
-                    e.target.style.background = 'var(--surface-tertiary)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (mode !== 'offer') {
-                    e.target.style.background = 'transparent';
-                  }
-                }}
-              >
-                🚗 {t('offerRide')}
-              </button>
-            )}
-
-            {/* Show demand button first for passengers */}
-            {!currentUser?.isDriver && (
-              <button
-                onClick={() => setMode('demand')}
-                style={{
-                  padding: 'var(--space-4)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  background: mode === 'demand' ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
-                  color: mode === 'demand' ? 'white' : 'var(--text-secondary)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'demand' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none',
-                  transform: mode === 'demand' ? 'scale(1)' : 'scale(0.98)',
-                  fontFamily: '"Cairo", sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  if (mode !== 'demand') {
-                    e.target.style.background = 'var(--surface-tertiary)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (mode !== 'demand') {
-                    e.target.style.background = 'transparent';
-                  }
-                }}
-              >
-                💺 طلب رحلة
-              </button>
-            )}
-
-            <button
-              onClick={() => setMode('find')}
-              style={{
-                padding: 'var(--space-4)',
-                border: 'none',
-                borderRadius: 'var(--radius)',
-                background: mode === 'find' ? 'var(--surface-primary)' : 'transparent',
-                color: mode === 'find' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: mode === 'find' ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none',
-                transform: mode === 'find' ? 'scale(1)' : 'scale(0.98)',
-                fontFamily: '"Cairo", sans-serif'
-              }}
-              onMouseEnter={(e) => {
-                if (mode !== 'find') {
-                  e.target.style.background = 'var(--surface-tertiary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (mode !== 'find') {
-                  e.target.style.background = 'transparent';
-                }
-              }}
-            >
-              🔍 {t('findRide')}
-            </button>
-          </div>
 
           {/* Location Inputs - Enhanced */}
           <div style={{
