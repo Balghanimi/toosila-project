@@ -1,0 +1,655 @@
+/**
+ * Professional ViewOffers Page Styles
+ * Modern ride-sharing offers listing with filters
+ */
+
+.offersPage {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(52, 199, 89, 0.03) 0%, transparent 40%),
+    linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding-bottom: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+body.dark-mode .offersPage {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(52, 199, 89, 0.05) 0%, transparent 40%),
+    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Decorative Elements */
+.blurCircle1 {
+  position: absolute;
+  top: 10%;
+  right: 5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.dark-mode .blurCircle1 {
+  background: radial-gradient(circle, rgba(52, 199, 89, 0.12) 0%, transparent 70%);
+}
+
+.blurCircle2 {
+  position: absolute;
+  bottom: 20%;
+  left: 10%;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(52, 199, 89, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.dark-mode .blurCircle2 {
+  background: radial-gradient(circle, rgba(52, 199, 89, 0.10) 0%, transparent 70%);
+}
+
+.dotPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle, rgba(52, 199, 89, 0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.dark-mode .dotPattern {
+  background-image: radial-gradient(circle, rgba(52, 199, 89, 0.12) 1px, transparent 1px);
+  opacity: 0.2;
+}
+
+.container {
+  padding-top: var(--space-6);
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: 'Cairo', sans-serif;
+}
+
+.subtitle {
+  color: var(--text-primary);
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+}
+
+/* Filter Section */
+.filterCard {
+  background: var(--surface-primary);
+  border-radius: 24px;
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--elevation-3);
+  border: 1px solid var(--border-light);
+  overflow: visible;
+}
+
+body.dark-mode .filterCard {
+  background: var(--surface-secondary);
+  border-color: var(--border-medium);
+}
+
+.filterTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  font-family: 'Cairo', sans-serif;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  color: var(--text-secondary);
+}
+
+.select,
+.input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: var(--text-base);
+  font-family: 'Cairo', sans-serif;
+  background: var(--surface-primary);
+  text-align: center;
+  direction: rtl;
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.select:hover,
+.input:hover {
+  border-color: var(--border-medium);
+}
+
+.select:focus,
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.1);
+}
+
+body.dark-mode .select,
+body.dark-mode .input {
+  background: var(--surface-tertiary);
+}
+
+/* Advanced Filters Toggle */
+.advancedToggle {
+  width: 100%;
+  padding: var(--space-3);
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: all var(--transition-base);
+}
+
+.advancedToggle:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+}
+
+.advancedToggle.active {
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+  box-shadow: var(--elevation-1);
+}
+
+.advancedFiltersContainer {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out;
+  margin-bottom: 0;
+}
+
+.advancedFiltersContainer.show {
+  max-height: 1000px;
+  opacity: 1;
+  margin-bottom: var(--space-4);
+}
+
+.advancedFiltersContent {
+  padding: var(--space-4);
+  background: var(--surface-secondary);
+  border-radius: 16px;
+  border: 2px dashed var(--border-light);
+}
+
+.advancedTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  font-family: 'Cairo', sans-serif;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Button Group */
+.buttonGroup {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.searchButton {
+  flex: 1;
+  padding: var(--space-3);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: var(--elevation-2);
+  transition: all var(--transition-base);
+}
+
+.searchButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+}
+
+.searchButton:active {
+  transform: translateY(0);
+}
+
+.clearButton {
+  flex: 1;
+  padding: var(--space-3);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: all var(--transition-base);
+}
+
+.clearButton:hover {
+  border-color: var(--primary);
+  background: var(--surface-tertiary);
+}
+
+/* Offers List */
+.offersList {
+  display: grid;
+  gap: var(--space-4);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.offerCard {
+  background: var(--surface-primary);
+  border-radius: 20px;
+  padding: var(--space-5);
+  box-shadow: var(--elevation-2);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+body.dark-mode .offerCard {
+  background: var(--surface-secondary);
+  border-color: var(--border-medium);
+}
+
+.offerCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--elevation-4);
+  border-color: var(--primary);
+}
+
+.offerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.offerRoute {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: 'Cairo', sans-serif;
+}
+
+.offerDetails {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  flex-wrap: wrap;
+}
+
+.offerPrice {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--primary);
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+}
+
+.driverInfo {
+  padding: var(--space-3);
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: var(--space-3);
+}
+
+.bookButton {
+  width: 100%;
+  padding: var(--space-3);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: var(--elevation-2);
+  transition: all var(--transition-base);
+}
+
+.bookButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+}
+
+.bookButton:active {
+  transform: translateY(0);
+}
+
+/* Loading & Empty States */
+.loadingContainer {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-light);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto var(--space-4) auto;
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-8);
+  background: var(--surface-primary);
+  border-radius: 24px;
+  box-shadow: var(--elevation-2);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+}
+
+.emptyTitle {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  font-family: 'Cairo', sans-serif;
+  color: var(--text-primary);
+}
+
+.emptyText {
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: var(--space-4);
+}
+
+/* Pagination */
+.paginationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--surface-primary);
+  border-radius: 20px;
+  box-shadow: var(--elevation-2);
+  border: 1px solid var(--border-light);
+}
+
+.paginationInfo {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  margin: 0;
+}
+
+.loadMoreButton {
+  padding: var(--space-3) var(--space-6);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: var(--elevation-2);
+  transition: all var(--transition-base);
+}
+
+.loadMoreButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+}
+
+.loadMoreButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Error Message */
+.errorMessage {
+  background: var(--color-error-50);
+  border: 2px solid var(--color-error-500);
+  border-radius: 12px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+  color: var(--color-error-700);
+  font-family: 'Cairo', sans-serif;
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Booking Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+  background: var(--surface-primary);
+  border-radius: 24px;
+  padding: var(--space-6);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--elevation-6);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: scaleIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modalTitle {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  font-family: 'Cairo', sans-serif;
+  text-align: center;
+}
+
+.driverCard {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  border-radius: 16px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  color: white;
+  box-shadow: var(--elevation-2);
+}
+
+.tripDetails {
+  background: var(--surface-secondary);
+  border-radius: 16px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.cancelButton {
+  flex: 1;
+  padding: var(--space-3);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: all var(--transition-base);
+}
+
+.cancelButton:hover {
+  border-color: var(--primary);
+}
+
+.confirmButton {
+  flex: 1;
+  padding: var(--space-3);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: var(--elevation-2);
+  transition: all var(--transition-base);
+}
+
+.confirmButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .offerHeader {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .offerPrice {
+    font-size: var(--text-xl);
+  }
+
+  .modalContent {
+    padding: var(--space-4);
+  }
+}

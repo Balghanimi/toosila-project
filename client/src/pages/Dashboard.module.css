@@ -1,0 +1,374 @@
+/**
+ * Professional Dashboard Page Styles
+ * Modern analytics and quick actions interface
+ */
+
+.dashboardPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding-bottom: 100px;
+}
+
+body.dark-mode .dashboardPage {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.container {
+  padding-top: var(--space-6);
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: 'Cairo', sans-serif;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 500;
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.statCard {
+  border-radius: 20px;
+  padding: var(--space-6);
+  color: white;
+  box-shadow: var(--elevation-3);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  animation: scaleIn 0.4s ease-out;
+}
+
+.statCard.clickable {
+  cursor: pointer;
+}
+
+.statCard.clickable:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.statCard.clickable:active {
+  transform: translateY(-2px);
+}
+
+.statCard.blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.statCard.green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.statCard.orange {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.statCard.purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.statIcon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.statValue {
+  font-size: clamp(32px, 5vw, 40px);
+  font-weight: 800;
+  margin-bottom: var(--space-1);
+  font-family: 'Cairo', sans-serif;
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  opacity: 0.9;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+/* Quick Actions Section */
+.quickActions {
+  background: var(--surface-primary);
+  border-radius: 24px;
+  padding: var(--space-6);
+  box-shadow: var(--elevation-2);
+  margin-bottom: var(--space-6);
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+}
+
+body.dark-mode .quickActions {
+  background: var(--surface-secondary);
+}
+
+.sectionTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  font-family: 'Cairo', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.actionButton {
+  padding: var(--space-4);
+  border: none;
+  border-radius: 14px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: 'Cairo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.actionButton.primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  box-shadow: var(--elevation-1);
+}
+
+.actionButton.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+.actionButton.secondary {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-light);
+}
+
+.actionButton.secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.actionButton:active {
+  transform: translateY(0);
+}
+
+.actionIcon {
+  font-size: 1.5rem;
+}
+
+/* Recent Activity Section */
+.recentActivity {
+  background: var(--surface-primary);
+  border-radius: 24px;
+  padding: var(--space-6);
+  box-shadow: var(--elevation-2);
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+body.dark-mode .recentActivity {
+  background: var(--surface-secondary);
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.activityItem {
+  padding: var(--space-4);
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+}
+
+body.dark-mode .activityItem {
+  background: var(--surface-tertiary);
+  border-color: var(--border-medium);
+}
+
+.activityItem:hover {
+  transform: translateX(-4px);
+  border-color: var(--primary);
+  box-shadow: var(--elevation-1);
+}
+
+/* Loading State */
+.loadingContainer {
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-light);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto var(--space-4) auto;
+}
+
+.loadingText {
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Auth Required State */
+.authRequired {
+  text-align: center;
+  padding: var(--space-8);
+  background: var(--surface-primary);
+  border-radius: 24px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--elevation-2);
+  animation: scaleIn 0.4s ease-out;
+}
+
+.authIcon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+}
+
+.authTitle {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: 'Cairo', sans-serif;
+}
+
+.authText {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  margin: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .statCard {
+    padding: var(--space-5);
+  }
+
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quickActions,
+  .recentActivity {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+  }
+
+  .statValue {
+    font-size: var(--text-3xl);
+  }
+}
