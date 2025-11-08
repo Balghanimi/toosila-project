@@ -32,6 +32,10 @@ const passwordResetRoutes = require('./routes/passwordReset.routes');
 
 const app = express();
 
+// Trust proxy for Railway deployment
+// This allows Express to correctly read X-Forwarded-For headers from Railway's reverse proxy
+app.set('trust proxy', 1);
+
 // Compression middleware - must be early in the middleware chain
 app.use(compression({
   filter: (req, res) => {
