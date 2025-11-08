@@ -233,18 +233,18 @@ const getBookingStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
   
   const result = await query(`
-    SELECT 
-      COUNT(*) as total_bookings,
-      COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_bookings,
-      COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_bookings,
-      COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_bookings,
-      COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_bookings,
-      AVG(total_price) as average_booking_value
+    SELECT
+      COUNT(*)::int as total,
+      COUNT(CASE WHEN status = 'pending' THEN 1 END)::int as pending,
+      COUNT(CASE WHEN status = 'confirmed' THEN 1 END)::int as confirmed,
+      COUNT(CASE WHEN status = 'cancelled' THEN 1 END)::int as cancelled,
+      COUNT(CASE WHEN status = 'completed' THEN 1 END)::int as completed
     FROM bookings
   `);
 
   res.json({
-    stats: result.rows[0]
+    success: true,
+    data: result.rows[0]
   });
 });
 

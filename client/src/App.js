@@ -61,6 +61,15 @@ const EmailVerificationReminder = lazy(() => import('./pages/EmailVerificationRe
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
+// Admin Pages
+const AdminRoute = lazy(() => import('./components/Admin/AdminRoute'));
+const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const VerificationManagement = lazy(() => import('./pages/admin/VerificationManagement'));
+const AdminStatistics = lazy(() => import('./pages/admin/AdminStatistics'));
+const AdminTest = lazy(() => import('./pages/AdminTest'));
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -121,6 +130,17 @@ export default function App() {
                       {/* Password Reset */}
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+                      {/* Admin Test Page - accessible to everyone */}
+                      <Route path="/admin-test" element={<AdminTest />} />
+
+                      {/* Admin Routes */}
+                      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="users" element={<UserManagement />} />
+                        <Route path="verification" element={<VerificationManagement />} />
+                        <Route path="statistics" element={<AdminStatistics />} />
+                      </Route>
                     </Routes>
                   </Suspense>
                 </main>

@@ -349,5 +349,61 @@ export const notificationsAPI = {
   },
 };
 
+// Admin API
+export const adminAPI = {
+  // User Management
+  getAllUsers: async (page = 1, limit = 20, filters = {}) => {
+    const queryParams = new URLSearchParams({ page, limit, ...filters }).toString();
+    return apiRequest(`/auth/users?${queryParams}`, { method: 'GET' });
+  },
+  getUserById: async (userId) => {
+    return apiRequest(`/auth/users/${userId}`, { method: 'GET' });
+  },
+  deactivateUser: async (userId) => {
+    return apiRequest(`/auth/users/${userId}/deactivate`, { method: 'PUT' });
+  },
+
+  // Verification Management
+  getPendingVerifications: async (page = 1, limit = 20) => {
+    const queryParams = new URLSearchParams({ page, limit }).toString();
+    return apiRequest(`/verification/admin/pending?${queryParams}`, { method: 'GET' });
+  },
+  getVerificationDocument: async (docId) => {
+    return apiRequest(`/verification/admin/document/${docId}`, { method: 'GET' });
+  },
+  approveVerification: async (docId) => {
+    return apiRequest(`/verification/admin/approve/${docId}`, { method: 'POST' });
+  },
+  rejectVerification: async (docId, reason) => {
+    return apiRequest(`/verification/admin/reject/${docId}`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  },
+  getVerificationStats: async () => {
+    return apiRequest('/verification/admin/stats', { method: 'GET' });
+  },
+  getUserAuditLog: async (userId) => {
+    return apiRequest(`/verification/admin/audit/${userId}`, { method: 'GET' });
+  },
+
+  // Statistics
+  getBookingStats: async () => {
+    return apiRequest('/bookings/admin/stats', { method: 'GET' });
+  },
+  getRatingStats: async () => {
+    return apiRequest('/ratings/admin/stats', { method: 'GET' });
+  },
+  getOfferStats: async () => {
+    return apiRequest('/offers/admin/stats', { method: 'GET' });
+  },
+  getDemandStats: async () => {
+    return apiRequest('/demands/admin/stats', { method: 'GET' });
+  },
+  getMessageStats: async () => {
+    return apiRequest('/messages/admin/stats', { method: 'GET' });
+  },
+};
+
 export default apiRequest;
 

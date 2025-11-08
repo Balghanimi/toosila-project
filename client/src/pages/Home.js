@@ -3,49 +3,42 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { demandsAPI, citiesAPI } from '../services/api';
+import styles from './Home.module.css';
 
 const Home = () => {
-  const [mode, setMode] = useState('find'); // 'find', 'offer', or 'demand'
+  const [mode, setMode] = useState('find');
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropLocation, setDropLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState('today');
   const [departureTime, setDepartureTime] = useState('');
   const [availableSeats, setAvailableSeats] = useState('1');
   const [pricePerSeat, setPricePerSeat] = useState('');
-  const [isAnimated, setIsAnimated] = useState(false);
   const [isSwapping, setIsSwapping] = useState(false);
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [dropSuggestions, setDropSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
   const [showDropSuggestions, setShowDropSuggestions] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [submitError, setSubmitError] = useState('');
-  const [availableCities, setAvailableCities] = useState([]); // Cities from database
+  const [availableCities, setAvailableCities] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // Handle mobile detection on resize
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Clear error message when user starts filling the form
   useEffect(() => {
     if (submitError && (pickupLocation || dropLocation || selectedDate)) {
       setSubmitError('');
     }
   }, [pickupLocation, dropLocation, selectedDate, submitError]);
 
-  // Fetch cities from database on component mount
   useEffect(() => {
     const fetchCities = async () => {
       try {
@@ -53,7 +46,6 @@ const Home = () => {
         setAvailableCities(response.cities || []);
       } catch (error) {
         console.error('Error fetching cities:', error);
-        // Fallback to empty array if API fails
         setAvailableCities([]);
       }
     };
@@ -61,22 +53,15 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    setIsAnimated(true);
-
-    // Check if we need to set mode from navigation state
     if (location.state?.mode) {
       setMode(location.state.mode);
-      // Clear the state after using it
       navigate(location.pathname, { replace: true, state: {} });
     }
-
-    // Set default time to current time + 1 hour
     const now = new Date();
     now.setHours(now.getHours() + 1);
     const timeString = now.toTimeString().slice(0, 5);
     setDepartureTime(timeString);
 
-    // Close suggestions when clicking outside
     const handleClickOutside = (e) => {
       if (!e.target.closest('input')) {
         setShowPickupSuggestions(false);
@@ -89,7 +74,6 @@ const Home = () => {
   }, []);
 
   const handleNext = async () => {
-    // Calculate date
     let calculatedDate;
     if (selectedDate === 'today') {
       calculatedDate = new Date().toISOString().split('T')[0];
@@ -102,27 +86,22 @@ const Home = () => {
     }
 
     if (mode === 'find') {
-      // إرسال معايير البحث - يمكن البحث بحقل واحد على الأقل
       const searchParams = {};
       if (pickupLocation) searchParams.fromCity = pickupLocation;
       if (dropLocation) searchParams.toCity = dropLocation;
       if (calculatedDate) searchParams.departureDate = calculatedDate;
 
-      // التحقق من وجود حقل واحد على الأقل للبحث
       if (!pickupLocation && !dropLocation && !calculatedDate) {
         setSubmitError('يرجى اختيار نقطة الانطلاق أو نقطة الوصول أو التاريخ على الأقل للبحث');
         return;
       }
 
-      // إذا كان المستخدم سائق، اذهب إلى صفحة الطلبات (demands)
-      // إذا كان راكب، اذهب إلى صفحة العروض (offers)
       if (currentUser && currentUser.isDriver) {
         navigate('/demands', { state: searchParams });
       } else {
         navigate('/offers', { state: searchParams });
       }
     } else if (mode === 'offer') {
-      // تمرير بيانات النموذج إلى صفحة نشر العرض
       const offerData = {
         fromCity: pickupLocation,
         toCity: dropLocation,
@@ -131,22 +110,16 @@ const Home = () => {
         seats: availableSeats,
         price: pricePerSeat
       };
-
       navigate('/post-offer', { state: offerData });
     } else if (mode === 'demand') {
-      // نشر الطلب مباشرة من الصفحة الرئيسية
       setIsSubmitting(true);
       setSubmitError('');
 
       try {
-        // Save cities to database if they're new
         await saveNewCityIfNeeded(pickupLocation);
         await saveNewCityIfNeeded(dropLocation);
 
-        // إنشاء تاريخ البداية والنهاية
         const earliestDateTime = new Date(`${calculatedDate}T${departureTime}:00`);
-
-        // تاريخ النهاية: يومين بعد تاريخ البداية
         const latestDateTime = new Date(earliestDateTime);
         latestDateTime.setDate(latestDateTime.getDate() + 2);
 
@@ -159,18 +132,10 @@ const Home = () => {
           budgetMax: parseFloat(pricePerSeat)
         };
 
-        console.log('Home - Creating demand:', demandData);
-        const result = await demandsAPI.create(demandData);
-        console.log('Home - Demand created successfully:', result);
-
-        // التوجيه إلى صفحة الطلبات بعد النجاح
+        await demandsAPI.create(demandData);
         navigate('/demands');
       } catch (err) {
         console.error('Error creating demand:', err);
-        console.error('Error details:', {
-          message: err.message,
-          stack: err.stack
-        });
         setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
         setIsSubmitting(false);
       }
@@ -189,9 +154,7 @@ const Home = () => {
   const handlePickupChange = (value) => {
     setPickupLocation(value);
     if (value.trim()) {
-      const filtered = availableCities.filter(city =>
-        city.includes(value.trim())
-      );
+      const filtered = availableCities.filter(city => city.includes(value.trim()));
       setPickupSuggestions(filtered);
       setShowPickupSuggestions(filtered.length > 0);
     } else {
@@ -202,9 +165,7 @@ const Home = () => {
   const handleDropChange = (value) => {
     setDropLocation(value);
     if (value.trim()) {
-      const filtered = availableCities.filter(city =>
-        city.includes(value.trim())
-      );
+      const filtered = availableCities.filter(city => city.includes(value.trim()));
       setDropSuggestions(filtered);
       setShowDropSuggestions(filtered.length > 0);
     } else {
@@ -222,28 +183,18 @@ const Home = () => {
     setShowDropSuggestions(false);
   };
 
-  // Auto-save new city to database when user enters it
   const saveNewCityIfNeeded = async (cityName) => {
     if (!cityName || cityName.trim().length < 2) return;
-
     const trimmedCity = cityName.trim();
-
-    // Check if city already exists in our list (case-insensitive)
-    const cityExists = availableCities.some(
-      city => city.toLowerCase() === trimmedCity.toLowerCase()
-    );
-
+    const cityExists = availableCities.some(city => city.toLowerCase() === trimmedCity.toLowerCase());
     if (!cityExists) {
       try {
         const response = await citiesAPI.add(trimmedCity);
         if (!response.alreadyExists) {
-          // Add to local state immediately for better UX
           setAvailableCities(prev => [...prev, trimmedCity].sort());
-          console.log('تم إضافة مدينة جديدة:', trimmedCity);
         }
       } catch (error) {
         console.error('Error saving city:', error);
-        // Don't show error to user - silent fail is OK for this feature
       }
     }
   };
@@ -256,808 +207,266 @@ const Home = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      paddingBottom: '80px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* Background decorative elements */}
-      <div style={{
-        position: 'absolute',
-        top: '-10%',
-        right: '-5%',
-        width: '300px',
-        height: '300px',
-        background: 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(31, 138, 53, 0.05) 100%)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-10%',
-        left: '-5%',
-        width: '250px',
-        height: '250px',
-        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
+    <div className={styles.homeContainer}>
+      {/* Animated Background Blobs */}
+      <div className={styles.backgroundBlob1} />
+      <div className={styles.backgroundBlob2} />
+      <div className={styles.backgroundBlob3} />
 
-      <div className="container" style={{
-        paddingTop: 'var(--space-8)',
-        transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
-        opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-        position: 'relative',
-        zIndex: 1
-      }}>
+      {/* Hero Section */}
+      <section className={styles.heroSection}>
+        <h1 className={styles.heroTitle}>توصيلة</h1>
+        <p className={styles.heroSubtitle}>رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق</p>
+        <p className={styles.heroTagline}>اربط بين المسافرين والسائقين بطريقة آمنة ومريحة وبأسعار معقولة</p>
 
-        {/* Hero Section - Enhanced */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: 'var(--space-12)',
-          paddingTop: 'var(--space-6)',
-          paddingBottom: 'var(--space-8)',
-          position: 'relative'
-        }}>
-          <h1 style={{
-            fontSize: 'clamp(36px, 8vw, 56px)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-4)',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-1px',
-            lineHeight: '1.1'
-          }}>
-            توصيلة
-          </h1>
-          <p style={{
-            fontSize: 'clamp(18px, 4vw, 24px)',
-            color: 'var(--text-secondary)',
-            margin: '0 auto var(--space-6) auto',
-            maxWidth: '500px',
-            lineHeight: '1.6',
-            fontWeight: '500'
-          }}>
-            رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
-          </p>
+        {/* Statistics Bar */}
+        <div className={styles.statsBar}>
+          <div className={styles.statItem}>
+            <div className={styles.statNumber}>500+</div>
+            <div className={styles.statLabel}>رحلة يومياً</div>
+          </div>
+          <div className={styles.statItem}>
+            <div className={styles.statNumber}>10K+</div>
+            <div className={styles.statLabel}>مستخدم نشط</div>
+          </div>
+          <div className={styles.statItem}>
+            <div className={styles.statNumber}>98%</div>
+            <div className={styles.statLabel}>تقييم إيجابي</div>
+          </div>
+        </div>
 
-          {/* Mode Toggle Buttons - Prominent Position */}
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-3)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 'var(--space-8)',
-            flexWrap: 'wrap'
-          }}>
-            {/* طلب رحلة Button */}
-            {!currentUser?.isDriver && (
-              <button
-                onClick={() => setMode('demand')}
-                style={{
-                  padding: '14px 32px',
-                  border: mode === 'demand' ? 'none' : '2px solid var(--primary)',
-                  borderRadius: '14px',
-                  background: mode === 'demand' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
-                  color: mode === 'demand' ? 'white' : 'var(--primary)',
-                  fontSize: '16px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'demand' ? '0 6px 16px rgba(52, 199, 89, 0.3)' : 'none',
-                  transform: mode === 'demand' ? 'translateY(-2px)' : 'translateY(0)',
-                  fontFamily: '"Cairo", sans-serif',
-                  minWidth: '160px'
-                }}
-                onMouseEnter={(e) => {
-                  if (mode !== 'demand') {
-                    e.target.style.background = 'var(--primary)';
-                    e.target.style.color = 'white';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (mode !== 'demand') {
-                    e.target.style.background = 'transparent';
-                    e.target.style.color = 'var(--primary)';
-                  }
-                }}
-              >
-                💺 طلب رحلة
-              </button>
-            )}
-
-            {/* نشر عرض Button for drivers */}
-            {currentUser?.isDriver && (
-              <button
-                onClick={() => setMode('offer')}
-                style={{
-                  padding: '14px 32px',
-                  border: mode === 'offer' ? 'none' : '2px solid var(--primary)',
-                  borderRadius: '14px',
-                  background: mode === 'offer' ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' : 'transparent',
-                  color: mode === 'offer' ? 'white' : 'var(--primary)',
-                  fontSize: '16px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: mode === 'offer' ? '0 6px 16px rgba(52, 199, 89, 0.3)' : 'none',
-                  transform: mode === 'offer' ? 'translateY(-2px)' : 'translateY(0)',
-                  fontFamily: '"Cairo", sans-serif',
-                  minWidth: '160px'
-                }}
-                onMouseEnter={(e) => {
-                  if (mode !== 'offer') {
-                    e.target.style.background = 'var(--primary)';
-                    e.target.style.color = 'white';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (mode !== 'offer') {
-                    e.target.style.background = 'transparent';
-                    e.target.style.color = 'var(--primary)';
-                  }
-                }}
-              >
-                🚗 نشر عرض
-              </button>
-            )}
-
-            {/* ابحث عن رحلة Button */}
+        {/* Mode Buttons */}
+        <div className={styles.modeButtons}>
+          {!currentUser?.isDriver && (
             <button
-              onClick={() => setMode('find')}
-              style={{
-                padding: '14px 32px',
-                border: mode === 'find' ? 'none' : '2px solid #3b82f6',
-                borderRadius: '14px',
-                background: mode === 'find' ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'transparent',
-                color: mode === 'find' ? 'white' : '#3b82f6',
-                fontSize: '16px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: mode === 'find' ? '0 6px 16px rgba(59, 130, 246, 0.3)' : 'none',
-                transform: mode === 'find' ? 'translateY(-2px)' : 'translateY(0)',
-                fontFamily: '"Cairo", sans-serif',
-                minWidth: '160px'
-              }}
-              onMouseEnter={(e) => {
-                if (mode !== 'find') {
-                  e.target.style.background = '#3b82f6';
-                  e.target.style.color = 'white';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (mode !== 'find') {
-                  e.target.style.background = 'transparent';
-                  e.target.style.color = '#3b82f6';
-                }
-              }}
+              onClick={() => setMode('demand')}
+              className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
             >
-              🔍 ابحث عن رحلة
+              💺 طلب رحلة
             </button>
-
-            {/* تصفح الرحلات المتاحة Button */}
+          )}
+          {currentUser?.isDriver && (
             <button
-              onClick={() => {
-                // الذهاب مباشرة إلى صفحة العروض/الطلبات بدون فلتر
-                if (currentUser && currentUser.isDriver) {
-                  navigate('/demands');
-                } else {
-                  navigate('/offers');
-                }
-              }}
-              style={{
-                padding: '14px 32px',
-                border: '2px solid #8b5cf6',
-                borderRadius: '14px',
-                background: 'transparent',
-                color: '#8b5cf6',
-                fontSize: '16px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontFamily: '"Cairo", sans-serif',
-                minWidth: '160px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = '#8b5cf6';
-                e.target.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'transparent';
-                e.target.style.color = '#8b5cf6';
-              }}
+              onClick={() => setMode('offer')}
+              className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
             >
-              📋 تصفح الرحلات
+              🚗 نشر عرض
             </button>
+          )}
+          <button
+            onClick={() => setMode('find')}
+            className={`${styles.modeButton} ${mode === 'find' ? styles.find : ''}`}
+          >
+            🔍 ابحث عن رحلة
+          </button>
+          <button
+            onClick={() => {
+              if (currentUser && currentUser.isDriver) {
+                navigate('/demands');
+              } else {
+                navigate('/offers');
+              }
+            }}
+            className={`${styles.modeButton} ${styles.browse}`}
+          >
+            📋 تصفح الرحلات
+          </button>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className={styles.trustIndicators}>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>✓</span>
+            <span>آمن وموثوق</span>
+          </div>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>✓</span>
+            <span>أسعار معقولة</span>
+          </div>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>✓</span>
+            <span>تقييمات موثقة</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Error Message */}
+      {submitError && (
+        <div className={styles.errorMessage}>
+          ⚠️ {submitError}
+        </div>
+      )}
+
+      {/* Main Search/Booking Card */}
+      <div className={styles.mainCard}>
+        {/* Location Container */}
+        <div className={styles.locationContainer}>
+          {/* Pickup Location */}
+          <div className={styles.locationRow}>
+            <div className={`${styles.locationMarker} ${styles.locationMarkerFrom}`} />
+            <div className={styles.locationInputWrapper}>
+              <input
+                type="text"
+                placeholder={t('pickupLocation')}
+                value={pickupLocation}
+                onChange={(e) => handlePickupChange(e.target.value)}
+                onFocus={() => {
+                  if (pickupLocation.trim()) {
+                    const filtered = availableCities.filter(city => city.includes(pickupLocation.trim()));
+                    if (filtered.length > 0) {
+                      setPickupSuggestions(filtered);
+                      setShowPickupSuggestions(true);
+                    }
+                  }
+                }}
+                className={styles.locationInput}
+              />
+              {showPickupSuggestions && pickupSuggestions.length > 0 && (
+                <div className={styles.suggestions}>
+                  {pickupSuggestions.map((city, index) => (
+                    <div
+                      key={index}
+                      onClick={() => selectPickupCity(city)}
+                      className={styles.suggestionItem}
+                    >
+                      {city}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Trust indicators */}
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-6)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-muted)',
-            flexWrap: 'wrap'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: '20px' }}>✓</span>
-              <span>آمن وموثوق</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: '20px' }}>✓</span>
-              <span>أسعار معقولة</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: '20px' }}>✓</span>
-              <span>تقييمات موثقة</span>
+          {/* Swap Button */}
+          <button
+            onClick={swapLocations}
+            className={styles.swapButton}
+            style={{ transform: isSwapping ? 'translateY(-50%) rotate(180deg) scale(1.1)' : 'translateY(-50%)' }}
+          >
+            ↕
+          </button>
+
+          {/* Drop Location */}
+          <div className={styles.locationRow}>
+            <div className={`${styles.locationMarker} ${styles.locationMarkerTo}`} />
+            <div className={styles.locationInputWrapper}>
+              <input
+                type="text"
+                placeholder={t('dropLocation')}
+                value={dropLocation}
+                onChange={(e) => handleDropChange(e.target.value)}
+                onFocus={() => {
+                  if (dropLocation.trim()) {
+                    const filtered = availableCities.filter(city => city.includes(dropLocation.trim()));
+                    if (filtered.length > 0) {
+                      setDropSuggestions(filtered);
+                      setShowDropSuggestions(true);
+                    }
+                  }
+                }}
+                className={styles.locationInput}
+              />
+              {showDropSuggestions && dropSuggestions.length > 0 && (
+                <div className={styles.suggestions}>
+                  {dropSuggestions.map((city, index) => (
+                    <div
+                      key={index}
+                      onClick={() => selectDropCity(city)}
+                      className={styles.suggestionItem}
+                    >
+                      {city}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Error Message */}
-        {submitError && (
-          <div style={{
-            background: '#fee2e2',
-            border: '2px solid #ef4444',
-            borderRadius: 'var(--radius-lg)',
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-4)',
-            color: '#991b1b',
-            fontFamily: '"Cairo", sans-serif',
-            fontSize: 'var(--text-base)',
-            textAlign: 'center',
-            fontWeight: '600'
-          }}>
-            ⚠️ {submitError}
+        {/* Date Time Section */}
+        <div className={styles.dateTimeSection}>
+          <div className={styles.dateTimeHeader}>
+            <div className={styles.dateTimeLabel}>
+              📅 {getCurrentDate()}، {departureTime}
+            </div>
+            <button
+              onClick={() => {
+                const inputs = document.getElementById('datetime-inputs');
+                if (inputs) inputs.style.display = inputs.style.display === 'none' ? 'block' : 'none';
+              }}
+              className={styles.editButton}
+            >
+              ✏️ تعديل
+            </button>
           </div>
-        )}
 
-        {/* Main Card - Enhanced */}
-        <div id="booking-form" style={{
-          background: 'var(--surface-primary)',
-          borderRadius: '24px',
-          padding: 'var(--space-8)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12)',
-          border: '1px solid var(--border-light)',
-          marginBottom: 'var(--space-8)',
-          backdropFilter: 'blur(10px)',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
-        }}>
-
-          {/* Background Pattern */}
-          <div style={{
-            position: 'absolute',
-            top: '-50%',
-            right: '-20%',
-            width: '100px',
-            height: '100px',
-            background: 'linear-gradient(45deg, var(--primary-light), transparent)',
-            borderRadius: '50%',
-            opacity: 0.1,
-            zIndex: 0
-          }} />
-
-          {/* Location Inputs - Enhanced */}
-          <div style={{
-            position: 'relative',
-            background: 'var(--surface-secondary)',
-            borderRadius: '16px',
-            border: '2px solid var(--border-light)',
-            marginBottom: 'var(--space-8)',
-            overflow: 'visible',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
-          }}>
-            {/* Pickup Location */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: 'var(--space-4)',
-              borderBottom: '1px solid var(--border-light)',
-              position: 'relative'
-            }}>
-              <div style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: 'var(--primary)',
-                marginLeft: 'var(--space-3)',
-                flexShrink: 0,
-                boxShadow: '0 0 0 3px rgba(52, 199, 89, 0.2)'
-              }} />
-              <div style={{ flex: 1, position: 'relative' }}>
+          {/* Hidden datetime inputs */}
+          <div id="datetime-inputs" style={{ display: 'none' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>التاريخ</label>
                 <input
-                  type="text"
-                  placeholder={t('pickupLocation')}
-                  value={pickupLocation}
-                  onChange={(e) => handlePickupChange(e.target.value)}
-                  onFocus={() => {
-                    if (pickupLocation.trim()) {
-                      const filtered = availableCities.filter(city => city.includes(pickupLocation.trim()));
-                      if (filtered.length > 0) {
-                        setPickupSuggestions(filtered);
-                        setShowPickupSuggestions(true);
-                      }
-                    }
+                  type="date"
+                  value={selectedDate === 'today' ? new Date().toISOString().split('T')[0] :
+                        selectedDate === 'tomorrow' ? new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0] :
+                        selectedDate}
+                  onChange={(e) => {
+                    const selectedDateValue = e.target.value;
+                    const today = new Date().toISOString().split('T')[0];
+                    const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
+                    if (selectedDateValue === today) setSelectedDate('today');
+                    else if (selectedDateValue === tomorrow) setSelectedDate('tomorrow');
+                    else setSelectedDate(selectedDateValue);
                   }}
-                  style={{
-                    width: '100%',
-                    border: 'none',
-                    outline: 'none',
-                    fontSize: 'var(--text-base)',
-                    color: 'var(--text-primary)',
-                    background: 'transparent',
-                    direction: 'rtl',
-                    textAlign: 'start',
-                    fontFamily: '"Cairo", sans-serif',
-                    fontWeight: '500'
-                  }}
+                  min={new Date().toISOString().split('T')[0]}
+                  className={styles.input}
                 />
-                {/* Suggestions Dropdown */}
-                {showPickupSuggestions && pickupSuggestions.length > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    left: 0,
-                    background: 'var(--surface-primary)',
-                    border: '2px solid var(--border-light)',
-                    borderRadius: 'var(--radius)',
-                    marginTop: 'var(--space-1)',
-                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-                    zIndex: 9999,
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                  }}>
-                    {pickupSuggestions.map((city, index) => (
-                      <div
-                        key={index}
-                        onClick={() => selectPickupCity(city)}
-                        style={{
-                          padding: 'var(--space-3)',
-                          cursor: 'pointer',
-                          borderBottom: index < pickupSuggestions.length - 1 ? '1px solid var(--border-light)' : 'none',
-                          direction: 'rtl',
-                          fontFamily: '"Cairo", sans-serif',
-                          transition: 'var(--transition)',
-                          background: 'transparent'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = 'var(--surface-secondary)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = 'transparent';
-                        }}
-                      >
-                        {city}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>الوقت</label>
+                <input
+                  type="time"
+                  value={departureTime}
+                  onChange={(e) => setDepartureTime(e.target.value)}
+                  className={styles.input}
+                />
               </div>
             </div>
-
-            {/* Swap Button */}
-            <div style={{
-              position: 'absolute',
-              left: 'var(--space-4)',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10
-            }}>
-              <button 
-                onClick={swapLocations}
-                style={{
-                  background: 'var(--surface-primary)',
-                  border: '2px solid var(--border-light)',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  color: 'var(--primary)',
-                  fontSize: 'var(--text-lg)',
-                  fontWeight: 'bold',
-                  boxShadow: 'var(--shadow-md)',
-                  transform: isSwapping ? 'rotate(180deg) scale(1.1)' : 'rotate(0deg) scale(1)'
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  const inputs = document.getElementById('datetime-inputs');
+                  if (inputs) inputs.style.display = 'none';
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = isSwapping ? 'rotate(180deg) scale(1.2)' : 'scale(1.1)';
-                  e.target.style.boxShadow = 'var(--shadow-lg)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = isSwapping ? 'rotate(180deg) scale(1.1)' : 'scale(1)';
-                  e.target.style.boxShadow = 'var(--shadow-md)';
-                }}
+                className={styles.editButton}
               >
-                ↕
+                حفظ
               </button>
             </div>
-
-            {/* Drop Location */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: 'var(--space-4)',
-              position: 'relative'
-            }}>
-              <div style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--text-muted)',
-                marginLeft: 'var(--space-3)',
-                flexShrink: 0
-              }} />
-              <div style={{ flex: 1, position: 'relative' }}>
-                <input
-                  type="text"
-                  placeholder={t('dropLocation')}
-                  value={dropLocation}
-                  onChange={(e) => handleDropChange(e.target.value)}
-                  onFocus={() => {
-                    if (dropLocation.trim()) {
-                      const filtered = availableCities.filter(city => city.includes(dropLocation.trim()));
-                      if (filtered.length > 0) {
-                        setDropSuggestions(filtered);
-                        setShowDropSuggestions(true);
-                      }
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    border: 'none',
-                    outline: 'none',
-                    fontSize: 'var(--text-base)',
-                    color: 'var(--text-primary)',
-                    background: 'transparent',
-                    direction: 'rtl',
-                    textAlign: 'start',
-                    fontFamily: '"Cairo", sans-serif',
-                    fontWeight: '500'
-                  }}
-                />
-                {/* Suggestions Dropdown */}
-                {showDropSuggestions && dropSuggestions.length > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    left: 0,
-                    background: 'var(--surface-primary)',
-                    border: '2px solid var(--border-light)',
-                    borderRadius: 'var(--radius)',
-                    marginTop: 'var(--space-1)',
-                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-                    zIndex: 9999,
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                  }}>
-                    {dropSuggestions.map((city, index) => (
-                      <div
-                        key={index}
-                        onClick={() => selectDropCity(city)}
-                        style={{
-                          padding: 'var(--space-3)',
-                          cursor: 'pointer',
-                          borderBottom: index < dropSuggestions.length - 1 ? '1px solid var(--border-light)' : 'none',
-                          direction: 'rtl',
-                          fontFamily: '"Cairo", sans-serif',
-                          transition: 'var(--transition)',
-                          background: 'transparent'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = 'var(--surface-secondary)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = 'transparent';
-                        }}
-                      >
-                        {city}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
-          {/* Date and Time */}
-          <div style={{ position: 'relative', marginBottom: 'var(--space-6)' }}>
-            <h3 style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: '600',
-              color: 'var(--text-primary)',
-              marginBottom: 'var(--space-3)',
-              textAlign: 'start',
-              fontFamily: '"Cairo", sans-serif'
-            }}>
-              📅 تاريخ ووقت المغادرة
-            </h3>
-
-            <div style={{
-              background: 'var(--surface-secondary)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-4)',
-              border: '1px solid var(--border-light)',
-              marginBottom: 'var(--space-4)',
-              position: 'relative'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-3)'
-              }}>
-                <span style={{
-                  fontSize: 'var(--text-lg)',
-                  fontWeight: '600',
-                  color: 'var(--text-primary)',
-                  fontFamily: '"Cairo", sans-serif'
-                }}>
-                  {getCurrentDate()}، {departureTime}
-                </span>
-                <button
-                  onClick={() => {
-                    // Toggle between showing date/time inputs
-                    const inputs = document.getElementById('datetime-inputs');
-                    if (inputs) {
-                      inputs.style.display = inputs.style.display === 'none' ? 'block' : 'none';
-                    }
-                  }}
-                  style={{
-                    background: 'var(--primary)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius)',
-                    padding: 'var(--space-2) var(--space-3)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'var(--primary-dark)';
-                    e.target.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'var(--primary)';
-                    e.target.style.transform = 'scale(1)';
-                  }}
-                >
-                  ✏️ تعديل
-                </button>
-              </div>
-
-              {/* Hidden datetime inputs */}
-              <div id="datetime-inputs" style={{ display: 'none', position: 'relative', zIndex: 100 }}>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 'var(--space-3)',
-                  marginBottom: 'var(--space-3)'
-                }}>
-                  <div>
-                    <label style={{
-                      display: 'block',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      color: 'var(--text-secondary)',
-                      marginBottom: 'var(--space-1)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
-                      التاريخ
-                    </label>
-                    <input
-                      type="date"
-                      value={selectedDate === 'today' ? new Date().toISOString().split('T')[0] : 
-                            selectedDate === 'tomorrow' ? new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0] : 
-                            selectedDate}
-                      onChange={(e) => {
-                        const selectedDateValue = e.target.value;
-                        const today = new Date().toISOString().split('T')[0];
-                        const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
-                        
-                        if (selectedDateValue === today) {
-                          setSelectedDate('today');
-                        } else if (selectedDateValue === tomorrow) {
-                          setSelectedDate('tomorrow');
-                        } else {
-                          setSelectedDate(selectedDateValue);
-                        }
-                      }}
-                      min={new Date().toISOString().split('T')[0]}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-2)',
-                        border: '2px solid var(--border-light)',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        background: 'var(--surface-primary)',
-                        color: 'var(--text-primary)',
-                        fontFamily: '"Cairo", sans-serif',
-                        transition: 'var(--transition)',
-                        outline: 'none'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{
-                      display: 'block',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      color: 'var(--text-secondary)',
-                      marginBottom: 'var(--space-1)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
-                      الوقت
-                    </label>
-                    <input
-                      type="time"
-                      value={departureTime}
-                      onChange={(e) => setDepartureTime(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-2)',
-                        border: '2px solid var(--border-light)',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        background: 'var(--surface-primary)',
-                        color: 'var(--text-primary)',
-                        fontFamily: '"Cairo", sans-serif',
-                        transition: 'var(--transition)',
-                        outline: 'none'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  gap: 'var(--space-2)',
-                  justifyContent: 'flex-end'
-                }}>
-                  <button
-                    onClick={() => {
-                      const inputs = document.getElementById('datetime-inputs');
-                      if (inputs) inputs.style.display = 'none';
-                    }}
-                    style={{
-                      padding: 'var(--space-2) var(--space-4)',
-                      background: 'var(--surface-secondary)',
-                      color: 'var(--text-secondary)',
-                      border: '1px solid var(--border-light)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'var(--transition)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    onClick={() => {
-                      const inputs = document.getElementById('datetime-inputs');
-                      if (inputs) inputs.style.display = 'none';
-                    }}
-                    style={{
-                      padding: 'var(--space-2) var(--space-4)',
-                      background: 'var(--primary)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'var(--transition)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}
-                  >
-                    حفظ
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: 'var(--space-3)'
-            }}>
-              {['today', 'tomorrow'].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setSelectedDate(option)}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3) var(--space-4)',
-                    border: 'none',
-                    borderRadius: 'var(--radius)',
-                    background: selectedDate === option ? 'var(--primary)' : 'var(--surface-secondary)',
-                    color: selectedDate === option ? 'var(--text-white)' : 'var(--text-secondary)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    fontFamily: '"Cairo", sans-serif',
-                    boxShadow: selectedDate === option ? 'var(--shadow-md)' : 'none',
-                    transform: selectedDate === option ? 'translateY(-1px)' : 'translateY(0)'
-                  }}
-                >
-                  {option === 'today' ? 'اليوم' : 'غداً'}
-                </button>
-              ))}
-            </div>
+          <div className={styles.dateButtons}>
+            {['today', 'tomorrow'].map((option) => (
+              <button
+                key={option}
+                onClick={() => setSelectedDate(option)}
+                className={`${styles.dateButton} ${selectedDate === option ? styles.active : ''}`}
+              >
+                {option === 'today' ? 'اليوم' : 'غداً'}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Seats and Price - Only show for offer and demand modes */}
-          {mode !== 'find' && (
-            <div style={{
-              position: 'relative',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 'var(--space-4)',
-              marginBottom: 'var(--space-6)'
-            }}>
-            <div>
-              <label style={{
-                display: 'block',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                color: 'var(--text-secondary)',
-                marginBottom: 'var(--space-2)',
-                textAlign: 'start',
-                fontFamily: '"Cairo", sans-serif'
-              }}>
-                المقاعد المتاحة
-              </label>
+        {/* Seats and Price */}
+        {mode !== 'find' && (
+          <div className={styles.seatsPrice}>
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>المقاعد المتاحة</label>
               <select
                 value={availableSeats}
                 onChange={(e) => setAvailableSeats(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-3)',
-                  border: '2px solid var(--border-light)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-base)',
-                  background: 'var(--surface-primary)',
-                  color: 'var(--text-primary)',
-                  direction: 'rtl',
-                  fontFamily: '"Cairo", sans-serif',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = 'var(--focus-ring)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-light)';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className={styles.select}
               >
                 <option value="1">1 مقعد</option>
                 <option value="2">2 مقعد</option>
@@ -1065,19 +474,9 @@ const Home = () => {
                 <option value="4">4 مقعد</option>
               </select>
             </div>
-            
-            <div>
-              <label style={{
-                display: 'block',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                color: 'var(--text-secondary)',
-                marginBottom: 'var(--space-2)',
-                textAlign: 'start',
-                fontFamily: '"Cairo", sans-serif'
-              }}>
-                السعر لكل مقعد (د.ع)
-              </label>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>السعر لكل مقعد (د.ع)</label>
               <input
                 type="number"
                 value={pricePerSeat}
@@ -1085,229 +484,129 @@ const Home = () => {
                 placeholder="أدخل السعر"
                 min="1000"
                 step="1000"
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-3)',
-                  border: '2px solid var(--border-light)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-base)',
-                  background: 'var(--surface-primary)',
-                  color: 'var(--text-primary)',
-                  direction: 'rtl',
-                  fontFamily: '"Cairo", sans-serif',
-                  fontWeight: '500',
-                  transition: 'var(--transition)',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = 'var(--focus-ring)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-light)';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className={styles.input}
               />
             </div>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginTop: 'var(--space-6)',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <button
-              onClick={handleNext}
-              disabled={isSubmitting}
-              style={{
-                padding: '16px 48px',
-                fontSize: '18px',
-                fontWeight: '700',
-                background: isSubmitting ? '#9CA3AF' : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '16px',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontFamily: '"Cairo", sans-serif',
-                boxShadow: isSubmitting ? 'none' : '0 8px 20px rgba(52, 199, 89, 0.3)',
-                minWidth: '200px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)'
-              }}
-              onMouseEnter={(e) => {
-                if (!isSubmitting) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 12px 28px rgba(52, 199, 89, 0.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSubmitting) {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 20px rgba(52, 199, 89, 0.3)';
-                }
-              }}
-            >
-              {isSubmitting ? (
-                <>
-                  <span style={{
-                    width: '20px',
-                    height: '20px',
-                    border: '3px solid white',
-                    borderTopColor: 'transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite'
-                  }} />
-                  جاري المعالجة...
-                </>
-              ) : (
-                <>
-                  {mode === 'find' && '🔍 ابحث الآن'}
-                  {mode === 'offer' && '🚗 نشر العرض'}
-                  {mode === 'demand' && '💺 نشر الطلب'}
-                </>
-              )}
-            </button>
-
-            {/* Error Message */}
-            {submitError && (
-              <div style={{
-                marginTop: 'var(--space-3)',
-                padding: 'var(--space-3) var(--space-4)',
-                background: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid var(--error)',
-                borderRadius: '12px',
-                color: 'var(--error)',
-                fontSize: '14px',
-                fontFamily: '"Cairo", sans-serif',
-                textAlign: 'center',
-                maxWidth: '400px'
-              }}>
-                ⚠️ {submitError}
-              </div>
-            )}
           </div>
+        )}
 
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-
-        {/* Trust Section - Enhanced */}
-        <div style={{
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          borderRadius: isMobile ? '16px' : '24px',
-          padding: isMobile ? 'var(--space-4)' : 'var(--space-8)',
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: 'center',
-          gap: isMobile ? 'var(--space-3)' : 'var(--space-6)',
-          color: 'white',
-          boxShadow: isMobile ? '0 10px 30px rgba(52, 199, 89, 0.25)' : '0 20px 60px rgba(52, 199, 89, 0.3)',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = '0 25px 70px rgba(52, 199, 89, 0.4)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 20px 60px rgba(52, 199, 89, 0.3)';
-        }}
+        {/* Submit Button */}
+        <button
+          onClick={handleNext}
+          disabled={isSubmitting}
+          className={styles.submitButton}
         >
-
-          {/* Background Pattern - Enhanced */}
-          <div style={{
-            position: 'absolute',
-            top: '-30%',
-            left: '-15%',
-            width: '200px',
-            height: '200px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '50%',
-            zIndex: 0,
-            filter: 'blur(40px)'
-          }} />
-
-          <div style={{
-            position: 'absolute',
-            bottom: '-20%',
-            right: '-10%',
-            width: '150px',
-            height: '150px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            borderRadius: '50%',
-            zIndex: 0,
-            filter: 'blur(40px)'
-          }} />
-
-          <div style={{
-            position: 'relative',
-            zIndex: 1,
-            fontSize: isMobile ? '2.5rem' : '4rem',
-            flexShrink: 0,
-            animation: 'float 3s ease-in-out infinite'
-          }}>
-            🛡️
-          </div>
-
-          <div style={{ position: 'relative', zIndex: 1, textAlign: isMobile ? 'center' : 'start', flex: 1 }}>
-            <div style={{
-              fontSize: isMobile ? 'clamp(16px, 3.5vw, 18px)' : 'clamp(18px, 4vw, 22px)',
-              fontWeight: '800',
-              marginBottom: 'var(--space-2)',
-              fontFamily: '"Cairo", sans-serif'
-            }}>
-              تعرف على المزيد حول سياسة الاسترداد
-            </div>
-            <div style={{
-              fontSize: isMobile ? 'clamp(13px, 2.5vw, 14px)' : 'clamp(14px, 3vw, 16px)',
-              opacity: 0.95,
-              fontFamily: '"Cairo", sans-serif',
-              fontWeight: '500',
-              lineHeight: '1.6'
-            }}>
-              وكيف نحمي أموالك وبياناتك الشخصية
-            </div>
-          </div>
-
-          {!isMobile && (
-            <div style={{
-              position: 'relative',
-              zIndex: 1,
-              fontSize: 'var(--text-2xl)',
-              opacity: 0.8,
-              transition: 'all 0.3s ease'
-            }}>
-              ←
-            </div>
+          {isSubmitting ? (
+            <span className={styles.loading}>
+              <span className={styles.spinner} />
+              جاري المعالجة...
+            </span>
+          ) : (
+            <>
+              {mode === 'find' && '🔍 ابحث الآن'}
+              {mode === 'offer' && '🚗 نشر العرض'}
+              {mode === 'demand' && '💺 نشر الطلب'}
+            </>
           )}
-        </div>
+        </button>
+      </div>
 
-        {/* Add floating animation keyframes */}
-        <style>{`
-          @keyframes float {
-            0%, 100% {
-              transform: translateY(0px);
-            }
-            50% {
-              transform: translateY(-10px);
-            }
-          }
-        `}</style>
+      {/* Features Section */}
+      <section className={styles.featuresSection}>
+        <h2 className={styles.sectionTitle}>لماذا تختار توصيلة؟</h2>
+        <p className={styles.sectionSubtitle}>نوفر لك تجربة سفر آمنة ومريحة بأفضل الأسعار</p>
+
+        <div className={styles.featuresGrid}>
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>🛡️</span>
+            <h3 className={styles.featureTitle}>آمن وموثوق</h3>
+            <p className={styles.featureDescription}>
+              جميع المستخدمين موثقون ومراجعين. نظام تقييم شامل لضمان أفضل تجربة.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>💰</span>
+            <h3 className={styles.featureTitle}>أسعار معقولة</h3>
+            <p className={styles.featureDescription}>
+              وفر حتى 70% من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>⚡</span>
+            <h3 className={styles.featureTitle}>حجز فوري</h3>
+            <p className={styles.featureDescription}>
+              ابحث واحجز رحلتك في ثوانٍ. تأكيد فوري ودعم على مدار الساعة.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>🌟</span>
+            <h3 className={styles.featureTitle}>تقييمات موثوقة</h3>
+            <p className={styles.featureDescription}>
+              اقرأ تقييمات المستخدمين الحقيقية واختر أفضل الرحلات والسائقين.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>💬</span>
+            <h3 className={styles.featureTitle}>تواصل سهل</h3>
+            <p className={styles.featureDescription}>
+              نظام مراسلة مدمج للتواصل المباشر مع السائقين والركاب.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <span className={styles.featureIcon}>🗺️</span>
+            <h3 className={styles.featureTitle}>تغطية شاملة</h3>
+            <p className={styles.featureDescription}>
+              رحلات إلى جميع المدن العراقية مع جدول واسع من الأوقات المتاحة.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className={styles.howItWorksSection}>
+        <h2 className={styles.sectionTitle}>كيف يعمل توصيلة؟</h2>
+        <p className={styles.sectionSubtitle}>ثلاث خطوات بسيطة للوصول إلى وجهتك</p>
+
+        <div className={styles.stepsGrid}>
+          <div className={styles.stepCard}>
+            <div className={styles.stepNumber}>1</div>
+            <h3 className={styles.stepTitle}>ابحث عن رحلة</h3>
+            <p className={styles.stepDescription}>
+              اختر مدينة الانطلاق والوجهة، وحدد التاريخ المناسب لك.
+            </p>
+          </div>
+
+          <div className={styles.stepCard}>
+            <div className={styles.stepNumber}>2</div>
+            <h3 className={styles.stepTitle}>احجز مقعدك</h3>
+            <p className={styles.stepDescription}>
+              اختر من بين العروض المتاحة واحجز مقعدك مع السائق المفضل.
+            </p>
+          </div>
+
+          <div className={styles.stepCard}>
+            <div className={styles.stepNumber}>3</div>
+            <h3 className={styles.stepTitle}>استمتع برحلتك</h3>
+            <p className={styles.stepDescription}>
+              تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Banner */}
+      <div className={styles.trustBanner}>
+        <span className={styles.trustBannerIcon}>🛡️</span>
+        <div className={styles.trustBannerContent}>
+          <h3 className={styles.trustBannerTitle}>تعرف على المزيد حول سياسة الاسترداد</h3>
+          <p className={styles.trustBannerText}>وكيف نحمي أموالك وبياناتك الشخصية</p>
+        </div>
+        {!isMobile && <span style={{ fontSize: '32px', opacity: 0.8 }}>←</span>}
       </div>
     </div>
   );

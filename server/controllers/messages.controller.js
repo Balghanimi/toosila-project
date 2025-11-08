@@ -169,12 +169,10 @@ const getMessageStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
   
   const result = await query(`
-    SELECT 
-      COUNT(*) as total_messages,
-      COUNT(CASE WHEN is_read = false THEN 1 END) as unread_messages,
-      COUNT(CASE WHEN is_read = true THEN 1 END) as read_messages,
-      COUNT(DISTINCT sender_id) as unique_senders,
-      COUNT(DISTINCT recipient_id) as unique_recipients
+    SELECT
+      COUNT(*)::int as total_messages,
+      COUNT(DISTINCT sender_id)::int as unique_senders,
+      COUNT(DISTINCT recipient_id)::int as unique_recipients
     FROM messages
   `);
 
@@ -188,11 +186,10 @@ const getUserMessageStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
   
   const result = await query(`
-    SELECT 
-      COUNT(*) as total_messages,
-      COUNT(CASE WHEN sender_id = $1 THEN 1 END) as sent_messages,
-      COUNT(CASE WHEN recipient_id = $1 THEN 1 END) as received_messages,
-      COUNT(CASE WHEN recipient_id = $1 AND is_read = false THEN 1 END) as unread_messages
+    SELECT
+      COUNT(*)::int as total_messages,
+      COUNT(CASE WHEN sender_id = $1 THEN 1 END)::int as sent_messages,
+      COUNT(CASE WHEN recipient_id = $1 THEN 1 END)::int as received_messages
     FROM messages
     WHERE sender_id = $1 OR recipient_id = $1
   `, [req.user.id]);

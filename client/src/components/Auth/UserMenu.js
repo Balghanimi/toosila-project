@@ -99,6 +99,42 @@ const UserMenu = ({ onClose }) => {
           gap: 'var(--space-2)',
           marginBottom: 'var(--space-6)'
         }}>
+          {/* Admin Panel Link - Only for admins */}
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => { navigate('/admin'); onClose(); }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                border: 'none',
+                borderRadius: 'var(--radius)',
+                color: 'white',
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'var(--transition)',
+                fontFamily: '"Cairo", sans-serif',
+                textAlign: 'start',
+                width: '100%',
+                boxShadow: '0 4px 12px rgba(52, 199, 89, 0.25)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(52, 199, 89, 0.35)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(52, 199, 89, 0.25)';
+              }}
+            >
+              <span style={{ fontSize: 'var(--text-lg)' }}>⚡</span>
+              لوحة الإدارة
+            </button>
+          )}
+
           {[
             { icon: '👤', label: 'الملف الشخصي', action: () => { navigate('/profile'); onClose(); } },
             { icon: '🚗', label: 'رحلاتي', action: () => { navigate('/bookings'); onClose(); } },
