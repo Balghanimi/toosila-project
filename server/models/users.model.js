@@ -5,6 +5,7 @@ class User {
     this.id = data.id;
     this.name = data.name;
     this.email = data.email;
+    this.role = data.role || 'user'; // Role for access control: user, admin, moderator
     this.isDriver = data.is_driver;
     this.languagePreference = data.language_preference;
     this.ratingAvg = parseFloat(data.rating_avg) || 0.00;
@@ -13,18 +14,33 @@ class User {
     this.verificationStatus = data.verification_status || 'unverified';
     this.verificationDate = data.verification_date;
     this.verifiedBy = data.verified_by;
+    // Email verification fields
+    this.emailVerified = data.email_verified || false;
+    this.emailVerifiedAt = data.email_verified_at;
+    this.verificationToken = data.verification_token;
+    this.verificationTokenExpires = data.verification_token_expires;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
 
   // Create a new user
   static async create(userData) {
-    const { name, email, passwordHash, isDriver = false, languagePreference = 'ar' } = userData;
+    const {
+      name,
+      email,
+      passwordHash,
+      isDriver = false,
+      languagePreference = 'ar',
+      verificationToken = null,
+      verificationTokenExpires = null,
+      emailVerified = false
+    } = userData;
+
     const result = await query(
-      `INSERT INTO users (name, email, password_hash, is_driver, language_preference)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (name, email, password_hash, is_driver, language_preference, verification_token, verification_token_expires, email_verified)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [name, email, passwordHash, isDriver, languagePreference]
+      [name, email, passwordHash, isDriver, languagePreference, verificationToken, verificationTokenExpires, emailVerified]
     );
     return new User(result.rows[0]);
   }

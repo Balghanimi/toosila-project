@@ -2,10 +2,13 @@ const AppError = require('../utils/AppError');
 
 /**
  * Middleware to check if user is an admin
- * Note: For now, we'll use a simple approach where admins are identified by a specific email domain
- * or can be marked in the database. You can enhance this later.
+ * Uses role-based access control (RBAC) checking the 'role' field in JWT token
  *
- * For production, consider adding an 'is_admin' or 'role' column to users table
+ * SECURITY FIX: Changed from hardcoded email list to role-based check
+ * The JWT token payload must include: { role: 'admin' } for admin users
+ *
+ * To create an admin user, set role='admin' in the users table:
+ * UPDATE users SET role = 'admin' WHERE email = 'admin@toosila.com';
  */
 const checkAdmin = (req, res, next) => {
   // Check if user is authenticated
@@ -13,19 +16,9 @@ const checkAdmin = (req, res, next) => {
     return next(new AppError('يجب تسجيل الدخول أولاً', 401));
   }
 
-  // TODO: Implement proper admin check
-  // For now, we'll use a simple email-based check
-  // In production, add 'is_admin' or 'role' column to users table
-
-  const adminEmails = [
-    'admin@toosila.com',
-    'support@toosila.com',
-    // Add more admin emails here
-  ];
-
-  // Check if user email is in admin list
-  if (!adminEmails.includes(req.user.email)) {
-    return next(new AppError('غير مصرح لك بالوصول إلى هذا المورد', 403));
+  // Check if user has admin role in JWT token payload
+  if (!req.user.role || req.user.role !== 'admin') {
+    return next(new AppError('غير مصرح لك بالوصول إلى هذا المورد - صلاحيات المشرف مطلوبة', 403));
   }
 
   next();

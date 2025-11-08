@@ -1,0 +1,233 @@
+.verification-reminder-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.verification-reminder-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.email-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.verification-reminder-card h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.verification-reminder-card h3 {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 20px;
+  direction: rtl;
+}
+
+.instruction {
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.instruction-ar {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.email-display {
+  background: #f5f5f5;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 30px;
+  word-break: break-all;
+}
+
+.steps {
+  margin: 30px 0;
+  text-align: left;
+}
+
+.step {
+  display: flex;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #667eea;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-text p {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.step-text-ar {
+  color: #666;
+  font-size: 14px;
+}
+
+.resend-section {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.resend-question {
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.resend-question-ar {
+  margin-bottom: 15px;
+  color: #666;
+  font-size: 14px;
+}
+
+.btn-resend {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-resend:hover:not(.disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-resend.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+}
+
+.message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #c62828;
+}
+
+.actions {
+  margin-top: 30px;
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 12px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  background: #f5f5f5;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #999;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.help-text-ar {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .verification-reminder-card {
+    padding: 30px 20px;
+  }
+
+  .verification-reminder-card h2 {
+    font-size: 24px;
+  }
+
+  .verification-reminder-card h3 {
+    font-size: 18px;
+  }
+
+  .email-icon {
+    font-size: 48px;
+  }
+
+  .step-number {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+}

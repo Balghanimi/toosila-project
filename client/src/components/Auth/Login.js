@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 
 export default function Login({ onSwitchToRegister, onClose }) {
   const { login, loading, error } = useAuth();
-  const { showSuccess } = useNotifications();
+  const { showSuccess, showError } = useNotifications();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showResendButton, setShowResendButton] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,7 +30,18 @@ export default function Login({ onSwitchToRegister, onClose }) {
       const userRole = result.user.isDriver ? 'سائق' : 'راكب';
       showSuccess(`مرحباً ${result.user.name}! تم تسجيل دخولك ك${userRole} 🎉`);
       onClose();
+    } else if (result.error?.code === 'EMAIL_NOT_VERIFIED') {
+      // Show resend verification button
+      setShowResendButton(true);
+      showError('Please verify your email address before logging in.');
     }
+  };
+
+  const handleResendVerification = async () => {
+    // Store email and navigate to verification reminder
+    localStorage.setItem('userEmail', formData.email);
+    onClose();
+    navigate('/email-verification-reminder', { state: { email: formData.email } });
   };
 
   return (
@@ -90,6 +104,26 @@ export default function Login({ onSwitchToRegister, onClose }) {
           textAlign: 'center'
         }}>
           {error}
+          {showResendButton && (
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              style={{
+                marginTop: '12px',
+                padding: '8px 16px',
+                background: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                width: '100%'
+              }}
+            >
+              Resend Verification Email / إعادة إرسال بريد التحقق
+            </button>
+          )}
         </div>
       )}
 
@@ -178,6 +212,29 @@ export default function Login({ onSwitchToRegister, onClose }) {
               {showPassword ? '🙈' : '👁️'}
             </button>
           </div>
+        </div>
+
+        {/* Forgot Password Link */}
+        <div style={{ textAlign: 'left', marginBottom: '16px' }}>
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              navigate('/forgot-password');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#3b82f6',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0
+            }}
+          >
+            نسيت كلمة المرور؟ / Forgot Password?
+          </button>
         </div>
 
         {/* Submit Button */}

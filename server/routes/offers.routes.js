@@ -23,6 +23,7 @@ const {
   validateId,
   validatePagination
 } = require('../middlewares/validate');
+const { requireEmailVerified } = require('../controllers/emailVerification.controller');
 
 // Public routes
 router.get('/', validatePagination, getOffers);
@@ -33,8 +34,8 @@ router.get('/:id', validateId, getOfferById);
 // Protected routes
 router.use(authenticateToken); // All routes below require authentication
 
-// Offer management routes
-router.post('/', moderateLimiter, validateOfferCreation, createOffer);
+// Offer management routes (require email verification)
+router.post('/', moderateLimiter, requireEmailVerified, validateOfferCreation, createOffer);
 router.put('/:id', moderateLimiter, validateOfferUpdate, updateOffer);
 router.put('/:id/deactivate', moderateLimiter, deactivateOffer);
 

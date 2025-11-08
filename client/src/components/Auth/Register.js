@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Register({ onSwitchToLogin, onClose }) {
   const { register, loading, error } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -145,14 +147,24 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     const result = await register(formData);
     if (result.success) {
-      onClose();
+      // Check if email verification is required
+      if (result.data?.requiresVerification) {
+        // Store email for verification reminder page
+        localStorage.setItem('userEmail', formData.email);
+        // Redirect to email verification reminder
+        onClose();
+        navigate('/email-verification-reminder', { state: { email: formData.email } });
+      } else {
+        // Old flow: close modal if no verification needed
+        onClose();
+      }
     }
   };
 

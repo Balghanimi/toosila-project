@@ -22,6 +22,7 @@ const {
   validateId,
   validatePagination
 } = require('../middlewares/validate');
+const { requireEmailVerified } = require('../controllers/emailVerification.controller');
 
 // Public routes
 router.get('/', validatePagination, getDemands);
@@ -34,8 +35,8 @@ router.use(authenticateToken); // All routes below require authentication
 // Protected routes that need authentication
 router.get('/:id', validateId, getDemandById);
 
-// Demand management routes
-router.post('/', moderateLimiter, validateDemandCreation, createDemand);
+// Demand management routes (require email verification)
+router.post('/', moderateLimiter, requireEmailVerified, validateDemandCreation, createDemand);
 router.put('/:id', moderateLimiter, updateDemand);
 router.put('/:id/deactivate', moderateLimiter, deactivateDemand);
 

@@ -46,7 +46,11 @@
       "Bash(chmod:*)",
       "Bash(npm test:*)",
       "Bash(CI=true npm test -- --passWithNoTests --watchAll=false)",
-      "Bash(set CI=true)"
+      "Bash(set CI=true)",
+      "Bash(git revert:*)",
+      "Bash(timeout 10 npm start)",
+      "Bash(taskkill:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

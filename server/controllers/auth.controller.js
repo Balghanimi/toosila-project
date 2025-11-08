@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/users.model');
 const config = require('../config/env');
 const { generateAccessToken } = require('../middlewares/auth');
+const { sendVerificationEmail } = require('../utils/emailService');
 
 // Register a new user
 const register = async (req, res) => {
@@ -25,23 +27,39 @@ const register = async (req, res) => {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create user
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Create user with verification token
     const user = await User.create({
       name,
       email,
       passwordHash,
       isDriver,
-      languagePreference
+      languagePreference,
+      verificationToken: hashedToken,
+      verificationTokenExpires: tokenExpiry,
+      emailVerified: false
     });
 
-    // Generate JWT token with all user fields
-    const token = generateAccessToken(user);
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, name, verificationToken);
+      console.log(`✅ Verification email sent to ${email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send verification email:', emailError);
+      // Continue with registration even if email fails
+    }
 
+    // Don't auto-login - require email verification first
     res.status(201).json({
       success: true,
+      message: 'Registration successful. Please check your email to verify your account.',
       data: {
         user: user.toJSON(),
-        token
+        requiresVerification: true
       }
     });
   } catch (error) {
@@ -81,6 +99,18 @@ const login = async (req, res) => {
         error: {
           code: 'INVALID_CREDENTIALS',
           message: 'Invalid email or password'
+        }
+      });
+    }
+
+    // Check email verification
+    if (!user.email_verified) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'EMAIL_NOT_VERIFIED',
+          message: 'Please verify your email address before logging in. Check your inbox for the verification link.',
+          requireVerification: true
         }
       });
     }

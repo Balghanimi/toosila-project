@@ -52,6 +52,14 @@ const About = lazy(() => import('./pages/About'));
 const Download = lazy(() => import('./pages/Download'));
 const Contact = lazy(() => import('./pages/Contact'));
 
+// Email Verification
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const EmailVerificationReminder = lazy(() => import('./pages/EmailVerificationReminder'));
+
+// Password Reset
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -106,6 +114,12 @@ export default function App() {
                       <Route path="/download" element={<Download />} />
                       {/* صفحة اتصل بنا */}
                       <Route path="/contact" element={<Contact />} />
+                      {/* Email Verification */}
+                      <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                      <Route path="/email-verification-reminder" element={<EmailVerificationReminder />} />
+                      {/* Password Reset */}
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password/:token" element={<ResetPassword />} />
                     </Routes>
                   </Suspense>
                 </main>

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function UserProfile({ isOpen, onClose }) {
   const { user, logout, updateProfile, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -73,6 +74,14 @@ export default function UserProfile({ isOpen, onClose }) {
     onClose();
   };
 
+  const handleToggleRole = async () => {
+    setIsSwitchingRole(true);
+    const newRole = user.userType === 'driver' ? 'passenger' : 'driver';
+    const result = await updateProfile({ isDriver: newRole === 'driver' });
+    setIsSwitchingRole(false);
+    // Profile will auto-update through context
+  };
+
   return (
     <div style={{
       position: 'fixed',
@@ -123,13 +132,16 @@ export default function UserProfile({ isOpen, onClose }) {
             width: '80px',
             height: '80px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: user.userType === 'driver'
+              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 16px auto',
             fontSize: '32px',
-            color: 'white'
+            color: 'white',
+            transition: 'all 0.3s ease'
           }}>
             {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
           </div>
@@ -141,6 +153,49 @@ export default function UserProfile({ isOpen, onClose }) {
           }}>
             {user.name}
           </h2>
+
+          {/* Role Toggle Button */}
+          <button
+            onClick={handleToggleRole}
+            disabled={isSwitchingRole}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              margin: '0 auto 12px auto',
+              padding: '8px 16px',
+              background: isSwitchingRole ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
+              border: 'none',
+              borderRadius: '20px',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: isSwitchingRole ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSwitchingRole) {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>
+              {user.userType === 'driver' ? '🧑‍💼' : '🚗'}
+            </span>
+            <span>
+              {isSwitchingRole ? 'جاري التبديل...' :
+               user.userType === 'driver' ? 'التبديل إلى راكب' : 'التبديل إلى سائق'}
+            </span>
+            <span style={{ fontSize: '16px' }}>⇄</span>
+          </button>
+
+          {/* Current Role Badge */}
           <div style={{
             display: 'inline-block',
             background: user.userType === 'driver' ? '#10b981' : '#3b82f6',
@@ -150,7 +205,21 @@ export default function UserProfile({ isOpen, onClose }) {
             fontSize: '12px',
             fontWeight: '600'
           }}>
-            {user.userType === 'driver' ? 'سائق' : 'راكب'}
+            {user.userType === 'driver' ? '🚗 سائق' : '🧑‍💼 راكب'}
+          </div>
+
+          {/* Email Verification Status */}
+          <div style={{
+            display: 'inline-block',
+            background: user.emailVerified ? '#10b981' : '#f59e0b',
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            fontWeight: '600',
+            marginLeft: '8px'
+          }}>
+            {user.emailVerified ? '✓ Email Verified' : '⚠ Not Verified'}
           </div>
         </div>
 

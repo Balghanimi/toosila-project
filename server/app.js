@@ -25,6 +25,8 @@ const statsRoutes = require('./routes/stats.routes');
 const citiesRoutes = require('./routes/cities.routes');
 const notificationsRoutes = require('./routes/notifications.routes');
 const verificationRoutes = require('./routes/verification.routes');
+const emailVerificationRoutes = require('./routes/emailVerification.routes');
+const passwordResetRoutes = require('./routes/passwordReset.routes');
 
 const app = express();
 
@@ -99,6 +101,8 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/cities', citiesRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/verification', verificationRoutes);
+app.use('/api/email-verification', emailVerificationRoutes);
+app.use('/api/password-reset', passwordResetRoutes);
 
 // Backward compatibility: Register routes without /api prefix
 app.use('/auth', authRoutes);
