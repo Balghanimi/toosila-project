@@ -232,7 +232,7 @@ const updateResponseStatus = asyncHandler(async (req, res) => {
     console.log(`تم رفض ${rejectedCount} رد/ردود أخرى على الطلب ${response.demandId}`);
 
     // يمكن أيضاً تعطيل الطلب نفسه (اختياري)
-    await Demand.update(response.demandId, { is_active: false });
+    await demand.update({ is_active: false });
   }
 
   // إرسال إشعار للسائق عند قبول/رفض رده (ليس عند الإلغاء)
