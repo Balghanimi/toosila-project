@@ -103,8 +103,8 @@ const login = async (req, res) => {
       });
     }
 
-    // Check email verification
-    if (!user.email_verified) {
+    // Check email verification (skip for admin users)
+    if (!user.email_verified && user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         error: {
