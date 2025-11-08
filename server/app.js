@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const compression = require('compression');
 const path = require('path');
 
 // Version: 1.1.0 - Fixed booking system to support seats and message
@@ -12,6 +13,7 @@ const config = require('./config/env');
 // Import middlewares
 const { generalLimiter } = require('./middlewares/rateLimiters');
 const { errorHandler, notFound } = require('./middlewares/error');
+const { noCache, shortCache, mediumCache, etag } = require('./middlewares/cacheControl');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -29,6 +31,20 @@ const emailVerificationRoutes = require('./routes/emailVerification.routes');
 const passwordResetRoutes = require('./routes/passwordReset.routes');
 
 const app = express();
+
+// Compression middleware - must be early in the middleware chain
+app.use(compression({
+  filter: (req, res) => {
+    // Don't compress responses if client doesn't accept encoding
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression for all requests
+    return compression.filter(req, res);
+  },
+  threshold: 1024, // Only compress responses larger than 1KB
+  level: 6 // Compression level (0-9, 6 is balanced)
+}));
 
 // Security middleware
 app.use(helmet({
@@ -89,33 +105,20 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/offers', offersRoutes);
-app.use('/api/demands', demandsRoutes);
-app.use('/api/demand-responses', demandResponsesRoutes);
-app.use('/api/bookings', bookingsRoutes);
-app.use('/api/messages', messagesRoutes);
-app.use('/api/ratings', ratingsRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/cities', citiesRoutes);
-app.use('/api/notifications', notificationsRoutes);
-app.use('/api/verification', verificationRoutes);
-app.use('/api/email-verification', emailVerificationRoutes);
-app.use('/api/password-reset', passwordResetRoutes);
-
-// Backward compatibility: Register routes without /api prefix
-app.use('/auth', authRoutes);
-app.use('/offers', offersRoutes);
-app.use('/demands', demandsRoutes);
-app.use('/demand-responses', demandResponsesRoutes);
-app.use('/bookings', bookingsRoutes);
-app.use('/messages', messagesRoutes);
-app.use('/ratings', ratingsRoutes);
-app.use('/stats', statsRoutes);
-app.use('/cities', citiesRoutes);
-app.use('/notifications', notificationsRoutes);
-app.use('/verification', verificationRoutes);
+// API routes with cache control
+app.use('/api/auth', noCache, authRoutes); // No cache for auth
+app.use('/api/offers', shortCache, etag, offersRoutes); // 5 min cache for offers
+app.use('/api/demands', shortCache, etag, demandsRoutes); // 5 min cache for demands
+app.use('/api/demand-responses', shortCache, demandResponsesRoutes);
+app.use('/api/bookings', noCache, bookingsRoutes); // No cache for user bookings
+app.use('/api/messages', noCache, messagesRoutes); // No cache for messages
+app.use('/api/ratings', mediumCache, ratingsRoutes); // 1 hour cache for ratings
+app.use('/api/stats', mediumCache, statsRoutes); // 1 hour cache for stats
+app.use('/api/cities', mediumCache, citiesRoutes); // 1 hour cache for cities
+app.use('/api/notifications', noCache, notificationsRoutes); // No cache for notifications
+app.use('/api/verification', noCache, verificationRoutes);
+app.use('/api/email-verification', noCache, emailVerificationRoutes);
+app.use('/api/password-reset', noCache, passwordResetRoutes);
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {

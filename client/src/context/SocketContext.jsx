@@ -5,7 +5,7 @@
  * Handles connection, disconnection, and all notification events
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -19,10 +19,21 @@ export function SocketProvider({ children }) {
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const { currentUser } = useAuth();
+  const previousTokenRef = useRef(null);
 
-  // Initialize socket connection
+  // Initialize socket connection - Only reconnect when token changes
   useEffect(() => {
-    if (!currentUser || !currentUser.token) {
+    const currentToken = currentUser?.token;
+
+    // If token hasn't changed, don't reconnect
+    if (currentToken === previousTokenRef.current) {
+      return;
+    }
+
+    // Update previous token ref
+    previousTokenRef.current = currentToken;
+
+    if (!currentUser || !currentToken) {
       // Disconnect if user logs out
       if (socket) {
         socket.disconnect();
@@ -48,16 +59,14 @@ export function SocketProvider({ children }) {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log('✅ Connected to Socket.io server');
       setIsConnected(true);
     });
 
     newSocket.on('connected', (data) => {
-      console.log('Socket.io confirmed:', data);
+      // Connected successfully
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('❌ Disconnected from Socket.io:', reason);
       setIsConnected(false);
     });
 
@@ -89,35 +98,30 @@ export function SocketProvider({ children }) {
 
   // Notification handlers
   const handleNewBooking = useCallback((data) => {
-    console.log('📥 New booking notification:', data);
     addNotification(data);
     playNotificationSound();
     showBrowserNotification(data.title, data.message);
   }, []);
 
   const handleBookingStatusUpdate = useCallback((data) => {
-    console.log('📥 Booking status updated:', data);
     addNotification(data);
     playNotificationSound();
     showBrowserNotification(data.title, data.message);
   }, []);
 
   const handleNewMessage = useCallback((data) => {
-    console.log('📥 New message notification:', data);
     addNotification(data);
     playNotificationSound();
     showBrowserNotification(data.title, data.message);
   }, []);
 
   const handleNewDemandResponse = useCallback((data) => {
-    console.log('📥 New demand response:', data);
     addNotification(data);
     playNotificationSound();
     showBrowserNotification(data.title, data.message);
   }, []);
 
   const handleDemandResponseStatusUpdate = useCallback((data) => {
-    console.log('📥 Demand response status updated:', data);
     addNotification(data);
     playNotificationSound();
     showBrowserNotification(data.title, data.message);
@@ -137,11 +141,11 @@ export function SocketProvider({ children }) {
   // Play notification sound
   const playNotificationSound = () => {
     try {
-      NOTIFICATION_SOUND.play().catch(err => {
-        console.log('Could not play notification sound:', err.message);
+      NOTIFICATION_SOUND.play().catch(() => {
+        // Sound play failed silently
       });
     } catch (error) {
-      console.log('Notification sound error:', error.message);
+      // Sound error - fail silently
     }
   };
 
@@ -156,7 +160,7 @@ export function SocketProvider({ children }) {
           tag: 'toosila-notification'
         });
       } catch (error) {
-        console.log('Browser notification error:', error.message);
+        // Notification error - fail silently
       }
     }
   };
@@ -166,7 +170,6 @@ export function SocketProvider({ children }) {
     if ('Notification' in window && Notification.permission === 'default') {
       try {
         const permission = await Notification.requestPermission();
-        console.log('Notification permission:', permission);
         return permission === 'granted';
       } catch (error) {
         console.error('Error requesting notification permission:', error);
@@ -198,7 +201,8 @@ export function SocketProvider({ children }) {
   // Get unread count
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const value = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     socket,
     isConnected,
     notifications,
@@ -207,7 +211,7 @@ export function SocketProvider({ children }) {
     markAllAsRead,
     clearAllNotifications,
     requestNotificationPermission
-  };
+  }), [socket, isConnected, notifications, unreadCount, markAsRead, markAllAsRead, clearAllNotifications, requestNotificationPermission]);
 
   return (
     <SocketContext.Provider value={value}>

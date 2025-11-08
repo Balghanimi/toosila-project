@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
 const OffersContext = createContext();
 
@@ -69,21 +69,21 @@ export function OffersProvider({ children }) {
     }
   });
 
-  // دوال إدارة العروض
-  const addOffer = (offer) => setOffers((prev) => [offer, ...prev]);
-  const updateOffer = (id, updates) => setOffers((prev) => 
+  // دوال إدارة العروض - Memoized with useCallback
+  const addOffer = useCallback((offer) => setOffers((prev) => [offer, ...prev]), []);
+  const updateOffer = useCallback((id, updates) => setOffers((prev) =>
     prev.map(offer => offer.id === id ? { ...offer, ...updates } : offer)
-  );
-  const deleteOffer = (id) => setOffers((prev) => prev.filter(offer => offer.id !== id));
-  const clearOffers = () => setOffers([]);
+  ), []);
+  const deleteOffer = useCallback((id) => setOffers((prev) => prev.filter(offer => offer.id !== id)), []);
+  const clearOffers = useCallback(() => setOffers([]), []);
 
-  // دوال إدارة طلبات الحجز
-  const addBooking = (booking) => setBookings((prev) => [booking, ...prev]);
-  const updateBooking = (id, updates) => setBookings((prev) => 
+  // دوال إدارة طلبات الحجز - Memoized with useCallback
+  const addBooking = useCallback((booking) => setBookings((prev) => [booking, ...prev]), []);
+  const updateBooking = useCallback((id, updates) => setBookings((prev) =>
     prev.map(booking => booking.id === id ? { ...booking, ...updates } : booking)
-  );
-  const deleteBooking = (id) => setBookings((prev) => prev.filter(booking => booking.id !== id));
-  const clearBookings = () => setBookings([]);
+  ), []);
+  const deleteBooking = useCallback((id) => setBookings((prev) => prev.filter(booking => booking.id !== id)), []);
+  const clearBookings = useCallback(() => setBookings([]), []);
 
   // حفظ العروض في localStorage
   useEffect(() => {
@@ -103,20 +103,14 @@ export function OffersProvider({ children }) {
     }
   }, [bookings]);
 
-  // تسجيل التغييرات للتطوير
-  useEffect(() => {
-    console.log('🚗 العروض الحالية:', offers);
-  }, [offers]);
-
-  useEffect(() => {
-    console.log('📋 طلبات الحجز الحالية:', bookings);
-  }, [bookings]);
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    offers, addOffer, updateOffer, deleteOffer, clearOffers,
+    bookings, addBooking, updateBooking, deleteBooking, clearBookings
+  }), [offers, addOffer, updateOffer, deleteOffer, clearOffers, bookings, addBooking, updateBooking, deleteBooking, clearBookings]);
 
   return (
-    <OffersContext.Provider value={{ 
-      offers, addOffer, updateOffer, deleteOffer, clearOffers,
-      bookings, addBooking, updateBooking, deleteBooking, clearBookings
-    }}>
+    <OffersContext.Provider value={contextValue}>
       {children}
     </OffersContext.Provider>
   );

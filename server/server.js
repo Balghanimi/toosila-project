@@ -9,15 +9,19 @@ const { initializeSocket } = require('./socket');
 const PORT = config.PORT;
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Frontend URL: ${config.FRONTEND_URL}`);
-  console.log(`🌍 Environment: ${config.NODE_ENV}`);
-  console.log(`📊 Database: ${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`);
+  if (config.NODE_ENV === 'development') {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Frontend URL: ${config.FRONTEND_URL}`);
+    console.log(`🌍 Environment: ${config.NODE_ENV}`);
+    console.log(`📊 Database: ${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`);
+  }
 });
 
 // Initialize Socket.io
 const io = initializeSocket(server);
-console.log('🔌 Socket.io initialized for real-time notifications');
+if (config.NODE_ENV === 'development') {
+  console.log('🔌 Socket.io initialized for real-time notifications');
+}
 
 // Make io instance available globally for controllers
 app.set('io', io);
@@ -36,16 +40,22 @@ process.on('unhandledRejection', (err) => {
 
 // Graceful shutdown with database pool draining
 const gracefulShutdown = async (signal) => {
-  console.log(`${signal} received. Shutting down gracefully...`);
+  if (config.NODE_ENV === 'development') {
+    console.log(`${signal} received. Shutting down gracefully...`);
+  }
 
   // Stop accepting new connections
   server.close(async () => {
-    console.log('HTTP server closed');
+    if (config.NODE_ENV === 'development') {
+      console.log('HTTP server closed');
+    }
 
     // Close database connection pool
     try {
       await pool.end();
-      console.log('Database pool closed');
+      if (config.NODE_ENV === 'development') {
+        console.log('Database pool closed');
+      }
       process.exit(0);
     } catch (err) {
       console.error('Error closing database pool:', err);

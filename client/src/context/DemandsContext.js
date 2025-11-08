@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
 const DemandsContext = createContext();
 
@@ -66,21 +66,21 @@ export function DemandsProvider({ children }) {
     }
   });
 
-  // دوال إدارة الطلبات
-  const addDemand = (demand) => setDemands((prev) => [demand, ...prev]);
-  const updateDemand = (id, updates) => setDemands((prev) => 
+  // دوال إدارة الطلبات - Memoized with useCallback
+  const addDemand = useCallback((demand) => setDemands((prev) => [demand, ...prev]), []);
+  const updateDemand = useCallback((id, updates) => setDemands((prev) =>
     prev.map(demand => demand.id === id ? { ...demand, ...updates } : demand)
-  );
-  const deleteDemand = (id) => setDemands((prev) => prev.filter(demand => demand.id !== id));
-  const clearDemands = () => setDemands([]);
+  ), []);
+  const deleteDemand = useCallback((id) => setDemands((prev) => prev.filter(demand => demand.id !== id)), []);
+  const clearDemands = useCallback(() => setDemands([]), []);
 
-  // دوال إدارة العروض المقدمة للطلبات
-  const addOfferToDemand = (offer) => setOffersToDemands((prev) => [offer, ...prev]);
-  const updateOfferToDemand = (id, updates) => setOffersToDemands((prev) => 
+  // دوال إدارة العروض المقدمة للطلبات - Memoized with useCallback
+  const addOfferToDemand = useCallback((offer) => setOffersToDemands((prev) => [offer, ...prev]), []);
+  const updateOfferToDemand = useCallback((id, updates) => setOffersToDemands((prev) =>
     prev.map(offer => offer.id === id ? { ...offer, ...updates } : offer)
-  );
-  const deleteOfferToDemand = (id) => setOffersToDemands((prev) => prev.filter(offer => offer.id !== id));
-  const clearOffersToDemands = () => setOffersToDemands([]);
+  ), []);
+  const deleteOfferToDemand = useCallback((id) => setOffersToDemands((prev) => prev.filter(offer => offer.id !== id)), []);
+  const clearOffersToDemands = useCallback(() => setOffersToDemands([]), []);
 
   // حفظ الطلبات في localStorage
   useEffect(() => {
@@ -100,20 +100,14 @@ export function DemandsProvider({ children }) {
     }
   }, [offersToDemands]);
 
-  // تسجيل التغييرات للتطوير
-  useEffect(() => {
-    console.log('👤 الطلبات الحالية:', demands);
-  }, [demands]);
-
-  useEffect(() => {
-    console.log('🤝 العروض المقدمة للطلبات الحالية:', offersToDemands);
-  }, [offersToDemands]);
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    demands, addDemand, updateDemand, deleteDemand, clearDemands,
+    offersToDemands, addOfferToDemand, updateOfferToDemand, deleteOfferToDemand, clearOffersToDemands
+  }), [demands, addDemand, updateDemand, deleteDemand, clearDemands, offersToDemands, addOfferToDemand, updateOfferToDemand, deleteOfferToDemand, clearOffersToDemands]);
 
   return (
-    <DemandsContext.Provider value={{ 
-      demands, addDemand, updateDemand, deleteDemand, clearDemands,
-      offersToDemands, addOfferToDemand, updateOfferToDemand, deleteOfferToDemand, clearOffersToDemands
-    }}>
+    <DemandsContext.Provider value={contextValue}>
       {children}
     </DemandsContext.Provider>
   );

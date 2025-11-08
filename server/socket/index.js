@@ -57,8 +57,6 @@ function initializeSocket(server) {
   io.on('connection', (socket) => {
     const userId = socket.userId;
 
-    console.log(`✅ User ${userId} connected (socket: ${socket.id})`);
-
     // Store user connection
     activeUsers.set(userId, socket.id);
 
@@ -73,13 +71,11 @@ function initializeSocket(server) {
 
     // Handle disconnection
     socket.on('disconnect', (reason) => {
-      console.log(`❌ User ${userId} disconnected (${reason})`);
       activeUsers.delete(userId);
     });
 
     // Handle manual reconnection
     socket.on('reconnect', () => {
-      console.log(`🔄 User ${userId} reconnected`);
       activeUsers.set(userId, socket.id);
       socket.join(`user:${userId}`);
     });
@@ -108,8 +104,6 @@ function emitToUser(io, userId, event, data) {
 
   const room = `user:${userId}`;
   io.to(room).emit(event, data);
-
-  console.log(`📤 Emitted "${event}" to user ${userId}`);
 }
 
 /**
