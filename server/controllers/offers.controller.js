@@ -1,10 +1,13 @@
 const Offer = require('../models/offers.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
+const moderationAgent = require('../agents/moderation.agent');
+const { query } = require('../config/db');
 
 // Create a new offer
 const createOffer = asyncHandler(async (req, res) => {
   const { fromCity, toCity, departureTime, seats, price } = req.body;
 
+  // Create offer with pending moderation status
   const offer = await Offer.create({
     driverId: req.user.id,
     fromCity,
@@ -14,7 +17,83 @@ const createOffer = asyncHandler(async (req, res) => {
     price
   });
 
+  // Run AI moderation
+  const moderation = await moderationAgent.analyzeOffer({
+    id: offer.id,
+    pickupLocation: fromCity,
+    dropLocation: toCity,
+    date: departureTime,
+    time: departureTime,
+    price: price,
+    seats: seats,
+    driverId: req.user.id
+  });
+
+  // Determine moderation status
+  let moderationStatus = 'pending';
+  if (moderation.approved) {
+    moderationStatus = 'approved';
+  } else if (moderation.rejected) {
+    moderationStatus = 'rejected';
+  } else if (moderation.flagged) {
+    moderationStatus = 'flagged';
+  }
+
+  // Update offer with moderation result
+  await query(
+    `UPDATE offers
+     SET moderation_status = $1,
+         moderation_reason = $2,
+         moderated_at = CURRENT_TIMESTAMP,
+         moderated_by = $3
+     WHERE id = $4`,
+    [moderationStatus, moderation.reason, moderation.moderatedBy || 'ai', offer.id]
+  );
+
+  // Log moderation decision
+  await query(
+    `INSERT INTO moderation_logs
+     (content_type, content_id, original_status, new_status, reason, confidence, moderated_by, metadata)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      'offer',
+      offer.id,
+      'pending',
+      moderationStatus,
+      moderation.reason,
+      moderation.confidence || 0,
+      moderation.moderatedBy || 'ai',
+      JSON.stringify({
+        issues: moderation.issues || [],
+        suggestions: moderation.suggestions || null
+      })
+    ]
+  );
+
+  // Return response based on moderation result
+  if (moderationStatus === 'rejected') {
+    return res.status(400).json({
+      success: false,
+      message: 'تم رفض العرض من قبل نظام المراجعة التلقائية',
+      reason: moderation.reason,
+      suggestions: moderation.suggestions
+    });
+  }
+
+  if (moderationStatus === 'flagged') {
+    return res.status(201).json({
+      success: true,
+      message: 'تم إنشاء العرض وهو قيد المراجعة اليدوية',
+      offer: offer.toJSON(),
+      moderation: {
+        status: 'flagged',
+        reason: moderation.reason
+      }
+    });
+  }
+
   res.status(201).json({
+    success: true,
     message: 'تم إنشاء العرض بنجاح',
     offer: offer.toJSON()
   });

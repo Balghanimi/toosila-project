@@ -1,10 +1,13 @@
 const Demand = require('../models/demands.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
+const moderationAgent = require('../agents/moderation.agent');
+const { query } = require('../config/db');
 
 // Create a new demand
 const createDemand = asyncHandler(async (req, res) => {
   const { fromCity, toCity, earliestTime, latestTime, seats, budgetMax } = req.body;
 
+  // Create demand with pending moderation status
   const demand = await Demand.create({
     passengerId: req.user.id,
     fromCity,
@@ -15,7 +18,83 @@ const createDemand = asyncHandler(async (req, res) => {
     budgetMax
   });
 
+  // Run AI moderation
+  const moderation = await moderationAgent.analyzeDemand({
+    id: demand.id,
+    fromCity: fromCity,
+    toCity: toCity,
+    earliestTime: earliestTime,
+    latestTime: latestTime,
+    budgetMax: budgetMax,
+    seats: seats,
+    passengerId: req.user.id
+  });
+
+  // Determine moderation status
+  let moderationStatus = 'pending';
+  if (moderation.approved) {
+    moderationStatus = 'approved';
+  } else if (moderation.rejected) {
+    moderationStatus = 'rejected';
+  } else if (moderation.flagged) {
+    moderationStatus = 'flagged';
+  }
+
+  // Update demand with moderation result
+  await query(
+    `UPDATE demands
+     SET moderation_status = $1,
+         moderation_reason = $2,
+         moderated_at = CURRENT_TIMESTAMP,
+         moderated_by = $3
+     WHERE id = $4`,
+    [moderationStatus, moderation.reason, moderation.moderatedBy || 'ai', demand.id]
+  );
+
+  // Log moderation decision
+  await query(
+    `INSERT INTO moderation_logs
+     (content_type, content_id, original_status, new_status, reason, confidence, moderated_by, metadata)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      'demand',
+      demand.id,
+      'pending',
+      moderationStatus,
+      moderation.reason,
+      moderation.confidence || 0,
+      moderation.moderatedBy || 'ai',
+      JSON.stringify({
+        issues: moderation.issues || [],
+        suggestions: moderation.suggestions || null
+      })
+    ]
+  );
+
+  // Return response based on moderation result
+  if (moderationStatus === 'rejected') {
+    return res.status(400).json({
+      success: false,
+      message: 'تم رفض الطلب من قبل نظام المراجعة التلقائية',
+      reason: moderation.reason,
+      suggestions: moderation.suggestions
+    });
+  }
+
+  if (moderationStatus === 'flagged') {
+    return res.status(201).json({
+      success: true,
+      message: 'تم إنشاء الطلب وهو قيد المراجعة اليدوية',
+      demand: demand.toJSON(),
+      moderation: {
+        status: 'flagged',
+        reason: moderation.reason
+      }
+    });
+  }
+
   res.status(201).json({
+    success: true,
     message: 'تم إنشاء الطلب بنجاح',
     demand: demand.toJSON()
   });
