@@ -17,6 +17,7 @@ import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 import './styles/enhancements.css';
+import './styles/professional-ui.css';
 
 // Lazy load all pages for code splitting
 const Home = lazy(() => import('./pages/Home'));

@@ -1,0 +1,631 @@
+/**
+ * Professional Home Page Styles
+ * Modern, clean design for the main landing page
+ */
+
+.homeContainer {
+  min-height: calc(100vh - 140px);
+  background: linear-gradient(
+    135deg,
+    var(--surface-primary) 0%,
+    var(--surface-secondary) 100%
+  );
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Pattern */
+.homeContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hero Section */
+.heroSection {
+  position: relative;
+  z-index: 1;
+  padding: 60px 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.heroSubtitle {
+  font-size: clamp(16px, 2.5vw, 20px);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: 500;
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Mode Tabs */
+.modeTabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 32px;
+  padding: 6px;
+  background: var(--surface-secondary);
+  border-radius: 16px;
+  box-shadow: var(--elevation-2);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+.modeTab {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.modeTab:hover {
+  color: var(--primary);
+  background: var(--surface-primary);
+}
+
+.modeTab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--elevation-3);
+  transform: scale(1.02);
+}
+
+.modeTab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Search Card */
+.searchCard {
+  background: var(--surface-primary);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: var(--elevation-4);
+  max-width: 700px;
+  margin: 0 auto;
+  border: 1px solid var(--border-light);
+  animation: scaleIn 0.5s ease-out 0.3s both;
+  position: relative;
+  overflow: visible;
+}
+
+.searchCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 24px 24px 0 0;
+}
+
+/* Form Section */
+.formSection {
+  margin-bottom: 24px;
+}
+
+.formSection:last-child {
+  margin-bottom: 0;
+}
+
+/* Location Input Container */
+.locationContainer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.locationInputWrapper {
+  position: relative;
+}
+
+.locationInput {
+  width: 100%;
+  padding: 16px 20px 16px 52px;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  font-size: 16px;
+  color: var(--text-primary);
+  background: var(--surface-primary);
+  transition: all var(--transition-base);
+  outline: none;
+  font-family: inherit;
+}
+
+.locationInput::placeholder {
+  color: var(--text-muted);
+}
+
+.locationInput:hover {
+  border-color: var(--border-medium);
+}
+
+.locationInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.1);
+  background: white;
+}
+
+.locationIcon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Swap Button */
+.swapButton {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: 3px solid var(--surface-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--elevation-3);
+  z-index: 10;
+}
+
+.swapButton:hover {
+  transform: translateY(-50%) scale(1.1) rotate(180deg);
+  box-shadow: var(--elevation-4);
+}
+
+.swapButton:active {
+  transform: translateY(-50%) scale(1) rotate(180deg);
+}
+
+/* Suggestions Dropdown */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: var(--elevation-4);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 100;
+  animation: slideDown 0.2s ease-out;
+}
+
+.suggestionItem {
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.suggestionItem:last-child {
+  border-bottom: none;
+}
+
+.suggestionItem:hover {
+  background: var(--surface-secondary);
+}
+
+/* Date Time Section */
+.dateTimeSection {
+  background: var(--surface-secondary);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.dateTimeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dateTimeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dateTimeLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.dateTimeValue {
+  font-size: 18px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.editButton {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+/* Date Buttons */
+.dateButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.dateButton {
+  flex: 1;
+  padding: 14px 20px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  background: var(--surface-primary);
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.dateButton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.dateButton.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: var(--elevation-3);
+  transform: translateY(-2px);
+}
+
+/* Seats and Price */
+.seatsPrice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.numberInput {
+  padding: 14px 16px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-primary);
+  background: var(--surface-primary);
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.numberInput:hover {
+  border-color: var(--border-medium);
+}
+
+.numberInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.1);
+}
+
+/* Submit Button */
+.submitButton {
+  width: 100%;
+  padding: 18px 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submitButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(52, 199, 89, 0.4);
+}
+
+.submitButton:hover::before {
+  left: 100%;
+}
+
+.submitButton:active {
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Error Message */
+.errorMessage {
+  background: var(--color-error-50);
+  color: var(--color-error-700);
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-error-500);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Features Section */
+.featuresSection {
+  padding: 80px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.featureCard {
+  background: var(--surface-primary);
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: var(--elevation-2);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+  text-align: center;
+}
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--elevation-5);
+  border-color: var(--primary);
+}
+
+.featureIcon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.featureTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.featureDescription {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .heroSection {
+    padding: 40px 16px 30px;
+  }
+
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .heroSubtitle {
+    font-size: 16px;
+  }
+
+  .modeTabs {
+    flex-direction: row;
+    max-width: 100%;
+  }
+
+  .modeTab {
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .searchCard {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+
+  .seatsPrice {
+    grid-template-columns: 1fr;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .swapButton {
+    right: 50%;
+    transform: translate(50%, -50%);
+    top: auto;
+    bottom: -20px;
+  }
+
+  .swapButton:hover {
+    transform: translate(50%, -50%) scale(1.1) rotate(90deg);
+  }
+}
+
+/* Dark Mode Adjustments */
+body.dark-mode .searchCard {
+  background: var(--surface-secondary);
+  border-color: var(--border-medium);
+  box-shadow: var(--elevation-4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .locationInput {
+  background: var(--surface-tertiary);
+}
+
+body.dark-mode .locationInput:focus {
+  background: var(--surface-primary);
+}
+
+body.dark-mode .featureCard {
+  background: var(--surface-secondary);
+  border-color: var(--border-medium);
+}
