@@ -73,15 +73,10 @@ export default function PostDemand() {
         notSameCity: newFormData.fromCity !== newFormData.toCity
       });
 
-      if (isComplete) {
-        console.log('PostDemand - Auto-submitting demand...');
-        // تأخير بسيط للسماح للمستخدم برؤية البيانات
-        setTimeout(() => {
-          submitDemand(newFormData);
-        }, 500);
-      } else {
-        console.log('PostDemand - Data incomplete, showing form');
-      }
+      // البيانات تم تعبئتها من الصفحة الرئيسية
+      // المستخدم يمكنه الآن تعديل البيانات قبل النشر
+      // (تم إزالة النشر التلقائي للسماح بتعديل التاريخ والوقت)
+      console.log('PostDemand - Data pre-filled, user can edit before submitting');
     } else {
       // إذا لم تكن هناك بيانات من الصفحة الرئيسية، ارجع للصفحة الرئيسية
       console.log('PostDemand - No data from home page, redirecting...');

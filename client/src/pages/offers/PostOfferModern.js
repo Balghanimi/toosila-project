@@ -47,20 +47,9 @@ export default function PostOfferModern() {
         ...newFormData
       }));
 
-      // إذا كانت جميع البيانات المطلوبة موجودة، نشر الرحلة تلقائياً
-      const isComplete = newFormData.fromCity &&
-                        newFormData.toCity &&
-                        newFormData.departureDate &&
-                        newFormData.departureTime &&
-                        newFormData.price &&
-                        newFormData.fromCity !== newFormData.toCity;
-
-      if (isComplete) {
-        // تأخير بسيط للسماح للمستخدم برؤية البيانات
-        setTimeout(() => {
-          submitOffer(newFormData);
-        }, 500);
-      }
+      // البيانات تم تعبئتها من الصفحة الرئيسية
+      // المستخدم يمكنه الآن تعديل البيانات قبل النشر
+      // (تم إزالة النشر التلقائي للسماح بتعديل التاريخ والوقت)
     } else {
       // إذا لم تكن هناك بيانات من الصفحة الرئيسية، ارجع للصفحة الرئيسية
       navigate('/', { replace: true });

@@ -13,7 +13,8 @@ WORKDIR /app/client
 COPY client/package.json client/package-lock.json ./
 
 # تثبيت جميع التبعيات (بما في ذلك devDependencies للبناء)
-RUN npm ci
+# Using npm install instead of npm ci to handle lock file mismatches
+RUN npm install
 
 # نسخ كود المصدر
 COPY client/ ./
