@@ -4,68 +4,94 @@ const app = require('./app');
 const config = require('./config/env');
 const { pool } = require('./config/db');
 const { initializeSocket } = require('./socket');
+const logger = require('./config/logger');
+const { logMetricsSummary } = require('./middlewares/metrics');
+const { connect: connectRedis, disconnect: disconnectRedis } = require('./config/redis');
+
+// Initialize Redis cache
+connectRedis().catch(err => {
+  logger.warn('Redis connection failed - continuing without cache', {
+    error: err.message
+  });
+});
 
 // Start server
 const PORT = config.PORT;
 
 const server = app.listen(PORT, () => {
-  if (config.NODE_ENV === 'development') {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📱 Frontend URL: ${config.FRONTEND_URL}`);
-    console.log(`🌍 Environment: ${config.NODE_ENV}`);
-    console.log(`📊 Database: ${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`);
-  }
+  logger.info('Server started successfully', {
+    port: PORT,
+    environment: config.NODE_ENV,
+    frontendUrl: config.FRONTEND_URL,
+    database: `${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`,
+  });
 });
 
 // Initialize Socket.io
 const io = initializeSocket(server);
-if (config.NODE_ENV === 'development') {
-  console.log('🔌 Socket.io initialized for real-time notifications');
-}
+logger.info('Socket.io initialized for real-time notifications');
 
 // Make io instance available globally for controllers
 app.set('io', io);
 
+// Log metrics summary every 15 minutes (optional)
+if (config.NODE_ENV === 'production') {
+  setInterval(logMetricsSummary, 15 * 60 * 1000); // 15 minutes
+}
+
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+  logger.error('Uncaught Exception - Server will shut down', {
+    error: err.message,
+    stack: err.stack,
+  });
   process.exit(1);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
+  logger.error('Unhandled Rejection - Server will shut down', {
+    error: err.message,
+    stack: err.stack,
+  });
   process.exit(1);
 });
 
 // Graceful shutdown with database pool draining
 const gracefulShutdown = async (signal) => {
-  if (config.NODE_ENV === 'development') {
-    console.log(`${signal} received. Shutting down gracefully...`);
-  }
+  logger.info(`${signal} received. Shutting down gracefully...`);
 
   // Stop accepting new connections
   server.close(async () => {
-    if (config.NODE_ENV === 'development') {
-      console.log('HTTP server closed');
+    logger.info('HTTP server closed');
+
+    // Close Redis connection
+    try {
+      await disconnectRedis();
+      logger.info('Redis connection closed');
+    } catch (err) {
+      logger.warn('Error closing Redis connection', {
+        error: err.message,
+      });
     }
 
     // Close database connection pool
     try {
       await pool.end();
-      if (config.NODE_ENV === 'development') {
-        console.log('Database pool closed');
-      }
+      logger.info('Database pool closed');
       process.exit(0);
     } catch (err) {
-      console.error('Error closing database pool:', err);
+      logger.error('Error closing database pool', {
+        error: err.message,
+        stack: err.stack,
+      });
       process.exit(1);
     }
   });
 
   // Force shutdown after 30 seconds
   setTimeout(() => {
-    console.error('Forcing shutdown after timeout');
+    logger.error('Forcing shutdown after timeout');
     process.exit(1);
   }, 30000);
 };

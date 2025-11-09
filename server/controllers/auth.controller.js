@@ -1,515 +1,237 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+/**
+ * Authentication Controller
+ * Handles HTTP requests for user authentication and profile management
+ */
+
 const User = require('../models/users.model');
-const config = require('../config/env');
-const { generateAccessToken } = require('../middlewares/auth');
-const { sendVerificationEmail } = require('../utils/emailService');
+const authService = require('../services/auth.service');
+const logger = require('../config/logger');
+const { catchAsync, sendSuccess, sendPaginatedResponse } = require('../utils/helpers');
+const { NotFoundError } = require('../utils/errors');
+const { RESPONSE_MESSAGES, HTTP_STATUS } = require('../constants');
 
-// Register a new user
-const register = async (req, res) => {
-  try {
-    const { name, email, password, isDriver = false, languagePreference = 'ar' } = req.body;
+/**
+ * Register a new user
+ * @route POST /api/auth/register
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.name - User's full name
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * @param {boolean} [req.body.isDriver=false] - Whether user is a driver
+ * @param {string} [req.body.languagePreference='ar'] - User's language preference
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const register = catchAsync(async (req, res) => {
+  const { name, email, password, isDriver = false, languagePreference = 'ar' } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'USER_EXISTS',
-          message: 'User with this email already exists'
-        }
-      });
-    }
+  const result = await authService.registerUser({
+    name,
+    email,
+    password,
+    isDriver,
+    languagePreference,
+  });
 
-    // Hash password
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+  sendSuccess(res, result, RESPONSE_MESSAGES.REGISTRATION_SUCCESS, HTTP_STATUS.CREATED);
+});
 
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
-    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+/**
+ * Login user
+ * @route POST /api/auth/login
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
 
-    // Create user with verification token
-    const user = await User.create({
-      name,
-      email,
-      passwordHash,
-      isDriver,
-      languagePreference,
-      verificationToken: hashedToken,
-      verificationTokenExpires: tokenExpiry,
-      emailVerified: false
-    });
+  const result = await authService.loginUser(email, password);
 
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, name, verificationToken);
-      console.log(`✅ Verification email sent to ${email}`);
-    } catch (emailError) {
-      console.error('❌ Failed to send verification email:', emailError);
-      // Continue with registration even if email fails
-    }
+  sendSuccess(res, result, RESPONSE_MESSAGES.LOGIN_SUCCESS);
+});
 
-    // Don't auto-login - require email verification first
-    res.status(201).json({
-      success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
-      data: {
-        user: user.toJSON(),
-        requiresVerification: true
-      }
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'REGISTRATION_FAILED',
-        message: 'Failed to register user'
-      }
-    });
+/**
+ * Get current user profile
+ * @route GET /api/auth/profile
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {number} req.user.id - User ID
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getProfile = catchAsync(async (req, res) => {
+  const user = await authService.getUserProfile(req.user.id);
+
+  sendSuccess(res, { user }, RESPONSE_MESSAGES.SUCCESS);
+});
+
+/**
+ * Update user profile
+ * @route PUT /api/auth/profile
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {Object} req.body - Request body
+ * @param {string} [req.body.name] - User's name
+ * @param {string} [req.body.languagePreference] - Language preference
+ * @param {boolean} [req.body.isDriver] - Driver status
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const updateProfile = catchAsync(async (req, res) => {
+  const { name, languagePreference, isDriver } = req.body;
+
+  const user = await authService.updateUserProfile(req.user.id, {
+    name,
+    languagePreference,
+    isDriver,
+  });
+
+  sendSuccess(res, { user }, RESPONSE_MESSAGES.PROFILE_UPDATED);
+});
+
+/**
+ * Change user password
+ * @route PUT /api/auth/password
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.currentPassword - Current password
+ * @param {string} req.body.newPassword - New password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const changePassword = catchAsync(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  await authService.changePassword(req.user.id, req.user.email, currentPassword, newPassword);
+
+  sendSuccess(res, null, RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS);
+});
+
+/**
+ * Get user statistics
+ * @route GET /api/auth/stats
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getUserStats = catchAsync(async (req, res) => {
+  const stats = await User.getStats(req.user.id);
+
+  sendSuccess(res, { stats }, RESPONSE_MESSAGES.SUCCESS);
+});
+
+/**
+ * Get all users (admin only)
+ * @route GET /api/auth/users
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=10] - Items per page
+ * @param {boolean} [req.query.isDriver] - Filter by driver status
+ * @param {string} [req.query.languagePreference] - Filter by language
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getAllUsers = catchAsync(async (req, res) => {
+  const { page = 1, limit = 10, isDriver, languagePreference } = req.query;
+  const filters = {};
+
+  if (isDriver !== undefined) filters.isDriver = isDriver === 'true';
+  if (languagePreference) filters.languagePreference = languagePreference;
+
+  const result = await User.findAll(page, limit, filters);
+
+  const users = result.users.map((user) => user.toJSON());
+
+  sendPaginatedResponse(res, users, result.total, result.page, result.limit);
+});
+
+/**
+ * Get user by ID (admin only)
+ * @route GET /api/auth/users/:id
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} req.params.id - User ID
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getUserById = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new NotFoundError('User');
   }
-};
 
-// Login user
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  sendSuccess(res, { user: user.toJSON() }, RESPONSE_MESSAGES.SUCCESS);
+});
 
-    // Find user with password hash
-    const user = await User.findByEmailWithPassword(email);
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_CREDENTIALS',
-          message: 'Invalid email or password'
-        }
-      });
-    }
+/**
+ * Deactivate user (admin only)
+ * @route PUT /api/auth/users/:id/deactivate
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} req.params.id - User ID
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const deactivateUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
 
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_CREDENTIALS',
-          message: 'Invalid email or password'
-        }
-      });
-    }
-
-    // Check email verification (skip for admin users)
-    if (!user.email_verified && user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'EMAIL_NOT_VERIFIED',
-          message: 'Please verify your email address before logging in. Check your inbox for the verification link.',
-          requireVerification: true
-        }
-      });
-    }
-
-    // Generate JWT token with all user fields
-    const token = generateAccessToken(user);
-
-    // Remove password hash from response
-    const { password_hash, ...userWithoutPassword } = user;
-
-    res.json({
-      success: true,
-      data: {
-        user: userWithoutPassword,
-        token
-      }
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'LOGIN_FAILED',
-        message: 'Failed to login'
-      }
-    });
+  if (!user) {
+    throw new NotFoundError('User');
   }
-};
 
-// Get user profile
-const getProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
+  await user.deactivate();
 
-    res.json({
-      success: true,
-      data: {
-        user: user.toJSON()
-      }
-    });
-  } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'PROFILE_FETCH_FAILED',
-        message: 'Failed to fetch profile'
-      }
-    });
-  }
-};
+  sendSuccess(res, null, 'User deactivated successfully');
+});
 
-// Update user profile
-const updateProfile = async (req, res) => {
-  try {
-    const { name, languagePreference, isDriver } = req.body;
-    const updateData = {};
+/**
+ * Update email address
+ * @route PUT /api/auth/email
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.newEmail - New email address
+ * @param {string} req.body.password - Current password for verification
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const updateEmail = catchAsync(async (req, res) => {
+  const { newEmail, password } = req.body;
 
-    if (name !== undefined) updateData.name = name;
-    if (languagePreference !== undefined) updateData.language_preference = languagePreference;
-    if (isDriver !== undefined) updateData.is_driver = isDriver;
+  const email = await authService.updateEmail(req.user.id, req.user.email, newEmail, password);
 
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
+  sendSuccess(res, { email }, 'Email updated successfully');
+});
 
-    const updatedUser = await user.update(updateData);
+/**
+ * Delete user account
+ * @route DELETE /api/auth/account
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user from middleware
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.password - Current password for verification
+ * @param {string} req.body.confirmation - Confirmation text (must be 'DELETE')
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const deleteAccount = catchAsync(async (req, res) => {
+  const { password, confirmation } = req.body;
 
-    res.json({
-      success: true,
-      data: {
-        user: updatedUser.toJSON()
-      }
-    });
-  } catch (error) {
-    console.error('Update profile error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'PROFILE_UPDATE_FAILED',
-        message: 'Failed to update profile'
-      }
-    });
-  }
-};
+  await authService.deleteAccount(req.user.id, req.user.email, password, confirmation);
 
-// Change password
-const changePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await User.findByEmailWithPassword(req.user.email);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    // Check current password
-    const isValidPassword = await bcrypt.compare(currentPassword, user.password_hash);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_PASSWORD',
-          message: 'Current password is incorrect'
-        }
-      });
-    }
-
-    // Hash new password
-    const saltRounds = 12;
-    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
-
-    // Update password
-    await user.updatePassword(newPasswordHash);
-
-    res.json({
-      success: true,
-      message: 'Password updated successfully'
-    });
-  } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'PASSWORD_CHANGE_FAILED',
-        message: 'Failed to change password'
-      }
-    });
-  }
-};
-
-// Get user statistics
-const getUserStats = async (req, res) => {
-  try {
-    const stats = await User.getStats(req.user.id);
-    res.json({
-      success: true,
-      data: {
-        stats
-      }
-    });
-  } catch (error) {
-    console.error('Get user stats error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'STATS_FETCH_FAILED',
-        message: 'Failed to fetch user statistics'
-      }
-    });
-  }
-};
-
-// Get all users (admin only)
-const getAllUsers = async (req, res) => {
-  try {
-    const { page = 1, limit = 10, isDriver, languagePreference } = req.query;
-    const filters = {};
-
-    if (isDriver !== undefined) filters.isDriver = isDriver === 'true';
-    if (languagePreference) filters.languagePreference = languagePreference;
-
-    const result = await User.findAll(page, limit, filters);
-
-    res.json({
-      success: true,
-      data: {
-        users: result.users.map(user => user.toJSON()),
-        pagination: {
-          total: result.total,
-          page: result.page,
-          limit: result.limit,
-          totalPages: result.totalPages
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Get all users error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'USERS_FETCH_FAILED',
-        message: 'Failed to fetch users'
-      }
-    });
-  }
-};
-
-// Get user by ID (admin only)
-const getUserById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    res.json({
-      success: true,
-      data: {
-        user: user.toJSON()
-      }
-    });
-  } catch (error) {
-    console.error('Get user by ID error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'USER_FETCH_FAILED',
-        message: 'Failed to fetch user'
-      }
-    });
-  }
-};
-
-// Deactivate user (admin only)
-const deactivateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    await user.deactivate();
-
-    res.json({
-      success: true,
-      message: 'User deactivated successfully'
-    });
-  } catch (error) {
-    console.error('Deactivate user error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'USER_DEACTIVATION_FAILED',
-        message: 'Failed to deactivate user'
-      }
-    });
-  }
-};
-
-// Update email
-const updateEmail = async (req, res) => {
-  try {
-    const { newEmail, password } = req.body;
-    const userId = req.user.id;
-
-    // Verify password first
-    const user = await User.findByEmailWithPassword(req.user.email);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_PASSWORD',
-          message: 'Password is incorrect'
-        }
-      });
-    }
-
-    // Check if new email already exists
-    const existingUser = await User.findByEmail(newEmail);
-    if (existingUser && existingUser.id !== userId) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'EMAIL_EXISTS',
-          message: 'Email already in use'
-        }
-      });
-    }
-
-    // Update email
-    await user.update({ email: newEmail });
-
-    res.json({
-      success: true,
-      message: 'Email updated successfully',
-      data: {
-        email: newEmail
-      }
-    });
-  } catch (error) {
-    console.error('Update email error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'EMAIL_UPDATE_FAILED',
-        message: 'Failed to update email'
-      }
-    });
-  }
-};
-
-// Delete account
-const deleteAccount = async (req, res) => {
-  try {
-    const { password, confirmation } = req.body;
-    const userId = req.user.id;
-
-    // Verify confirmation text
-    if (confirmation !== 'DELETE') {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_CONFIRMATION',
-          message: 'Please type DELETE to confirm'
-        }
-      });
-    }
-
-    // Verify password
-    const user = await User.findByEmailWithPassword(req.user.email);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'INVALID_PASSWORD',
-          message: 'Password is incorrect'
-        }
-      });
-    }
-
-    // Delete user (CASCADE will delete related records)
-    await user.delete();
-
-    res.json({
-      success: true,
-      message: 'Account deleted successfully'
-    });
-  } catch (error) {
-    console.error('Delete account error:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'ACCOUNT_DELETE_FAILED',
-        message: 'Failed to delete account'
-      }
-    });
-  }
-};
+  sendSuccess(res, null, 'Account deleted successfully');
+});
 
 module.exports = {
   register,
@@ -522,5 +244,5 @@ module.exports = {
   getUserStats,
   getAllUsers,
   getUserById,
-  deactivateUser
+  deactivateUser,
 };

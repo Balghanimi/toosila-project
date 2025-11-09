@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/users.model');
 const { sendPasswordResetEmail } = require('../utils/emailService');
 const { query } = require('../config/db');
+const logger = require('../config/logger');
 
 /**
  * Generate a secure random token
@@ -62,9 +63,9 @@ const requestPasswordReset = async (req, res) => {
     // Send reset email
     try {
       await sendPasswordResetEmail(email, user.name, resetToken);
-      console.log(`✅ Password reset email sent to ${email}`);
+      logger.info('Password reset email sent successfully', { email, userId: user.id });
     } catch (emailError) {
-      console.error('❌ Failed to send password reset email:', emailError);
+      logger.error('Failed to send password reset email', { email, error: emailError.message });
       // Continue anyway - don't reveal email sending failure
     }
 
@@ -74,7 +75,7 @@ const requestPasswordReset = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Request password reset error:', error);
+    logger.error('Request password reset error', { error: error.message, email: req.body?.email });
     res.status(500).json({
       success: false,
       error: {
@@ -131,7 +132,7 @@ const verifyResetToken = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Verify reset token error:', error);
+    logger.error('Verify reset token error', { error: error.message });
     res.status(500).json({
       success: false,
       error: {
@@ -209,7 +210,7 @@ const resetPassword = async (req, res) => {
       [newPasswordHash, user.id]
     );
 
-    console.log(`✅ Password reset successful for user: ${user.email}`);
+    logger.info('Password reset successful', { email: user.email, userId: user.id });
 
     res.json({
       success: true,
@@ -217,7 +218,7 @@ const resetPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Reset password error:', error);
+    logger.error('Reset password error', { error: error.message });
     res.status(500).json({
       success: false,
       error: {

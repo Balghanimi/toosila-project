@@ -180,4 +180,3 @@ module.exports = {
   getCategories,
   getDemandStats
 };
-console.log('DEMAND CREATE FUNCTION LOADED');

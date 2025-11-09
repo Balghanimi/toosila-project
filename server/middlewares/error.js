@@ -1,76 +1,141 @@
-// Global error handling middleware
-const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-  console.error('Error details:', { code: err.code, column: err.column, detail: err.detail });
+/**
+ * Error Handling Middleware
+ * Centralized error handling for the application
+ */
 
-  // Default error
+const logger = require('../config/logger');
+const { captureException } = require('../config/sentry');
+const { errorHandler: customErrorHandler } = require('../utils/errors');
+const { HTTP_STATUS, ERROR_CODES } = require('../constants');
+
+/**
+ * Global error handling middleware
+ * Handles all errors thrown in the application
+ * @param {Error} err - Error object
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+const errorHandler = (err, req, res, next) => {
+  // Log error with structured logging
+  logger.error('Request error', {
+    error: {
+      message: err.message,
+      stack: err.stack,
+      code: err.code,
+      statusCode: err.statusCode,
+      isOperational: err.isOperational,
+    },
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.ip,
+      userId: req.user?.id,
+    },
+  });
+
+  // Send to Sentry for 5xx errors
+  const statusCode = err.statusCode || err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR;
+  if (statusCode >= 500 && process.env.SENTRY_DSN) {
+    captureException(err, {
+      user: req.user,
+      tags: {
+        endpoint: req.originalUrl,
+        method: req.method,
+      },
+      extra: {
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      },
+    });
+  }
+
+  // Handle custom operational errors
+  if (err.isOperational) {
+    return customErrorHandler(err, req, res, next);
+  }
+
+  // Handle specific error types
+  const error = handleSpecificErrors(err);
+
+  // Send error response
+  res.status(error.statusCode).json({
+    success: false,
+    error: {
+      code: error.code,
+      message: error.message,
+      ...(error.details && { details: error.details }),
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    },
+  });
+};
+
+/**
+ * Handle specific error types
+ * @param {Error} err - Error object
+ * @returns {Object} Formatted error object
+ * @private
+ */
+const handleSpecificErrors = (err) => {
   let error = {
     message: err.message || 'Internal Server Error',
-    status: err.status || 500
+    statusCode: err.statusCode || err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    code: err.code || ERROR_CODES.SERVER_ERROR,
   };
-
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const messages = Object.values(err.errors).map(val => val.message);
-    error = {
-      message: 'Validation Error',
-      status: 400,
-      details: messages
-    };
-  }
-
-  // Mongoose duplicate key error
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyValue)[0];
-    error = {
-      message: `${field} already exists`,
-      status: 400
-    };
-  }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     error = {
       message: 'Invalid token',
-      status: 401
+      statusCode: HTTP_STATUS.UNAUTHORIZED,
+      code: ERROR_CODES.INVALID_TOKEN,
     };
   }
 
   if (err.name === 'TokenExpiredError') {
     error = {
       message: 'Token expired',
-      status: 401
+      statusCode: HTTP_STATUS.UNAUTHORIZED,
+      code: ERROR_CODES.TOKEN_EXPIRED,
     };
   }
 
   // PostgreSQL errors
-  if (err.code === '23505') { // Unique violation
+  if (err.code === '23505') {
+    // Unique violation
     error = {
       message: 'Duplicate entry',
-      status: 400
+      statusCode: HTTP_STATUS.CONFLICT,
+      code: ERROR_CODES.CONFLICT,
     };
   }
 
-  if (err.code === '23503') { // Foreign key violation
+  if (err.code === '23503') {
+    // Foreign key violation
     error = {
       message: 'Referenced record not found',
-      status: 400
+      statusCode: HTTP_STATUS.BAD_REQUEST,
+      code: ERROR_CODES.NOT_FOUND,
     };
   }
 
-  if (err.code === '23502') { // Not null violation
+  if (err.code === '23502') {
+    // Not null violation
     const column = err.column || 'unknown';
     error = {
       message: `Required field missing: ${column}`,
-      status: 400
+      statusCode: HTTP_STATUS.BAD_REQUEST,
+      code: ERROR_CODES.VALIDATION_ERROR,
     };
   }
 
   // Rate limit error
-  if (err.status === 429) {
+  if (err.status === 429 || err.statusCode === 429) {
     error = {
-      message: 'Too many requests',
-      status: 429
+      message: 'Too many requests. Please try again later.',
+      statusCode: 429,
+      code: 'RATE_LIMIT_EXCEEDED',
     };
   }
 
@@ -78,47 +143,72 @@ const errorHandler = (err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
     error = {
       message: 'File too large',
-      status: 413
+      statusCode: 413,
+      code: 'FILE_TOO_LARGE',
     };
   }
 
   if (err.code === 'LIMIT_FILE_COUNT') {
     error = {
       message: 'Too many files',
-      status: 413
+      statusCode: 413,
+      code: 'TOO_MANY_FILES',
     };
   }
 
-  // Send error response
-  res.status(error.status).json({
-    error: error.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-    ...(error.details && { details: error.details })
-  });
+  // Validation errors
+  if (err.name === 'ValidationError') {
+    const messages = err.errors
+      ? Object.values(err.errors).map((val) => val.message)
+      : [err.message];
+    error = {
+      message: 'Validation Error',
+      statusCode: HTTP_STATUS.BAD_REQUEST,
+      code: ERROR_CODES.VALIDATION_ERROR,
+      details: messages,
+    };
+  }
+
+  return error;
 };
 
-// 404 handler
+/**
+ * 404 Not Found handler
+ * Handles routes that don't exist
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 const notFound = (req, res, next) => {
   const error = new Error(`Route not found - ${req.originalUrl}`);
-  error.status = 404;
+  error.statusCode = HTTP_STATUS.NOT_FOUND;
+  error.code = ERROR_CODES.NOT_FOUND;
+  error.isOperational = true;
   next(error);
 };
 
-// Async error wrapper
+/**
+ * Async error wrapper (deprecated - use catchAsync from helpers instead)
+ * @deprecated Use catchAsync from utils/helpers.js
+ * @param {Function} fn - Async function to wrap
+ * @returns {Function} Express middleware function
+ */
 const asyncHandler = (fn) => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
 
-// Custom error class
+/**
+ * Custom error class (deprecated - use errors from utils/errors.js instead)
+ * @deprecated Use error classes from utils/errors.js
+ */
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
     this.statusCode = statusCode;
     this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
     this.isOperational = true;
-
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -127,6 +217,5 @@ module.exports = {
   errorHandler,
   notFound,
   asyncHandler,
-  AppError
+  AppError,
 };
-

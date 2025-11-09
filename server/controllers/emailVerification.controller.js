@@ -6,6 +6,7 @@
 const crypto = require('crypto');
 const { query } = require('../config/db');
 const { sendVerificationEmail, sendEmailChangeVerification } = require('../utils/emailService');
+const logger = require('../config/logger');
 
 /**
  * Generate a secure verification token
@@ -72,7 +73,7 @@ const sendVerification = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Send verification error:', error);
+    logger.error('Send verification error', { error: error.message, email: req.body?.email });
     res.status(500).json({
       success: false,
       message: 'فشل في إرسال رسالة التأكيد'
@@ -129,7 +130,7 @@ const verifyEmail = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Email verification error:', error);
+    logger.error('Email verification error', { error: error.message, token: req.params?.token });
     res.status(500).json({
       success: false,
       message: 'فشل في تأكيد البريد الإلكتروني'
@@ -184,7 +185,7 @@ const resendVerification = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Resend verification error:', error);
+    logger.error('Resend verification error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       message: 'فشل في إعادة إرسال رسالة التأكيد'
@@ -224,7 +225,7 @@ const requireEmailVerified = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Email verification check error:', error);
+    logger.error('Email verification check error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       message: 'خطأ في التحقق من البريد الإلكتروني'

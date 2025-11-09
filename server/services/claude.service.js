@@ -20,7 +20,7 @@ class ClaudeService {
 
     try {
       this.client = new Anthropic({
-        apiKey: this.apiKey
+        apiKey: this.apiKey,
       });
       this.enabled = true;
       this.model = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
@@ -55,7 +55,7 @@ class ClaudeService {
         flagged: false,
         rejected: false,
         reason: 'AI moderation disabled',
-        confidence: 0
+        confidence: 0,
       };
     }
 
@@ -67,9 +67,9 @@ class ClaudeService {
         messages: [
           {
             role: 'user',
-            content: userMessage
-          }
-        ]
+            content: userMessage,
+          },
+        ],
       });
 
       // Extract response text
@@ -88,10 +88,9 @@ class ClaudeService {
           rejected: false,
           reason: 'Failed to parse AI response - requires manual review',
           confidence: 0,
-          rawResponse: responseText
+          rawResponse: responseText,
         };
       }
-
     } catch (error) {
       console.error('❌ Claude API error:', error);
 
@@ -101,7 +100,7 @@ class ClaudeService {
         flagged: true,
         rejected: false,
         reason: `AI service error: ${error.message}`,
-        confidence: 0
+        confidence: 0,
       };
     }
   }
@@ -117,7 +116,7 @@ class ClaudeService {
     return {
       enabled: true,
       model: this.model,
-      maxTokens: this.maxTokens
+      maxTokens: this.maxTokens,
     };
   }
 }

@@ -4,16 +4,21 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Version: 1.1.0 - Fixed booking system to support seats and message
 
 // Import configuration
 const config = require('./config/env');
+const logger = require('./config/logger');
+const { initializeSentry, sentryErrorHandler } = require('./config/sentry');
 
 // Import middlewares
 const { generalLimiter } = require('./middlewares/rateLimiters');
 const { errorHandler, notFound } = require('./middlewares/error');
 const { noCache, shortCache, mediumCache, etag } = require('./middlewares/cacheControl');
+const { metricsMiddleware } = require('./middlewares/metrics');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -29,8 +34,12 @@ const notificationsRoutes = require('./routes/notifications.routes');
 const verificationRoutes = require('./routes/verification.routes');
 const emailVerificationRoutes = require('./routes/emailVerification.routes');
 const passwordResetRoutes = require('./routes/passwordReset.routes');
+const healthRoutes = require('./routes/health.routes');
 
 const app = express();
+
+// Initialize Sentry (must be first)
+initializeSentry(app);
 
 // Trust proxy for Railway deployment
 // This allows Express to correctly read X-Forwarded-For headers from Railway's reverse proxy
@@ -50,16 +59,44 @@ app.use(compression({
   level: 6 // Compression level (0-9, 6 is balanced)
 }));
 
-// Security middleware
+// Enhanced Security middleware with comprehensive CSP
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"], // unsafe-inline needed for some React styles
       imgSrc: ["'self'", "data:", "https:"],
-    },
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      upgradeInsecureRequests: config.NODE_ENV === 'production' ? [] : null
+    }
   },
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: {
+    action: 'deny'
+  },
+  noSniff: true,
+  xssFilter: true,
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin'
+  },
+  permittedCrossDomainPolicies: {
+    permittedPolicies: 'none'
+  },
+  dnsPrefetchControl: {
+    allow: false
+  }
 }));
 
 // CORS configuration
@@ -85,29 +122,20 @@ app.use(express.urlencoded({
   limit: config.MAX_FILE_SIZE 
 }));
 
-// Logging middleware
-if (config.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
+// Logging middleware - integrate Morgan with Winston
+app.use(morgan('combined', { stream: logger.stream }));
 
-// Health check endpoint with memory monitoring
-app.get('/api/health', (req, res) => {
-  const used = process.memoryUsage();
-  res.json({
-    ok: true,
-    timestamp: new Date().toISOString(),
-    environment: config.NODE_ENV,
-    version: '1.0.0',
-    memory: {
-      heapUsed: `${Math.round(used.heapUsed / 1024 / 1024)} MB`,
-      heapTotal: `${Math.round(used.heapTotal / 1024 / 1024)} MB`,
-      rss: `${Math.round(used.rss / 1024 / 1024)} MB`
-    },
-    uptime: `${Math.round(process.uptime())} seconds`
-  });
-});
+// Metrics middleware - track request performance
+app.use(metricsMiddleware);
+
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Toosila API Documentation'
+}));
+
+// Health check routes (comprehensive monitoring)
+app.use('/api/health', healthRoutes);
 
 // API routes with cache control
 app.use('/api/auth', noCache, authRoutes); // No cache for auth
@@ -137,6 +165,8 @@ if (config.NODE_ENV === 'production') {
 
 // Error handling middleware
 app.use(notFound);
+// Sentry error handler (must be before other error handlers)
+app.use(sentryErrorHandler());
 app.use(errorHandler);
 
 module.exports = app;

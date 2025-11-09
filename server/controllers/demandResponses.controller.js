@@ -4,6 +4,7 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { notifyDemandResponse, notifyResponseStatus } = require('../utils/notificationHelpers');
 const { notifyNewDemandResponse, notifyDemandResponseStatusUpdate } = require('../socket');
+const logger = require('../config/logger');
 
 /**
  * إنشاء رد جديد على طلب رحلة
@@ -43,7 +44,12 @@ const createDemandResponse = asyncHandler(async (req, res) => {
   // التحقق من أن السعر المقترح معقول
   if (demand.budgetMax && offerPrice > demand.budgetMax) {
     // تحذير فقط، لكن نسمح بالإنشاء
-    console.log(`السائق ${driverId} قدم سعر ${offerPrice} أعلى من الميزانية ${demand.budgetMax}`);
+    logger.warn('Driver offered price higher than budget', {
+      driverId,
+      offerPrice,
+      budgetMax: demand.budgetMax,
+      demandId
+    });
   }
 
   // التحقق من أن المقاعد المتاحة كافية
@@ -229,7 +235,11 @@ const updateResponseStatus = asyncHandler(async (req, res) => {
       response.demandId,
       id
     );
-    console.log(`تم رفض ${rejectedCount} رد/ردود أخرى على الطلب ${response.demandId}`);
+    logger.info('Auto-rejected other demand responses', {
+      demandId: response.demandId,
+      rejectedCount,
+      acceptedResponseId: id
+    });
 
     // يمكن أيضاً تعطيل الطلب نفسه (اختياري)
     await demand.update({ is_active: false });

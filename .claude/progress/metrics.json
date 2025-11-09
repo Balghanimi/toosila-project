@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-11-09T00:00:00Z",
+  "overall_score": 78,
+  "target_score": 92,
+  "metrics": {
+    "test_coverage": {
+      "backend": {
+        "current": 40,
+        "target": 75,
+        "status": "critical"
+      },
+      "frontend": {
+        "current": 40,
+        "target": 75,
+        "status": "critical"
+      },
+      "overall": {
+        "current": 40,
+        "target": 75,
+        "status": "critical"
+      }
+    },
+    "code_quality": {
+      "score": 75,
+      "target": 90,
+      "status": "good",
+      "issues": {
+        "eslint_errors": 0,
+        "code_duplication_percent": 15,
+        "large_files": 5,
+        "magic_strings": 50
+      }
+    },
+    "security": {
+      "score": 85,
+      "target": 95,
+      "status": "good",
+      "issues": {
+        "known_vulnerabilities": 0,
+        "missing_rate_limits": 8,
+        "audit_logging": false,
+        "two_factor_auth": false
+      }
+    },
+    "performance": {
+      "score": 75,
+      "target": 90,
+      "status": "good",
+      "metrics": {
+        "api_response_p95_ms": null,
+        "db_query_avg_ms": null,
+        "frontend_load_time_s": null,
+        "bundle_size_kb": null,
+        "cache_hit_rate": null
+      }
+    },
+    "documentation": {
+      "score": 80,
+      "target": 95,
+      "status": "good",
+      "coverage": {
+        "api_docs": false,
+        "swagger": false,
+        "code_comments": 60,
+        "readme": true,
+        "deployment_guide": true
+      }
+    },
+    "monitoring": {
+      "score": 60,
+      "target": 90,
+      "status": "critical",
+      "features": {
+        "structured_logging": false,
+        "error_tracking": false,
+        "apm": false,
+        "uptime_monitoring": false,
+        "log_aggregation": false,
+        "alerts": false
+      }
+    },
+    "ci_cd": {
+      "score": 30,
+      "target": 90,
+      "status": "critical",
+      "features": {
+        "automated_tests": false,
+        "automated_deployment": false,
+        "code_quality_gates": false,
+        "security_scanning": false,
+        "performance_tests": false
+      }
+    }
+  },
+  "agent_contributions": {},
+  "last_updated_by": "initial_baseline",
+  "next_review_date": "2025-11-16"
+}

@@ -1,0 +1,105 @@
+# Artillery Load Testing Configuration for Toosila API
+# Run with: artillery run tests/load/api-load-test.yml
+
+config:
+  target: "http://localhost:5001"
+  # Warm up phase: 5 users per second for 30 seconds
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm up"
+    # Ramp up phase: gradually increase to 50 users per second
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+      name: "Ramp up load"
+    # Sustained load: 50 users per second for 2 minutes
+    - duration: 120
+      arrivalRate: 50
+      name: "Sustained load"
+  # Performance thresholds
+  ensure:
+    # 95th percentile response time should be under 500ms
+    p95: 500
+    # 99th percentile response time should be under 1000ms
+    p99: 1000
+    # Max response time should be under 3000ms
+    max: 3000
+    # Median response time should be under 200ms
+    median: 200
+  # HTTP settings
+  http:
+    timeout: 10
+  # Plugins for enhanced reporting
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+
+# Test scenarios
+scenarios:
+  # Test 1: Browse offers (most common operation)
+  - name: "Browse Offers"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/offers?page=1&limit=10"
+          expect:
+            - statusCode: 200
+            - contentType: json
+      - think: 2  # User reads results for 2 seconds
+
+  # Test 2: Search offers (search queries are expensive)
+  - name: "Search Offers"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/offers/search?q={{ $randomString() }}&page=1&limit=10"
+          expect:
+            - statusCode: 200
+            - contentType: json
+      - think: 3
+
+  # Test 3: View offer details
+  - name: "View Offer Details"
+    weight: 20
+    flow:
+      # First, get list of offers
+      - get:
+          url: "/api/offers?page=1&limit=1"
+          capture:
+            - json: "$.offers[0].id"
+              as: "offerId"
+      # Then view specific offer
+      - get:
+          url: "/api/offers/{{ offerId }}"
+          expect:
+            - statusCode: 200
+            - contentType: json
+      - think: 5  # User reads offer details
+
+  # Test 4: Browse demands
+  - name: "Browse Demands"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/demands?page=1&limit=10"
+          expect:
+            - statusCode: 200
+            - contentType: json
+      - think: 2
+
+  # Test 5: Health check (lightweight)
+  - name: "Health Check"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
+
+# Virtual user behavior
+behaviors:
+  # Random think time between actions (human-like behavior)
+  thinkTime:
+    min: 1
+    max: 5

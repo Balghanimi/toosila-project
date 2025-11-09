@@ -3,13 +3,19 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-// ✅ TEMP: check environment variable
+import { initializeSentry } from './config/sentry';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Initialize Sentry for error tracking
+initializeSentry();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );

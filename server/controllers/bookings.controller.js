@@ -1,298 +1,252 @@
-const Booking = require('../models/bookings.model');
-const Offer = require('../models/offers.model');
-const { asyncHandler, AppError } = require('../middlewares/error');
-const { notifyNewBooking, notifyBookingStatusUpdate } = require('../socket');
+/**
+ * Bookings Controller
+ * Handles HTTP requests for booking operations
+ */
 
-// Create a new booking
-const createBooking = asyncHandler(async (req, res) => {
+const Booking = require('../models/bookings.model');
+const bookingService = require('../services/booking.service');
+const { notifyNewBooking, notifyBookingStatusUpdate } = require('../socket');
+const { catchAsync, sendSuccess, sendPaginatedResponse } = require('../utils/helpers');
+const { NotFoundError } = require('../utils/errors');
+const { RESPONSE_MESSAGES, HTTP_STATUS, BOOKING_STATUS } = require('../constants');
+
+/**
+ * Create a new booking
+ * @route POST /api/bookings
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {number} req.body.offerId - Offer ID
+ * @param {number} [req.body.seats=1] - Number of seats to book
+ * @param {string} [req.body.message] - Optional message to driver
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const createBooking = catchAsync(async (req, res) => {
   const { offerId, seats = 1, message } = req.body;
 
-  // Check if offer exists and is active
-  const offer = await Offer.findById(offerId);
-  if (!offer) {
-    throw new AppError('Offer not found', 404);
-  }
-
-  if (!offer.isActive) {
-    throw new AppError('Offer is not available', 400);
-  }
-
-  // Check if user is not booking their own offer
-  if (offer.driverId === req.user.id) {
-    throw new AppError('You cannot book your own offer', 400);
-  }
-
-  // Check if enough seats are available
-  const { query } = require('../config/db');
-  const bookedSeats = await query(
-    `SELECT COALESCE(SUM(seats), 0) as total_booked
-     FROM bookings
-     WHERE offer_id = $1
-     AND status IN ('pending', 'confirmed')`,
-    [offerId]
-  );
-
-  const totalBooked = parseInt(bookedSeats.rows[0].total_booked) || 0;
-  const availableSeats = offer.seats - totalBooked;
-
-  if (seats > availableSeats) {
-    throw new AppError(`Only ${availableSeats} seat(s) available`, 400);
-  }
-
-  const booking = await Booking.create({
-    passengerId: req.user.id,
+  const result = await bookingService.createBooking(req.user.id, {
     offerId,
     seats,
-    message
+    message,
   });
 
   // Send real-time notification to driver
   const io = req.app.get('io');
   if (io) {
-    notifyNewBooking(io, offer.driverId, {
-      ...booking.toJSON(),
-      fromCity: offer.fromCity,
-      toCity: offer.toCity,
-      passengerName: req.user.name
+    notifyNewBooking(io, result.offer.driverId, {
+      ...result.booking,
+      fromCity: result.offer.fromCity,
+      toCity: result.offer.toCity,
+      passengerName: req.user.name,
     });
   }
 
-  res.status(201).json({
-    message: 'Booking request sent successfully',
-    booking: booking.toJSON()
-  });
+  sendSuccess(
+    res,
+    { booking: result.booking },
+    RESPONSE_MESSAGES.BOOKING_CREATED,
+    HTTP_STATUS.CREATED
+  );
 });
 
-// Get all bookings with filters and pagination
-const getBookings = asyncHandler(async (req, res) => {
-  const { 
-    page = 1, 
-    limit = 10, 
-    status,
-    userId,
-    offerId,
-    offerOwnerId
-  } = req.query;
+/**
+ * Get all bookings with filters and pagination
+ * @route GET /api/bookings
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=10] - Items per page
+ * @param {string} [req.query.status] - Filter by status
+ * @param {number} [req.query.userId] - Filter by passenger ID
+ * @param {number} [req.query.offerId] - Filter by offer ID
+ * @param {number} [req.query.offerOwnerId] - Filter by driver ID
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getBookings = catchAsync(async (req, res) => {
+  const { page = 1, limit = 10, status, userId, offerId, offerOwnerId } = req.query;
 
   const filters = {};
   if (status) filters.status = status;
-  if (userId) filters.passengerId = parseInt(userId);
-  if (offerId) filters.offerId = parseInt(offerId);
-  if (offerOwnerId) filters.driverId = parseInt(offerOwnerId);
+  if (userId) filters.passengerId = parseInt(userId, 10);
+  if (offerId) filters.offerId = parseInt(offerId, 10);
+  if (offerOwnerId) filters.driverId = parseInt(offerOwnerId, 10);
 
-  const result = await Booking.findAll(parseInt(page), parseInt(limit), filters);
-  
-  res.json(result);
+  const result = await Booking.findAll(parseInt(page, 10), parseInt(limit, 10), filters);
+
+  sendSuccess(res, result, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Get booking by ID
-const getBookingById = asyncHandler(async (req, res) => {
+/**
+ * Get booking by ID
+ * @route GET /api/bookings/:id
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} req.params.id - Booking ID
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getBookingById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  
+
   const booking = await Booking.findById(id);
   if (!booking) {
-    throw new AppError('Booking not found', 404);
+    throw new NotFoundError('Booking');
   }
 
-  // Check if user has access to this booking
-  if (booking.passengerId !== req.user.id && req.user.role !== 'admin') {
-    // Check if user is the offer owner
-    const offer = await Offer.findById(booking.offerId);
-    if (!offer || offer.driverId !== req.user.id) {
-      throw new AppError('Access denied', 403);
-    }
-  }
+  // Verify user has access to this booking
+  await bookingService.verifyBookingAccess(booking, req.user.id, req.user.role);
 
-  res.json({
-    booking: booking.toJSON()
-  });
+  sendSuccess(res, { booking: booking.toJSON() }, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Update booking status (offer owner or admin only)
-const updateBookingStatus = asyncHandler(async (req, res) => {
+/**
+ * Update booking status (offer owner or admin only)
+ * @route PUT /api/bookings/:id/status
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} req.params.id - Booking ID
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.status - New status
+ * @param {number} [req.body.totalPrice] - Total price
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const updateBookingStatus = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { status, totalPrice } = req.body;
 
-  const booking = await Booking.findById(id);
-  if (!booking) {
-    throw new AppError('Booking not found', 404);
-  }
-
-  // Check if user is the offer owner or admin
-  const offer = await Offer.findById(booking.offerId);
-  if (!offer || (offer.driverId !== req.user.id && req.user.role !== 'admin')) {
-    throw new AppError('You can only update bookings for your offers', 403);
-  }
-
-  // Validate status
-  const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
-  if (!validStatuses.includes(status)) {
-    throw new AppError('Invalid status', 400);
-  }
-
-  // If confirming booking, reduce available seats in offer
-  if (status === 'confirmed' && booking.status === 'pending') {
-    // Check if enough seats are still available
-    const { query } = require('../config/db');
-    const bookedSeats = await query(
-      `SELECT COALESCE(SUM(seats), 0) as total_booked
-       FROM bookings
-       WHERE offer_id = $1
-       AND status = 'confirmed'
-       AND id != $2`,
-      [booking.offerId, id]
-    );
-
-    const totalBooked = parseInt(bookedSeats.rows[0].total_booked) || 0;
-    const availableSeats = offer.seats - totalBooked;
-
-    if (booking.seats > availableSeats) {
-      throw new AppError(`Only ${availableSeats} seat(s) available`, 400);
-    }
-
-    // Reduce seats in offer
-    await offer.updateSeats(offer.seats - booking.seats);
-  }
-
-  // If cancelling a confirmed booking, restore seats to offer
-  if (status === 'cancelled' && booking.status === 'confirmed') {
-    await offer.updateSeats(offer.seats + booking.seats);
-  }
-
-  const updatedBooking = await booking.updateStatus(status, totalPrice);
+  const result = await bookingService.updateBookingStatus(
+    id,
+    req.user.id,
+    req.user.role,
+    status,
+    totalPrice
+  );
 
   // Send real-time notification to passenger
   const io = req.app.get('io');
-  if (io && (status === 'confirmed' || status === 'cancelled')) {
-    notifyBookingStatusUpdate(io, booking.passengerId, {
-      ...updatedBooking.toJSON(),
-      fromCity: offer.fromCity,
-      toCity: offer.toCity,
-      status: status
+  if (io && (status === BOOKING_STATUS.ACCEPTED || status === BOOKING_STATUS.CANCELLED)) {
+    notifyBookingStatusUpdate(io, result.offer.passengerId, {
+      ...result.booking,
+      fromCity: result.offer.fromCity,
+      toCity: result.offer.toCity,
+      status,
     });
   }
 
-  res.json({
-    message: 'Booking status updated successfully',
-    booking: updatedBooking.toJSON()
-  });
+  sendSuccess(res, { booking: result.booking }, RESPONSE_MESSAGES.BOOKING_UPDATED);
 });
 
-// Cancel booking (booking owner only)
-const cancelBooking = asyncHandler(async (req, res) => {
+/**
+ * Cancel booking (booking owner only)
+ * @route PUT /api/bookings/:id/cancel
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} req.params.id - Booking ID
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const cancelBooking = catchAsync(async (req, res) => {
   const { id } = req.params;
-  
-  const booking = await Booking.findById(id);
-  if (!booking) {
-    throw new AppError('Booking not found', 404);
-  }
 
-  // Check if user owns the booking
-  if (booking.passengerId !== req.user.id && req.user.role !== 'admin') {
-    throw new AppError('You can only cancel your own bookings', 403);
-  }
+  const booking = await bookingService.cancelBooking(id, req.user.id, req.user.role);
 
-  // Check if booking can be cancelled
-  if (booking.status === 'cancelled') {
-    throw new AppError('Booking is already cancelled', 400);
-  }
-
-  if (booking.status === 'completed') {
-    throw new AppError('Cannot cancel completed booking', 400);
-  }
-
-  const updatedBooking = await booking.updateStatus('cancelled');
-
-  res.json({
-    message: 'Booking cancelled successfully',
-    booking: updatedBooking.toJSON()
-  });
+  sendSuccess(res, { booking }, 'Booking cancelled successfully');
 });
 
-// Get user's bookings (as passenger)
-const getUserBookings = asyncHandler(async (req, res) => {
+/**
+ * Get user's bookings (as passenger)
+ * @route GET /api/bookings/user/:userId?
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - Route parameters
+ * @param {string} [req.params.userId] - User ID (optional, defaults to current user)
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=10] - Items per page
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getUserBookings = catchAsync(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const passengerId = req.params.userId || req.user.id;
 
-  const result = await Booking.getSentBookings(passengerId, parseInt(page), parseInt(limit));
+  const result = await Booking.getSentBookings(
+    passengerId,
+    parseInt(page, 10),
+    parseInt(limit, 10)
+  );
 
-  res.json(result);
+  sendSuccess(res, result, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Get bookings for user's offers (as driver)
-const getOfferBookings = asyncHandler(async (req, res) => {
+/**
+ * Get bookings for user's offers (as driver)
+ * @route GET /api/bookings/offers
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=10] - Items per page
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getOfferBookings = catchAsync(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
-  const result = await Booking.getReceivedBookings(req.user.id, parseInt(page), parseInt(limit));
+  const result = await Booking.getReceivedBookings(
+    req.user.id,
+    parseInt(page, 10),
+    parseInt(limit, 10)
+  );
 
-  res.json(result);
+  sendSuccess(res, result, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Get booking statistics
-const getBookingStats = asyncHandler(async (req, res) => {
-  const { query } = require('../config/db');
-  
-  const result = await query(`
-    SELECT
-      COUNT(*)::int as total,
-      COUNT(CASE WHEN status = 'pending' THEN 1 END)::int as pending,
-      COUNT(CASE WHEN status = 'confirmed' THEN 1 END)::int as confirmed,
-      COUNT(CASE WHEN status = 'cancelled' THEN 1 END)::int as cancelled,
-      COUNT(CASE WHEN status = 'completed' THEN 1 END)::int as completed
-    FROM bookings
-  `);
+/**
+ * Get booking statistics
+ * @route GET /api/bookings/stats
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getBookingStats = catchAsync(async (req, res) => {
+  const stats = await bookingService.getBookingStats();
 
-  res.json({
-    success: true,
-    data: result.rows[0]
-  });
+  sendSuccess(res, stats, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Get user booking statistics
-const getUserBookingStats = asyncHandler(async (req, res) => {
-  const { query } = require('../config/db');
+/**
+ * Get user booking statistics
+ * @route GET /api/bookings/stats/user
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getUserBookingStats = catchAsync(async (req, res) => {
+  const stats = await bookingService.getUserBookingStats(req.user.id);
 
-  const result = await query(`
-    SELECT
-      COUNT(*) as total_bookings,
-      COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_bookings,
-      COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_bookings,
-      COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_bookings,
-      COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_bookings,
-      AVG(total_price) as average_booking_value
-    FROM bookings
-    WHERE passenger_id = $1
-  `, [req.user.id]);
-
-  res.json({
-    stats: result.rows[0]
-  });
+  sendSuccess(res, { stats }, RESPONSE_MESSAGES.SUCCESS);
 });
 
-// Get pending bookings count for current user (both as passenger and driver)
-const getPendingCount = asyncHandler(async (req, res) => {
-  const { query } = require('../config/db');
+/**
+ * Get pending bookings count for current user
+ * @route GET /api/bookings/pending/count
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+const getPendingCount = catchAsync(async (req, res) => {
+  const counts = await bookingService.getPendingCount(req.user.id);
 
-  // Count bookings I received on my offers (as driver) that are pending
-  const receivedResult = await query(`
-    SELECT COUNT(*) as count
-    FROM bookings b
-    INNER JOIN offers o ON b.offer_id = o.id
-    WHERE o.driver_id = $1 AND b.status = 'pending'
-  `, [req.user.id]);
-
-  // Count bookings I made (as passenger) that are pending
-  const sentResult = await query(`
-    SELECT COUNT(*) as count
-    FROM bookings
-    WHERE passenger_id = $1 AND status = 'pending'
-  `, [req.user.id]);
-
-  res.json({
-    receivedPending: parseInt(receivedResult.rows[0].count),
-    sentPending: parseInt(sentResult.rows[0].count),
-    totalPending: parseInt(receivedResult.rows[0].count) + parseInt(sentResult.rows[0].count)
-  });
+  sendSuccess(res, counts, RESPONSE_MESSAGES.SUCCESS);
 });
 
 module.exports = {
@@ -305,6 +259,5 @@ module.exports = {
   getOfferBookings,
   getBookingStats,
   getUserBookingStats,
-  getPendingCount
+  getPendingCount,
 };
-

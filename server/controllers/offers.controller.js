@@ -1,5 +1,6 @@
 const Offer = require('../models/offers.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
+const { invalidateOfferCache, invalidateUserStats } = require('../middlewares/cache');
 // const moderationAgent = require('../agents/moderation.agent'); // Temporarily disabled
 // const { query } = require('../config/db'); // Temporarily disabled
 
@@ -16,6 +17,10 @@ const createOffer = asyncHandler(async (req, res) => {
     seats,
     price
   });
+
+  // Invalidate offer cache and user stats
+  invalidateOfferCache();
+  invalidateUserStats(req.user.id);
 
   res.status(201).json({
     success: true,
@@ -96,6 +101,9 @@ const updateOffer = asyncHandler(async (req, res) => {
 
   const updatedOffer = await offer.update(updateData);
 
+  // Invalidate offer cache
+  invalidateOfferCache();
+
   res.json({
     message: 'تم تحديث العرض بنجاح',
     offer: updatedOffer.toJSON()
@@ -117,6 +125,10 @@ const deactivateOffer = asyncHandler(async (req, res) => {
   }
 
   await offer.deactivate();
+
+  // Invalidate offer cache and user stats
+  invalidateOfferCache();
+  invalidateUserStats(offer.driverId);
 
   res.json({
     message: 'تم إلغاء تفعيل العرض بنجاح'

@@ -1,0 +1,1613 @@
+{
+  "info": {
+    "name": "Toosila API Collection",
+    "description": "Comprehensive API documentation for Toosila - Iraq Ride-Sharing Platform",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "test@example.com",
+      "type": "string"
+    },
+    {
+      "key": "user_password",
+      "value": "TestPassword123!",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register a new user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Create a new user account (passenger or driver) and send email verification",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد\",\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"isDriver\": \"\",\n  \"languagePreference\": \"ar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticate user and return JWT access token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get user profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Retrieve authenticated user's profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Update user profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Update authenticated user's profile information",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد العلي\",\n  \"phone\": \"+9647XXXXXXXXX\",\n  \"languagePreference\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Change authenticated user's password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"\",\n  \"newPassword\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update email address",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/update-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "update-email"
+              ]
+            },
+            "description": "Update authenticated user's email address (requires re-verification)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"\",\n  \"password\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/delete-account",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "delete-account"
+              ]
+            },
+            "description": "Permanently delete authenticated user's account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get user statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "stats"
+              ]
+            },
+            "description": "Retrieve statistics for authenticated user (rides, bookings, ratings)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get all users (Admin only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve paginated list of all users - Admin access required"
+          },
+          "response": []
+        },
+        {
+          "name": "Get user by ID (Admin only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/users/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "users",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve specific user details by ID - Admin access required"
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate user (Admin only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/users/:id/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "users",
+                ":id",
+                "deactivate"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Deactivate or activate a user account - Admin access required",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create a new booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings"
+              ]
+            },
+            "description": "Create a booking for a ride offer",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offerId\": \"\",\n  \"seats\": 2,\n  \"message\": \"أريد الحجز من فضلك\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve paginated list of all bookings for authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get booking statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "stats"
+              ]
+            },
+            "description": "Retrieve booking statistics for authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get my booking statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/my/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "my",
+                "stats"
+              ]
+            },
+            "description": "Get detailed booking statistics for the authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get pending bookings count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/my/pending-count",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "my",
+                "pending-count"
+              ]
+            },
+            "description": "Get count of pending bookings for authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve specific booking details"
+          },
+          "response": []
+        },
+        {
+          "name": "Update booking status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/:id/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                ":id",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Accept or reject a booking (driver only)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/:id/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                ":id",
+                "cancel"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Cancel a booking (passenger or driver)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get user bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/user/:userId",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "user",
+                ":userId"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve bookings for a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get my bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/my/bookings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "my",
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all bookings created by authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get bookings for my offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/my/offers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "my",
+                "offers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all bookings for offers created by authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get admin booking statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/admin/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Retrieve platform-wide booking statistics (Admin only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Demands",
+      "item": [
+        {
+          "name": "Get all ride demands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve paginated list of active ride demands/requests"
+          },
+          "response": []
+        },
+        {
+          "name": "Create new ride demand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands"
+              ]
+            },
+            "description": "Create a new ride demand/request (requires email verification)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origin\": \"أربيل\",\n  \"destination\": \"السليمانية\",\n  \"departureTime\": \"2025-11-15T08:00:00Z\",\n  \"seats\": 2,\n  \"maxPrice\": 40000,\n  \"notes\": \"أفضل السفر صباحاً\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search ride demands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "origin",
+                  "value": "",
+                  "description": "Starting city"
+                },
+                {
+                  "key": "destination",
+                  "value": "",
+                  "description": "Destination city"
+                },
+                {
+                  "key": "date",
+                  "value": "",
+                  "description": "Desired departure date"
+                },
+                {
+                  "key": "seats",
+                  "value": "",
+                  "description": "Number of seats needed"
+                },
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Search demands by origin, destination, date, and other criteria"
+          },
+          "response": []
+        },
+        {
+          "name": "Get demand categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                "categories"
+              ]
+            },
+            "description": "Retrieve list of available ride demand categories"
+          },
+          "response": []
+        },
+        {
+          "name": "Get demand by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve detailed information about a specific ride demand (authentication required)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update ride demand",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Update an existing ride demand (owner only)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origin\": \"\",\n  \"destination\": \"\",\n  \"departureTime\": \"\",\n  \"seats\": \"\",\n  \"maxPrice\": \"\",\n  \"notes\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate ride demand",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/:id/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                ":id",
+                "deactivate"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Deactivate or cancel a ride demand (owner only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get user's demands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/user/:userId",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                "user",
+                ":userId"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all demands created by a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get my demands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/my/demands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                "my",
+                "demands"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all demands created by authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get demand statistics (Admin only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/admin/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Retrieve platform-wide demand statistics - Admin access required"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Offers",
+      "item": [
+        {
+          "name": "Get all ride offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve paginated list of active ride offers"
+          },
+          "response": []
+        },
+        {
+          "name": "Create new ride offer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers"
+              ]
+            },
+            "description": "Create a new ride offer (drivers only, requires email verification)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origin\": \"بغداد\",\n  \"destination\": \"البصرة\",\n  \"departureTime\": \"2025-11-15T08:00:00Z\",\n  \"availableSeats\": 3,\n  \"pricePerSeat\": 50000,\n  \"vehicleType\": \"سيدان\",\n  \"vehicleModel\": \"Toyota Camry 2020\",\n  \"notes\": \"رحلة مريحة مع مكيف\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search ride offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "origin",
+                  "value": "",
+                  "description": "Starting city"
+                },
+                {
+                  "key": "destination",
+                  "value": "",
+                  "description": "Destination city"
+                },
+                {
+                  "key": "date",
+                  "value": "",
+                  "description": "Departure date"
+                },
+                {
+                  "key": "seats",
+                  "value": "",
+                  "description": "Minimum available seats"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "",
+                  "description": "Maximum price per seat"
+                },
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Search offers by origin, destination, date, and other criteria"
+          },
+          "response": []
+        },
+        {
+          "name": "Get offer categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                "categories"
+              ]
+            },
+            "description": "Retrieve list of available ride offer categories/types"
+          },
+          "response": []
+        },
+        {
+          "name": "Get offer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve detailed information about a specific ride offer"
+          },
+          "response": []
+        },
+        {
+          "name": "Update ride offer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Update an existing ride offer (owner only)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origin\": \"\",\n  \"destination\": \"\",\n  \"departureTime\": \"\",\n  \"availableSeats\": \"\",\n  \"pricePerSeat\": \"\",\n  \"vehicleType\": \"\",\n  \"vehicleModel\": \"\",\n  \"notes\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate ride offer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/:id/deactivate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                ":id",
+                "deactivate"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Deactivate or cancel a ride offer (owner only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get user's offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/user/:userId",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                "user",
+                ":userId"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all offers created by a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get my offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/my/offers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                "my",
+                "offers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Retrieve all offers created by authenticated user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get offer statistics (Admin only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/offers/admin/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "offers",
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Retrieve platform-wide offer statistics - Admin access required"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

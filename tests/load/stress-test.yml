@@ -1,0 +1,39 @@
+# Artillery Stress Testing Configuration
+# Purpose: Find the breaking point of the API
+# Run with: artillery run tests/load/stress-test.yml
+
+config:
+  target: "http://localhost:5001"
+  phases:
+    # Phase 1: Start with normal load
+    - duration: 30
+      arrivalRate: 10
+      name: "Baseline"
+    # Phase 2: Increase to moderate load
+    - duration: 60
+      arrivalRate: 50
+      name: "Moderate load"
+    # Phase 3: Heavy load
+    - duration: 60
+      arrivalRate: 100
+      name: "Heavy load"
+    # Phase 4: Extreme load (stress point)
+    - duration: 60
+      arrivalRate: 200
+      name: "Extreme load"
+    # Phase 5: Cool down
+    - duration: 30
+      arrivalRate: 10
+      name: "Cool down"
+  http:
+    timeout: 10
+
+scenarios:
+  - name: "Mixed Load"
+    flow:
+      - get:
+          url: "/api/offers?page={{ $randomNumber(1, 10) }}&limit=10"
+      - think: 1
+      - get:
+          url: "/api/demands?page={{ $randomNumber(1, 10) }}&limit=10"
+      - think: 1
