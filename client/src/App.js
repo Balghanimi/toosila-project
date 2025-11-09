@@ -68,7 +68,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const VerificationManagement = lazy(() => import('./pages/admin/VerificationManagement'));
 const AdminStatistics = lazy(() => import('./pages/admin/AdminStatistics'));
-const AdminTest = lazy(() => import('./pages/AdminTest'));
+// const AdminTest = lazy(() => import('./pages/AdminTest')); // Temporarily removed - file not in git
 
 export default function App() {
   return (
@@ -131,8 +131,8 @@ export default function App() {
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-                      {/* Admin Test Page - accessible to everyone */}
-                      <Route path="/admin-test" element={<AdminTest />} />
+                      {/* Admin Test Page - temporarily disabled */}
+                      {/* <Route path="/admin-test" element={<AdminTest />} /> */}
 
                       {/* Admin Routes */}
                       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
