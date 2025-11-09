@@ -98,7 +98,7 @@ export default function Login({ onSwitchToRegister, onClose }) {
           border: '1px solid #fecaca',
           color: '#dc2626',
           padding: '12px 16px',
-          borderRadius: '8px',
+          borderRadius: "8px",
           marginBottom: '24px',
           fontSize: '14px',
           textAlign: 'center'
