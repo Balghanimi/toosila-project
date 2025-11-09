@@ -28,6 +28,18 @@ async function setupDatabase() {
     console.log('   - ratings');
     console.log('   - refresh_tokens');
 
+    // Run email verification migration
+    console.log('\n🔄 Running email verification migration...');
+    const migrationPath = path.join(__dirname, '../database/migrations/007_add_email_verification.sql');
+
+    if (fs.existsSync(migrationPath)) {
+      const migrationSql = fs.readFileSync(migrationPath, 'utf8');
+      await query(migrationSql);
+      console.log('✅ Email verification migration completed successfully!');
+    } else {
+      console.log('⚠️  Email verification migration file not found, skipping...');
+    }
+
     // Verify tables exist
     const result = await query(`
       SELECT table_name
@@ -36,7 +48,7 @@ async function setupDatabase() {
       ORDER BY table_name;
     `);
 
-    console.log(`📋 Total tables in database: ${result.rows.length}`);
+    console.log(`\n📋 Total tables in database: ${result.rows.length}`);
 
     process.exit(0);
   } catch (error) {
