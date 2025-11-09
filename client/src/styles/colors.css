@@ -106,8 +106,8 @@
   /* ===== Text Colors (Light Mode) ===== */
   --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --text-muted: #cbd5e1;
+  --text-tertiary: #64748b; /* Improved from #94a3b8 for better contrast */
+  --text-muted: #94a3b8; /* Improved from #cbd5e1 for better contrast */
   --text-inverse: #ffffff;
 
   /* ===== Border Colors ===== */
