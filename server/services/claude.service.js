@@ -9,19 +9,28 @@ class ClaudeService {
   constructor() {
     this.apiKey = process.env.ANTHROPIC_API_KEY;
 
-    if (!this.apiKey) {
+    if (!this.apiKey || this.apiKey === 'your-anthropic-api-key-here') {
       console.warn('⚠️  ANTHROPIC_API_KEY not found. AI moderation will be disabled.');
       this.enabled = false;
+      this.client = null;
+      this.model = null;
+      this.maxTokens = null;
       return;
     }
 
-    this.client = new Anthropic({
-      apiKey: this.apiKey
-    });
-
-    this.enabled = true;
-    this.model = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
-    this.maxTokens = parseInt(process.env.ANTHROPIC_MAX_TOKENS || '1024');
+    try {
+      this.client = new Anthropic({
+        apiKey: this.apiKey
+      });
+      this.enabled = true;
+      this.model = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+      this.maxTokens = parseInt(process.env.ANTHROPIC_MAX_TOKENS || '1024');
+      console.log('✅ Claude AI moderation enabled');
+    } catch (error) {
+      console.error('❌ Failed to initialize Claude client:', error);
+      this.enabled = false;
+      this.client = null;
+    }
   }
 
   /**

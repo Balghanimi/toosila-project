@@ -1,7 +1,7 @@
 const Offer = require('../models/offers.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
-const moderationAgent = require('../agents/moderation.agent');
-const { query } = require('../config/db');
+// const moderationAgent = require('../agents/moderation.agent'); // Temporarily disabled
+// const { query } = require('../config/db'); // Temporarily disabled
 
 // Create a new offer
 const createOffer = asyncHandler(async (req, res) => {
