@@ -522,10 +522,46 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
                       gap: 'var(--space-3)',
                     }}
                   >
+                    {/* زر الاتصال */}
+                    {response.driverPhone && (
+                      <a
+                        href={`tel:${response.driverPhone}`}
+                        style={{
+                          padding: 'var(--space-3) var(--space-4)',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 'var(--radius)',
+                          fontSize: 'var(--text-base)',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          fontFamily: '"Cairo", sans-serif',
+                          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                          transition: 'var(--transition)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 'var(--space-2)',
+                          textDecoration: 'none',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                        }}
+                      >
+                        <span>📞</span>
+                        اتصال
+                      </a>
+                    )}
+
                     {/* زر المراسلة */}
                     <button
                       onClick={() => navigate('/messages')}
@@ -556,7 +592,7 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                       }}
                     >
                       <span>💬</span>
-                      مراسلة السائق
+                      مراسلة
                     </button>
 
                     {/* زر عرض الملف الشخصي */}
@@ -589,7 +625,7 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                       }}
                     >
                       <span>👤</span>
-                      ملف السائق
+                      الملف
                     </button>
                   </div>
                 </div>
