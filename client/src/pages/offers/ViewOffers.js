@@ -1032,9 +1032,15 @@ export default function ViewOffers() {
                         fontFamily: '"Cairo", sans-serif',
                       }}
                     >
-                      <span>📅 {formatDate(offer.departureTime)}</span>
-                      <span>🕐 {formatTime(offer.departureTime)}</span>
-                      <span>💺 {offer.seats} مقعد</span>
+                      <span>
+                        📅{' '}
+                        {formatDate(offer.departureTime || offer.departureDate || offer.createdAt)}
+                      </span>
+                      <span>
+                        🕐{' '}
+                        {formatTime(offer.departureTime || offer.departureDate || offer.createdAt)}
+                      </span>
+                      <span>💺 {offer.seats || offer.seatsAvailable || 0} مقعد</span>
                     </div>
                   </div>
 
@@ -1046,7 +1052,10 @@ export default function ViewOffers() {
                       fontFamily: '"Cairo", sans-serif',
                     }}
                   >
-                    {offer.price ? Number(offer.price).toLocaleString() : '0'} د.ع
+                    {offer.price || offer.maxPrice
+                      ? Number(offer.price || offer.maxPrice).toLocaleString()
+                      : '0'}{' '}
+                    د.ع
                   </div>
                 </div>
 
@@ -1061,7 +1070,7 @@ export default function ViewOffers() {
                     marginBottom: 'var(--space-3)',
                   }}
                 >
-                  👤 السائق: {offer.name || 'غير متوفر'}
+                  👤 {isDriver ? 'الراكب' : 'السائق'}: {offer.name || offer.userName || 'غير متوفر'}
                 </div>
 
                 {/* Book Now Button */}
