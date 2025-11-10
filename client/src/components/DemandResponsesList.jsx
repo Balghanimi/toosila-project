@@ -199,14 +199,27 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                   </div>
                   <div>
                     <div
+                      onClick={() => navigate(`/user-ratings/${response.driverId}`)}
                       style={{
                         fontSize: 'var(--text-lg)',
                         fontWeight: '700',
-                        color: 'var(--text-primary)',
+                        color: '#8b5cf6',
                         fontFamily: '"Cairo", sans-serif',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                        display: 'inline-block',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#7c3aed';
+                        e.currentTarget.style.textDecoration = 'underline';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#8b5cf6';
+                        e.currentTarget.style.textDecoration = 'none';
                       }}
                     >
-                      {response.driverName || 'سائق'}
+                      {response.driverName || 'سائق'} 👤
                     </div>
                     {response.driverRating && (
                       <div
@@ -217,6 +230,7 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: 'var(--space-1)',
+                          marginTop: 'var(--space-1)',
                         }}
                       >
                         <span>⭐</span>
@@ -226,6 +240,16 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                             ({response.driverRatingCount} تقييم)
                           </span>
                         )}
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                            color: '#8b5cf6',
+                            marginRight: 'var(--space-2)',
+                            fontWeight: '600',
+                          }}
+                        >
+                          اضغط لعرض الملف
+                        </span>
                       </div>
                     )}
                   </div>
@@ -453,7 +477,7 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                 </div>
               )}
 
-              {/* زر المراسلة - يظهر بعد القبول */}
+              {/* أزرار المراسلة وعرض الملف - يظهران بعد القبول */}
               {isOwner && response.status === 'accepted' && (
                 <div
                   style={{
@@ -466,43 +490,47 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                 >
                   <div
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 'var(--space-3)',
-                      flexWrap: 'wrap',
+                      marginBottom: 'var(--space-3)',
                     }}
                   >
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 'var(--text-base)',
-                          fontWeight: '700',
-                          color: '#0c4a6e',
-                          marginBottom: 'var(--space-1)',
-                          fontFamily: '"Cairo", sans-serif',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-2)',
-                        }}
-                      >
-                        <span>✅</span>
-                        تم قبول العرض
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 'var(--text-sm)',
-                          color: '#075985',
-                          fontFamily: '"Cairo", sans-serif',
-                        }}
-                      >
-                        يمكنك الآن التواصل مع السائق لتنسيق تفاصيل الرحلة
-                      </div>
+                    <div
+                      style={{
+                        fontSize: 'var(--text-base)',
+                        fontWeight: '700',
+                        color: '#0c4a6e',
+                        marginBottom: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                      }}
+                    >
+                      <span>✅</span>
+                      تم قبول العرض
                     </div>
+                    <div
+                      style={{
+                        fontSize: 'var(--text-sm)',
+                        color: '#075985',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      يمكنك الآن التواصل مع السائق والاطلاع على ملفه الشخصي
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: 'var(--space-3)',
+                    }}
+                  >
+                    {/* زر المراسلة */}
                     <button
                       onClick={() => navigate('/messages')}
                       style={{
-                        padding: 'var(--space-3) var(--space-5)',
+                        padding: 'var(--space-3) var(--space-4)',
                         background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
                         color: 'white',
                         border: 'none',
@@ -515,8 +543,8 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                         transition: 'var(--transition)',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: 'var(--space-2)',
-                        whiteSpace: 'nowrap',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -529,6 +557,39 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                     >
                       <span>💬</span>
                       مراسلة السائق
+                    </button>
+
+                    {/* زر عرض الملف الشخصي */}
+                    <button
+                      onClick={() => navigate(`/user-ratings/${response.driverId}`)}
+                      style={{
+                        padding: 'var(--space-3) var(--space-4)',
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                        transition: 'var(--transition)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 'var(--space-2)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.3)';
+                      }}
+                    >
+                      <span>👤</span>
+                      ملف السائق
                     </button>
                   </div>
                 </div>
