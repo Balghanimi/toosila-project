@@ -35,14 +35,17 @@ function NotificationDropdown({ onClose, dropdownRef }) {
         await markAsRead(notification.id);
       }
 
+      // استخراج البيانات من data object
+      const data = notification.data || {};
+
       // الانتقال حسب نوع الإشعار
       const routes = {
         demand_response: () => {
           // السائق رد على طلبك - انتقل إلى الطلبات وافتح modal العروض
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -52,10 +55,10 @@ function NotificationDropdown({ onClose, dropdownRef }) {
         },
         response_accepted: () => {
           // تم قبول ردك - انتقل إلى الطلبات
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -65,10 +68,10 @@ function NotificationDropdown({ onClose, dropdownRef }) {
         },
         response_rejected: () => {
           // تم رفض ردك - انتقل إلى الطلبات
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -81,17 +84,33 @@ function NotificationDropdown({ onClose, dropdownRef }) {
           navigate('/bookings', {
             state: {
               tab: 'received', // عرض تبويب الحجوزات المستلمة
-              highlightBookingId: notification.relatedId,
+              highlightBookingId: data.bookingId || data.booking_id,
             },
           });
         },
         booking_accepted: () => {
           // تم قبول حجزك
-          navigate('/bookings');
+          if (data.bookingId || data.booking_id) {
+            navigate('/bookings', {
+              state: {
+                highlightBookingId: data.bookingId || data.booking_id,
+              },
+            });
+          } else {
+            navigate('/bookings');
+          }
         },
         booking_rejected: () => {
           // تم رفض حجزك
-          navigate('/bookings');
+          if (data.bookingId || data.booking_id) {
+            navigate('/bookings', {
+              state: {
+                highlightBookingId: data.bookingId || data.booking_id,
+              },
+            });
+          } else {
+            navigate('/bookings');
+          }
         },
         new_message: () => {
           // رسالة جديدة

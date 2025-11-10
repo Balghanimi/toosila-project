@@ -49,7 +49,7 @@ const Home = () => {
         const now = Date.now();
         const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-        if (cached && cacheTime && (now - parseInt(cacheTime)) < CACHE_TTL) {
+        if (cached && cacheTime && now - parseInt(cacheTime) < CACHE_TTL) {
           // Use cached data
           setAvailableCities(JSON.parse(cached));
           return;

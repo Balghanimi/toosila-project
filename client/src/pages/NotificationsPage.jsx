@@ -33,13 +33,16 @@ function NotificationsPage() {
         await markAsRead(notification.id);
       }
 
+      // استخراج البيانات من data object
+      const data = notification.data || {};
+
       // الانتقال حسب نوع الإشعار
       const routes = {
         demand_response: () => {
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -48,10 +51,10 @@ function NotificationsPage() {
           }
         },
         response_accepted: () => {
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -60,10 +63,10 @@ function NotificationsPage() {
           }
         },
         response_rejected: () => {
-          if (notification.relatedId) {
+          if (data.demandId) {
             navigate('/demands', {
               state: {
-                openDemandId: notification.relatedId,
+                openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
@@ -76,12 +79,32 @@ function NotificationsPage() {
           navigate('/bookings', {
             state: {
               tab: 'received', // عرض تبويب الحجوزات المستلمة
-              highlightBookingId: notification.relatedId,
+              highlightBookingId: data.bookingId || data.booking_id,
             },
           });
         },
-        booking_accepted: () => navigate('/bookings'),
-        booking_rejected: () => navigate('/bookings'),
+        booking_accepted: () => {
+          if (data.bookingId || data.booking_id) {
+            navigate('/bookings', {
+              state: {
+                highlightBookingId: data.bookingId || data.booking_id,
+              },
+            });
+          } else {
+            navigate('/bookings');
+          }
+        },
+        booking_rejected: () => {
+          if (data.bookingId || data.booking_id) {
+            navigate('/bookings', {
+              state: {
+                highlightBookingId: data.bookingId || data.booking_id,
+              },
+            });
+          } else {
+            navigate('/bookings');
+          }
+        },
         new_message: () => navigate('/messages'),
         trip_reminder: () => navigate('/'),
       };

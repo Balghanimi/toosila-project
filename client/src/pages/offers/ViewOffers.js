@@ -259,19 +259,22 @@ const ViewOffers = React.memo(function ViewOffers() {
   const MAIN_CITIES = React.useMemo(() => ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'], []);
 
   // All Iraqi cities (for advanced filters)
-  const IRAQ_CITIES = React.useMemo(() => [
-    'بغداد',
-    'البصرة',
-    'النجف',
-    'أربيل',
-    'الموصل',
-    'كربلاء',
-    'ذي قار',
-    'ديالى',
-    'الأنبار',
-    'واسط',
-    'ميسان',
-  ], []);
+  const IRAQ_CITIES = React.useMemo(
+    () => [
+      'بغداد',
+      'البصرة',
+      'النجف',
+      'أربيل',
+      'الموصل',
+      'كربلاء',
+      'ذي قار',
+      'ديالى',
+      'الأنبار',
+      'واسط',
+      'ميسان',
+    ],
+    []
+  );
 
   return (
     <div
