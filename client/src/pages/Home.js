@@ -337,6 +337,7 @@ const Home = () => {
                 aria-describedby={showPickupSuggestions ? 'pickup-suggestions' : undefined}
                 aria-autocomplete="list"
                 aria-expanded={showPickupSuggestions}
+                aria-controls="pickup-suggestions"
                 role="combobox"
               />
               {showPickupSuggestions && pickupSuggestions.length > 0 && (
@@ -408,6 +409,7 @@ const Home = () => {
                 aria-describedby={showDropSuggestions ? 'drop-suggestions' : undefined}
                 aria-autocomplete="list"
                 aria-expanded={showDropSuggestions}
+                aria-controls="drop-suggestions"
                 role="combobox"
               />
               {showDropSuggestions && dropSuggestions.length > 0 && (
