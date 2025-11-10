@@ -60,42 +60,28 @@ const Header = () => {
               >
                 الرئيسية
               </button>
-              <button
-                className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
-                onClick={() => navigate('/offers')}
-                title="عروض السائقين"
-              >
-                <span style={{ marginLeft: '4px' }}>🚗</span>
-                العروض
-                <span
-                  style={{
-                    fontSize: '0.7rem',
-                    opacity: 0.7,
-                    marginRight: '4px',
-                    fontWeight: '400',
-                  }}
+              {/* Show Offers only for passengers */}
+              {!currentUser?.isDriver && (
+                <button
+                  className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
+                  onClick={() => navigate('/offers')}
+                  title="عروض السائقين"
                 >
-                  (سائق)
-                </span>
-              </button>
-              <button
-                className={`${styles.navLink} ${isActive('/demands') ? styles.navLinkActive : ''}`}
-                onClick={() => navigate('/demands')}
-                title="طلبات الركاب"
-              >
-                <span style={{ marginLeft: '4px' }}>🙋</span>
-                الطلبات
-                <span
-                  style={{
-                    fontSize: '0.7rem',
-                    opacity: 0.7,
-                    marginRight: '4px',
-                    fontWeight: '400',
-                  }}
+                  <span style={{ marginLeft: '4px' }}>🚗</span>
+                  العروض
+                </button>
+              )}
+              {/* Show Demands only for drivers */}
+              {currentUser?.isDriver && (
+                <button
+                  className={`${styles.navLink} ${isActive('/demands') ? styles.navLinkActive : ''}`}
+                  onClick={() => navigate('/demands')}
+                  title="طلبات الركاب"
                 >
-                  (راكب)
-                </span>
-              </button>
+                  <span style={{ marginLeft: '4px' }}>🙋</span>
+                  الطلبات
+                </button>
+              )}
               <button
                 className={`${styles.navLink} ${isActive('/bookings') ? styles.navLinkActive : ''}`}
                 onClick={() => navigate('/bookings')}
