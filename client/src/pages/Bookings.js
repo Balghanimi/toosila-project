@@ -15,6 +15,13 @@ export default function Bookings() {
   const [highlightedBooking, setHighlightedBooking] = useState(
     location.state?.highlightBookingId || null
   );
+  const [editingDemand, setEditingDemand] = useState(null);
+  const [editForm, setEditForm] = useState({
+    earliestTime: '',
+    latestTime: '',
+    seats: '',
+    budgetMax: '',
+  });
   const { currentUser } = useAuth();
   const { showSuccess, showError, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
@@ -118,6 +125,46 @@ export default function Bookings() {
     } catch (err) {
       showError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
       setError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
+    }
+  };
+
+  const handleEditDemand = (demand) => {
+    setEditingDemand(demand);
+    setEditForm({
+      earliestTime: new Date(demand.earliestTime).toISOString().slice(0, 16),
+      latestTime: new Date(demand.latestTime).toISOString().slice(0, 16),
+      seats: demand.seats,
+      budgetMax: demand.budgetMax,
+    });
+  };
+
+  const handleUpdateDemand = async () => {
+    if (!editingDemand) return;
+
+    try {
+      await demandsAPI.update(editingDemand.id, {
+        earliestTime: new Date(editForm.earliestTime).toISOString(),
+        latestTime: new Date(editForm.latestTime).toISOString(),
+        seats: parseInt(editForm.seats),
+        budgetMax: parseFloat(editForm.budgetMax),
+      });
+      showSuccess('✅ تم تحديث الطلب بنجاح!');
+      setEditingDemand(null);
+      fetchBookings();
+    } catch (err) {
+      showError(err.message || 'حدث خطأ أثناء تحديث الطلب');
+    }
+  };
+
+  const handleDeleteDemand = async (demandId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+
+    try {
+      await demandsAPI.delete(demandId);
+      showSuccess('✅ تم حذف الطلب بنجاح!');
+      fetchBookings();
+    } catch (err) {
+      showError(err.message || 'حدث خطأ أثناء حذف الطلب');
     }
   };
 
@@ -610,17 +657,59 @@ export default function Bookings() {
                       borderBottom: '2px solid var(--border-light)',
                     }}
                   >
-                    <h3
+                    <div
                       style={{
-                        fontSize: 'var(--text-xl)',
-                        fontWeight: '700',
-                        color: 'var(--text-primary)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
                         marginBottom: 'var(--space-3)',
-                        fontFamily: '"Cairo", sans-serif',
                       }}
                     >
-                      📍 {demand.fromCity} ← {demand.toCity}
-                    </h3>
+                      <h3
+                        style={{
+                          fontSize: 'var(--text-xl)',
+                          fontWeight: '700',
+                          color: 'var(--text-primary)',
+                          fontFamily: '"Cairo", sans-serif',
+                        }}
+                      >
+                        📍 {demand.fromCity} ← {demand.toCity}
+                      </h3>
+                      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                        <button
+                          onClick={() => handleEditDemand(demand)}
+                          style={{
+                            padding: 'var(--space-2) var(--space-3)',
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontFamily: '"Cairo", sans-serif',
+                          }}
+                        >
+                          ✏️ تعديل
+                        </button>
+                        <button
+                          onClick={() => handleDeleteDemand(demand.id)}
+                          style={{
+                            padding: 'var(--space-2) var(--space-3)',
+                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontFamily: '"Cairo", sans-serif',
+                          }}
+                        >
+                          🗑️ حذف
+                        </button>
+                      </div>
+                    </div>
                     <div
                       style={{
                         display: 'grid',
@@ -631,22 +720,28 @@ export default function Bookings() {
                       }}
                     >
                       <div>
-                        📅{' '}
-                        {demand.departureTime
-                          ? new Date(demand.departureTime).toLocaleDateString('ar-EG')
+                        📅 من:{' '}
+                        {demand.earliestTime
+                          ? new Date(demand.earliestTime).toLocaleDateString('ar-EG')
                           : 'غير محدد'}
                       </div>
                       <div>
                         🕐{' '}
-                        {demand.departureTime
-                          ? new Date(demand.departureTime).toLocaleTimeString('ar-EG', {
+                        {demand.earliestTime
+                          ? new Date(demand.earliestTime).toLocaleTimeString('ar-EG', {
                               hour: '2-digit',
                               minute: '2-digit',
                             })
                           : '--:--'}
                       </div>
+                      <div>
+                        📅 إلى:{' '}
+                        {demand.latestTime
+                          ? new Date(demand.latestTime).toLocaleDateString('ar-EG')
+                          : 'غير محدد'}
+                      </div>
                       <div>💺 {demand.seats} مقعد</div>
-                      <div>💰 {demand.price} د.ع</div>
+                      <div>💰 {demand.budgetMax} د.ع (الحد الأقصى)</div>
                     </div>
                   </div>
 
@@ -713,6 +808,216 @@ export default function Bookings() {
           <div>{bookings.map(renderBookingCard)}</div>
         )}
       </div>
+
+      {/* Edit Demand Modal */}
+      {editingDemand && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 'var(--space-4)',
+          }}
+          onClick={() => setEditingDemand(null)}
+        >
+          <div
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              padding: 'var(--space-6)',
+              maxWidth: '500px',
+              width: '100%',
+              boxShadow: 'var(--shadow-xl)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: '700',
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--space-4)',
+                fontFamily: '"Cairo", sans-serif',
+              }}
+            >
+              ✏️ تعديل الطلب
+            </h2>
+
+            <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+              {/* Earliest Time */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  📅 أقرب وقت للمغادرة
+                </label>
+                <input
+                  type="datetime-local"
+                  value={editForm.earliestTime}
+                  onChange={(e) => setEditForm({ ...editForm, earliestTime: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-3)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                />
+              </div>
+
+              {/* Latest Time */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  📅 آخر وقت للمغادرة
+                </label>
+                <input
+                  type="datetime-local"
+                  value={editForm.latestTime}
+                  onChange={(e) => setEditForm({ ...editForm, latestTime: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-3)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                />
+              </div>
+
+              {/* Seats */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  💺 عدد المقاعد
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="8"
+                  value={editForm.seats}
+                  onChange={(e) => setEditForm({ ...editForm, seats: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-3)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                />
+              </div>
+
+              {/* Budget Max */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  💰 الميزانية القصوى (د.ع)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={editForm.budgetMax}
+                  onChange={(e) => setEditForm({ ...editForm, budgetMax: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-3)',
+                    border: '2px solid var(--border-light)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div
+              style={{
+                display: 'flex',
+                gap: 'var(--space-3)',
+                marginTop: 'var(--space-6)',
+              }}
+            >
+              <button
+                onClick={handleUpdateDemand}
+                style={{
+                  flex: 1,
+                  padding: 'var(--space-3)',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                }}
+              >
+                ✅ حفظ التغييرات
+              </button>
+              <button
+                onClick={() => setEditingDemand(null)}
+                style={{
+                  flex: 1,
+                  padding: 'var(--space-3)',
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '2px solid var(--border-light)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                }}
+              >
+                ❌ إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin {

@@ -157,6 +157,17 @@ export const demandsAPI = {
       body: JSON.stringify(demandData),
     });
   },
+  update: async (demandId, demandData) => {
+    return apiRequest(`/demands/${demandId}`, {
+      method: 'PUT',
+      body: JSON.stringify(demandData),
+    });
+  },
+  delete: async (demandId) => {
+    return apiRequest(`/demands/${demandId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 export const messagesAPI = {
