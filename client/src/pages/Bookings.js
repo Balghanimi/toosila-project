@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { bookingsAPI } from '../services/api';
+import { bookingsAPI, demandsAPI, demandResponsesAPI } from '../services/api';
+import DemandResponsesList from '../components/DemandResponsesList';
 
 export default function Bookings() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.state?.tab || 'received'); // 'received' or 'sent'
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'received'); // 'received', 'sent', or 'demands'
   const [bookings, setBookings] = useState([]);
+  const [demands, setDemands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [highlightedBooking, setHighlightedBooking] = useState(
@@ -48,14 +50,40 @@ export default function Bookings() {
     setLoading(true);
     setError('');
     try {
-      const response =
-        activeTab === 'received'
-          ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
-          : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
+      if (activeTab === 'demands') {
+        // جلب طلباتي (demands)
+        const response = await demandsAPI.getAll({ userId: currentUser?.id });
+        const myDemands = (response.demands || []).filter((d) => d.userId === currentUser?.id);
 
-      setBookings(response.bookings || []);
+        // جلب الردود لكل طلب
+        const demandsWithResponses = await Promise.all(
+          myDemands.map(async (demand) => {
+            try {
+              const responsesData = await demandResponsesAPI.getByDemandId(demand.id);
+              return {
+                ...demand,
+                responses: responsesData.responses || [],
+              };
+            } catch {
+              return {
+                ...demand,
+                responses: [],
+              };
+            }
+          })
+        );
+
+        setDemands(demandsWithResponses);
+      } else {
+        const response =
+          activeTab === 'received'
+            ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
+            : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
+
+        setBookings(response.bookings || []);
+      }
     } catch (err) {
-      setError(err.message || 'حدث خطأ أثناء تحميل الحجوزات');
+      setError(err.message || 'حدث خطأ أثناء تحميل البيانات');
     } finally {
       setLoading(false);
     }
@@ -415,7 +443,8 @@ export default function Bookings() {
           role="tablist"
           aria-label="أنواع الحجوزات"
           style={{
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 'var(--space-2)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
@@ -430,13 +459,12 @@ export default function Bookings() {
             aria-controls="bookings-panel"
             aria-label="الحجوزات الواردة على عروضي"
             style={{
-              flex: 1,
               padding: 'var(--space-3)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
               background: activeTab === 'received' ? 'var(--surface-primary)' : 'transparent',
               color: activeTab === 'received' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontSize: 'var(--text-base)',
+              fontSize: 'var(--text-sm)',
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
@@ -452,13 +480,12 @@ export default function Bookings() {
             aria-controls="bookings-panel"
             aria-label="حجوزاتي على عروض الآخرين"
             style={{
-              flex: 1,
               padding: 'var(--space-3)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
               background: activeTab === 'sent' ? 'var(--surface-primary)' : 'transparent',
               color: activeTab === 'sent' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontSize: 'var(--text-base)',
+              fontSize: 'var(--text-sm)',
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
@@ -466,6 +493,27 @@ export default function Bookings() {
             }}
           >
             📤 حجوزاتي
+          </button>
+          <button
+            onClick={() => setActiveTab('demands')}
+            role="tab"
+            aria-selected={activeTab === 'demands'}
+            aria-controls="bookings-panel"
+            aria-label="طلباتي التي أنشأتها"
+            style={{
+              padding: 'var(--space-3)',
+              border: 'none',
+              borderRadius: 'var(--radius-sm)',
+              background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
+              color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+              boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
+            }}
+          >
+            🙋 طلباتي
           </button>
         </div>
 
@@ -518,6 +566,128 @@ export default function Bookings() {
               جاري التحميل...
             </p>
           </div>
+        ) : activeTab === 'demands' ? (
+          // عرض الطلبات (Demands)
+          demands.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: 'var(--space-8)',
+                background: 'var(--surface-primary)',
+                borderRadius: 'var(--radius-xl)',
+                boxShadow: 'var(--shadow-md)',
+              }}
+            >
+              <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🙋</div>
+              <p
+                style={{
+                  fontSize: 'var(--text-lg)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: '"Cairo", sans-serif',
+                }}
+              >
+                لم تقم بإنشاء أي طلبات بعد
+              </p>
+            </div>
+          ) : (
+            <div>
+              {demands.map((demand) => (
+                <div
+                  key={demand.id}
+                  style={{
+                    background: 'var(--surface-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                    marginBottom: 'var(--space-6)',
+                    boxShadow: 'var(--shadow-md)',
+                  }}
+                >
+                  {/* معلومات الطلب */}
+                  <div
+                    style={{
+                      marginBottom: 'var(--space-4)',
+                      paddingBottom: 'var(--space-4)',
+                      borderBottom: '2px solid var(--border-light)',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: 'var(--text-xl)',
+                        fontWeight: '700',
+                        color: 'var(--text-primary)',
+                        marginBottom: 'var(--space-3)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      📍 {demand.fromCity} ← {demand.toCity}
+                    </h3>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gap: 'var(--space-2)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--text-secondary)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      <div>
+                        📅{' '}
+                        {demand.departureTime
+                          ? new Date(demand.departureTime).toLocaleDateString('ar-EG')
+                          : 'غير محدد'}
+                      </div>
+                      <div>
+                        🕐{' '}
+                        {demand.departureTime
+                          ? new Date(demand.departureTime).toLocaleTimeString('ar-EG', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : '--:--'}
+                      </div>
+                      <div>💺 {demand.seats} مقعد</div>
+                      <div>💰 {demand.price} د.ع</div>
+                    </div>
+                  </div>
+
+                  {/* الردود على الطلب */}
+                  <div>
+                    <h4
+                      style={{
+                        fontSize: 'var(--text-base)',
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        marginBottom: 'var(--space-3)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      الردود ({demand.responses?.length || 0})
+                    </h4>
+                    {demand.responses && demand.responses.length > 0 ? (
+                      <DemandResponsesList
+                        responses={demand.responses}
+                        isOwner={true}
+                        onResponseUpdate={fetchBookings}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: 'var(--space-6)',
+                          background: 'var(--surface-secondary)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--text-secondary)',
+                          fontFamily: '"Cairo", sans-serif',
+                        }}
+                      >
+                        لا توجد ردود على هذا الطلب بعد
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         ) : bookings.length === 0 ? (
           <div
             style={{
