@@ -35,7 +35,8 @@
       "Bash(npm run format:*)",
       "Bash(npx eslint:*)",
       "Bash(node fix-eslint-errors.js:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
