@@ -335,6 +335,74 @@ router.put('/:id/deactivate', moderateLimiter, deactivateDemand);
 
 /**
  * @swagger
+ * /demands/{id}:
+ *   delete:
+ *     summary: Delete ride demand
+ *     description: Permanently delete a ride demand (owner only)
+ *     tags: [Demands]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         description: Demand deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *       403:
+ *         description: Forbidden - Not demand owner
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Demand not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.delete('/:id', moderateLimiter, async (req, res, next) => {
+  try {
+    const pool = req.app.get('dbPool');
+    const userId = req.user.id;
+    const demandId = parseInt(req.params.id);
+
+    // Check if demand exists and belongs to user
+    const checkQuery = 'SELECT user_id FROM demands WHERE id = $1';
+    const checkResult = await pool.query(checkQuery, [demandId]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'الطلب غير موجود',
+      });
+    }
+
+    if (checkResult.rows[0].user_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بحذف هذا الطلب',
+      });
+    }
+
+    // Delete the demand
+    const deleteQuery = 'DELETE FROM demands WHERE id = $1';
+    await pool.query(deleteQuery, [demandId]);
+
+    res.json({
+      success: true,
+      message: 'تم حذف الطلب بنجاح',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
  * /demands/user/{userId}:
  *   get:
  *     summary: Get user's demands
