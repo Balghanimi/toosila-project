@@ -158,7 +158,7 @@ const Home = () => {
         };
 
         await demandsAPI.create(demandData);
-        navigate('/demands');
+        navigate('/bookings', { state: { tab: 'demands' } });
       } catch (err) {
         console.error('Error creating demand:', err);
         setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');

@@ -59,8 +59,8 @@ export default function Bookings() {
     try {
       if (activeTab === 'demands') {
         // جلب طلباتي (demands)
-        const response = await demandsAPI.getAll({ userId: currentUser?.id });
-        const myDemands = (response.demands || []).filter((d) => d.userId === currentUser?.id);
+        const response = await demandsAPI.getAll({ passengerId: currentUser?.id });
+        const myDemands = response.demands || [];
 
         // جلب الردود لكل طلب
         const demandsWithResponses = await Promise.all(
