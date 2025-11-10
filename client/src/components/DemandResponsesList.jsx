@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { demandResponsesAPI } from '../services/api';
 
 /**
@@ -10,6 +11,7 @@ import { demandResponsesAPI } from '../services/api';
  * @param {Function} props.onResponseUpdate - دالة تُستدعى عند تحديث رد
  */
 const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
+  const navigate = useNavigate();
   const [actionLoading, setActionLoading] = useState(null); // معرف الرد الذي يتم معالجته
   const [error, setError] = useState('');
 
@@ -448,6 +450,87 @@ const DemandResponsesList = ({ responses, isOwner, onResponseUpdate }) => {
                   >
                     ❌ رفض العرض
                   </button>
+                </div>
+              )}
+
+              {/* زر المراسلة - يظهر بعد القبول */}
+              {isOwner && response.status === 'accepted' && (
+                <div
+                  style={{
+                    marginTop: 'var(--space-4)',
+                    padding: 'var(--space-4)',
+                    background: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '2px solid #0ea5e9',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 'var(--space-3)',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 'var(--text-base)',
+                          fontWeight: '700',
+                          color: '#0c4a6e',
+                          marginBottom: 'var(--space-1)',
+                          fontFamily: '"Cairo", sans-serif',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--space-2)',
+                        }}
+                      >
+                        <span>✅</span>
+                        تم قبول العرض
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 'var(--text-sm)',
+                          color: '#075985',
+                          fontFamily: '"Cairo", sans-serif',
+                        }}
+                      >
+                        يمكنك الآن التواصل مع السائق لتنسيق تفاصيل الرحلة
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('/messages')}
+                      style={{
+                        padding: 'var(--space-3) var(--space-5)',
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-base)',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)',
+                        transition: 'var(--transition)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        whiteSpace: 'nowrap',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(14, 165, 233, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.3)';
+                      }}
+                    >
+                      <span>💬</span>
+                      مراسلة السائق
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
