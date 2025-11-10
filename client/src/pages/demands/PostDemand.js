@@ -178,7 +178,12 @@ export default function PostDemand() {
   ];
 
   const updateField = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    console.log(`PostDemand - Updating field "${field}" to:`, value);
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value };
+      console.log('PostDemand - FormData after update:', updated);
+      return updated;
+    });
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
@@ -224,9 +229,16 @@ export default function PostDemand() {
     setError('');
 
     try {
+      console.log('PostDemand - Submitting with data:', data);
+
       // Combine date and time into ISO format
       const earliestDateTime = new Date(`${data.earliestDate}T${data.earliestTime}:00`);
       const latestDateTime = new Date(`${data.latestDate}T${data.latestTime}:00`);
+
+      console.log('PostDemand - Parsed dates:', {
+        earliest: earliestDateTime.toISOString(),
+        latest: latestDateTime.toISOString(),
+      });
 
       const demandData = {
         fromCity: data.fromCity,
@@ -237,6 +249,7 @@ export default function PostDemand() {
         budgetMax: parseFloat(data.budgetMax),
       };
 
+      console.log('PostDemand - Sending to API:', demandData);
       await demandsAPI.create(demandData);
       setSuccess(true);
 
