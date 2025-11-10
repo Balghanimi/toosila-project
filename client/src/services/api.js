@@ -175,7 +175,9 @@ export const messagesAPI = {
     return apiRequest('/messages/conversations', { method: 'GET' });
   },
   getRideMessages: async (rideType, rideId, page = 1, limit = 50) => {
-    return apiRequest(`/messages/${rideType}/${rideId}?page=${page}&limit=${limit}`, { method: 'GET' });
+    return apiRequest(`/messages/${rideType}/${rideId}?page=${page}&limit=${limit}`, {
+      method: 'GET',
+    });
   },
   // Deprecated - use getRideMessages instead
   getConversation: async (userId) => {
