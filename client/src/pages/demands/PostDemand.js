@@ -241,7 +241,7 @@ export default function PostDemand() {
       setSuccess(true);
 
       setTimeout(() => {
-        navigate('/demands');
+        navigate('/bookings', { state: { tab: 'demands' } });
       }, 2000);
     } catch (err) {
       console.error('Error creating demand:', err);
