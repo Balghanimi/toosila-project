@@ -11,7 +11,7 @@ const {
   getUserDemands,
   searchDemands,
   getCategories,
-  getDemandStats
+  getDemandStats,
 } = require('../controllers/demands.controller');
 
 // Import middlewares
@@ -20,7 +20,7 @@ const { moderateLimiter } = require('../middlewares/rateLimiters');
 const {
   validateDemandCreation,
   validateId,
-  validatePagination
+  validatePagination,
 } = require('../middlewares/validate');
 const { requireEmailVerified } = require('../controllers/emailVerification.controller');
 const { cacheList, cacheSearch, cacheStatic } = require('../middlewares/cache');
@@ -368,10 +368,10 @@ router.delete('/:id', moderateLimiter, async (req, res, next) => {
   try {
     const pool = req.app.get('dbPool');
     const userId = req.user.id;
-    const demandId = parseInt(req.params.id);
+    const demandId = req.params.id;
 
     // Check if demand exists and belongs to user
-    const checkQuery = 'SELECT user_id FROM demands WHERE id = $1';
+    const checkQuery = 'SELECT passenger_id FROM demands WHERE id = $1';
     const checkResult = await pool.query(checkQuery, [demandId]);
 
     if (checkResult.rows.length === 0) {
@@ -381,7 +381,7 @@ router.delete('/:id', moderateLimiter, async (req, res, next) => {
       });
     }
 
-    if (checkResult.rows[0].user_id !== userId) {
+    if (checkResult.rows[0].passenger_id !== userId) {
       return res.status(403).json({
         success: false,
         message: 'غير مصرح لك بحذف هذا الطلب',
