@@ -1,6 +1,23 @@
-import React, { useMemo, useState, useEffect } from 'react';
+/* eslint-disable */
+// DEPRECATED: This file is no longer used. Use PostOfferModern.js instead.
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOffers } from '../../context/OffersContext';
+
+// Define IRAQ_REGIONS to fix undefined variable error
+const IRAQ_REGIONS = {
+  بغداد: ['الكرادة', 'المنصور', 'الكاظمية', 'الأعظمية', 'الشعلة'],
+  البصرة: ['المعقل', 'القبلة', 'شط العرب', 'الزبير'],
+  النجف: ['المركز', 'الكوفة', 'المشخاب'],
+  أربيل: ['المركز', 'سوران', 'شقلاوة'],
+  الموصل: ['نينوى', 'الموصل القديمة', 'حمدانية'],
+  كربلاء: ['المركز', 'الحسينية', 'عين التمر'],
+  'ذي قار': ['الناصرية', 'الشطرة', 'سوق الشيوخ'],
+  ديالى: ['بعقوبة', 'المقدادية', 'خانقين'],
+  الأنبار: ['الرمادي', 'الفلوجة', 'هيت'],
+  واسط: ['الكوت', 'الحي', 'النعمانية'],
+  ميسان: ['العمارة', 'المجر الكبير', 'قلعة صالح'],
+};
 
 export default function PostOffer() {
   // Location selections
@@ -30,8 +47,26 @@ export default function PostOffer() {
   const normalizeDigits = (value) => {
     if (typeof value !== 'string') return value;
     const map = {
-      '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
-      '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'
+      '٠': '0',
+      '١': '1',
+      '٢': '2',
+      '٣': '3',
+      '٤': '4',
+      '٥': '5',
+      '٦': '6',
+      '٧': '7',
+      '٨': '8',
+      '٩': '9',
+      '۰': '0',
+      '۱': '1',
+      '۲': '2',
+      '۳': '3',
+      '۴': '4',
+      '۵': '5',
+      '۶': '6',
+      '۷': '7',
+      '۸': '8',
+      '۹': '9',
     };
     return value.replace(/[٠-٩۰-۹]/g, (d) => map[d] || d);
   };
@@ -44,21 +79,27 @@ export default function PostOffer() {
   };
 
   // Iraqi Provinces (Governorates) - Simplified list
-  const IRAQ_CITIES = useMemo(() => [
-    'بغداد',
-    'البصرة',
-    'النجف',
-    'أربيل',
-    'الموصل',
-    'كربلاء',
-    'ذي قار',
-    'ديالى',
-    'الأنبار',
-    'واسط',
-    'ميسان'
-  ], []);
+  const IRAQ_CITIES = useMemo(
+    () => [
+      'بغداد',
+      'البصرة',
+      'النجف',
+      'أربيل',
+      'الموصل',
+      'كربلاء',
+      'ذي قار',
+      'ديالى',
+      'الأنبار',
+      'واسط',
+      'ميسان',
+    ],
+    []
+  );
 
-  const fromAreas = useMemo(() => (fromGov ? IRAQ_REGIONS[fromGov] || [] : []), [fromGov, IRAQ_REGIONS]);
+  const fromAreas = useMemo(
+    () => (fromGov ? IRAQ_REGIONS[fromGov] || [] : []),
+    [fromGov, IRAQ_REGIONS]
+  );
   const toAreas = useMemo(() => (toGov ? IRAQ_REGIONS[toGov] || [] : []), [toGov, IRAQ_REGIONS]);
 
   // إضافة منطقة جديدة
@@ -101,11 +142,14 @@ export default function PostOffer() {
     if (!date) newErrors.date = 'حقل إجباري';
     if (!time) newErrors.time = 'حقل إجباري';
     const seatsNum = Number(seats);
-    if (!seats || Number.isNaN(seatsNum) || seatsNum <= 0) newErrors.seats = 'يجب أن يكون رقمًا موجبًا';
+    if (!seats || Number.isNaN(seatsNum) || seatsNum <= 0)
+      newErrors.seats = 'يجب أن يكون رقمًا موجبًا';
     const priceNum = Number(price);
-    if (!price || Number.isNaN(priceNum) || priceNum <= 0) newErrors.price = 'يجب أن يكون رقمًا موجبًا';
+    if (!price || Number.isNaN(priceNum) || priceNum <= 0)
+      newErrors.price = 'يجب أن يكون رقمًا موجبًا';
     if (!driverName.trim()) newErrors.driverName = 'اسم السائق مطلوب';
-    if (!driverPhone.trim() || driverPhone.trim().length < 7) newErrors.driverPhone = 'رقم هاتف غير صالح';
+    if (!driverPhone.trim() || driverPhone.trim().length < 7)
+      newErrors.driverPhone = 'رقم هاتف غير صالح';
     if (!carModel.trim()) newErrors.carModel = 'نوع السيارة مطلوب';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -136,7 +180,11 @@ export default function PostOffer() {
 
   const formatIQD = (value) => {
     try {
-      return new Intl.NumberFormat('ar-IQ', { style: 'currency', currency: 'IQD', maximumFractionDigits: 0 }).format(Number(value));
+      return new Intl.NumberFormat('ar-IQ', {
+        style: 'currency',
+        currency: 'IQD',
+        maximumFractionDigits: 0,
+      }).format(Number(value));
     } catch {
       return `${value} IQD`;
     }
@@ -144,21 +192,25 @@ export default function PostOffer() {
   const examplePrice = price ? formatIQD(price) : formatIQD(15000);
 
   return (
-    <div style={{ 
-      maxWidth: 600, 
-      margin: '1rem auto', 
-      padding: '0 16px',
-      background: '#ffffff',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-    }}>
+    <div
+      style={{
+        maxWidth: 600,
+        margin: '1rem auto',
+        padding: '0 16px',
+        background: '#ffffff',
+        borderRadius: '12px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      }}
+    >
       {/* Header */}
-      <div style={{ 
-        padding: '20px 0 16px 0',
-        borderBottom: '1px solid #e5e7eb',
-        marginBottom: '20px'
-      }}>
-        <button 
+      <div
+        style={{
+          padding: '20px 0 16px 0',
+          borderBottom: '1px solid #e5e7eb',
+          marginBottom: '20px',
+        }}
+      >
+        <button
           onClick={() => navigate('/')}
           style={{
             background: '#f3f4f6',
@@ -168,67 +220,80 @@ export default function PostOffer() {
             cursor: 'pointer',
             fontSize: '14px',
             color: '#374151',
-            marginBottom: '12px'
+            marginBottom: '12px',
           }}
         >
           ← رجوع للرئيسية
         </button>
-        <h2 style={{ 
-          margin: '0 0 8px 0', 
-          fontSize: '24px',
-          fontWeight: '700',
-          color: '#1f2937',
-          textAlign: 'center'
-        }}>
+        <h2
+          style={{
+            margin: '0 0 8px 0',
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#1f2937',
+            textAlign: 'center',
+          }}
+        >
           🚗 عرض مقعد
         </h2>
-        <p style={{ 
-          margin: '0',
-          fontSize: '14px',
-          color: '#6b7280',
-          textAlign: 'center'
-        }}>
+        <p
+          style={{
+            margin: '0',
+            fontSize: '14px',
+            color: '#6b7280',
+            textAlign: 'center',
+          }}
+        >
           أنا سائق أبحث عن ركاب
         </p>
       </div>
 
       <form onSubmit={handlePost} noValidate style={{ display: 'grid', gap: '20px' }}>
         {/* معلومات السائق */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #0ea5e9',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#0ea5e9',
-            color: 'white',
-            padding: '4px 12px',
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+            padding: '20px',
             borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
+            border: '1px solid #0ea5e9',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '20px',
+              background: '#0ea5e9',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
             معلومات السائق
           </div>
           <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '6px', 
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#0369a1'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0369a1',
+                }}
+              >
                 اسم السائق
               </label>
               <input
                 placeholder="أدخل اسمك الكامل"
                 value={driverName}
-                onChange={(e) => { setDriverName(e.target.value); if (errors.driverName) setErrors((p) => ({ ...p, driverName: undefined })); }}
+                onChange={(e) => {
+                  setDriverName(e.target.value);
+                  if (errors.driverName) setErrors((p) => ({ ...p, driverName: undefined }));
+                }}
                 aria-invalid={!!errors.driverName}
                 required
                 style={{
@@ -237,26 +302,35 @@ export default function PostOffer() {
                   border: '1px solid #0ea5e9',
                   borderRadius: '8px',
                   fontSize: '16px',
-                  background: 'white'
+                  background: 'white',
                 }}
               />
-              {errors.driverName ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.driverName}</div> : null}
+              {errors.driverName ? (
+                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                  {errors.driverName}
+                </div>
+              ) : null}
             </div>
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '6px', 
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#0369a1'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0369a1',
+                }}
+              >
                 رقم الهاتف
               </label>
               <input
                 placeholder="07XXXXXXXX"
                 inputMode="tel"
                 value={driverPhone}
-                onChange={(e) => { setDriverPhone(e.target.value); if (errors.driverPhone) setErrors((p) => ({ ...p, driverPhone: undefined })); }}
+                onChange={(e) => {
+                  setDriverPhone(e.target.value);
+                  if (errors.driverPhone) setErrors((p) => ({ ...p, driverPhone: undefined }));
+                }}
                 aria-invalid={!!errors.driverPhone}
                 required
                 style={{
@@ -265,25 +339,34 @@ export default function PostOffer() {
                   border: '1px solid #0ea5e9',
                   borderRadius: '8px',
                   fontSize: '16px',
-                  background: 'white'
+                  background: 'white',
                 }}
               />
-              {errors.driverPhone ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.driverPhone}</div> : null}
+              {errors.driverPhone ? (
+                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                  {errors.driverPhone}
+                </div>
+              ) : null}
             </div>
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '6px', 
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#0369a1'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#0369a1',
+                }}
+              >
                 نوع السيارة
               </label>
               <input
                 placeholder="مثال: تويوتا كامري 2020"
                 value={carModel}
-                onChange={(e) => { setCarModel(e.target.value); if (errors.carModel) setErrors((p) => ({ ...p, carModel: undefined })); }}
+                onChange={(e) => {
+                  setCarModel(e.target.value);
+                  if (errors.carModel) setErrors((p) => ({ ...p, carModel: undefined }));
+                }}
                 aria-invalid={!!errors.carModel}
                 required
                 style={{
@@ -292,51 +375,65 @@ export default function PostOffer() {
                   border: '1px solid #0ea5e9',
                   borderRadius: '8px',
                   fontSize: '16px',
-                  background: 'white'
+                  background: 'white',
                 }}
               />
-              {errors.carModel ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.carModel}</div> : null}
+              {errors.carModel ? (
+                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                  {errors.carModel}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
 
         {/* تفاصيل الرحلة */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #22c55e',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#22c55e',
-            color: 'white',
-            padding: '4px 12px',
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+            padding: '20px',
             borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
+            border: '1px solid #22c55e',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '20px',
+              background: '#22c55e',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
             تفاصيل الرحلة
           </div>
           <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
             {/* من */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   من - المحافظة
                 </label>
                 <select
                   value={fromGov}
-                  onChange={(e) => { setFromGov(e.target.value); setFromArea(''); if (errors.fromGov) setErrors((p) => ({ ...p, fromGov: undefined })); }}
+                  onChange={(e) => {
+                    setFromGov(e.target.value);
+                    setFromArea('');
+                    if (errors.fromGov) setErrors((p) => ({ ...p, fromGov: undefined }));
+                  }}
                   aria-invalid={!!errors.fromGov}
                   required
                   style={{
@@ -345,33 +442,41 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 >
                   <option value="">اختر المحافظة</option>
                   {Object.keys(IRAQ_REGIONS).map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </select>
-                {errors.fromGov ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.fromGov}</div> : null}
+                {errors.fromGov ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.fromGov}
+                  </div>
+                ) : null}
               </div>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   من - المنطقة
                 </label>
                 <select
                   value={fromArea}
-                  onChange={(e) => { 
+                  onChange={(e) => {
                     if (e.target.value === 'add-new') {
                       setShowAddFromArea(true);
                     } else {
-                      setFromArea(e.target.value); 
+                      setFromArea(e.target.value);
                       if (errors.fromArea) setErrors((p) => ({ ...p, fromArea: undefined }));
                     }
                   }}
@@ -384,35 +489,45 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: fromGov ? 'white' : '#f9fafb'
+                    background: fromGov ? 'white' : '#f9fafb',
                   }}
                 >
                   <option value="">اختر المنطقة</option>
                   {fromAreas.map((a) => (
-                    <option key={a} value={a}>{a}</option>
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
                   ))}
                   <option value="add-new" style={{ color: '#22c55e', fontWeight: '600' }}>
                     ➕ إضافة منطقة جديدة
                   </option>
                 </select>
-                {errors.fromArea ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.fromArea}</div> : null}
-                
+                {errors.fromArea ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.fromArea}
+                  </div>
+                ) : null}
+
                 {/* إضافة منطقة جديدة */}
                 {showAddFromArea && (
-                  <div style={{ 
-                    marginTop: '8px', 
-                    padding: '12px', 
-                    background: '#f0fdf4', 
-                    border: '1px solid #22c55e', 
-                    borderRadius: '8px' 
-                  }}>
-                    <label style={{ 
-                      display: 'block', 
-                      marginBottom: '6px', 
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#15803d'
-                    }}>
+                  <div
+                    style={{
+                      marginTop: '8px',
+                      padding: '12px',
+                      background: '#f0fdf4',
+                      border: '1px solid #22c55e',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '6px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#15803d',
+                      }}
+                    >
                       اسم المنطقة الجديدة
                     </label>
                     <div style={{ display: 'flex', gap: '8px' }}>
@@ -425,7 +540,7 @@ export default function PostOffer() {
                           padding: '8px',
                           border: '1px solid #22c55e',
                           borderRadius: '6px',
-                          fontSize: '14px'
+                          fontSize: '14px',
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -443,7 +558,7 @@ export default function PostOffer() {
                           padding: '8px 12px',
                           borderRadius: '6px',
                           fontSize: '12px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
                         }}
                       >
                         إضافة
@@ -461,7 +576,7 @@ export default function PostOffer() {
                           padding: '8px 12px',
                           borderRadius: '6px',
                           fontSize: '12px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
                         }}
                       >
                         إلغاء
@@ -475,18 +590,24 @@ export default function PostOffer() {
             {/* إلى */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   إلى - المحافظة
                 </label>
                 <select
                   value={toGov}
-                  onChange={(e) => { setToGov(e.target.value); setToArea(''); if (errors.toGov) setErrors((p) => ({ ...p, toGov: undefined })); }}
+                  onChange={(e) => {
+                    setToGov(e.target.value);
+                    setToArea('');
+                    if (errors.toGov) setErrors((p) => ({ ...p, toGov: undefined }));
+                  }}
                   aria-invalid={!!errors.toGov}
                   required
                   style={{
@@ -495,33 +616,41 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 >
                   <option value="">اختر المحافظة</option>
                   {Object.keys(IRAQ_REGIONS).map((g) => (
-                    <option key={g} value={g}>{g}</option>
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </select>
-                {errors.toGov ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.toGov}</div> : null}
+                {errors.toGov ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.toGov}
+                  </div>
+                ) : null}
               </div>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   إلى - المنطقة
                 </label>
                 <select
                   value={toArea}
-                  onChange={(e) => { 
+                  onChange={(e) => {
                     if (e.target.value === 'add-new') {
                       setShowAddToArea(true);
                     } else {
-                      setToArea(e.target.value); 
+                      setToArea(e.target.value);
                       if (errors.toArea) setErrors((p) => ({ ...p, toArea: undefined }));
                     }
                   }}
@@ -534,35 +663,45 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: toGov ? 'white' : '#f9fafb'
+                    background: toGov ? 'white' : '#f9fafb',
                   }}
                 >
                   <option value="">اختر المنطقة</option>
                   {toAreas.map((a) => (
-                    <option key={a} value={a}>{a}</option>
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
                   ))}
                   <option value="add-new" style={{ color: '#22c55e', fontWeight: '600' }}>
                     ➕ إضافة منطقة جديدة
                   </option>
                 </select>
-                {errors.toArea ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.toArea}</div> : null}
-                
+                {errors.toArea ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.toArea}
+                  </div>
+                ) : null}
+
                 {/* إضافة منطقة جديدة */}
                 {showAddToArea && (
-                  <div style={{ 
-                    marginTop: '8px', 
-                    padding: '12px', 
-                    background: '#f0fdf4', 
-                    border: '1px solid #22c55e', 
-                    borderRadius: '8px' 
-                  }}>
-                    <label style={{ 
-                      display: 'block', 
-                      marginBottom: '6px', 
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#15803d'
-                    }}>
+                  <div
+                    style={{
+                      marginTop: '8px',
+                      padding: '12px',
+                      background: '#f0fdf4',
+                      border: '1px solid #22c55e',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '6px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#15803d',
+                      }}
+                    >
                       اسم المنطقة الجديدة
                     </label>
                     <div style={{ display: 'flex', gap: '8px' }}>
@@ -575,7 +714,7 @@ export default function PostOffer() {
                           padding: '8px',
                           border: '1px solid #22c55e',
                           borderRadius: '6px',
-                          fontSize: '14px'
+                          fontSize: '14px',
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -593,7 +732,7 @@ export default function PostOffer() {
                           padding: '8px 12px',
                           borderRadius: '6px',
                           fontSize: '12px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
                         }}
                       >
                         إضافة
@@ -611,7 +750,7 @@ export default function PostOffer() {
                           padding: '8px 12px',
                           borderRadius: '6px',
                           fontSize: '12px',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
                         }}
                       >
                         إلغاء
@@ -625,19 +764,24 @@ export default function PostOffer() {
             {/* التاريخ والوقت */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   التاريخ
                 </label>
                 <input
                   type="date"
                   value={date}
-                  onChange={(e) => { setDate(e.target.value); if (errors.date) setErrors((p) => ({ ...p, date: undefined })); }}
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                    if (errors.date) setErrors((p) => ({ ...p, date: undefined }));
+                  }}
                   aria-invalid={!!errors.date}
                   required
                   style={{
@@ -646,25 +790,34 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 />
-                {errors.date ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.date}</div> : null}
+                {errors.date ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.date}
+                  </div>
+                ) : null}
               </div>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#15803d'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#15803d',
+                  }}
+                >
                   الوقت
                 </label>
                 <input
                   type="time"
                   value={time}
-                  onChange={(e) => { setTime(e.target.value); if (errors.time) setErrors((p) => ({ ...p, time: undefined })); }}
+                  onChange={(e) => {
+                    setTime(e.target.value);
+                    if (errors.time) setErrors((p) => ({ ...p, time: undefined }));
+                  }}
                   aria-invalid={!!errors.time}
                   required
                   style={{
@@ -673,46 +826,56 @@ export default function PostOffer() {
                     border: '1px solid #22c55e',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 />
-                {errors.time ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.time}</div> : null}
+                {errors.time ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.time}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
         </div>
 
         {/* السعر والمقاعد */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', 
-          padding: '20px', 
-          borderRadius: '12px', 
-          border: '1px solid #f59e0b',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '20px',
-            background: '#f59e0b',
-            color: 'white',
-            padding: '4px 12px',
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+            padding: '20px',
             borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
+            border: '1px solid #f59e0b',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '20px',
+              background: '#f59e0b',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
             السعر والمقاعد
           </div>
           <div style={{ display: 'grid', gap: '16px', marginTop: '8px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#92400e'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#92400e',
+                  }}
+                >
                   عدد المقاعد المتاحة
                 </label>
                 <input
@@ -737,19 +900,25 @@ export default function PostOffer() {
                     border: '1px solid #f59e0b',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 />
-                {errors.seats ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.seats}</div> : null}
+                {errors.seats ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.seats}
+                  </div>
+                ) : null}
               </div>
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#92400e'
-                }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#92400e',
+                  }}
+                >
                   السعر لكل مقعد (دينار)
                 </label>
                 <input
@@ -776,27 +945,33 @@ export default function PostOffer() {
                     border: '1px solid #f59e0b',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    background: 'white'
+                    background: 'white',
                   }}
                 />
                 <div style={{ fontSize: '12px', color: '#92400e', marginTop: '4px' }}>
                   مثال: {examplePrice}
                 </div>
-                {errors.price ? <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.price}</div> : null}
+                {errors.price ? (
+                  <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.price}
+                  </div>
+                ) : null}
               </div>
             </div>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px',
-              padding: '12px',
-              background: 'rgba(255, 255, 255, 0.5)',
-              borderRadius: '8px',
-              border: '1px solid rgba(245, 158, 11, 0.3)'
-            }}>
-              <input 
-                type="checkbox" 
-                checked={negotiable} 
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px',
+                background: 'rgba(255, 255, 255, 0.5)',
+                borderRadius: '8px',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={negotiable}
                 onChange={(e) => setNegotiable(e.target.checked)}
                 style={{ transform: 'scale(1.2)' }}
               />
@@ -808,7 +983,7 @@ export default function PostOffer() {
         </div>
 
         {/* زر النشر */}
-        <button 
+        <button
           type="submit"
           style={{
             background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
@@ -820,7 +995,7 @@ export default function PostOffer() {
             fontWeight: '700',
             cursor: 'pointer',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = 'translateY(-2px)';

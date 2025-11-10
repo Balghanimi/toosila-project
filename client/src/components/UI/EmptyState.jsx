@@ -12,27 +12,27 @@ const EmptyState = ({
   actions = [],
   size = 'md',
   variant = 'default',
-  className = ''
+  className = '',
 }) => {
   const sizes = {
     sm: {
       container: 'var(--space-6)',
       icon: '3rem',
       titleSize: 'var(--text-base)',
-      descSize: 'var(--text-sm)'
+      descSize: 'var(--text-sm)',
     },
     md: {
       container: 'var(--space-8)',
       icon: '4rem',
       titleSize: 'var(--text-xl)',
-      descSize: 'var(--text-base)'
+      descSize: 'var(--text-base)',
     },
     lg: {
       container: 'var(--space-12)',
       icon: '5rem',
       titleSize: 'var(--text-2xl)',
-      descSize: 'var(--text-lg)'
-    }
+      descSize: 'var(--text-lg)',
+    },
   };
 
   const sizeConfig = sizes[size] || sizes.md;
@@ -41,18 +41,18 @@ const EmptyState = ({
     default: {
       background: 'var(--surface-primary)',
       border: '1px solid var(--border-light)',
-      shadow: 'var(--shadow-md)'
+      shadow: 'var(--shadow-md)',
     },
     subtle: {
       background: 'transparent',
       border: 'none',
-      shadow: 'none'
+      shadow: 'none',
     },
     card: {
       background: 'var(--surface-primary)',
       border: '2px solid var(--border-light)',
-      shadow: 'var(--shadow-lg)'
-    }
+      shadow: 'var(--shadow-lg)',
+    },
   };
 
   const variantConfig = variants[variant] || variants.default;
@@ -67,7 +67,7 @@ const EmptyState = ({
         border: variantConfig.border,
         borderRadius: 'var(--radius-xl)',
         boxShadow: variantConfig.shadow,
-        fontFamily: '"Cairo", sans-serif'
+        fontFamily: '"Cairo", sans-serif',
       }}
       role="status"
       aria-live="polite"
@@ -77,7 +77,7 @@ const EmptyState = ({
         style={{
           fontSize: sizeConfig.icon,
           marginBottom: 'var(--space-4)',
-          animation: 'fadeIn 0.5s ease-out'
+          animation: 'fadeIn 0.5s ease-out',
         }}
         aria-hidden="true"
       >
@@ -91,7 +91,7 @@ const EmptyState = ({
           fontWeight: '700',
           color: 'var(--text-primary)',
           marginBottom: description ? 'var(--space-2)' : 'var(--space-4)',
-          margin: '0 0 ' + (description ? 'var(--space-2)' : 'var(--space-4)') + ' 0'
+          margin: '0 0 ' + (description ? 'var(--space-2)' : 'var(--space-4)') + ' 0',
         }}
       >
         {title}
@@ -108,7 +108,7 @@ const EmptyState = ({
             maxWidth: '500px',
             marginLeft: 'auto',
             marginRight: 'auto',
-            lineHeight: '1.6'
+            lineHeight: '1.6',
           }}
         >
           {description}
@@ -123,19 +123,24 @@ const EmptyState = ({
             gap: 'var(--space-3)',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            marginTop: 'var(--space-4)'
+            marginTop: 'var(--space-4)',
           }}
         >
           {actions.map((action, index) => (
             <button
               key={index}
               onClick={action.onClick}
-              className={action.variant === 'primary' ? 'btn-pro btn-pro-primary' : 'btn-pro btn-pro-secondary'}
+              className={
+                action.variant === 'primary'
+                  ? 'btn-pro btn-pro-primary'
+                  : 'btn-pro btn-pro-secondary'
+              }
               style={{
                 padding: 'var(--space-3) var(--space-6)',
-                background: action.variant === 'primary'
-                  ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                  : 'var(--surface-secondary)',
+                background:
+                  action.variant === 'primary'
+                    ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                    : 'var(--surface-secondary)',
                 color: action.variant === 'primary' ? 'white' : 'var(--text-primary)',
                 border: action.variant === 'primary' ? 'none' : '2px solid var(--border-light)',
                 borderRadius: 'var(--radius-lg)',
@@ -144,7 +149,7 @@ const EmptyState = ({
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontFamily: '"Cairo", sans-serif',
-                boxShadow: action.variant === 'primary' ? 'var(--shadow-md)' : 'none'
+                boxShadow: action.variant === 'primary' ? 'var(--shadow-md)' : 'none',
               }}
               onMouseEnter={(e) => {
                 if (action.variant === 'primary') {

@@ -46,8 +46,9 @@ body.dark-mode .glass {
   background: var(--surface-primary);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--border-light);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -68,8 +69,9 @@ body.dark-mode .glass {
 
 .card-enhanced:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-color: var(--primary);
 }
 
@@ -79,7 +81,8 @@ body.dark-mode .glass {
 
 /* ===== Floating Animation ===== */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -93,7 +96,8 @@ body.dark-mode .glass {
 
 /* ===== Pulse Animation ===== */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
   }
   50% {
@@ -166,7 +170,8 @@ body.dark-mode .glass {
 }
 
 .input-modern::placeholder {
-  color: var(--text-muted);
+  color: var(--text-placeholder, var(--text-muted));
+  opacity: 1; /* Ensure full opacity for proper contrast */
 }
 
 /* ===== Badge Styles ===== */
@@ -256,12 +261,7 @@ body.dark-mode .glass {
 /* ===== Divider ===== */
 .divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--border-light),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--border-light), transparent);
   margin: 24px 0;
 }
 

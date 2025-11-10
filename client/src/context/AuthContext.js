@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
       try {
         const token = localStorage.getItem('token');
         const savedUser = localStorage.getItem('currentUser');
-        
+
         if (token && savedUser) {
           const userData = JSON.parse(savedUser);
           // Validate user data structure
@@ -68,7 +68,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-
   // Register function - API-based
   const register = async (userData) => {
     setError('');
@@ -95,7 +94,7 @@ export function AuthProvider({ children }) {
         name,
         email,
         password,
-        userType
+        userType,
       });
 
       // Save token and user data
@@ -105,7 +104,6 @@ export function AuthProvider({ children }) {
 
       setLoading(false);
       return { success: true, user: data.data.user };
-
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -124,9 +122,9 @@ export function AuthProvider({ children }) {
       }
 
       const allUsers = getAllUsers();
-      
+
       // Find user by phone
-      const foundUser = allUsers.find(u => u.phone === phone.trim());
+      const foundUser = allUsers.find((u) => u.phone === phone.trim());
 
       if (!foundUser) {
         throw new Error('رقم الهاتف غير مسجل. يرجى إنشاء حساب جديد.');
@@ -139,7 +137,6 @@ export function AuthProvider({ children }) {
 
       setLoading(false);
       return { success: true, user: userForStorage };
-
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -169,7 +166,6 @@ export function AuthProvider({ children }) {
 
       setLoading(false);
       return { success: true, user: data.data.user };
-
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -208,7 +204,6 @@ export function AuthProvider({ children }) {
       setUser(updatedUser);
 
       return { success: true, user: updatedUser };
-
     } catch (error) {
       setError(error.message);
       return { success: false, error: error.message };
@@ -218,7 +213,7 @@ export function AuthProvider({ children }) {
   // Get user by ID
   const getUserById = (userId) => {
     const allUsers = getAllUsers();
-    return allUsers.find(u => u.id === userId);
+    return allUsers.find((u) => u.id === userId);
   };
 
   // Check if user is authenticated
@@ -245,12 +240,8 @@ export function AuthProvider({ children }) {
     isAuthenticated,
     isDriver,
     isPassenger,
-    setError
+    setError,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

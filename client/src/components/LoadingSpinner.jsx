@@ -10,13 +10,13 @@ export default function LoadingSpinner({
   size = 'md',
   variant = 'page',
   text = 'جاري التحميل...',
-  showText = true
+  showText = true,
 }) {
   // Size configurations
   const sizes = {
     sm: { spinner: '24px', border: '3px', fontSize: '0.875rem' },
     md: { spinner: '40px', border: '4px', fontSize: '1rem' },
-    lg: { spinner: '60px', border: '4px', fontSize: '1.125rem' }
+    lg: { spinner: '60px', border: '4px', fontSize: '1.125rem' },
   };
 
   const sizeConfig = sizes[size] || sizes.md;
@@ -32,18 +32,18 @@ export default function LoadingSpinner({
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: '"Cairo", sans-serif',
-        padding: 'var(--space-4, 1rem)'
+        padding: 'var(--space-4, 1rem)',
       },
-      showLogo: true
+      showLogo: true,
     },
     inline: {
       container: {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 'var(--space-2, 0.5rem)',
-        fontFamily: '"Cairo", sans-serif'
+        fontFamily: '"Cairo", sans-serif',
       },
-      showLogo: false
+      showLogo: false,
     },
     overlay: {
       container: {
@@ -59,9 +59,9 @@ export default function LoadingSpinner({
         background: 'rgba(0, 0, 0, 0.5)',
         backdropFilter: 'blur(4px)',
         zIndex: 9999,
-        fontFamily: '"Cairo", sans-serif'
+        fontFamily: '"Cairo", sans-serif',
       },
-      showLogo: false
+      showLogo: false,
     },
     card: {
       container: {
@@ -70,21 +70,16 @@ export default function LoadingSpinner({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 'var(--space-8, 2rem)',
-        fontFamily: '"Cairo", sans-serif'
+        fontFamily: '"Cairo", sans-serif',
       },
-      showLogo: false
-    }
+      showLogo: false,
+    },
   };
 
   const variantConfig = variants[variant] || variants.page;
 
   return (
-    <div
-      style={variantConfig.container}
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-    >
+    <div style={variantConfig.container} role="status" aria-live="polite" aria-busy="true">
       {/* Spinner */}
       <div
         style={{
@@ -94,20 +89,22 @@ export default function LoadingSpinner({
           borderTop: `${sizeConfig.border} solid var(--primary, #10b981)`,
           borderRadius: '50%',
           animation: 'spinner-spin 0.8s linear infinite',
-          marginBottom: showText ? 'var(--space-4, 1rem)' : '0'
+          marginBottom: showText ? 'var(--space-4, 1rem)' : '0',
         }}
         aria-hidden="true"
       />
 
       {/* Loading Text - Visible */}
       {showText && (
-        <p style={{
-          fontSize: sizeConfig.fontSize,
-          fontWeight: '600',
-          color: variant === 'overlay' ? 'white' : 'var(--text-secondary, #64748b)',
-          margin: 0,
-          textAlign: 'center'
-        }}>
+        <p
+          style={{
+            fontSize: sizeConfig.fontSize,
+            fontWeight: '600',
+            color: variant === 'overlay' ? 'white' : 'var(--text-secondary, #64748b)',
+            margin: 0,
+            textAlign: 'center',
+          }}
+        >
           {text}
         </p>
       )}
@@ -117,11 +114,13 @@ export default function LoadingSpinner({
 
       {/* Logo/Branding for page variant */}
       {variantConfig.showLogo && (
-        <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--text-muted, #94a3b8)',
-          marginTop: 'var(--space-2, 0.5rem)'
-        }}>
+        <p
+          style={{
+            fontSize: '0.875rem',
+            color: 'var(--text-muted, #94a3b8)',
+            marginTop: 'var(--space-2, 0.5rem)',
+          }}
+        >
           توصيلة
         </p>
       )}

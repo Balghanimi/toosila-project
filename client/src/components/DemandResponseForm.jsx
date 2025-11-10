@@ -14,7 +14,7 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     offerPrice: demand.budgetMax || '',
     availableSeats: demand.seats || 1,
-    message: ''
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -22,9 +22,9 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
   // معالجة تغيير الحقول
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     setError(''); // مسح الخطأ عند التعديل
   };
@@ -52,7 +52,7 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
         demandId: demand.id,
         offerPrice: parseFloat(formData.offerPrice),
         availableSeats: parseInt(formData.availableSeats),
-        message: formData.message
+        message: formData.message,
       });
 
       // استدعاء دالة النجاح
@@ -68,58 +68,80 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
   };
 
   return (
-    <div style={{
-      background: 'var(--surface-primary)',
-      borderRadius: 'var(--radius-xl)',
-      padding: 'var(--space-6)',
-      boxShadow: 'var(--shadow-lg)',
-      border: '1px solid var(--border-light)'
-    }}>
+    <div
+      style={{
+        background: 'var(--surface-primary)',
+        borderRadius: 'var(--radius-xl)',
+        padding: 'var(--space-6)',
+        boxShadow: 'var(--shadow-lg)',
+        border: '1px solid var(--border-light)',
+      }}
+    >
       {/* العنوان */}
-      <h3 style={{
-        fontSize: 'var(--text-xl)',
-        fontWeight: '700',
-        color: 'var(--text-primary)',
-        marginBottom: 'var(--space-4)',
-        fontFamily: '"Cairo", sans-serif',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-2)'
-      }}>
+      <h3
+        style={{
+          fontSize: 'var(--text-xl)',
+          fontWeight: '700',
+          color: 'var(--text-primary)',
+          marginBottom: 'var(--space-4)',
+          fontFamily: '"Cairo", sans-serif',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+        }}
+      >
         <span style={{ fontSize: '1.5rem' }}>💼</span>
         إرسال عرض للراكب
       </h3>
 
       {/* معلومات الطلب */}
-      <div style={{
-        background: 'var(--surface-secondary)',
-        borderRadius: 'var(--radius)',
-        padding: 'var(--space-4)',
-        marginBottom: 'var(--space-4)',
-        fontFamily: '"Cairo", sans-serif'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: 'var(--space-3)',
-          fontSize: 'var(--text-sm)'
-        }}>
+      <div
+        style={{
+          background: 'var(--surface-secondary)',
+          borderRadius: 'var(--radius)',
+          padding: 'var(--space-4)',
+          marginBottom: 'var(--space-4)',
+          fontFamily: '"Cairo", sans-serif',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 'var(--space-3)',
+            fontSize: 'var(--text-sm)',
+          }}
+        >
           <div>
             <span style={{ color: 'var(--text-secondary)' }}>المسار:</span>
-            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginTop: 'var(--space-1)' }}>
+            <div
+              style={{
+                fontWeight: '600',
+                color: 'var(--text-primary)',
+                marginTop: 'var(--space-1)',
+              }}
+            >
               {demand.fromCity} ← {demand.toCity}
             </div>
           </div>
           <div>
             <span style={{ color: 'var(--text-secondary)' }}>المقاعد المطلوبة:</span>
-            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginTop: 'var(--space-1)' }}>
+            <div
+              style={{
+                fontWeight: '600',
+                color: 'var(--text-primary)',
+                marginTop: 'var(--space-1)',
+              }}
+            >
               {demand.seats} مقعد/مقاعد
             </div>
           </div>
           {demand.budgetMax && (
             <div>
               <span style={{ color: 'var(--text-secondary)' }}>الميزانية القصوى:</span>
-              <div style={{ fontWeight: '600', color: 'var(--primary)', marginTop: 'var(--space-1)' }}>
+              <div
+                style={{ fontWeight: '600', color: 'var(--primary)', marginTop: 'var(--space-1)' }}
+              >
                 {Number(demand.budgetMax).toLocaleString()} د.ع
               </div>
             </div>
@@ -131,14 +153,16 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
       <form onSubmit={handleSubmit}>
         {/* السعر المقترح */}
         <div style={{ marginBottom: 'var(--space-4)' }}>
-          <label style={{
-            display: 'block',
-            fontSize: 'var(--text-sm)',
-            fontWeight: '600',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             💰 السعر المقترح (دينار عراقي)
             <span style={{ color: 'var(--error)', marginRight: 'var(--space-1)' }}>*</span>
           </label>
@@ -160,18 +184,20 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               fontFamily: '"Cairo", sans-serif',
               transition: 'var(--transition)',
               textAlign: 'center',
-              direction: 'ltr'
+              direction: 'ltr',
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'var(--border-light)')}
           />
           {demand.budgetMax && formData.offerPrice > demand.budgetMax && (
-            <div style={{
-              fontSize: 'var(--text-sm)',
-              color: '#ff9800',
-              marginTop: 'var(--space-2)',
-              fontFamily: '"Cairo", sans-serif'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-sm)',
+                color: '#ff9800',
+                marginTop: 'var(--space-2)',
+                fontFamily: '"Cairo", sans-serif',
+              }}
+            >
               ⚠️ سعرك أعلى من الميزانية القصوى ({Number(demand.budgetMax).toLocaleString()} د.ع)
             </div>
           )}
@@ -179,14 +205,16 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
 
         {/* عدد المقاعد المتاحة */}
         <div style={{ marginBottom: 'var(--space-4)' }}>
-          <label style={{
-            display: 'block',
-            fontSize: 'var(--text-sm)',
-            fontWeight: '600',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             💺 عدد المقاعد المتاحة
             <span style={{ color: 'var(--error)', marginRight: 'var(--space-1)' }}>*</span>
           </label>
@@ -207,31 +235,35 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               fontFamily: '"Cairo", sans-serif',
               transition: 'var(--transition)',
               textAlign: 'center',
-              direction: 'ltr'
+              direction: 'ltr',
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'var(--border-light)')}
           />
-          <div style={{
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-secondary)',
-            marginTop: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <div
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-secondary)',
+              marginTop: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             الحد الأدنى: {demand.seats} مقعد/مقاعد
           </div>
         </div>
 
         {/* رسالة اختيارية */}
         <div style={{ marginBottom: 'var(--space-4)' }}>
-          <label style={{
-            display: 'block',
-            fontSize: 'var(--text-sm)',
-            fontWeight: '600',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '600',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             💬 رسالة للراكب (اختياري)
           </label>
           <textarea
@@ -250,48 +282,54 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               fontFamily: '"Cairo", sans-serif',
               resize: 'vertical',
               transition: 'var(--transition)',
-              textAlign: 'center'
+              textAlign: 'center',
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}
+            onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.target.style.borderColor = 'var(--border-light)')}
           />
-          <div style={{
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-secondary)',
-            marginTop: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif',
-            textAlign: 'left'
-          }}>
+          <div
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-secondary)',
+              marginTop: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+              textAlign: 'left',
+            }}
+          >
             {formData.message.length}/500
           </div>
         </div>
 
         {/* رسالة خطأ */}
         {error && (
-          <div style={{
-            background: '#fee',
-            border: '2px solid #f88',
-            borderRadius: 'var(--radius)',
-            padding: 'var(--space-3)',
-            marginBottom: 'var(--space-4)',
-            color: '#c00',
-            fontSize: 'var(--text-sm)',
-            fontFamily: '"Cairo", sans-serif',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)'
-          }}>
+          <div
+            style={{
+              background: '#fee',
+              border: '2px solid #f88',
+              borderRadius: 'var(--radius)',
+              padding: 'var(--space-3)',
+              marginBottom: 'var(--space-4)',
+              color: '#c00',
+              fontSize: 'var(--text-sm)',
+              fontFamily: '"Cairo", sans-serif',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+            }}
+          >
             <span>⚠️</span>
             {error}
           </div>
         )}
 
         {/* أزرار الإجراءات */}
-        <div style={{
-          display: 'flex',
-          gap: 'var(--space-3)',
-          marginTop: 'var(--space-5)'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 'var(--space-3)',
+            marginTop: 'var(--space-5)',
+          }}
+        >
           <button
             type="submit"
             disabled={isSubmitting}
@@ -313,19 +351,21 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 'var(--space-2)'
+              gap: 'var(--space-2)',
             }}
           >
             {isSubmitting ? (
               <>
-                <div style={{
-                  width: '16px',
-                  height: '16px',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  borderTop: '2px solid white',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite'
-                }} />
+                <div
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTop: '2px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                  }}
+                />
                 جاري الإرسال...
               </>
             ) : (
@@ -351,10 +391,14 @@ const DemandResponseForm = ({ demand, onSuccess, onCancel }) => {
               fontWeight: '600',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              transition: 'var(--transition)'
+              transition: 'var(--transition)',
             }}
-            onMouseEnter={(e) => !isSubmitting && (e.target.style.borderColor = 'var(--text-secondary)')}
-            onMouseLeave={(e) => !isSubmitting && (e.target.style.borderColor = 'var(--border-light)')}
+            onMouseEnter={(e) =>
+              !isSubmitting && (e.target.style.borderColor = 'var(--text-secondary)')
+            }
+            onMouseLeave={(e) =>
+              !isSubmitting && (e.target.style.borderColor = 'var(--border-light)')
+            }
           >
             إلغاء
           </button>

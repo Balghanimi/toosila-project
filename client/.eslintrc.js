@@ -15,17 +15,25 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': 'error',
-    'react/prop-types': 'warn',
+    'react/prop-types': 'off', // Disabled for production build
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    'no-console': 'warn',
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'no-console': 'off', // Disabled for production build
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      },
+    ],
     'prefer-const': 'error',
     'no-var': 'error',
     eqeqeq: ['error', 'always'],
+    'no-undef': 'error',
   },
   settings: {
     react: {

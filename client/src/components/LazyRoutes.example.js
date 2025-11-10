@@ -44,24 +44,29 @@ const AdminTest = lazy(() => import('./pages/AdminTest'));
 // ============================================================================
 
 const LoadingSpinner = () => (
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    fontSize: '18px',
-    color: '#4A90E2'
-  }}>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      fontSize: '18px',
+      color: '#4A90E2',
+    }}
+  >
     <div>
-      <div className="spinner" style={{
-        border: '4px solid #f3f3f3',
-        borderTop: '4px solid #4A90E2',
-        borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        animation: 'spin 1s linear infinite',
-        margin: '0 auto 10px'
-      }} />
+      <div
+        className="spinner"
+        style={{
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #4A90E2',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 10px',
+        }}
+      />
       جاري التحميل...
     </div>
   </div>

@@ -108,7 +108,7 @@ const Home = () => {
         departureDate: calculatedDate,
         departureTime: departureTime,
         seats: availableSeats,
-        price: pricePerSeat
+        price: pricePerSeat,
       };
       navigate('/post-offer', { state: offerData });
     } else if (mode === 'demand') {
@@ -129,7 +129,7 @@ const Home = () => {
           earliestTime: earliestDateTime.toISOString(),
           latestTime: latestDateTime.toISOString(),
           seats: parseInt(availableSeats),
-          budgetMax: parseFloat(pricePerSeat)
+          budgetMax: parseFloat(pricePerSeat),
         };
 
         await demandsAPI.create(demandData);
@@ -154,7 +154,7 @@ const Home = () => {
   const handlePickupChange = (value) => {
     setPickupLocation(value);
     if (value.trim()) {
-      const filtered = availableCities.filter(city => city.includes(value.trim()));
+      const filtered = availableCities.filter((city) => city.includes(value.trim()));
       setPickupSuggestions(filtered);
       setShowPickupSuggestions(filtered.length > 0);
     } else {
@@ -165,7 +165,7 @@ const Home = () => {
   const handleDropChange = (value) => {
     setDropLocation(value);
     if (value.trim()) {
-      const filtered = availableCities.filter(city => city.includes(value.trim()));
+      const filtered = availableCities.filter((city) => city.includes(value.trim()));
       setDropSuggestions(filtered);
       setShowDropSuggestions(filtered.length > 0);
     } else {
@@ -186,12 +186,14 @@ const Home = () => {
   const saveNewCityIfNeeded = async (cityName) => {
     if (!cityName || cityName.trim().length < 2) return;
     const trimmedCity = cityName.trim();
-    const cityExists = availableCities.some(city => city.toLowerCase() === trimmedCity.toLowerCase());
+    const cityExists = availableCities.some(
+      (city) => city.toLowerCase() === trimmedCity.toLowerCase()
+    );
     if (!cityExists) {
       try {
         const response = await citiesAPI.add(trimmedCity);
         if (!response.alreadyExists) {
-          setAvailableCities(prev => [...prev, trimmedCity].sort());
+          setAvailableCities((prev) => [...prev, trimmedCity].sort());
         }
       } catch (error) {
         console.error('Error saving city:', error);
@@ -217,7 +219,9 @@ const Home = () => {
       <section className={styles.heroSection}>
         <h1 className={styles.heroTitle}>توصيلة</h1>
         <p className={styles.heroSubtitle}>رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق</p>
-        <p className={styles.heroTagline}>اربط بين المسافرين والسائقين بطريقة آمنة ومريحة وبأسعار معقولة</p>
+        <p className={styles.heroTagline}>
+          اربط بين المسافرين والسائقين بطريقة آمنة ومريحة وبأسعار معقولة
+        </p>
 
         {/* Statistics Bar */}
         <div className={styles.statsBar}>
@@ -236,11 +240,13 @@ const Home = () => {
         </div>
 
         {/* Mode Buttons */}
-        <div className={styles.modeButtons}>
+        <div className={styles.modeButtons} role="group" aria-label="خيارات البحث والنشر">
           {!currentUser?.isDriver && (
             <button
               onClick={() => setMode('demand')}
               className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
+              aria-label="طلب رحلة جديدة"
+              aria-pressed={mode === 'demand'}
             >
               💺 طلب رحلة
             </button>
@@ -249,6 +255,8 @@ const Home = () => {
             <button
               onClick={() => setMode('offer')}
               className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
+              aria-label="نشر عرض رحلة جديد"
+              aria-pressed={mode === 'offer'}
             >
               🚗 نشر عرض
             </button>
@@ -256,6 +264,8 @@ const Home = () => {
           <button
             onClick={() => setMode('find')}
             className={`${styles.modeButton} ${mode === 'find' ? styles.find : ''}`}
+            aria-label="البحث عن رحلة متاحة"
+            aria-pressed={mode === 'find'}
           >
             🔍 ابحث عن رحلة
           </button>
@@ -268,6 +278,7 @@ const Home = () => {
               }
             }}
             className={`${styles.modeButton} ${styles.browse}`}
+            aria-label={currentUser?.isDriver ? 'تصفح طلبات الركاب' : 'تصفح عروض السائقين'}
           >
             📋 تصفح الرحلات
           </button>
@@ -292,7 +303,7 @@ const Home = () => {
 
       {/* Error Message */}
       {submitError && (
-        <div className={styles.errorMessage}>
+        <div className={styles.errorMessage} role="alert" aria-live="assertive">
           ⚠️ {submitError}
         </div>
       )}
@@ -312,7 +323,9 @@ const Home = () => {
                 onChange={(e) => handlePickupChange(e.target.value)}
                 onFocus={() => {
                   if (pickupLocation.trim()) {
-                    const filtered = availableCities.filter(city => city.includes(pickupLocation.trim()));
+                    const filtered = availableCities.filter((city) =>
+                      city.includes(pickupLocation.trim())
+                    );
                     if (filtered.length > 0) {
                       setPickupSuggestions(filtered);
                       setShowPickupSuggestions(true);
@@ -320,14 +333,33 @@ const Home = () => {
                   }
                 }}
                 className={styles.locationInput}
+                aria-label="نقطة الانطلاق"
+                aria-describedby={showPickupSuggestions ? 'pickup-suggestions' : undefined}
+                aria-autocomplete="list"
+                aria-expanded={showPickupSuggestions}
+                role="combobox"
               />
               {showPickupSuggestions && pickupSuggestions.length > 0 && (
-                <div className={styles.suggestions}>
+                <div
+                  className={styles.suggestions}
+                  id="pickup-suggestions"
+                  role="listbox"
+                  aria-label="مقترحات نقطة الانطلاق"
+                >
                   {pickupSuggestions.map((city, index) => (
                     <div
                       key={index}
                       onClick={() => selectPickupCity(city)}
                       className={styles.suggestionItem}
+                      role="option"
+                      aria-selected={pickupLocation === city}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          selectPickupCity(city);
+                        }
+                      }}
                     >
                       {city}
                     </div>
@@ -341,7 +373,12 @@ const Home = () => {
           <button
             onClick={swapLocations}
             className={styles.swapButton}
-            style={{ transform: isSwapping ? 'translateY(-50%) rotate(180deg) scale(1.1)' : 'translateY(-50%)' }}
+            style={{
+              transform: isSwapping
+                ? 'translateY(-50%) rotate(180deg) scale(1.1)'
+                : 'translateY(-50%)',
+            }}
+            aria-label="تبديل نقطة الانطلاق والوصول"
           >
             ↕
           </button>
@@ -357,7 +394,9 @@ const Home = () => {
                 onChange={(e) => handleDropChange(e.target.value)}
                 onFocus={() => {
                   if (dropLocation.trim()) {
-                    const filtered = availableCities.filter(city => city.includes(dropLocation.trim()));
+                    const filtered = availableCities.filter((city) =>
+                      city.includes(dropLocation.trim())
+                    );
                     if (filtered.length > 0) {
                       setDropSuggestions(filtered);
                       setShowDropSuggestions(true);
@@ -365,14 +404,33 @@ const Home = () => {
                   }
                 }}
                 className={styles.locationInput}
+                aria-label="نقطة الوصول"
+                aria-describedby={showDropSuggestions ? 'drop-suggestions' : undefined}
+                aria-autocomplete="list"
+                aria-expanded={showDropSuggestions}
+                role="combobox"
               />
               {showDropSuggestions && dropSuggestions.length > 0 && (
-                <div className={styles.suggestions}>
+                <div
+                  className={styles.suggestions}
+                  id="drop-suggestions"
+                  role="listbox"
+                  aria-label="مقترحات نقطة الوصول"
+                >
                   {dropSuggestions.map((city, index) => (
                     <div
                       key={index}
                       onClick={() => selectDropCity(city)}
                       className={styles.suggestionItem}
+                      role="option"
+                      aria-selected={dropLocation === city}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          selectDropCity(city);
+                        }
+                      }}
                     >
                       {city}
                     </div>
@@ -392,9 +450,12 @@ const Home = () => {
             <button
               onClick={() => {
                 const inputs = document.getElementById('datetime-inputs');
-                if (inputs) inputs.style.display = inputs.style.display === 'none' ? 'block' : 'none';
+                if (inputs)
+                  inputs.style.display = inputs.style.display === 'none' ? 'block' : 'none';
               }}
               className={styles.editButton}
+              aria-label="تعديل التاريخ والوقت"
+              aria-expanded="false"
             >
               ✏️ تعديل
             </button>
@@ -402,33 +463,66 @@ const Home = () => {
 
           {/* Hidden datetime inputs */}
           <div id="datetime-inputs" style={{ display: 'none' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px',
+                marginBottom: '16px',
+              }}
+            >
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>التاريخ</label>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '8px',
+                  }}
+                >
+                  التاريخ
+                </label>
                 <input
                   type="date"
-                  value={selectedDate === 'today' ? new Date().toISOString().split('T')[0] :
-                        selectedDate === 'tomorrow' ? new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0] :
-                        selectedDate}
+                  value={
+                    selectedDate === 'today'
+                      ? new Date().toISOString().split('T')[0]
+                      : selectedDate === 'tomorrow'
+                        ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                        : selectedDate
+                  }
                   onChange={(e) => {
                     const selectedDateValue = e.target.value;
                     const today = new Date().toISOString().split('T')[0];
-                    const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
+                    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split('T')[0];
                     if (selectedDateValue === today) setSelectedDate('today');
                     else if (selectedDateValue === tomorrow) setSelectedDate('tomorrow');
                     else setSelectedDate(selectedDateValue);
                   }}
                   min={new Date().toISOString().split('T')[0]}
                   className={styles.input}
+                  aria-label="تاريخ المغادرة"
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>الوقت</label>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '8px',
+                  }}
+                >
+                  الوقت
+                </label>
                 <input
                   type="time"
                   value={departureTime}
                   onChange={(e) => setDepartureTime(e.target.value)}
                   className={styles.input}
+                  aria-label="وقت المغادرة"
                 />
               </div>
             </div>
@@ -439,18 +533,21 @@ const Home = () => {
                   if (inputs) inputs.style.display = 'none';
                 }}
                 className={styles.editButton}
+                aria-label="حفظ التاريخ والوقت"
               >
                 حفظ
               </button>
             </div>
           </div>
 
-          <div className={styles.dateButtons}>
+          <div className={styles.dateButtons} role="group" aria-label="اختيار التاريخ">
             {['today', 'tomorrow'].map((option) => (
               <button
                 key={option}
                 onClick={() => setSelectedDate(option)}
                 className={`${styles.dateButton} ${selectedDate === option ? styles.active : ''}`}
+                aria-label={option === 'today' ? 'السفر اليوم' : 'السفر غداً'}
+                aria-pressed={selectedDate === option}
               >
                 {option === 'today' ? 'اليوم' : 'غداً'}
               </button>
@@ -467,6 +564,7 @@ const Home = () => {
                 value={availableSeats}
                 onChange={(e) => setAvailableSeats(e.target.value)}
                 className={styles.select}
+                aria-label="عدد المقاعد المتاحة"
               >
                 <option value="1">1 مقعد</option>
                 <option value="2">2 مقعد</option>
@@ -485,6 +583,7 @@ const Home = () => {
                 min="1000"
                 step="1000"
                 className={styles.input}
+                aria-label="السعر لكل مقعد بالدينار العراقي"
               />
             </div>
           </div>
@@ -495,10 +594,18 @@ const Home = () => {
           onClick={handleNext}
           disabled={isSubmitting}
           className={styles.submitButton}
+          aria-label={
+            mode === 'find'
+              ? 'البحث عن رحلات متاحة'
+              : mode === 'offer'
+                ? 'نشر عرض الرحلة'
+                : 'نشر طلب الرحلة'
+          }
+          aria-busy={isSubmitting}
         >
           {isSubmitting ? (
             <span className={styles.loading}>
-              <span className={styles.spinner} />
+              <span className={styles.spinner} role="status" aria-label="جاري التحميل" />
               جاري المعالجة...
             </span>
           ) : (
@@ -592,9 +699,7 @@ const Home = () => {
           <div className={styles.stepCard}>
             <div className={styles.stepNumber}>3</div>
             <h3 className={styles.stepTitle}>استمتع برحلتك</h3>
-            <p className={styles.stepDescription}>
-              تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.
-            </p>
+            <p className={styles.stepDescription}>تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.</p>
           </div>
         </div>
       </section>

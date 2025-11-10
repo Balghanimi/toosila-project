@@ -21,7 +21,7 @@ export default function NotificationBell() {
     markAsRead,
     markAllAsRead,
     isConnected,
-    requestNotificationPermission
+    requestNotificationPermission,
   } = useSocket();
 
   // Request notification permission on mount
@@ -107,46 +107,48 @@ export default function NotificationBell() {
           fontSize: '1.5rem',
           padding: '0.5rem',
           color: 'var(--text-primary)',
-          animation: shouldAnimate ? 'bellRing 0.5s ease-in-out' : 'none'
+          animation: shouldAnimate ? 'bellRing 0.5s ease-in-out' : 'none',
         }}
         aria-label="Notifications"
       >
         🔔
-
         {/* Connection Status Indicator */}
         {!isConnected && (
-          <span style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#f59e0b',
-            border: '2px solid white'
-          }} />
+          <span
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#f59e0b',
+              border: '2px solid white',
+            }}
+          />
         )}
-
         {/* Unread Count Badge */}
         {unreadCount > 0 && (
-          <span style={{
-            position: 'absolute',
-            top: '2px',
-            right: '2px',
-            background: '#ef4444',
-            color: 'white',
-            borderRadius: '50%',
-            width: unreadCount > 9 ? '22px' : '18px',
-            height: unreadCount > 9 ? '22px' : '18px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '0.7rem',
-            fontWeight: '700',
-            fontFamily: '"Cairo", sans-serif',
-            border: '2px solid white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-          }}>
+          <span
+            style={{
+              position: 'absolute',
+              top: '2px',
+              right: '2px',
+              background: '#ef4444',
+              color: 'white',
+              borderRadius: '50%',
+              width: unreadCount > 9 ? '22px' : '18px',
+              height: unreadCount > 9 ? '22px' : '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.7rem',
+              fontWeight: '700',
+              fontFamily: '"Cairo", sans-serif',
+              border: '2px solid white',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -154,37 +156,43 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {showDropdown && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(100% + 8px)',
-          right: 0,
-          width: '350px',
-          maxWidth: '90vw',
-          maxHeight: '500px',
-          background: 'var(--surface-primary)',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-2xl)',
-          border: '1px solid var(--border-light)',
-          overflow: 'hidden',
-          zIndex: 1000,
-          animation: 'slideDown 0.2s ease-out'
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 8px)',
+            right: 0,
+            width: '350px',
+            maxWidth: '90vw',
+            maxHeight: '500px',
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-2xl)',
+            border: '1px solid var(--border-light)',
+            overflow: 'hidden',
+            zIndex: 1000,
+            animation: 'slideDown 0.2s ease-out',
+          }}
+        >
           {/* Header */}
-          <div style={{
-            padding: 'var(--space-4)',
-            borderBottom: '1px solid var(--border-light)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            background: 'var(--surface-secondary)'
-          }}>
-            <h3 style={{
-              margin: 0,
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              fontFamily: '"Cairo", sans-serif',
-              color: 'var(--text-primary)'
-            }}>
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              borderBottom: '1px solid var(--border-light)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'var(--surface-secondary)',
+            }}
+          >
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)',
+              }}
+            >
               🔔 الإشعارات
             </h3>
 
@@ -199,7 +207,7 @@ export default function NotificationBell() {
                   fontWeight: '600',
                   cursor: 'pointer',
                   fontFamily: '"Cairo", sans-serif',
-                  padding: '0.25rem 0.5rem'
+                  padding: '0.25rem 0.5rem',
                 }}
               >
                 قراءة الكل
@@ -208,17 +216,21 @@ export default function NotificationBell() {
           </div>
 
           {/* Notifications List */}
-          <div style={{
-            maxHeight: '400px',
-            overflowY: 'auto'
-          }}>
+          <div
+            style={{
+              maxHeight: '400px',
+              overflowY: 'auto',
+            }}
+          >
             {notifications.length === 0 ? (
-              <div style={{
-                padding: 'var(--space-8)',
-                textAlign: 'center',
-                color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif'
-              }}>
+              <div
+                style={{
+                  padding: 'var(--space-8)',
+                  textAlign: 'center',
+                  color: 'var(--text-secondary)',
+                  fontFamily: '"Cairo", sans-serif',
+                }}
+              >
                 <div style={{ fontSize: '3rem', marginBottom: 'var(--space-2)' }}>🔕</div>
                 <p>لا توجد إشعارات</p>
               </div>
@@ -234,59 +246,71 @@ export default function NotificationBell() {
                     background: notification.read ? 'transparent' : '#eff6ff',
                     transition: 'background 0.2s',
                     ':hover': {
-                      background: 'var(--surface-secondary)'
-                    }
+                      background: 'var(--surface-secondary)',
+                    },
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'var(--surface-secondary)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = notification.read ? 'transparent' : '#eff6ff';
+                    e.currentTarget.style.background = notification.read
+                      ? 'transparent'
+                      : '#eff6ff';
                   }}
                 >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'start',
-                    marginBottom: 'var(--space-2)'
-                  }}>
-                    <h4 style={{
-                      margin: 0,
-                      fontSize: 'var(--text-base)',
-                      fontWeight: '600',
-                      fontFamily: '"Cairo", sans-serif',
-                      color: 'var(--text-primary)',
-                      flex: 1
-                    }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'start',
+                      marginBottom: 'var(--space-2)',
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: 0,
+                        fontSize: 'var(--text-base)',
+                        fontWeight: '600',
+                        fontFamily: '"Cairo", sans-serif',
+                        color: 'var(--text-primary)',
+                        flex: 1,
+                      }}
+                    >
                       {notification.title}
                     </h4>
                     {!notification.read && (
-                      <span style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        background: 'var(--primary)',
-                        marginTop: '6px',
-                        marginLeft: 'var(--space-2)'
-                      }} />
+                      <span
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: 'var(--primary)',
+                          marginTop: '6px',
+                          marginLeft: 'var(--space-2)',
+                        }}
+                      />
                     )}
                   </div>
 
-                  <p style={{
-                    margin: '0 0 var(--space-2) 0',
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif',
-                    lineHeight: 1.5
-                  }}>
+                  <p
+                    style={{
+                      margin: '0 0 var(--space-2) 0',
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--text-secondary)',
+                      fontFamily: '"Cairo", sans-serif',
+                      lineHeight: 1.5,
+                    }}
+                  >
                     {notification.message}
                   </p>
 
-                  <span style={{
-                    fontSize: 'var(--text-xs)',
-                    color: 'var(--text-tertiary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
+                  <span
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--text-tertiary)',
+                      fontFamily: '"Cairo", sans-serif',
+                    }}
+                  >
                     {formatTimeAgo(notification.timestamp)}
                   </span>
                 </div>
@@ -296,12 +320,14 @@ export default function NotificationBell() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div style={{
-              padding: 'var(--space-3)',
-              borderTop: '1px solid var(--border-light)',
-              textAlign: 'center',
-              background: 'var(--surface-secondary)'
-            }}>
+            <div
+              style={{
+                padding: 'var(--space-3)',
+                borderTop: '1px solid var(--border-light)',
+                textAlign: 'center',
+                background: 'var(--surface-secondary)',
+              }}
+            >
               <button
                 onClick={() => {
                   setShowDropdown(false);
@@ -315,7 +341,7 @@ export default function NotificationBell() {
                   fontWeight: '600',
                   cursor: 'pointer',
                   fontFamily: '"Cairo", sans-serif',
-                  padding: '0.5rem'
+                  padding: '0.5rem',
                 }}
               >
                 عرض جميع الإشعارات

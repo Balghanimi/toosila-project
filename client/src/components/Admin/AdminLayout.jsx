@@ -21,23 +21,23 @@ const AdminLayout = () => {
       path: '/admin',
       icon: '📊',
       label: 'لوحة التحكم',
-      end: true
+      end: true,
     },
     {
       path: '/admin/users',
       icon: '👥',
-      label: 'إدارة المستخدمين'
+      label: 'إدارة المستخدمين',
     },
     {
       path: '/admin/verification',
       icon: '✅',
-      label: 'التحقق من الهوية'
+      label: 'التحقق من الهوية',
     },
     {
       path: '/admin/statistics',
       icon: '📈',
-      label: 'الإحصائيات'
-    }
+      label: 'الإحصائيات',
+    },
   ];
 
   return (
@@ -48,18 +48,14 @@ const AdminLayout = () => {
         <div className="admin-sidebar-header">
           <div className="admin-logo">
             <span className="admin-logo-icon">⚡</span>
-            {sidebarOpen && (
-              <span className="admin-logo-text">لوحة الإدارة</span>
-            )}
+            {sidebarOpen && <span className="admin-logo-text">لوحة الإدارة</span>}
           </div>
         </div>
 
         {/* User Info */}
         {sidebarOpen && (
           <div className="admin-user-info">
-            <div className="admin-user-avatar">
-              {user?.name?.charAt(0).toUpperCase() || 'A'}
-            </div>
+            <div className="admin-user-avatar">{user?.name?.charAt(0).toUpperCase() || 'A'}</div>
             <div className="admin-user-details">
               <div className="admin-user-name">{user?.name}</div>
               <div className="admin-user-role">مدير النظام</div>
@@ -74,33 +70,21 @@ const AdminLayout = () => {
               key={item.path}
               to={item.path}
               end={item.end}
-              className={({ isActive }) =>
-                `admin-nav-item ${isActive ? 'active' : ''}`
-              }
+              className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
             >
               <span className="admin-nav-icon">{item.icon}</span>
-              {sidebarOpen && (
-                <span className="admin-nav-label">{item.label}</span>
-              )}
+              {sidebarOpen && <span className="admin-nav-label">{item.label}</span>}
             </NavLink>
           ))}
         </nav>
 
         {/* Bottom Actions */}
         <div className="admin-sidebar-footer">
-          <button
-            onClick={() => navigate('/')}
-            className="admin-action-btn"
-            title="العودة للموقع"
-          >
+          <button onClick={() => navigate('/')} className="admin-action-btn" title="العودة للموقع">
             <span className="admin-nav-icon">🏠</span>
             {sidebarOpen && <span className="admin-nav-label">الموقع الرئيسي</span>}
           </button>
-          <button
-            onClick={handleLogout}
-            className="admin-action-btn logout"
-            title="تسجيل الخروج"
-          >
+          <button onClick={handleLogout} className="admin-action-btn logout" title="تسجيل الخروج">
             <span className="admin-nav-icon">🚪</span>
             {sidebarOpen && <span className="admin-nav-label">تسجيل الخروج</span>}
           </button>

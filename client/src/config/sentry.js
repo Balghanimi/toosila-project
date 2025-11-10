@@ -1,3 +1,4 @@
+import React from 'react';
 import * as Sentry from '@sentry/react';
 
 /**
@@ -56,10 +57,10 @@ export const initializeSentry = () => {
       beforeSend(event, hint) {
         // Remove any sensitive data from breadcrumbs
         if (event.breadcrumbs) {
-          event.breadcrumbs = event.breadcrumbs.map(breadcrumb => {
+          event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
             if (breadcrumb.data) {
               const sensitiveFields = ['password', 'token', 'authorization'];
-              sensitiveFields.forEach(field => {
+              sensitiveFields.forEach((field) => {
                 if (breadcrumb.data[field]) {
                   breadcrumb.data[field] = '[REDACTED]';
                 }
@@ -70,7 +71,10 @@ export const initializeSentry = () => {
         }
 
         // Don't send events for network errors in development
-        if (process.env.NODE_ENV === 'development' && hint?.originalException?.message?.includes('Network')) {
+        if (
+          process.env.NODE_ENV === 'development' &&
+          hint?.originalException?.message?.includes('Network')
+        ) {
           return null;
         }
 
@@ -122,14 +126,14 @@ export const captureException = (error, context = {}) => {
 
     // Add tags for filtering
     if (context.tags) {
-      Object.keys(context.tags).forEach(key => {
+      Object.keys(context.tags).forEach((key) => {
         scope.setTag(key, context.tags[key]);
       });
     }
 
     // Add extra context
     if (context.extra) {
-      Object.keys(context.extra).forEach(key => {
+      Object.keys(context.extra).forEach((key) => {
         scope.setExtra(key, context.extra[key]);
       });
     }

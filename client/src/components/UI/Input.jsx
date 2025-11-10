@@ -13,7 +13,6 @@ const Input = ({
   type = 'text',
   className = '',
   containerClassName = '',
-  icon,
   addon,
   ...props
 }) => {
@@ -21,31 +20,23 @@ const Input = ({
   const sizeClass = size !== 'md' ? `input-pro-${size}` : '';
   const stateClass = error ? 'input-pro-error' : success ? 'input-pro-success' : '';
 
-  const inputClasses = [
-    inputClass,
-    sizeClass,
-    stateClass,
-    className
-  ].filter(Boolean).join(' ');
+  const inputClasses = [inputClass, sizeClass, stateClass, className].filter(Boolean).join(' ');
 
-  const renderInput = () => (
-    <input
-      type={type}
-      className={inputClasses}
-      {...props}
-    />
-  );
+  const renderInput = () => <input type={type} className={inputClasses} {...props} />;
 
   return (
     <div className={`input-wrapper ${containerClassName}`}>
       {label && (
-        <label className="input-label" style={{
-          display: 'block',
-          marginBottom: '8px',
-          fontSize: '14px',
-          fontWeight: '600',
-          color: 'var(--text-primary)'
-        }}>
+        <label
+          className="input-label"
+          style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: 'var(--text-primary)',
+          }}
+        >
           {label}
         </label>
       )}
@@ -60,11 +51,13 @@ const Input = ({
       )}
 
       {(error || helperText) && (
-        <div style={{
-          marginTop: '6px',
-          fontSize: '13px',
-          color: error ? 'var(--error)' : 'var(--text-muted)'
-        }}>
+        <div
+          style={{
+            marginTop: '6px',
+            fontSize: '13px',
+            color: error ? 'var(--error)' : 'var(--text-muted)',
+          }}
+        >
           {error || helperText}
         </div>
       )}

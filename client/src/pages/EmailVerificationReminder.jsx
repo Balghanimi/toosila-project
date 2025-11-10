@@ -54,7 +54,9 @@ const EmailVerificationReminder = () => {
 
       if (response.data.success) {
         setResendStatus('success');
-        setMessage('Verification email sent! Check your inbox. / تم إرسال البريد! تحقق من صندوق الوارد.');
+        setMessage(
+          'Verification email sent! Check your inbox. / تم إرسال البريد! تحقق من صندوق الوارد.'
+        );
         setCountdown(60); // 60 seconds cooldown
       }
     } catch (error) {
@@ -75,9 +77,7 @@ const EmailVerificationReminder = () => {
         <h2>Check Your Email</h2>
         <h3>تحقق من بريدك الإلكتروني</h3>
 
-        <p className="instruction">
-          We've sent a verification link to:
-        </p>
+        <p className="instruction">We've sent a verification link to:</p>
         <p className="instruction-ar" dir="rtl">
           لقد أرسلنا رابط التحقق إلى:
         </p>
@@ -133,18 +133,16 @@ const EmailVerificationReminder = () => {
                 Sending... / جاري الإرسال...
               </>
             ) : countdown > 0 ? (
-              <>Resend in {countdown}s / إعادة إرسال خلال {countdown}ث</>
+              <>
+                Resend in {countdown}s / إعادة إرسال خلال {countdown}ث
+              </>
             ) : (
               <>Resend Verification Email / إعادة إرسال بريد التحقق</>
             )}
           </button>
 
           {message && (
-            <p
-              className={`message ${
-                resendStatus === 'success' ? 'success' : 'error'
-              }`}
-            >
+            <p className={`message ${resendStatus === 'success' ? 'success' : 'error'}`}>
               {message}
             </p>
           )}
@@ -156,9 +154,7 @@ const EmailVerificationReminder = () => {
           </Link>
         </div>
 
-        <p className="help-text">
-          Need help? Contact support at support@toosila.com
-        </p>
+        <p className="help-text">Need help? Contact support at support@toosila.com</p>
         <p className="help-text-ar" dir="rtl">
           تحتاج مساعدة؟ اتصل بالدعم على support@toosila.com
         </p>

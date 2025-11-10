@@ -59,14 +59,12 @@ export const NotificationsProvider = ({ children }) => {
       await notificationsAPI.markAsRead(notificationId);
 
       // تحديث الحالة المحلية
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === notificationId ? { ...notif, isRead: true } : notif
-        )
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.id === notificationId ? { ...notif, isRead: true } : notif))
       );
 
       // تقليل العداد
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
       console.error('Error marking notification as read:', err);
       throw err;
@@ -79,9 +77,7 @@ export const NotificationsProvider = ({ children }) => {
       await notificationsAPI.markAllAsRead();
 
       // تحديث الحالة المحلية
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, isRead: true }))
-      );
+      setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: true })));
 
       setUnreadCount(0);
     } catch (err) {
@@ -96,12 +92,12 @@ export const NotificationsProvider = ({ children }) => {
       await notificationsAPI.delete(notificationId);
 
       // إزالة من القائمة المحلية
-      const deletedNotif = notifications.find(n => n.id === notificationId);
-      setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
+      const deletedNotif = notifications.find((n) => n.id === notificationId);
+      setNotifications((prev) => prev.filter((notif) => notif.id !== notificationId));
 
       // إذا كان غير مقروء، تقليل العداد
       if (deletedNotif && !deletedNotif.isRead) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (err) {
       console.error('Error deleting notification:', err);
@@ -142,14 +138,10 @@ export const NotificationsProvider = ({ children }) => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    refresh
+    refresh,
   };
 
-  return (
-    <NotificationsContext.Provider value={value}>
-      {children}
-    </NotificationsContext.Provider>
-  );
+  return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>;
 };
 
 // Hook لاستخدام context

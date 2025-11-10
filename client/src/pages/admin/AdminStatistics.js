@@ -12,7 +12,7 @@ const AdminStatistics = () => {
     offers: null,
     demands: null,
     messages: null,
-    verifications: null
+    verifications: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ const AdminStatistics = () => {
         adminAPI.getOfferStats().catch(() => ({ data: {} })),
         adminAPI.getDemandStats().catch(() => ({ data: {} })),
         adminAPI.getMessageStats().catch(() => ({ data: {} })),
-        adminAPI.getVerificationStats().catch(() => ({ data: {} }))
+        adminAPI.getVerificationStats().catch(() => ({ data: {} })),
       ]);
 
       setStats({
@@ -41,7 +41,7 @@ const AdminStatistics = () => {
         offers: offers.data,
         demands: demands.data,
         messages: messages.data,
-        verifications: verifications.data
+        verifications: verifications.data,
       });
     } catch (err) {
       console.error('Error fetching stats:', err);

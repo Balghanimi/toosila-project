@@ -1,0 +1,179 @@
+/**
+ * Mobile Touch Target Sizing
+ * Ensures all interactive elements meet WCAG 2.1 Level AA requirements (48x48px minimum)
+ */
+
+@media (max-width: 768px) {
+  /* All interactive elements */
+  button,
+  a,
+  [role='button'],
+  [role='tab'],
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Buttons with text */
+  button,
+  .btn,
+  [role='button'] {
+    padding: 12px 20px;
+    min-height: 48px;
+  }
+
+  /* Icon-only buttons */
+  .icon-button,
+  .close-button,
+  button[aria-label]:not([aria-label='']) {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  /* Bottom navigation items */
+  .bottom-nav button,
+  .bottom-nav a,
+  [class*='bottom'] button,
+  [class*='bottom'] a {
+    min-height: 56px;
+    padding: 8px;
+  }
+
+  /* Header buttons */
+  .header button,
+  .header a,
+  header button,
+  header a,
+  nav button,
+  nav a {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Form inputs */
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+    padding: 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Links in paragraphs and lists */
+  p a,
+  li a {
+    padding: 8px 4px;
+    display: inline-block;
+    min-height: 44px;
+    line-height: 1.5;
+  }
+
+  /* Checkboxes and radio buttons */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    /* Add padding around using parent element */
+  }
+
+  /* Checkbox/Radio container for proper touch target */
+  input[type='checkbox'] + label,
+  input[type='radio'] + label {
+    padding: 12px;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  /* Toggle switches */
+  .toggle,
+  .switch {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Close buttons */
+  [aria-label*='close' i],
+  [aria-label*='إغلاق' i],
+  .modal button[type='button']:first-child {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  /* Dropdown/Select improvements */
+  select {
+    min-height: 48px;
+    padding-right: 40px; /* Space for dropdown arrow */
+  }
+
+  /* Card action buttons */
+  .card button,
+  .card a,
+  [class*='card'] button,
+  [class*='card'] a {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Social media and share buttons */
+  .social-button,
+  .share-button,
+  [class*='social'] button,
+  [class*='share'] button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Tab navigation */
+  [role='tab'],
+  .tab,
+  [class*='tab'] button {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  /* Pagination buttons */
+  .pagination button,
+  .pagination a,
+  [class*='pagination'] button,
+  [class*='pagination'] a {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Action buttons in lists */
+  li button,
+  li a[role='button'] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Tablet specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  button,
+  a[role='button'],
+  input[type='button'],
+  input[type='submit'] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Ensure touch targets are visually centered */
+@media (max-width: 768px) {
+  button,
+  [role='button'],
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+}

@@ -9,7 +9,7 @@ import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
 import ThemeToggle from '../ThemeToggle';
 
-const Header = ({ title = 'توصيلة' }) => {
+const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -20,7 +20,7 @@ const Header = ({ title = 'توصيلة' }) => {
   const navigate = useNavigate();
 
   const toggleDrawer = () => {
-    setDrawerOpen(prev => !prev);
+    setDrawerOpen((prev) => !prev);
   };
 
   const handleAuthClick = () => {
@@ -46,11 +46,7 @@ const Header = ({ title = 'توصيلة' }) => {
             onClick={() => navigate('/')}
             aria-label="الصفحة الرئيسية"
           >
-            <img
-              src="/toosila-logo-text.svg"
-              alt="توصيلة"
-              className={styles.logoText}
-            />
+            <img src="/toosila-logo-text.svg" alt="توصيلة" className={styles.logoText} />
           </button>
         </div>
 
@@ -119,10 +115,7 @@ const Header = ({ title = 'توصيلة' }) => {
             {/* Notification Bell - visible only for logged-in users */}
             {isAuthenticated && <NotificationBell />}
 
-            <button
-              className={styles.loginButton}
-              onClick={handleAuthClick}
-            >
+            <button className={styles.loginButton} onClick={handleAuthClick}>
               {isAuthenticated ? user.name : t('login')}
             </button>
             {isAuthenticated && (
@@ -174,7 +167,10 @@ const Header = ({ title = 'توصيلة' }) => {
               {/* الصفحة الرئيسية */}
               <button
                 className={styles.drawerItem}
-                onClick={() => { navigate('/'); toggleDrawer(); }}
+                onClick={() => {
+                  navigate('/');
+                  toggleDrawer();
+                }}
               >
                 🏠 الصفحة الرئيسية
               </button>
@@ -185,13 +181,19 @@ const Header = ({ title = 'توصيلة' }) => {
                   <div className={styles.drawerSection}>قسم السائقين</div>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/post-offer'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/post-offer');
+                      toggleDrawer();
+                    }}
                   >
                     🚗 نشر عرض رحلة
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/offers'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/offers');
+                      toggleDrawer();
+                    }}
                   >
                     📋 عروضي
                   </button>
@@ -204,13 +206,19 @@ const Header = ({ title = 'توصيلة' }) => {
                   <div className={styles.drawerSection}>قسم الركاب</div>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/', { state: { mode: 'demand' } }); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/', { state: { mode: 'demand' } });
+                      toggleDrawer();
+                    }}
                   >
                     🙋 نشر طلب رحلة
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/demands'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/demands');
+                      toggleDrawer();
+                    }}
                   >
                     📋 طلباتي
                   </button>
@@ -223,19 +231,28 @@ const Header = ({ title = 'توصيلة' }) => {
                   <div className={styles.drawerSection}>المشترك</div>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/dashboard'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/dashboard');
+                      toggleDrawer();
+                    }}
                   >
                     📊 لوحة التحكم
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate(currentUser.isDriver ? '/demands' : '/offers'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate(currentUser.isDriver ? '/demands' : '/offers');
+                      toggleDrawer();
+                    }}
                   >
                     👀 {currentUser.isDriver ? 'عرض الطلبات' : 'عرض العروض'}
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/bookings'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/bookings');
+                      toggleDrawer();
+                    }}
                     style={{ position: 'relative' }}
                   >
                     📋 حجوزاتي
@@ -256,7 +273,7 @@ const Header = ({ title = 'توصيلة' }) => {
                           justifyContent: 'center',
                           fontSize: 'var(--text-xs)',
                           fontWeight: '700',
-                          padding: '0 4px'
+                          padding: '0 4px',
                         }}
                       >
                         {pendingBookings.totalPending > 99 ? '99+' : pendingBookings.totalPending}
@@ -265,7 +282,10 @@ const Header = ({ title = 'توصيلة' }) => {
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/messages'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/messages');
+                      toggleDrawer();
+                    }}
                     style={{ position: 'relative' }}
                   >
                     💬 الرسائل
@@ -286,7 +306,7 @@ const Header = ({ title = 'توصيلة' }) => {
                           justifyContent: 'center',
                           fontSize: 'var(--text-xs)',
                           fontWeight: '700',
-                          padding: '0 4px'
+                          padding: '0 4px',
                         }}
                       >
                         {unreadMessages > 99 ? '99+' : unreadMessages}
@@ -295,7 +315,10 @@ const Header = ({ title = 'توصيلة' }) => {
                   </button>
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/profile'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/profile');
+                      toggleDrawer();
+                    }}
                   >
                     👤 الملف الشخصي
                   </button>
@@ -304,37 +327,66 @@ const Header = ({ title = 'توصيلة' }) => {
 
               {/* إذا لم يكن مسجل دخول */}
               {!currentUser && (
-                <p className={styles.placeholder}>
-                  يرجى تسجيل الدخول لرؤية القائمة الكاملة
-                </p>
+                <p className={styles.placeholder}>يرجى تسجيل الدخول لرؤية القائمة الكاملة</p>
               )}
 
               {/* قسم الاتصال بنا */}
               <div className={styles.drawerSection}>اتصل بنا</div>
-              <div style={{
-                padding: 'var(--space-4)',
-                background: 'var(--surface-secondary)',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: 'var(--text-sm)',
-                color: 'var(--text-secondary)',
-                lineHeight: '1.8'
-              }}>
-                <div style={{ marginBottom: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'var(--surface-secondary)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.8',
+                }}
+              >
+                <div
+                  style={{
+                    marginBottom: 'var(--space-2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
                   <span>📧</span>
-                  <a href="mailto:support@toosila.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                  <a
+                    href="mailto:support@toosila.com"
+                    style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                  >
                     support@toosila.com
                   </a>
                 </div>
-                <div style={{ marginBottom: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <div
+                  style={{
+                    marginBottom: 'var(--space-2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
                   <span>📱</span>
-                  <a href="tel:+9647700000000" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                  <a
+                    href="tel:+9647700000000"
+                    style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                  >
                     +964 770 000 0000
                   </a>
                 </div>
-                <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--border-light)' }}>
+                <div
+                  style={{
+                    marginTop: 'var(--space-3)',
+                    paddingTop: 'var(--space-3)',
+                    borderTop: '1px solid var(--border-light)',
+                  }}
+                >
                   <button
                     className={styles.drawerItem}
-                    onClick={() => { navigate('/messages'); toggleDrawer(); }}
+                    onClick={() => {
+                      navigate('/messages');
+                      toggleDrawer();
+                    }}
                   >
                     💬 مراسلة الدعم الفني
                   </button>
@@ -347,7 +399,7 @@ const Header = ({ title = 'توصيلة' }) => {
 
       {/* Authentication Modal */}
       {showAuthModal && (
-        <AuthModal 
+        <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           initialMode="login"
@@ -355,16 +407,9 @@ const Header = ({ title = 'توصيلة' }) => {
       )}
 
       {/* User Menu */}
-      {showUserMenu && (
-        <UserMenu 
-          onClose={() => setShowUserMenu(false)}
-        />
-      )}
+      {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
     </>
   );
 };
 
 export default Header;
-
-
-

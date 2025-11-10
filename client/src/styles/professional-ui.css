@@ -9,7 +9,6 @@
 
 /* ===== Component-specific enhancements ===== */
 :root {
-
   /* Status Colors with variants */
   --color-success-50: #f0fdf4;
   --color-success-500: #22c55e;
@@ -83,13 +82,16 @@
 }
 
 .btn-pro:focus-visible {
-  box-shadow: 0 0 0 3px var(--surface-primary), 0 0 0 5px var(--primary);
+  box-shadow:
+    0 0 0 3px var(--surface-primary),
+    0 0 0 5px var(--primary);
 }
 
 .btn-pro:disabled {
-  opacity: 0.6;
+  opacity: 0.65; /* Increased for better visibility while maintaining disabled appearance */
   cursor: not-allowed;
   pointer-events: none;
+  filter: grayscale(0.3); /* Subtle indication of disabled state */
 }
 
 /* Primary Button */
@@ -114,6 +116,7 @@
   background: var(--surface-secondary);
   color: var(--text-primary);
   border-color: var(--border-medium);
+  box-shadow: var(--elevation-1);
 }
 
 .btn-pro-secondary:hover:not(:disabled) {
@@ -140,12 +143,13 @@
 /* Ghost Button */
 .btn-pro-ghost {
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-primary); /* Improved contrast - changed from text-secondary */
 }
 
 .btn-pro-ghost:hover:not(:disabled) {
   background: var(--surface-secondary);
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 /* Danger Button */
@@ -214,7 +218,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== Professional Card System ===== */
@@ -302,7 +308,8 @@ body.dark-mode .card-pro-glass {
 }
 
 .input-pro::placeholder {
-  color: var(--text-muted);
+  color: var(--text-placeholder, var(--text-muted));
+  opacity: 1; /* Ensure full opacity for proper contrast */
 }
 
 .input-pro:hover:not(:disabled):not(:focus) {
@@ -317,8 +324,9 @@ body.dark-mode .card-pro-glass {
 
 .input-pro:disabled {
   background-color: var(--surface-tertiary);
+  color: var(--text-secondary); /* Maintain contrast in disabled state */
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.7; /* Increased from 0.6 for better visibility */
 }
 
 /* Input States */
@@ -490,8 +498,12 @@ body.dark-mode .card-pro-glass {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-pro-text {
@@ -593,12 +605,24 @@ body.dark-mode .card-pro-glass {
   animation: fadeIn 0.4s var(--transition-base) forwards;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 0.3s;
+}
 
 /* ===== Professional Tooltips ===== */
 .tooltip-pro {
@@ -649,12 +673,7 @@ body.dark-mode .card-pro-glass {
 .divider-pro {
   height: 1px;
   margin: 24px 0;
-  background: linear-gradient(
-    to left,
-    transparent,
-    var(--border-medium),
-    transparent
-  );
+  background: linear-gradient(to left, transparent, var(--border-medium), transparent);
   border: none;
 }
 
@@ -684,7 +703,9 @@ body.dark-mode .card-pro-glass {
 
 .focus-ring-pro:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--surface-primary), 0 0 0 5px var(--primary);
+  box-shadow:
+    0 0 0 3px var(--surface-primary),
+    0 0 0 5px var(--primary);
   border-radius: 8px;
 }
 
@@ -714,7 +735,9 @@ body.dark-mode .card-pro {
 
 body.dark-mode .card-pro:hover {
   border-color: var(--border-dark);
-  box-shadow: var(--elevation-4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow:
+    var(--elevation-4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 body.dark-mode .input-pro {
@@ -747,7 +770,8 @@ body.dark-mode .input-pro:focus {
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

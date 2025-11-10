@@ -5,14 +5,24 @@
  * Handles connection, disconnection, and all notification events
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 const SocketContext = createContext(null);
 
 // Notification sound (using data URI for a simple beep)
-const NOTIFICATION_SOUND = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBDGH0fPTgjMGHm7A7+OZSA0PVqzn77BXFwxKo+Hyu2sfBDOK0/PQfS0GH2+/7+OYRw0QV63o8LBYFw1MpOLyu2weBDSM1PPPfywGH2+/7uOXRw0RWK7o8LBZGQ5NpePyu20fBTaO1fPOfiwGIG++7+SXRw0RWK/o8LBZGQ5OpeTyu24gBTiQ1vPNfisGIG6+7+SWRg0RWK/o77BZGQ5PpuTyu28hBTmS1/PNfioGIG6+7+SWRg0RWK/o77BZGQ5PpuTyu28hBTmS1/PNfioGIG6+7+SWRg0RWK/o77BZGg5PpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ==');
+const NOTIFICATION_SOUND = new Audio(
+  'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBDGH0fPTgjMGHm7A7+OZSA0PVqzn77BXFwxKo+Hyu2sfBDOK0/PQfS0GH2+/7+OYRw0QV63o8LBYFw1MpOLyu2weBDSM1PPPfywGH2+/7uOXRw0RWK7o8LBZGQ5NpePyu20fBTaO1fPOfiwGIG++7+SXRw0RWK/o8LBZGQ5OpeTyu24gBTiQ1vPNfisGIG6+7+SWRg0RWK/o77BZGQ5PpuTyu28hBTmS1/PNfioGIG6+7+SWRg0RWK/o77BZGQ5PpuTyu28hBTmS1/PNfioGIG6+7+SWRg0RWK/o77BZGg5PpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ0QV67n77BZGg5QpuTyu3AiBTqT2PPMfSgGH26+7uSVRQ=='
+);
 
 export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
@@ -48,13 +58,13 @@ export function SocketProvider({ children }) {
 
     const newSocket = io(backendURL, {
       auth: {
-        token: currentUser.token
+        token: currentUser.token,
       },
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 5,
     });
 
     // Connection events
@@ -62,11 +72,11 @@ export function SocketProvider({ children }) {
       setIsConnected(true);
     });
 
-    newSocket.on('connected', (data) => {
+    newSocket.on('connected', () => {
       // Connected successfully
     });
 
-    newSocket.on('disconnect', (reason) => {
+    newSocket.on('disconnect', () => {
       setIsConnected(false);
     });
 
@@ -132,10 +142,10 @@ export function SocketProvider({ children }) {
     const newNotification = {
       ...notification,
       id: Date.now() + Math.random(),
-      read: false
+      read: false,
     };
 
-    setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50
+    setNotifications((prev) => [newNotification, ...prev].slice(0, 50)); // Keep last 50
   };
 
   // Play notification sound
@@ -157,7 +167,7 @@ export function SocketProvider({ children }) {
           body: message,
           icon: '/logo192.png',
           badge: '/logo192.png',
-          tag: 'toosila-notification'
+          tag: 'toosila-notification',
         });
       } catch (error) {
         // Notification error - fail silently
@@ -181,16 +191,14 @@ export function SocketProvider({ children }) {
 
   // Mark notification as read
   const markAsRead = useCallback((notificationId) => {
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
     );
   }, []);
 
   // Mark all as read
   const markAllAsRead = useCallback(() => {
-    setNotifications(prev =>
-      prev.map(n => ({ ...n, read: true }))
-    );
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
   // Clear all notifications
@@ -199,25 +207,33 @@ export function SocketProvider({ children }) {
   }, []);
 
   // Get unread count
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   // Memoize context value to prevent unnecessary re-renders
-  const value = useMemo(() => ({
-    socket,
-    isConnected,
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    clearAllNotifications,
-    requestNotificationPermission
-  }), [socket, isConnected, notifications, unreadCount, markAsRead, markAllAsRead, clearAllNotifications, requestNotificationPermission]);
-
-  return (
-    <SocketContext.Provider value={value}>
-      {children}
-    </SocketContext.Provider>
+  const value = useMemo(
+    () => ({
+      socket,
+      isConnected,
+      notifications,
+      unreadCount,
+      markAsRead,
+      markAllAsRead,
+      clearAllNotifications,
+      requestNotificationPermission,
+    }),
+    [
+      socket,
+      isConnected,
+      notifications,
+      unreadCount,
+      markAsRead,
+      markAllAsRead,
+      clearAllNotifications,
+      requestNotificationPermission,
+    ]
   );
+
+  return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 }
 
 export function useSocket() {

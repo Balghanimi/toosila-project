@@ -10,7 +10,9 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [highlightedBooking, setHighlightedBooking] = useState(location.state?.highlightBookingId || null);
+  const [highlightedBooking, setHighlightedBooking] = useState(
+    location.state?.highlightBookingId || null
+  );
   const { currentUser } = useAuth();
   const { showSuccess, showError, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
@@ -46,9 +48,10 @@ export default function Bookings() {
     setLoading(true);
     setError('');
     try {
-      const response = activeTab === 'received'
-        ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
-        : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
+      const response =
+        activeTab === 'received'
+          ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
+          : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
 
       setBookings(response.bookings || []);
     } catch (err) {
@@ -95,7 +98,7 @@ export default function Bookings() {
       pending: '#fbbf24',
       confirmed: '#34c759',
       cancelled: '#dc2626',
-      completed: '#3b82f6'
+      completed: '#3b82f6',
     };
     return colors[status] || '#6b7280';
   };
@@ -105,7 +108,7 @@ export default function Bookings() {
       pending: 'قيد الانتظار',
       confirmed: 'مؤكد',
       cancelled: 'ملغي',
-      completed: 'مكتمل'
+      completed: 'مكتمل',
     };
     return texts[status] || status;
   };
@@ -130,7 +133,7 @@ export default function Bookings() {
           border: isHighlighted ? '3px solid #f59e0b' : '1px solid var(--border-light)',
           position: 'relative',
           transition: 'all 0.3s ease',
-          animation: isHighlighted ? 'pulse 1.5s ease-in-out infinite' : 'none'
+          animation: isHighlighted ? 'pulse 1.5s ease-in-out infinite' : 'none',
         }}
       >
         {/* Status Badge */}
@@ -145,7 +148,7 @@ export default function Bookings() {
             borderRadius: 'var(--radius-full)',
             fontSize: 'var(--text-xs)',
             fontWeight: '700',
-            fontFamily: '"Cairo", sans-serif'
+            fontFamily: '"Cairo", sans-serif',
           }}
         >
           {getStatusText(booking.status)}
@@ -159,7 +162,7 @@ export default function Bookings() {
               fontWeight: '700',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-2)',
-              fontFamily: '"Cairo", sans-serif'
+              fontFamily: '"Cairo", sans-serif',
             }}
           >
             {booking.offer?.fromCity} ← {booking.offer?.toCity}
@@ -172,11 +175,24 @@ export default function Bookings() {
               marginBottom: 'var(--space-3)',
               fontSize: 'var(--text-sm)',
               color: 'var(--text-secondary)',
-              fontFamily: '"Cairo", sans-serif'
+              fontFamily: '"Cairo", sans-serif',
             }}
           >
-            <div>📅 {booking.offer?.departureTime ? new Date(booking.offer.departureTime).toLocaleDateString('ar-EG') : 'غير محدد'}</div>
-            <div>🕐 {booking.offer?.departureTime ? new Date(booking.offer.departureTime).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '--:--'}</div>
+            <div>
+              📅{' '}
+              {booking.offer?.departureTime
+                ? new Date(booking.offer.departureTime).toLocaleDateString('ar-EG')
+                : 'غير محدد'}
+            </div>
+            <div>
+              🕐{' '}
+              {booking.offer?.departureTime
+                ? new Date(booking.offer.departureTime).toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '--:--'}
+            </div>
             <div>💺 {booking.offer?.seats || '--'} مقعد</div>
             <div>💰 {booking.totalPrice || booking.offer?.price || '0'} د.ع</div>
           </div>
@@ -184,11 +200,13 @@ export default function Bookings() {
           {/* Passenger/Driver Details Card */}
           <div
             style={{
-              background: isReceived ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              background: isReceived
+                ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'
+                : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
               padding: 'var(--space-3)',
               borderRadius: 'var(--radius)',
               marginBottom: 'var(--space-3)',
-              border: `2px solid ${isReceived ? '#3b82f6' : '#10b981'}`
+              border: `2px solid ${isReceived ? '#3b82f6' : '#10b981'}`,
             }}
           >
             <div
@@ -197,7 +215,7 @@ export default function Bookings() {
                 fontWeight: '600',
                 color: isReceived ? '#1e40af' : '#047857',
                 marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               {isReceived ? '👤 معلومات الراكب' : '🚗 معلومات السائق'}
@@ -208,20 +226,40 @@ export default function Bookings() {
                 gap: 'var(--space-1)',
                 fontSize: 'var(--text-sm)',
                 color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               {isReceived ? (
                 <>
-                  <div><strong>الاسم:</strong> {booking.user?.name || 'غير متوفر'}</div>
-                  {booking.user?.email && <div><strong>البريد:</strong> {booking.user.email}</div>}
-                  {booking.user?.phone && <div><strong>الهاتف:</strong> {booking.user.phone}</div>}
+                  <div>
+                    <strong>الاسم:</strong> {booking.user?.name || 'غير متوفر'}
+                  </div>
+                  {booking.user?.email && (
+                    <div>
+                      <strong>البريد:</strong> {booking.user.email}
+                    </div>
+                  )}
+                  {booking.user?.phone && (
+                    <div>
+                      <strong>الهاتف:</strong> {booking.user.phone}
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
-                  <div><strong>الاسم:</strong> {booking.offer?.driver?.name || 'غير متوفر'}</div>
-                  {booking.offer?.driver?.email && <div><strong>البريد:</strong> {booking.offer.driver.email}</div>}
-                  {booking.offer?.driver?.phone && <div><strong>الهاتف:</strong> {booking.offer.driver.phone}</div>}
+                  <div>
+                    <strong>الاسم:</strong> {booking.offer?.driver?.name || 'غير متوفر'}
+                  </div>
+                  {booking.offer?.driver?.email && (
+                    <div>
+                      <strong>البريد:</strong> {booking.offer.driver.email}
+                    </div>
+                  )}
+                  {booking.offer?.driver?.phone && (
+                    <div>
+                      <strong>الهاتف:</strong> {booking.offer.driver.phone}
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -237,7 +275,7 @@ export default function Bookings() {
                 marginBottom: 'var(--space-3)',
                 fontSize: 'var(--text-sm)',
                 color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               💬 {booking.message}
@@ -252,6 +290,7 @@ export default function Bookings() {
                 <>
                   <button
                     onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                    aria-label={`قبول حجز ${booking.user?.name || 'الراكب'} من ${booking.offer?.fromCity} إلى ${booking.offer?.toCity}`}
                     style={{
                       flex: 1,
                       padding: 'var(--space-3)',
@@ -262,13 +301,14 @@ export default function Bookings() {
                       fontSize: 'var(--text-sm)',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      fontFamily: '"Cairo", sans-serif'
+                      fontFamily: '"Cairo", sans-serif',
                     }}
                   >
                     ✅ قبول
                   </button>
                   <button
                     onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                    aria-label={`رفض حجز ${booking.user?.name || 'الراكب'}`}
                     style={{
                       flex: 1,
                       padding: 'var(--space-3)',
@@ -279,7 +319,7 @@ export default function Bookings() {
                       fontSize: 'var(--text-sm)',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      fontFamily: '"Cairo", sans-serif'
+                      fontFamily: '"Cairo", sans-serif',
                     }}
                   >
                     ❌ رفض
@@ -290,6 +330,7 @@ export default function Bookings() {
               {!isReceived && canCancel && (
                 <button
                   onClick={() => handleCancel(booking.id)}
+                  aria-label={`إلغاء حجزي مع ${booking.offer?.driver?.name || 'السائق'}`}
                   style={{
                     flex: 1,
                     padding: 'var(--space-3)',
@@ -300,7 +341,7 @@ export default function Bookings() {
                     fontSize: 'var(--text-sm)',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    fontFamily: '"Cairo", sans-serif'
+                    fontFamily: '"Cairo", sans-serif',
                   }}
                 >
                   إلغاء الحجز
@@ -315,6 +356,7 @@ export default function Bookings() {
                 const recipientName = isReceived ? booking.user?.name : booking.offer?.driver?.name;
                 navigate(`/messages`, { state: { recipientId, recipientName } });
               }}
+              aria-label={`مراسلة ${isReceived ? booking.user?.name || 'الراكب' : booking.offer?.driver?.name || 'السائق'}`}
               style={{
                 width: '100%',
                 padding: 'var(--space-3)',
@@ -326,7 +368,7 @@ export default function Bookings() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontFamily: '"Cairo", sans-serif',
-                boxShadow: 'var(--shadow-sm)'
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               💬 مراسلة {isReceived ? 'الراكب' : 'السائق'}
@@ -342,7 +384,7 @@ export default function Bookings() {
       style={{
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        paddingBottom: '100px'
+        paddingBottom: '100px',
       }}
     >
       <div
@@ -350,7 +392,7 @@ export default function Bookings() {
         style={{
           paddingTop: 'var(--space-6)',
           maxWidth: '600px',
-          margin: '0 auto'
+          margin: '0 auto',
         }}
       >
         {/* Header */}
@@ -361,7 +403,7 @@ export default function Bookings() {
               fontWeight: '800',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-2)',
-              fontFamily: '"Cairo", sans-serif'
+              fontFamily: '"Cairo", sans-serif',
             }}
           >
             📋 حجوزاتي
@@ -370,17 +412,23 @@ export default function Bookings() {
 
         {/* Tabs */}
         <div
+          role="tablist"
+          aria-label="أنواع الحجوزات"
           style={{
             display: 'flex',
             gap: 'var(--space-2)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
             borderRadius: 'var(--radius)',
-            padding: 'var(--space-1)'
+            padding: 'var(--space-1)',
           }}
         >
           <button
             onClick={() => setActiveTab('received')}
+            role="tab"
+            aria-selected={activeTab === 'received'}
+            aria-controls="bookings-panel"
+            aria-label="الحجوزات الواردة على عروضي"
             style={{
               flex: 1,
               padding: 'var(--space-3)',
@@ -392,13 +440,17 @@ export default function Bookings() {
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'received' ? 'var(--shadow-sm)' : 'none'
+              boxShadow: activeTab === 'received' ? 'var(--shadow-sm)' : 'none',
             }}
           >
             📬 الحجوزات الواردة
           </button>
           <button
             onClick={() => setActiveTab('sent')}
+            role="tab"
+            aria-selected={activeTab === 'sent'}
+            aria-controls="bookings-panel"
+            aria-label="حجوزاتي على عروض الآخرين"
             style={{
               flex: 1,
               padding: 'var(--space-3)',
@@ -410,7 +462,7 @@ export default function Bookings() {
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'sent' ? 'var(--shadow-sm)' : 'none'
+              boxShadow: activeTab === 'sent' ? 'var(--shadow-sm)' : 'none',
             }}
           >
             📤 حجوزاتي
@@ -420,6 +472,8 @@ export default function Bookings() {
         {/* Error Message */}
         {error && (
           <div
+            role="alert"
+            aria-live="assertive"
             style={{
               background: '#fee',
               border: '2px solid #f88',
@@ -428,7 +482,7 @@ export default function Bookings() {
               marginBottom: 'var(--space-4)',
               color: '#c00',
               fontFamily: '"Cairo", sans-serif',
-              fontSize: 'var(--text-base)'
+              fontSize: 'var(--text-base)',
             }}
           >
             {error}
@@ -437,7 +491,11 @@ export default function Bookings() {
 
         {/* Loading */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+          <div
+            style={{ textAlign: 'center', padding: 'var(--space-8)' }}
+            role="status"
+            aria-live="polite"
+          >
             <div
               style={{
                 width: '40px',
@@ -446,14 +504,15 @@ export default function Bookings() {
                 borderTop: '4px solid var(--primary)',
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite',
-                margin: '0 auto'
+                margin: '0 auto',
               }}
+              aria-label="جاري التحميل"
             />
             <p
               style={{
                 marginTop: 'var(--space-4)',
                 color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               جاري التحميل...
@@ -466,7 +525,7 @@ export default function Bookings() {
               padding: 'var(--space-8)',
               background: 'var(--surface-primary)',
               borderRadius: 'var(--radius-xl)',
-              boxShadow: 'var(--shadow-md)'
+              boxShadow: 'var(--shadow-md)',
             }}
           >
             <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>📭</div>
@@ -474,12 +533,10 @@ export default function Bookings() {
               style={{
                 fontSize: 'var(--text-lg)',
                 color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
-              {activeTab === 'received'
-                ? 'لا توجد حجوزات واردة حالياً'
-                : 'لم تقم بأي حجوزات بعد'}
+              {activeTab === 'received' ? 'لا توجد حجوزات واردة حالياً' : 'لم تقم بأي حجوزات بعد'}
             </p>
           </div>
         ) : (

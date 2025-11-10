@@ -51,7 +51,7 @@ function NotificationBell() {
           transition: 'background-color 0.2s ease',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -65,7 +65,7 @@ function NotificationBell() {
           style={{
             fontSize: '1.5rem',
             lineHeight: 1,
-            color: '#374151'
+            color: '#374151',
           }}
         >
           🔔
@@ -73,20 +73,22 @@ function NotificationBell() {
 
         {/* Connection Status Indicator (small dot if not connected) */}
         {!isConnected && (
-          <span style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#f59e0b',
-            border: '2px solid white'
-          }} />
+          <span
+            style={{
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#f59e0b',
+              border: '2px solid white',
+            }}
+          />
         )}
 
         {/* Badge العدد - combined from both contexts */}
-        {(unreadCount + socketUnreadCount) > 0 && (
+        {unreadCount + socketUnreadCount > 0 && (
           <span
             style={{
               position: 'absolute',
@@ -105,20 +107,20 @@ function NotificationBell() {
               padding: '0 4px',
               boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               fontFamily: '"Cairo", sans-serif',
-              animation: (unreadCount + socketUnreadCount) > 0 ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
+              animation:
+                unreadCount + socketUnreadCount > 0
+                  ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  : 'none',
             }}
           >
-            {(unreadCount + socketUnreadCount) > 9 ? '9+' : (unreadCount + socketUnreadCount)}
+            {unreadCount + socketUnreadCount > 9 ? '9+' : unreadCount + socketUnreadCount}
           </span>
         )}
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <NotificationDropdown
-          onClose={() => setIsOpen(false)}
-          dropdownRef={dropdownRef}
-        />
+        <NotificationDropdown onClose={() => setIsOpen(false)} dropdownRef={dropdownRef} />
       )}
 
       <style>{`

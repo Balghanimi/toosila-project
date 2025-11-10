@@ -14,7 +14,7 @@ const UserManagement = () => {
   const [filters, setFilters] = useState({
     role: '',
     isDriver: '',
-    isActive: ''
+    isActive: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -53,9 +53,10 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading && users.length === 0) {
@@ -129,11 +130,7 @@ const UserManagement = () => {
             </select>
           </div>
 
-          <Button
-            variant="primary"
-            onClick={fetchUsers}
-            loading={loading}
-          >
+          <Button variant="primary" onClick={fetchUsers} loading={loading}>
             تطبيق الفلاتر
           </Button>
         </div>
@@ -229,7 +226,7 @@ const UserManagement = () => {
         <div className="pagination">
           <Button
             variant="secondary"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             السابق
@@ -239,7 +236,7 @@ const UserManagement = () => {
           </span>
           <Button
             variant="secondary"
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >
             التالي

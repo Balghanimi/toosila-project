@@ -12,7 +12,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
     confirmPassword: '',
     userType: 'passenger', // default to passenger
     selfieImage: null,
-    acceptTerms: false
+    acceptTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -32,16 +32,16 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear field error when user starts typing
     if (formErrors[name]) {
-      setFormErrors(prev => ({
+      setFormErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -50,21 +50,21 @@ export default function Register({ onSwitchToLogin, onClose }) {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' }
+        video: { facingMode: 'user' },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setShowCamera(true);
       }
     } catch (err) {
-      setFormErrors(prev => ({ ...prev, selfie: 'لم نتمكن من الوصول إلى الكاميرا' }));
+      setFormErrors((prev) => ({ ...prev, selfie: 'لم نتمكن من الوصول إلى الكاميرا' }));
     }
   };
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const tracks = videoRef.current.srcObject.getTracks();
-      tracks.forEach(track => track.stop());
+      tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
     setShowCamera(false);
@@ -79,28 +79,32 @@ export default function Register({ onSwitchToLogin, onClose }) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0);
 
-      canvas.toBlob((blob) => {
-        const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
-        setFormData(prev => ({ ...prev, selfieImage: file }));
-        setSelfiePreview(URL.createObjectURL(blob));
-        stopCamera();
-      }, 'image/jpeg', 0.8);
+      canvas.toBlob(
+        (blob) => {
+          const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
+          setFormData((prev) => ({ ...prev, selfieImage: file }));
+          setSelfiePreview(URL.createObjectURL(blob));
+          stopCamera();
+        },
+        'image/jpeg',
+        0.8
+      );
     }
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      setFormData(prev => ({ ...prev, selfieImage: file }));
+      setFormData((prev) => ({ ...prev, selfieImage: file }));
       setSelfiePreview(URL.createObjectURL(file));
       if (formErrors.selfie) {
-        setFormErrors(prev => ({ ...prev, selfie: '' }));
+        setFormErrors((prev) => ({ ...prev, selfie: '' }));
       }
     }
   };
 
   const removeSelfie = () => {
-    setFormData(prev => ({ ...prev, selfieImage: null }));
+    setFormData((prev) => ({ ...prev, selfieImage: null }));
     setSelfiePreview(null);
   };
 
@@ -169,17 +173,19 @@ export default function Register({ onSwitchToLogin, onClose }) {
   };
 
   return (
-    <div style={{
-      background: 'white',
-      borderRadius: '16px',
-      padding: '32px',
-      width: '100%',
-      maxWidth: '460px',
-      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-      position: 'relative',
-      maxHeight: '90vh',
-      overflowY: 'auto'
-    }}>
+    <div
+      style={{
+        background: 'white',
+        borderRadius: '16px',
+        padding: '32px',
+        width: '100%',
+        maxWidth: '460px',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        position: 'relative',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+      }}
+    >
       {/* Close Button */}
       <button
         onClick={onClose}
@@ -193,7 +199,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
           cursor: 'pointer',
           color: '#6b7280',
           padding: '8px',
-          zIndex: 1
+          zIndex: 1,
         }}
       >
         ×
@@ -201,56 +207,67 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <h2 style={{
-          fontSize: '28px',
-          fontWeight: '700',
-          color: '#1f2937',
-          margin: '0 0 8px 0'
-        }}>
+        <h2
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#1f2937',
+            margin: '0 0 8px 0',
+          }}
+        >
           إنشاء حساب جديد
         </h2>
-        <p style={{
-          fontSize: '16px',
-          color: '#6b7280',
-          margin: '0'
-        }}>
+        <p
+          style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            margin: '0',
+          }}
+        >
           انضم إلى مجتمع توصيلة
         </p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div style={{
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
-          color: '#dc2626',
-          padding: '12px 16px',
-          borderRadius: '8px',
-          marginBottom: '24px',
-          fontSize: '14px',
-          textAlign: 'center'
-        }}>
+        <div
+          style={{
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            color: '#dc2626',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '24px',
+            fontSize: '14px',
+            textAlign: 'center',
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+      >
         {/* User Type Selector */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px',
+            }}
+          >
             أريد التسجيل كـ
           </label>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
               type="button"
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'passenger' }))}
+              onClick={() => setFormData((prev) => ({ ...prev, userType: 'passenger' }))}
               style={{
                 flex: 1,
                 padding: '12px 16px',
@@ -265,7 +282,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '8px',
               }}
             >
               <span style={{ fontSize: '20px' }}>👤</span>
@@ -273,7 +290,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             </button>
             <button
               type="button"
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'driver' }))}
+              onClick={() => setFormData((prev) => ({ ...prev, userType: 'driver' }))}
               style={{
                 flex: 1,
                 padding: '12px 16px',
@@ -288,7 +305,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '8px',
               }}
             >
               <span style={{ fontSize: '20px' }}>🚗</span>
@@ -299,13 +316,15 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
         {/* Name Input */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px',
+            }}
+          >
             الاسم الكامل
           </label>
           <input
@@ -322,7 +341,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
               fontSize: '16px',
               outline: 'none',
               transition: 'border-color 0.2s ease',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
             }}
             onFocus={(e) => !formErrors.name && (e.target.style.borderColor = '#3b82f6')}
             onBlur={(e) => !formErrors.name && (e.target.style.borderColor = '#e5e7eb')}
@@ -336,13 +355,15 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
         {/* Email Input */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px',
+            }}
+          >
             البريد الإلكتروني
           </label>
           <input
@@ -359,7 +380,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
               fontSize: '16px',
               outline: 'none',
               transition: 'border-color 0.2s ease',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
             }}
             onFocus={(e) => !formErrors.email && (e.target.style.borderColor = '#3b82f6')}
             onBlur={(e) => !formErrors.email && (e.target.style.borderColor = '#e5e7eb')}
@@ -374,30 +395,41 @@ export default function Register({ onSwitchToLogin, onClose }) {
         {/* Selfie Upload for Drivers Only */}
         {formData.userType === 'driver' && (
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '8px'
-            }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px',
+              }}
+            >
               📸 صورة سيلفي (مطلوبة للسائقين)
             </label>
 
             {!selfiePreview ? (
-              <div style={{
-                border: `2px dashed ${formErrors.selfie ? '#dc2626' : '#d1d5db'}`,
-                borderRadius: '12px',
-                padding: '24px',
-                textAlign: 'center',
-                background: '#f9fafb'
-              }}>
+              <div
+                style={{
+                  border: `2px dashed ${formErrors.selfie ? '#dc2626' : '#d1d5db'}`,
+                  borderRadius: '12px',
+                  padding: '24px',
+                  textAlign: 'center',
+                  background: '#f9fafb',
+                }}
+              >
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>🤳</div>
                 <p style={{ color: '#6b7280', marginBottom: '16px', fontSize: '14px' }}>
                   التقط صورة سيلفي واضحة لوجهك
                 </p>
 
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   <button
                     type="button"
                     onClick={startCamera}
@@ -412,25 +444,27 @@ export default function Register({ onSwitchToLogin, onClose }) {
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '8px',
                     }}
                   >
                     📷 التقط صورة
                   </button>
 
-                  <label style={{
-                    padding: '10px 20px',
-                    background: 'white',
-                    color: '#10b981',
-                    border: '2px solid #10b981',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
+                  <label
+                    style={{
+                      padding: '10px 20px',
+                      background: 'white',
+                      color: '#10b981',
+                      border: '2px solid #10b981',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
                     📁 ارفع صورة
                     <input
                       type="file"
@@ -446,32 +480,44 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 </p>
               </div>
             ) : (
-              <div style={{
-                border: '2px solid #10b981',
-                borderRadius: '12px',
-                padding: '16px',
-                background: '#f0fdf4'
-              }}>
-                <div style={{
-                  position: 'relative',
-                  width: '150px',
-                  height: '150px',
-                  margin: '0 auto 12px',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  border: '3px solid #10b981'
-                }}>
+              <div
+                style={{
+                  border: '2px solid #10b981',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  background: '#f0fdf4',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '150px',
+                    height: '150px',
+                    margin: '0 auto 12px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: '3px solid #10b981',
+                  }}
+                >
                   <img
                     src={selfiePreview}
                     alt="Selfie preview"
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover'
+                      objectFit: 'cover',
                     }}
                   />
                 </div>
-                <p style={{ textAlign: 'center', color: '#059669', fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
+                <p
+                  style={{
+                    textAlign: 'center',
+                    color: '#059669',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '12px',
+                  }}
+                >
                   ✅ تم التقاط الصورة بنجاح
                 </p>
                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -486,7 +532,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '600',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
                     🗑️ حذف
@@ -505,7 +551,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '600',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
                     📷 التقط صورة جديدة
@@ -515,27 +561,36 @@ export default function Register({ onSwitchToLogin, onClose }) {
             )}
 
             {formErrors.selfie && (
-              <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}>
+              <div
+                style={{
+                  color: '#dc2626',
+                  fontSize: '12px',
+                  marginTop: '8px',
+                  textAlign: 'center',
+                }}
+              >
                 {formErrors.selfie}
               </div>
             )}
 
             {/* Camera Modal */}
             {showCamera && (
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0, 0, 0, 0.9)',
-                zIndex: 9999,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '20px'
-              }}>
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(0, 0, 0, 0.9)',
+                  zIndex: 9999,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '20px',
+                }}
+              >
                 <video
                   ref={videoRef}
                   autoPlay
@@ -544,7 +599,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                     maxWidth: '100%',
                     maxHeight: '70vh',
                     borderRadius: '12px',
-                    transform: 'scaleX(-1)' // Mirror effect
+                    transform: 'scaleX(-1)', // Mirror effect
                   }}
                 />
                 <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
@@ -560,7 +615,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                       fontSize: '16px',
                       fontWeight: '700',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)'
+                      boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)',
                     }}
                   >
                     📸 التقط الصورة
@@ -576,7 +631,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                       borderRadius: '50px',
                       fontSize: '16px',
                       fontWeight: '700',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
                     }}
                   >
                     ✖️ إلغاء
@@ -592,13 +647,15 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
         {/* Password Input */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px',
+            }}
+          >
             كلمة المرور
           </label>
           <div style={{ position: 'relative' }}>
@@ -616,7 +673,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 fontSize: '16px',
                 outline: 'none',
                 transition: 'border-color 0.2s ease',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
               }}
               onFocus={(e) => !formErrors.password && (e.target.style.borderColor = '#3b82f6')}
               onBlur={(e) => !formErrors.password && (e.target.style.borderColor = '#e5e7eb')}
@@ -633,7 +690,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '18px',
-                color: '#6b7280'
+                color: '#6b7280',
               }}
             >
               {showPassword ? '🙈' : '👁️'}
@@ -644,17 +701,19 @@ export default function Register({ onSwitchToLogin, onClose }) {
               {formErrors.password}
             </div>
           )}
-          
+
           {/* Password Instructions */}
-          <div style={{
-            background: '#f0f9ff',
-            border: '1px solid #0ea5e9',
-            borderRadius: '6px',
-            padding: '8px 12px',
-            marginTop: '6px',
-            fontSize: '12px',
-            color: '#0369a1'
-          }}>
+          <div
+            style={{
+              background: '#f0f9ff',
+              border: '1px solid #0ea5e9',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              marginTop: '6px',
+              fontSize: '12px',
+              color: '#0369a1',
+            }}
+          >
             💡 <strong>تعليمات كلمة المرور:</strong>
             <ul style={{ margin: '4px 0 0 0', paddingLeft: '16px' }}>
               <li>أقل عدد 5 أحرف أو أرقام</li>
@@ -667,13 +726,15 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
         {/* Confirm Password Input */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px',
+            }}
+          >
             تأكيد كلمة المرور
           </label>
           <div style={{ position: 'relative' }}>
@@ -691,10 +752,14 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 fontSize: '16px',
                 outline: 'none',
                 transition: 'border-color 0.2s ease',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
               }}
-              onFocus={(e) => !formErrors.confirmPassword && (e.target.style.borderColor = '#3b82f6')}
-              onBlur={(e) => !formErrors.confirmPassword && (e.target.style.borderColor = '#e5e7eb')}
+              onFocus={(e) =>
+                !formErrors.confirmPassword && (e.target.style.borderColor = '#3b82f6')
+              }
+              onBlur={(e) =>
+                !formErrors.confirmPassword && (e.target.style.borderColor = '#e5e7eb')
+              }
             />
             <button
               type="button"
@@ -708,7 +773,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '18px',
-                color: '#6b7280'
+                color: '#6b7280',
               }}
             >
               {showConfirmPassword ? '🙈' : '👁️'}
@@ -723,24 +788,26 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
         {/* Terms and Conditions */}
         <div>
-          <label style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '12px',
-            cursor: 'pointer',
-            padding: '16px',
-            background: formErrors.terms ? '#fef2f2' : '#f9fafb',
-            border: `2px solid ${formErrors.terms ? '#dc2626' : '#e5e7eb'}`,
-            borderRadius: '8px',
-            transition: 'all 0.2s ease'
-          }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px',
+              cursor: 'pointer',
+              padding: '16px',
+              background: formErrors.terms ? '#fef2f2' : '#f9fafb',
+              border: `2px solid ${formErrors.terms ? '#dc2626' : '#e5e7eb'}`,
+              borderRadius: '8px',
+              transition: 'all 0.2s ease',
+            }}
+          >
             <input
               type="checkbox"
               checked={formData.acceptTerms}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, acceptTerms: e.target.checked }));
+                setFormData((prev) => ({ ...prev, acceptTerms: e.target.checked }));
                 if (formErrors.terms) {
-                  setFormErrors(prev => ({ ...prev, terms: '' }));
+                  setFormErrors((prev) => ({ ...prev, terms: '' }));
                 }
               }}
               style={{
@@ -748,14 +815,16 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 height: '20px',
                 cursor: 'pointer',
                 flexShrink: 0,
-                marginTop: '2px'
+                marginTop: '2px',
               }}
             />
-            <span style={{
-              fontSize: '14px',
-              color: formErrors.terms ? '#dc2626' : '#374151',
-              lineHeight: '1.5'
-            }}>
+            <span
+              style={{
+                fontSize: '14px',
+                color: formErrors.terms ? '#dc2626' : '#374151',
+                lineHeight: '1.5',
+              }}
+            >
               أوافق على{' '}
               <button
                 type="button"
@@ -771,16 +840,18 @@ export default function Register({ onSwitchToLogin, onClose }) {
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '600',
-                  padding: 0
+                  padding: 0,
                 }}
               >
                 الشروط والأحكام
-              </button>
-              {' '}وسياسة الخصوصية لتطبيق توصيلة
+              </button>{' '}
+              وسياسة الخصوصية لتطبيق توصيلة
             </span>
           </label>
           {formErrors.terms && (
-            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}>
+            <div
+              style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}
+            >
               {formErrors.terms}
             </div>
           )}
@@ -800,7 +871,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             fontWeight: '600',
             cursor: loading ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s ease',
-            marginTop: '8px'
+            marginTop: '8px',
           }}
         >
           {loading ? 'جارٍ إنشاء الحساب...' : 'إنشاء حساب'}
@@ -809,29 +880,33 @@ export default function Register({ onSwitchToLogin, onClose }) {
 
       {/* Terms and Conditions Modal */}
       {showTerms && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.7)',
-          zIndex: 10000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '16px',
-            padding: '32px',
-            maxWidth: '600px',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            position: 'relative',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
-          }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '600px',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              position: 'relative',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+            }}
+          >
             {/* Close Button */}
             <button
               onClick={() => setShowTerms(false)}
@@ -849,40 +924,58 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 color: '#6b7280',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}
             >
               ✖
             </button>
 
-            <h2 style={{
-              fontSize: '24px',
-              fontWeight: '700',
-              color: '#1f2937',
-              marginBottom: '24px',
-              textAlign: 'center'
-            }}>
+            <h2
+              style={{
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#1f2937',
+                marginBottom: '24px',
+                textAlign: 'center',
+              }}
+            >
               الشروط والأحكام
             </h2>
 
-            <div style={{
-              fontSize: '14px',
-              color: '#374151',
-              lineHeight: '1.8',
-              textAlign: 'right'
-            }}>
+            <div
+              style={{
+                fontSize: '14px',
+                color: '#374151',
+                lineHeight: '1.8',
+                textAlign: 'right',
+              }}
+            >
               <section style={{ marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    marginBottom: '12px',
+                  }}
+                >
                   📱 مقدمة
                 </h3>
                 <p style={{ marginBottom: '12px' }}>
-                  مرحباً بك في تطبيق توصيلة! هذه الشروط والأحكام تحدد القواعد واللوائح الخاصة باستخدام خدماتنا.
-                  باستخدامك للتطبيق، فإنك توافق على الالتزام بهذه الشروط.
+                  مرحباً بك في تطبيق توصيلة! هذه الشروط والأحكام تحدد القواعد واللوائح الخاصة
+                  باستخدام خدماتنا. باستخدامك للتطبيق، فإنك توافق على الالتزام بهذه الشروط.
                 </p>
               </section>
 
               <section style={{ marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    marginBottom: '12px',
+                  }}
+                >
                   👥 شروط عامة لجميع المستخدمين
                 </h3>
                 <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
@@ -895,40 +988,105 @@ export default function Register({ onSwitchToLogin, onClose }) {
               </section>
 
               {formData.userType === 'driver' && (
-                <section style={{ marginBottom: '24px', background: '#ecfdf5', padding: '16px', borderRadius: '8px', border: '2px solid #10b981' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#047857', marginBottom: '12px' }}>
+                <section
+                  style={{
+                    marginBottom: '24px',
+                    background: '#ecfdf5',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '2px solid #10b981',
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#047857',
+                      marginBottom: '12px',
+                    }}
+                  >
                     🚗 شروط خاصة بالسائقين
                   </h3>
                   <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
-                    <li><strong>رخصة القيادة:</strong> يجب أن تكون لديك رخصة قيادة سارية المفعول</li>
-                    <li><strong>المركبة:</strong> يجب أن تكون مركبتك في حالة جيدة ومستوفية لمعايير السلامة</li>
-                    <li><strong>التأمين:</strong> يجب أن يكون لديك تأمين ساري المفعول على المركبة</li>
-                    <li><strong>السلوك:</strong> الالتزام بالسلوك المهني واللباقة مع الركاب</li>
-                    <li><strong>صورة السيلفي:</strong> توافق على استخدام صورتك للتحقق من هويتك وزيادة أمان المنصة</li>
-                    <li><strong>المواعيد:</strong> الالتزام بالمواعيد المحددة للرحلات</li>
-                    <li><strong>النظافة:</strong> الحفاظ على نظافة المركبة</li>
-                    <li><strong>الأسعار:</strong> الالتزام بالأسعار المتفق عليها عبر التطبيق</li>
+                    <li>
+                      <strong>رخصة القيادة:</strong> يجب أن تكون لديك رخصة قيادة سارية المفعول
+                    </li>
+                    <li>
+                      <strong>المركبة:</strong> يجب أن تكون مركبتك في حالة جيدة ومستوفية لمعايير
+                      السلامة
+                    </li>
+                    <li>
+                      <strong>التأمين:</strong> يجب أن يكون لديك تأمين ساري المفعول على المركبة
+                    </li>
+                    <li>
+                      <strong>السلوك:</strong> الالتزام بالسلوك المهني واللباقة مع الركاب
+                    </li>
+                    <li>
+                      <strong>صورة السيلفي:</strong> توافق على استخدام صورتك للتحقق من هويتك وزيادة
+                      أمان المنصة
+                    </li>
+                    <li>
+                      <strong>المواعيد:</strong> الالتزام بالمواعيد المحددة للرحلات
+                    </li>
+                    <li>
+                      <strong>النظافة:</strong> الحفاظ على نظافة المركبة
+                    </li>
+                    <li>
+                      <strong>الأسعار:</strong> الالتزام بالأسعار المتفق عليها عبر التطبيق
+                    </li>
                   </ul>
                 </section>
               )}
 
               {formData.userType === 'passenger' && (
-                <section style={{ marginBottom: '24px', background: '#eff6ff', padding: '16px', borderRadius: '8px', border: '2px solid #3b82f6' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1d4ed8', marginBottom: '12px' }}>
+                <section
+                  style={{
+                    marginBottom: '24px',
+                    background: '#eff6ff',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '2px solid #3b82f6',
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#1d4ed8',
+                      marginBottom: '12px',
+                    }}
+                  >
                     👤 شروط خاصة بالركاب
                   </h3>
                   <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
-                    <li><strong>الحجز:</strong> تأكد من صحة معلومات الحجز قبل التأكيد</li>
-                    <li><strong>الدفع:</strong> الالتزام بدفع المبلغ المتفق عليه</li>
-                    <li><strong>الإلغاء:</strong> إلغاء الرحلة قبل الموعد المحدد بوقت كافٍ</li>
-                    <li><strong>السلوك:</strong> احترام السائق والمركبة</li>
-                    <li><strong>التقييم:</strong> تقديم تقييم عادل للرحلة</li>
+                    <li>
+                      <strong>الحجز:</strong> تأكد من صحة معلومات الحجز قبل التأكيد
+                    </li>
+                    <li>
+                      <strong>الدفع:</strong> الالتزام بدفع المبلغ المتفق عليه
+                    </li>
+                    <li>
+                      <strong>الإلغاء:</strong> إلغاء الرحلة قبل الموعد المحدد بوقت كافٍ
+                    </li>
+                    <li>
+                      <strong>السلوك:</strong> احترام السائق والمركبة
+                    </li>
+                    <li>
+                      <strong>التقييم:</strong> تقديم تقييم عادل للرحلة
+                    </li>
                   </ul>
                 </section>
               )}
 
               <section style={{ marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    marginBottom: '12px',
+                  }}
+                >
                   🔒 سياسة الخصوصية
                 </h3>
                 <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
@@ -941,7 +1099,14 @@ export default function Register({ onSwitchToLogin, onClose }) {
               </section>
 
               <section style={{ marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    marginBottom: '12px',
+                  }}
+                >
                   ⚠️ إخلاء المسؤولية
                 </h3>
                 <ul style={{ paddingRight: '20px', marginBottom: '12px' }}>
@@ -953,49 +1118,59 @@ export default function Register({ onSwitchToLogin, onClose }) {
               </section>
 
               <section style={{ marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    marginBottom: '12px',
+                  }}
+                >
                   📞 التواصل والدعم
                 </h3>
                 <p>
-                  في حالة وجود أي استفسارات أو مشاكل، يمكنك التواصل معنا عبر التطبيق أو البريد الإلكتروني.
-                  نحن ملتزمون بتقديم أفضل خدمة ممكنة لك.
+                  في حالة وجود أي استفسارات أو مشاكل، يمكنك التواصل معنا عبر التطبيق أو البريد
+                  الإلكتروني. نحن ملتزمون بتقديم أفضل خدمة ممكنة لك.
                 </p>
               </section>
 
-              <section style={{
-                background: '#fef3c7',
-                padding: '16px',
-                borderRadius: '8px',
-                border: '2px solid #f59e0b',
-                marginTop: '24px'
-              }}>
+              <section
+                style={{
+                  background: '#fef3c7',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  border: '2px solid #f59e0b',
+                  marginTop: '24px',
+                }}
+              >
                 <p style={{ fontWeight: '600', color: '#92400e', marginBottom: '8px' }}>
                   ⚡ ملاحظة هامة:
                 </p>
                 <p style={{ color: '#92400e' }}>
-                  باستخدامك لتطبيق توصيلة، فإنك تقر بأنك قد قرأت وفهمت ووافقت على جميع هذه الشروط والأحكام.
-                  نحتفظ بالحق في تحديث هذه الشروط في أي وقت، وسيتم إخطارك بأي تغييرات جوهرية.
+                  باستخدامك لتطبيق توصيلة، فإنك تقر بأنك قد قرأت وفهمت ووافقت على جميع هذه الشروط
+                  والأحكام. نحتفظ بالحق في تحديث هذه الشروط في أي وقت، وسيتم إخطارك بأي تغييرات
+                  جوهرية.
                 </p>
               </section>
 
-              <div style={{
-                textAlign: 'center',
-                marginTop: '24px',
-                paddingTop: '24px',
-                borderTop: '1px solid #e5e7eb'
-              }}>
-                <p style={{ fontSize: '12px', color: '#6b7280' }}>
-                  آخر تحديث: نوفمبر 2025
-                </p>
+              <div
+                style={{
+                  textAlign: 'center',
+                  marginTop: '24px',
+                  paddingTop: '24px',
+                  borderTop: '1px solid #e5e7eb',
+                }}
+              >
+                <p style={{ fontSize: '12px', color: '#6b7280' }}>آخر تحديث: نوفمبر 2025</p>
               </div>
             </div>
 
             <button
               onClick={() => {
-                setFormData(prev => ({ ...prev, acceptTerms: true }));
+                setFormData((prev) => ({ ...prev, acceptTerms: true }));
                 setShowTerms(false);
                 if (formErrors.terms) {
-                  setFormErrors(prev => ({ ...prev, terms: '' }));
+                  setFormErrors((prev) => ({ ...prev, terms: '' }));
                 }
               }}
               style={{
@@ -1008,7 +1183,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 borderRadius: '8px',
                 fontSize: '16px',
                 fontWeight: '600',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               ✅ قرأت وأوافق على الشروط
@@ -1018,12 +1193,14 @@ export default function Register({ onSwitchToLogin, onClose }) {
       )}
 
       {/* Switch to Login */}
-      <div style={{
-        textAlign: 'center',
-        marginTop: '24px',
-        fontSize: '14px',
-        color: '#6b7280'
-      }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: '24px',
+          fontSize: '14px',
+          color: '#6b7280',
+        }}
+      >
         لديك حساب بالفعل؟{' '}
         <button
           type="button"
@@ -1035,7 +1212,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             textDecoration: 'underline',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '600'
+            fontWeight: '600',
           }}
         >
           تسجيل الدخول
@@ -1044,4 +1221,3 @@ export default function Register({ onSwitchToLogin, onClose }) {
     </div>
   );
 }
-

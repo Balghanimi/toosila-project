@@ -28,7 +28,7 @@ const Profile = () => {
 
     try {
       const result = await updateProfile({
-        isDriver: !currentUser.isDriver
+        isDriver: !currentUser.isDriver,
       });
 
       if (result.success) {
@@ -45,7 +45,6 @@ const Profile = () => {
       } else {
         setError(result.error || 'حدث خطأ أثناء التحديث. حاول مرة أخرى.');
       }
-
     } catch (err) {
       console.error('Error updating profile:', err);
       setError('حدث خطأ أثناء التحديث. حاول مرة أخرى.');
@@ -55,57 +54,75 @@ const Profile = () => {
   };
 
   return (
-    <div className="container" style={{
-      paddingTop: 'var(--space-6)',
-      paddingBottom: '100px',
-      background: isDarkMode
-        ? 'linear-gradient(to bottom, rgba(52, 199, 89, 0.08) 0%, transparent 50%)'
-        : 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)',
-      minHeight: '100vh'
-    }}>
+    <div
+      className="container"
+      style={{
+        paddingTop: 'var(--space-6)',
+        paddingBottom: '100px',
+        background: isDarkMode
+          ? 'linear-gradient(to bottom, rgba(52, 199, 89, 0.08) 0%, transparent 50%)'
+          : 'linear-gradient(to bottom, rgba(52, 199, 89, 0.03) 0%, transparent 50%)',
+        minHeight: '100vh',
+      }}
+    >
       {/* Profile Header */}
-      <div style={{
-        textAlign: 'center',
-        marginBottom: 'var(--space-8)',
-        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
-        borderRadius: 'var(--radius-2xl)',
-        padding: 'var(--space-8) var(--space-4)',
-        boxShadow: isDarkMode
-          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-          : '0 4px 20px rgba(0, 0, 0, 0.08)',
-        position: 'relative',
-        overflow: 'hidden',
-        border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none'
-      }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginBottom: 'var(--space-8)',
+          background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
+          borderRadius: 'var(--radius-2xl)',
+          padding: 'var(--space-8) var(--space-4)',
+          boxShadow: isDarkMode
+            ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+            : '0 4px 20px rgba(0, 0, 0, 0.08)',
+          position: 'relative',
+          overflow: 'hidden',
+          border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none',
+        }}
+      >
         {/* Decorative background circles */}
-        <div style={{
-          position: 'absolute',
-          top: '-60px',
-          left: '-60px',
-          width: '200px',
-          height: '200px',
-          background: isDarkMode
-            ? 'linear-gradient(135deg, rgba(52, 199, 89, 0.15) 0%, rgba(52, 199, 89, 0.08) 100%)'
-            : 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '-80px',
-          right: '-80px',
-          width: '250px',
-          height: '250px',
-          background: isDarkMode
-            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%)'
-            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '-60px',
+            left: '-60px',
+            width: '200px',
+            height: '200px',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(52, 199, 89, 0.15) 0%, rgba(52, 199, 89, 0.08) 100%)'
+              : 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)',
+            borderRadius: '50%',
+            zIndex: 0,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-80px',
+            right: '-80px',
+            width: '250px',
+            height: '250px',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%)'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+            borderRadius: '50%',
+            zIndex: 0,
+          }}
+        />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div
             onClick={() => navigate(currentUser.isDriver ? '/post-offer' : '/')}
+            role="button"
+            tabIndex={0}
+            aria-label={currentUser.isDriver ? 'انقر لنشر رحلة جديدة' : 'انقر للبحث عن رحلة'}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                navigate(currentUser.isDriver ? '/post-offer' : '/');
+              }
+            }}
             style={{
               width: '120px',
               height: '120px',
@@ -120,7 +137,7 @@ const Profile = () => {
               fontSize: '4rem',
               cursor: 'pointer',
               transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-              position: 'relative'
+              position: 'relative',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.15) rotate(5deg)';
@@ -134,64 +151,72 @@ const Profile = () => {
           >
             {currentUser.isDriver ? '🚗' : '🧑‍💼'}
             {/* Click hint badge */}
-            <div style={{
-              position: 'absolute',
-              bottom: '0',
-              right: '0',
-              width: '36px',
-              height: '36px',
-              background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.2rem',
-              boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
-              animation: 'bounce 2s infinite',
-              border: '3px solid white'
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                width: '36px',
+                height: '36px',
+                background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.2rem',
+                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                animation: 'bounce 2s infinite',
+                border: '3px solid white',
+              }}
+            >
               ✨
             </div>
           </div>
 
-          <h1 style={{
-            fontSize: '2rem',
-            fontWeight: '800',
-            color: isDarkMode ? '#ffffff' : '#1a1a1a',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif',
-            textShadow: isDarkMode ? '0 2px 10px rgba(52, 199, 89, 0.3)' : 'none'
-          }}>
+          <h1
+            style={{
+              fontSize: '2rem',
+              fontWeight: '800',
+              color: isDarkMode ? '#ffffff' : '#1a1a1a',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+              textShadow: isDarkMode ? '0 2px 10px rgba(52, 199, 89, 0.3)' : 'none',
+            }}
+          >
             {currentUser.name}
           </h1>
 
-          <p style={{
-            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
-            fontSize: 'var(--text-base)',
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '500',
-            marginBottom: 'var(--space-3)'
-          }}>
+          <p
+            style={{
+              color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
+              fontSize: 'var(--text-base)',
+              fontFamily: '"Cairo", sans-serif',
+              fontWeight: '500',
+              marginBottom: 'var(--space-3)',
+            }}
+          >
             {currentUser.email}
           </p>
 
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            padding: 'var(--space-2) var(--space-5)',
-            background: currentUser.isDriver
-              ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-              : 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
-            color: 'white',
-            borderRadius: '50px',
-            fontSize: 'var(--text-sm)',
-            fontWeight: '700',
-            fontFamily: '"Cairo", sans-serif',
-            boxShadow: currentUser.isDriver
-              ? '0 4px 15px rgba(59, 130, 246, 0.3)'
-              : '0 4px 15px rgba(52, 199, 89, 0.3)'
-          }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-2) var(--space-5)',
+              background: currentUser.isDriver
+                ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                : 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+              color: 'white',
+              borderRadius: '50px',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '700',
+              fontFamily: '"Cairo", sans-serif',
+              boxShadow: currentUser.isDriver
+                ? '0 4px 15px rgba(59, 130, 246, 0.3)'
+                : '0 4px 15px rgba(52, 199, 89, 0.3)',
+            }}
+          >
             <span style={{ fontSize: '1.2rem' }}>{currentUser.isDriver ? '🚗' : '🧑‍💼'}</span>
             <span>{currentUser.isDriver ? 'سائق' : 'راكب'}</span>
           </div>
@@ -200,97 +225,113 @@ const Profile = () => {
 
       {/* Messages */}
       {message && (
-        <div style={{
-          background: '#d1fae5',
-          border: '2px solid #10b981',
-          borderRadius: 'var(--radius)',
-          padding: 'var(--space-4)',
-          marginBottom: 'var(--space-6)',
-          color: '#065f46',
-          fontFamily: '"Cairo", sans-serif',
-          textAlign: 'center',
-          fontSize: 'var(--text-base)',
-          fontWeight: '600'
-        }}>
+        <div
+          style={{
+            background: '#d1fae5',
+            border: '2px solid #10b981',
+            borderRadius: 'var(--radius)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)',
+            color: '#065f46',
+            fontFamily: '"Cairo", sans-serif',
+            textAlign: 'center',
+            fontSize: 'var(--text-base)',
+            fontWeight: '600',
+          }}
+        >
           {message}
         </div>
       )}
 
       {error && (
-        <div style={{
-          background: '#fee',
-          border: '2px solid #f88',
-          borderRadius: 'var(--radius)',
-          padding: 'var(--space-4)',
-          marginBottom: 'var(--space-6)',
-          color: '#c00',
-          fontFamily: '"Cairo", sans-serif',
-          textAlign: 'center'
-        }}>
+        <div
+          style={{
+            background: '#fee',
+            border: '2px solid #f88',
+            borderRadius: 'var(--radius)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)',
+            color: '#c00',
+            fontFamily: '"Cairo", sans-serif',
+            textAlign: 'center',
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* Quick Actions Card - Role-based */}
-      <div style={{
-        background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
-        borderRadius: 'var(--radius-2xl)',
-        padding: 'var(--space-7)',
-        boxShadow: '0 10px 40px rgba(52, 199, 89, 0.3)',
-        border: 'none',
-        marginBottom: 'var(--space-6)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+          borderRadius: 'var(--radius-2xl)',
+          padding: 'var(--space-7)',
+          boxShadow: '0 10px 40px rgba(52, 199, 89, 0.3)',
+          border: 'none',
+          marginBottom: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         {/* Background Pattern */}
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-20%',
-          width: '250px',
-          height: '250px',
-          background: 'rgba(255, 255, 255, 0.12)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '-30%',
-          left: '-10%',
-          width: '180px',
-          height: '180px',
-          background: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '-50%',
+            right: '-20%',
+            width: '250px',
+            height: '250px',
+            background: 'rgba(255, 255, 255, 0.12)',
+            borderRadius: '50%',
+            zIndex: 0,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-30%',
+            left: '-10%',
+            width: '180px',
+            height: '180px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: '50%',
+            zIndex: 0,
+          }}
+        />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--space-2)',
-            marginBottom: 'var(--space-3)'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              marginBottom: 'var(--space-3)',
+            }}
+          >
             <span style={{ fontSize: '2rem' }}>⚡</span>
-            <h2 style={{
-              fontSize: 'var(--text-2xl)',
-              fontWeight: '800',
-              color: 'white',
-              fontFamily: '"Cairo", sans-serif',
-              margin: 0
-            }}>
+            <h2
+              style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: '800',
+                color: 'white',
+                fontFamily: '"Cairo", sans-serif',
+                margin: 0,
+              }}
+            >
               إجراءات سريعة
             </h2>
           </div>
-          <p style={{
-            color: 'rgba(255, 255, 255, 0.95)',
-            fontSize: 'var(--text-base)',
-            fontFamily: '"Cairo", sans-serif',
-            marginBottom: 'var(--space-6)',
-            textAlign: 'center',
-            fontWeight: '500'
-          }}>
+          <p
+            style={{
+              color: 'rgba(255, 255, 255, 0.95)',
+              fontSize: 'var(--text-base)',
+              fontFamily: '"Cairo", sans-serif',
+              marginBottom: 'var(--space-6)',
+              textAlign: 'center',
+              fontWeight: '500',
+            }}
+          >
             {currentUser.isDriver ? 'ابدأ بنشر رحلتك الآن' : 'ابحث عن رحلتك المثالية'}
           </p>
 
@@ -315,7 +356,7 @@ const Profile = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 'var(--space-3)',
-                marginBottom: 'var(--space-3)'
+                marginBottom: 'var(--space-3)',
               }}
               onMouseEnter={(e) => {
                 e.target.style.transform = 'translateY(-4px) scale(1.02)';
@@ -350,7 +391,7 @@ const Profile = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 'var(--space-3)'
+                  gap: 'var(--space-3)',
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'translateY(-3px) scale(1.02)';
@@ -383,7 +424,7 @@ const Profile = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 'var(--space-3)'
+                  gap: 'var(--space-3)',
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'translateY(-3px) scale(1.02)';
@@ -419,7 +460,7 @@ const Profile = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 'var(--space-2)'
+              gap: 'var(--space-2)',
             }}
             onMouseEnter={(e) => {
               e.target.style.background = 'rgba(255, 255, 255, 0.15)';
@@ -439,53 +480,63 @@ const Profile = () => {
       </div>
 
       {/* Role Switcher Card */}
-      <div style={{
-        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
-        borderRadius: 'var(--radius-2xl)',
-        padding: 'var(--space-7)',
-        boxShadow: isDarkMode
-          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-          : '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none',
-        marginBottom: 'var(--space-6)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+      <div
+        style={{
+          background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
+          borderRadius: 'var(--radius-2xl)',
+          padding: 'var(--space-7)',
+          boxShadow: isDarkMode
+            ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+            : '0 4px 20px rgba(0, 0, 0, 0.08)',
+          border: isDarkMode ? '1px solid rgba(52, 199, 89, 0.2)' : 'none',
+          marginBottom: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         {/* Decorative gradient bar */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '4px',
-          background: 'linear-gradient(90deg, #34c759 0%, #3b82f6 100%)'
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #34c759 0%, #3b82f6 100%)',
+          }}
+        />
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-          marginBottom: 'var(--space-4)'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-4)',
+          }}
+        >
           <span style={{ fontSize: '1.8rem' }}>🔄</span>
-          <h2 style={{
-            fontSize: 'var(--text-xl)',
-            fontWeight: '800',
-            color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
-            fontFamily: '"Cairo", sans-serif',
-            margin: 0
-          }}>
+          <h2
+            style={{
+              fontSize: 'var(--text-xl)',
+              fontWeight: '800',
+              color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0,
+            }}
+          >
             تبديل الدور
           </h2>
         </div>
 
-        <p style={{
-          color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
-          fontSize: 'var(--text-base)',
-          fontFamily: '"Cairo", sans-serif',
-          marginBottom: 'var(--space-4)',
-          lineHeight: '1.6'
-        }}>
+        <p
+          style={{
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
+            fontSize: 'var(--text-base)',
+            fontFamily: '"Cairo", sans-serif',
+            marginBottom: 'var(--space-4)',
+            lineHeight: '1.6',
+          }}
+        >
           يمكنك التبديل بين دور السائق والراكب في أي وقت.
           {currentUser.isDriver
             ? ' حالياً أنت سائق - يمكنك نشر عروض الرحلات.'
@@ -513,7 +564,7 @@ const Profile = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--space-3)'
+            gap: 'var(--space-3)',
           }}
           onMouseEnter={(e) => {
             if (!isUpdating) {
@@ -530,78 +581,87 @@ const Profile = () => {
         >
           {isUpdating ? (
             <>
-              <div style={{
-                width: '20px',
-                height: '20px',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderTop: '2px solid white',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }} />
+              <div
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              />
               جاري التحديث...
             </>
           ) : (
-            <>
-              {currentUser.isDriver ? '🧑‍💼 التبديل إلى راكب' : '🚗 التبديل إلى سائق'}
-            </>
+            <>{currentUser.isDriver ? '🧑‍💼 التبديل إلى راكب' : '🚗 التبديل إلى سائق'}</>
           )}
         </button>
       </div>
 
       {/* Account Info */}
-      <div style={{
-        background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
-        borderRadius: 'var(--radius-2xl)',
-        padding: 'var(--space-7)',
-        boxShadow: isDarkMode
-          ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-          : '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: isDarkMode ? '1px solid rgba(59, 130, 246, 0.2)' : 'none',
-        marginBottom: 'var(--space-6)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+      <div
+        style={{
+          background: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'white',
+          borderRadius: 'var(--radius-2xl)',
+          padding: 'var(--space-7)',
+          boxShadow: isDarkMode
+            ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+            : '0 4px 20px rgba(0, 0, 0, 0.08)',
+          border: isDarkMode ? '1px solid rgba(59, 130, 246, 0.2)' : 'none',
+          marginBottom: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         {/* Decorative gradient bar */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '4px',
-          background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)'
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)',
+          }}
+        />
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-          marginBottom: 'var(--space-5)'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-5)',
+          }}
+        >
           <span style={{ fontSize: '1.8rem' }}>📋</span>
-          <h2 style={{
-            fontSize: 'var(--text-xl)',
-            fontWeight: '800',
-            color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
-            fontFamily: '"Cairo", sans-serif',
-            margin: 0
-          }}>
+          <h2
+            style={{
+              fontSize: 'var(--text-xl)',
+              fontWeight: '800',
+              color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0,
+            }}
+          >
             معلومات الحساب
           </h2>
         </div>
 
         <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
-          <div style={{
-            padding: 'var(--space-4)',
-            background: isDarkMode
-              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
-              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
-            borderRadius: 'var(--radius-lg)',
-            fontFamily: '"Cairo", sans-serif',
-            border: isDarkMode
-              ? '2px solid rgba(59, 130, 246, 0.25)'
-              : '2px solid rgba(59, 130, 246, 0.1)',
-            transition: 'all 0.3s ease'
-          }}
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              background: isDarkMode
+                ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+                : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+              borderRadius: 'var(--radius-lg)',
+              fontFamily: '"Cairo", sans-serif',
+              border: isDarkMode
+                ? '2px solid rgba(59, 130, 246, 0.25)'
+                : '2px solid rgba(59, 130, 246, 0.1)',
+              transition: 'all 0.3s ease',
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = isDarkMode
                 ? 'rgba(59, 130, 246, 0.5)'
@@ -615,35 +675,40 @@ const Profile = () => {
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{
-              fontSize: 'var(--text-sm)',
-              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
-              marginBottom: 'var(--space-2)',
-              fontWeight: '600'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-sm)',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+                marginBottom: 'var(--space-2)',
+                fontWeight: '600',
+              }}
+            >
               👤 الاسم
             </div>
-            <div style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
+              }}
+            >
               {currentUser.name}
             </div>
           </div>
 
-          <div style={{
-            padding: 'var(--space-4)',
-            background: isDarkMode
-              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
-              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
-            borderRadius: 'var(--radius-lg)',
-            fontFamily: '"Cairo", sans-serif',
-            border: isDarkMode
-              ? '2px solid rgba(139, 92, 246, 0.25)'
-              : '2px solid rgba(139, 92, 246, 0.1)',
-            transition: 'all 0.3s ease'
-          }}
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              background: isDarkMode
+                ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+                : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+              borderRadius: 'var(--radius-lg)',
+              fontFamily: '"Cairo", sans-serif',
+              border: isDarkMode
+                ? '2px solid rgba(139, 92, 246, 0.25)'
+                : '2px solid rgba(139, 92, 246, 0.1)',
+              transition: 'all 0.3s ease',
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = isDarkMode
                 ? 'rgba(139, 92, 246, 0.5)'
@@ -657,35 +722,40 @@ const Profile = () => {
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{
-              fontSize: 'var(--text-sm)',
-              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
-              marginBottom: 'var(--space-2)',
-              fontWeight: '600'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-sm)',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+                marginBottom: 'var(--space-2)',
+                fontWeight: '600',
+              }}
+            >
               ✉️ البريد الإلكتروني
             </div>
-            <div style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
+              }}
+            >
               {currentUser.email}
             </div>
           </div>
 
-          <div style={{
-            padding: 'var(--space-4)',
-            background: isDarkMode
-              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
-              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
-            borderRadius: 'var(--radius-lg)',
-            fontFamily: '"Cairo", sans-serif',
-            border: isDarkMode
-              ? '2px solid rgba(59, 130, 246, 0.25)'
-              : '2px solid rgba(59, 130, 246, 0.1)',
-            transition: 'all 0.3s ease'
-          }}
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              background: isDarkMode
+                ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)'
+                : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+              borderRadius: 'var(--radius-lg)',
+              fontFamily: '"Cairo", sans-serif',
+              border: isDarkMode
+                ? '2px solid rgba(59, 130, 246, 0.25)'
+                : '2px solid rgba(59, 130, 246, 0.1)',
+              transition: 'all 0.3s ease',
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = isDarkMode
                 ? 'rgba(59, 130, 246, 0.5)'
@@ -699,19 +769,23 @@ const Profile = () => {
               e.currentTarget.style.transform = 'translateX(0)';
             }}
           >
-            <div style={{
-              fontSize: 'var(--text-sm)',
-              color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
-              marginBottom: 'var(--space-2)',
-              fontWeight: '600'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-sm)',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-secondary)',
+                marginBottom: 'var(--space-2)',
+                fontWeight: '600',
+              }}
+            >
               🎭 الدور الحالي
             </div>
-            <div style={{
-              fontSize: 'var(--text-lg)',
-              fontWeight: '700',
-              color: isDarkMode ? '#ffffff' : 'var(--text-primary)'
-            }}>
+            <div
+              style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: '700',
+                color: isDarkMode ? '#ffffff' : 'var(--text-primary)',
+              }}
+            >
               {currentUser.isDriver ? '🚗 سائق' : '🧑‍💼 راكب'}
             </div>
           </div>
@@ -739,7 +813,7 @@ const Profile = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 'var(--space-2)'
+          gap: 'var(--space-2)',
         }}
         onMouseEnter={(e) => {
           e.target.style.background = isDarkMode ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2';

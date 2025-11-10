@@ -20,14 +20,9 @@ const Card = ({
   const accentClass = accent ? 'card-pro-accent' : '';
   const hoverClass = hover ? 'hover-lift' : '';
 
-  const classes = [
-    baseClass,
-    variantClass,
-    interactiveClass,
-    accentClass,
-    hoverClass,
-    className
-  ].filter(Boolean).join(' ');
+  const classes = [baseClass, variantClass, interactiveClass, accentClass, hoverClass, className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div

@@ -10,14 +10,14 @@ import React from 'react';
  */
 const getNotificationIcon = (type) => {
   const icons = {
-    demand_response: '📮',      // رد على طلب
-    response_accepted: '✅',    // قبول رد
-    response_rejected: '❌',    // رفض رد
-    booking_created: '🎫',      // حجز جديد
-    booking_accepted: '✅',     // قبول حجز
-    booking_rejected: '❌',     // رفض حجز
-    new_message: '💬',          // رسالة جديدة
-    trip_reminder: '⏰'         // تذكير برحلة
+    demand_response: '📮', // رد على طلب
+    response_accepted: '✅', // قبول رد
+    response_rejected: '❌', // رفض رد
+    booking_created: '🎫', // حجز جديد
+    booking_accepted: '✅', // قبول حجز
+    booking_rejected: '❌', // رفض حجز
+    new_message: '💬', // رسالة جديدة
+    trip_reminder: '⏰', // تذكير برحلة
   };
   return icons[type] || '🔔';
 };
@@ -48,7 +48,7 @@ const getTimeAgo = (timestamp) => {
   // أكثر من أسبوع: عرض التاريخ
   return new Date(timestamp).toLocaleDateString('ar-EG', {
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   });
 };
 
@@ -65,7 +65,7 @@ function NotificationItem({
   onClick,
   compact = false,
   showDelete = false,
-  onDelete
+  onDelete,
 }) {
   const handleDelete = (e) => {
     e.stopPropagation();
@@ -82,7 +82,7 @@ function NotificationItem({
         transition: 'all 0.2s ease',
         backgroundColor: notification.isRead ? 'white' : '#eff6ff',
         borderRight: notification.isRead ? 'none' : '4px solid #3b82f6',
-        padding: compact ? '12px' : '16px'
+        padding: compact ? '12px' : '16px',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = notification.isRead ? '#f9fafb' : '#dbeafe';
@@ -91,63 +91,77 @@ function NotificationItem({
         e.currentTarget.style.backgroundColor = notification.isRead ? 'white' : '#eff6ff';
       }}
     >
-      <div style={{
-        display: 'flex',
-        gap: '12px',
-        alignItems: 'start',
-        direction: 'rtl'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'start',
+          direction: 'rtl',
+        }}
+      >
         {/* الأيقونة */}
-        <div style={{
-          fontSize: compact ? '1.25rem' : '1.5rem',
-          flexShrink: 0,
-          marginTop: '2px'
-        }}>
+        <div
+          style={{
+            fontSize: compact ? '1.25rem' : '1.5rem',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}
+        >
           {getNotificationIcon(notification.type)}
         </div>
 
         {/* المحتوى */}
-        <div style={{
-          flex: 1,
-          minWidth: 0
-        }}>
-          <h4 style={{
-            fontSize: compact ? '0.875rem' : '0.9375rem',
-            fontWeight: notification.isRead ? '600' : '700',
-            color: notification.isRead ? '#1f2937' : '#1e3a8a',
-            marginBottom: '4px',
-            fontFamily: '"Cairo", sans-serif',
-            textAlign: 'right',
-            lineHeight: '1.4'
-          }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <h4
+            style={{
+              fontSize: compact ? '0.875rem' : '0.9375rem',
+              fontWeight: notification.isRead ? '600' : '700',
+              color: notification.isRead ? '#1f2937' : '#1e3a8a',
+              marginBottom: '4px',
+              fontFamily: '"Cairo", sans-serif',
+              textAlign: 'right',
+              lineHeight: '1.4',
+            }}
+          >
             {notification.title}
           </h4>
 
-          <p style={{
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            marginBottom: '8px',
-            fontFamily: '"Cairo", sans-serif',
-            textAlign: 'right',
-            lineHeight: '1.5',
-            display: '-webkit-box',
-            WebkitLineClamp: compact ? 2 : 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}>
+          <p
+            style={{
+              fontSize: '0.875rem',
+              color: '#6b7280',
+              marginBottom: '8px',
+              fontFamily: '"Cairo", sans-serif',
+              textAlign: 'right',
+              lineHeight: '1.5',
+              display: '-webkit-box',
+              WebkitLineClamp: compact ? 2 : 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {notification.message}
           </p>
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-            <span style={{
-              fontSize: '0.75rem',
-              color: '#9ca3af',
-              fontFamily: '"Cairo", sans-serif'
-            }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '0.75rem',
+                color: '#9ca3af',
+                fontFamily: '"Cairo", sans-serif',
+              }}
+            >
               {getTimeAgo(notification.createdAt)}
             </span>
           </div>
@@ -155,14 +169,16 @@ function NotificationItem({
 
         {/* نقطة غير مقروء */}
         {!notification.isRead && (
-          <div style={{
-            width: '8px',
-            height: '8px',
-            backgroundColor: '#3b82f6',
-            borderRadius: '50%',
-            flexShrink: 0,
-            marginTop: '8px'
-          }}></div>
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              backgroundColor: '#3b82f6',
+              borderRadius: '50%',
+              flexShrink: 0,
+              marginTop: '8px',
+            }}
+          ></div>
         )}
 
         {/* زر حذف */}
@@ -177,7 +193,7 @@ function NotificationItem({
               color: '#9ca3af',
               padding: '4px',
               flexShrink: 0,
-              transition: 'color 0.2s ease'
+              transition: 'color 0.2s ease',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = '#ef4444';

@@ -15,7 +15,7 @@ export default function PostOfferModern() {
     departureDate: '',
     departureTime: '',
     seats: '1',
-    price: ''
+    price: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -39,12 +39,12 @@ export default function PostOfferModern() {
         departureDate: location.state.departureDate || '',
         departureTime: location.state.departureTime || '',
         seats: location.state.seats || '1',
-        price: location.state.price || ''
+        price: location.state.price || '',
       };
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        ...newFormData
+        ...newFormData,
       }));
 
       // البيانات تم تعبئتها من الصفحة الرئيسية
@@ -61,44 +61,54 @@ export default function PostOfferModern() {
   // Check if user is a driver
   if (currentUser && !currentUser.isDriver) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-4)'
-      }}>
-        <div style={{
-          background: 'var(--surface-primary)',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--space-8)',
-          boxShadow: 'var(--shadow-xl)',
-          textAlign: 'center',
-          maxWidth: '500px',
-          border: '2px solid #fbbf24'
-        }}>
-          <div style={{
-            fontSize: '4rem',
-            marginBottom: 'var(--space-4)'
-          }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'var(--space-4)',
+        }}
+      >
+        <div
+          style={{
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-8)',
+            boxShadow: 'var(--shadow-xl)',
+            textAlign: 'center',
+            maxWidth: '500px',
+            border: '2px solid #fbbf24',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '4rem',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
             🚫
           </div>
-          <h2 style={{
-            fontSize: 'var(--text-2xl)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-3)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <h2
+            style={{
+              fontSize: 'var(--text-2xl)',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-3)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             هذه الصفحة للسائقين فقط
           </h2>
-          <p style={{
-            fontSize: 'var(--text-lg)',
-            color: 'var(--text-secondary)',
-            marginBottom: 'var(--space-6)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <p
+            style={{
+              fontSize: 'var(--text-lg)',
+              color: 'var(--text-secondary)',
+              marginBottom: 'var(--space-6)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             يجب التبديل إلى وضع السائق لنشر عرض رحلة
           </p>
           <button
@@ -114,7 +124,7 @@ export default function PostOfferModern() {
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
               boxShadow: 'var(--shadow-lg)',
-              width: '100%'
+              width: '100%',
             }}
           >
             الذهاب إلى الملف الشخصي للتبديل 🔄
@@ -135,13 +145,13 @@ export default function PostOfferModern() {
     'ديالى',
     'الأنبار',
     'واسط',
-    'ميسان'
+    'ميسان',
   ];
 
   const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
     setError('');
   };
@@ -181,7 +191,7 @@ export default function PostOfferModern() {
         toCity: data.toCity,
         departureTime: departureDateTime.toISOString(),
         seats: parseInt(data.seats),
-        price: parseFloat(data.price)
+        price: parseFloat(data.price),
       };
 
       await offersAPI.create(offerData);
@@ -190,7 +200,6 @@ export default function PostOfferModern() {
       setTimeout(() => {
         navigate('/offers');
       }, 2000);
-
     } catch (err) {
       console.error('Error creating offer:', err);
       setError(err.message || 'حدث خطأ أثناء نشر الرحلة. حاول مرة أخرى.');
@@ -208,44 +217,54 @@ export default function PostOfferModern() {
 
   if (success) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-4)'
-      }}>
-        <div style={{
-          background: 'var(--surface-primary)',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--space-8)',
-          boxShadow: 'var(--shadow-xl)',
-          textAlign: 'center',
-          maxWidth: '500px',
-          animation: 'fadeInUp 0.5s ease-out'
-        }}>
-          <div style={{
-            fontSize: '5rem',
-            marginBottom: 'var(--space-4)',
-            animation: 'bounce 1s infinite'
-          }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'var(--space-4)',
+        }}
+      >
+        <div
+          style={{
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-8)',
+            boxShadow: 'var(--shadow-xl)',
+            textAlign: 'center',
+            maxWidth: '500px',
+            animation: 'fadeInUp 0.5s ease-out',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '5rem',
+              marginBottom: 'var(--space-4)',
+              animation: 'bounce 1s infinite',
+            }}
+          >
             ✅
           </div>
-          <h2 style={{
-            fontSize: 'var(--text-3xl)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-3)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <h2
+            style={{
+              fontSize: 'var(--text-3xl)',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-3)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             تم نشر رحلتك بنجاح! 🎉
           </h2>
-          <p style={{
-            fontSize: 'var(--text-lg)',
-            color: 'var(--text-secondary)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <p
+            style={{
+              fontSize: 'var(--text-lg)',
+              color: 'var(--text-secondary)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             جاري تحويلك إلى صفحة العروض...
           </p>
         </div>
@@ -254,93 +273,110 @@ export default function PostOfferModern() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      paddingBottom: '100px'
-    }}>
-      <div className="container" style={{
-        paddingTop: 'var(--space-6)',
-        maxWidth: '600px',
-        margin: '0 auto',
-        transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
-        opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}>
-
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        paddingBottom: '100px',
+      }}
+    >
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--space-6)',
+          maxWidth: '600px',
+          margin: '0 auto',
+          transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
+          opacity: isAnimated ? 1 : 0,
+          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
         {/* Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: 'var(--space-8)'
-        }}>
-          <h1 style={{
-            fontSize: 'var(--text-3xl)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 'var(--space-8)',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 'var(--text-3xl)',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             🚗 نشر رحلة جديدة
           </h1>
-          <p style={{
-            color: 'var(--text-secondary)',
-            fontSize: 'var(--text-lg)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: 'var(--text-lg)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             شارك رحلتك مع ركاب آخرين
           </p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div style={{
-            background: '#fee',
-            border: '2px solid #f88',
-            borderRadius: 'var(--radius)',
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-6)',
-            color: '#c00',
-            fontFamily: '"Cairo", sans-serif',
-            fontSize: 'var(--text-base)'
-          }}>
+          <div
+            style={{
+              background: '#fee',
+              border: '2px solid #f88',
+              borderRadius: 'var(--radius)',
+              padding: 'var(--space-4)',
+              marginBottom: 'var(--space-6)',
+              color: '#c00',
+              fontFamily: '"Cairo", sans-serif',
+              fontSize: 'var(--text-base)',
+            }}
+          >
             {error}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div style={{
-            background: 'var(--surface-primary)',
-            borderRadius: 'var(--radius-xl)',
-            padding: 'var(--space-6)',
-            boxShadow: 'var(--shadow-xl)',
-            border: '1px solid var(--border-light)',
-            display: 'grid',
-            gap: 'var(--space-6)'
-          }}>
-
+          <div
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              padding: 'var(--space-6)',
+              boxShadow: 'var(--shadow-xl)',
+              border: '1px solid var(--border-light)',
+              display: 'grid',
+              gap: 'var(--space-6)',
+            }}
+          >
             {/* Route */}
             <div>
-              <h3 style={{
-                fontSize: 'var(--text-lg)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-4)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-primary)'
-              }}>
+              <h3
+                style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-primary)',
+                }}
+              >
                 🛣️ المسار
               </h3>
 
               <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     من (مدينة الانطلاق)
                   </label>
                   <select
@@ -354,30 +390,41 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   >
                     <option value="">اختر المدينة</option>
-                    {IRAQ_CITIES.map(city => (
-                      <option key={city} value={city}>{city}</option>
+                    {IRAQ_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
                     ))}
                   </select>
                   {errors.fromCity && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.fromCity}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     إلى (مدينة الوصول)
                   </label>
                   <select
@@ -391,16 +438,25 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   >
                     <option value="">اختر المدينة</option>
-                    {IRAQ_CITIES.map(city => (
-                      <option key={city} value={city}>{city}</option>
+                    {IRAQ_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
                     ))}
                   </select>
                   {errors.toCity && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.toCity}
                     </p>
                   )}
@@ -410,26 +466,32 @@ export default function PostOfferModern() {
 
             {/* DateTime */}
             <div>
-              <h3 style={{
-                fontSize: 'var(--text-lg)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-4)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-primary)'
-              }}>
+              <h3
+                style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-primary)',
+                }}
+              >
                 📅 التاريخ والوقت
               </h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+              <div
+                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}
+              >
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     التاريخ
                   </label>
                   <input
@@ -445,25 +507,34 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   />
                   {errors.departureDate && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.departureDate}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     الوقت
                   </label>
                   <input
@@ -478,11 +549,18 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   />
                   {errors.departureTime && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.departureTime}
                     </p>
                   )}
@@ -492,26 +570,32 @@ export default function PostOfferModern() {
 
             {/* Seats & Price */}
             <div>
-              <h3 style={{
-                fontSize: 'var(--text-lg)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-4)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-primary)'
-              }}>
+              <h3
+                style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-primary)',
+                }}
+              >
                 💺 التفاصيل
               </h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+              <div
+                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}
+              >
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     عدد المقاعد
                   </label>
                   <select
@@ -525,29 +609,40 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   >
-                    {[1,2,3,4,5,6,7].map(num => (
-                      <option key={num} value={num}>{num} مقعد</option>
+                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                      <option key={num} value={num}>
+                        {num} مقعد
+                      </option>
                     ))}
                   </select>
                   {errors.seats && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.seats}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     السعر لكل مقعد (د.ع)
                   </label>
                   <input
@@ -565,11 +660,18 @@ export default function PostOfferModern() {
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      color: 'var(--text-primary)'
+                      color: 'var(--text-primary)',
                     }}
                   />
                   {errors.price && (
-                    <p style={{ color: '#c00', fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)', fontFamily: '"Cairo", sans-serif' }}>
+                    <p
+                      style={{
+                        color: '#c00',
+                        fontSize: 'var(--text-sm)',
+                        marginTop: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {errors.price}
                     </p>
                   )}
@@ -598,19 +700,21 @@ export default function PostOfferModern() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 'var(--space-2)',
-                width: '100%'
+                width: '100%',
               }}
             >
               {isSubmitting ? (
                 <>
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTop: '2px solid white',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
-                  }} />
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTop: '2px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }}
+                  />
                   جاري النشر...
                 </>
               ) : (

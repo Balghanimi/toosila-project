@@ -55,7 +55,7 @@ body.dark-mode .blurCircle1 {
 }
 
 body.dark-mode .blurCircle2 {
-  background: radial-gradient(circle, rgba(52, 199, 89, 0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(52, 199, 89, 0.1) 0%, transparent 70%);
 }
 
 .dotPattern {
@@ -216,7 +216,10 @@ body.dark-mode .input {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out;
+  transition:
+    max-height 0.3s ease-in-out,
+    opacity 0.3s ease-in-out,
+    margin 0.3s ease-in-out;
   margin-bottom: 0;
 }
 
@@ -624,14 +627,25 @@ body.dark-mode .offerCard {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 /* Responsive Design */

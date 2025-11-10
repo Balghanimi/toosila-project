@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-const RatingModal = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  ratedUserName, 
+const RatingModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  ratedUserName,
   userType, // 'driver' أو 'passenger'
-  tripInfo 
+  tripInfo,
 }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -15,12 +15,12 @@ const RatingModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (rating === 0) return;
-    
+
     onSubmit({
       rating,
       comment: comment.trim(),
     });
-    
+
     // إعادة تعيين النموذج
     setRating(0);
     setComment('');
@@ -41,88 +41,108 @@ const RatingModal = ({
   const userTypeEmoji = userType === 'driver' ? '🚗' : '👤';
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        padding: '24px',
-        maxWidth: '500px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-      }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px',
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: '24px',
+          maxWidth: '500px',
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        }}
+      >
         {/* Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '24px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid #e5e7eb'
-        }}>
-          <div style={{
-            fontSize: '48px',
-            marginBottom: '8px'
-          }}>
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '24px',
+            paddingBottom: '16px',
+            borderBottom: '1px solid #e5e7eb',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '48px',
+              marginBottom: '8px',
+            }}
+          >
             ⭐
           </div>
-          <h2 style={{
-            margin: '0 0 8px 0',
-            fontSize: '24px',
-            fontWeight: '700',
-            color: '#1f2937'
-          }}>
+          <h2
+            style={{
+              margin: '0 0 8px 0',
+              fontSize: '24px',
+              fontWeight: '700',
+              color: '#1f2937',
+            }}
+          >
             تقييم {userTypeText}
           </h2>
-          <p style={{
-            margin: '0',
-            fontSize: '16px',
-            color: '#6b7280'
-          }}>
+          <p
+            style={{
+              margin: '0',
+              fontSize: '16px',
+              color: '#6b7280',
+            }}
+          >
             {userTypeEmoji} {ratedUserName}
           </p>
         </div>
 
         {/* Trip Info */}
         {tripInfo && (
-          <div style={{
-            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-            padding: '16px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            border: '1px solid #0ea5e9'
-          }}>
-            <h3 style={{
-              margin: '0 0 8px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#0369a1'
-            }}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+              padding: '16px',
+              borderRadius: '12px',
+              marginBottom: '24px',
+              border: '1px solid #0ea5e9',
+            }}
+          >
+            <h3
+              style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#0369a1',
+              }}
+            >
               🗺️ تفاصيل الرحلة
             </h3>
-            <p style={{
-              margin: '0',
-              fontSize: '14px',
-              color: '#374151'
-            }}>
+            <p
+              style={{
+                margin: '0',
+                fontSize: '14px',
+                color: '#374151',
+              }}
+            >
               {tripInfo.from} → {tripInfo.to}
             </p>
-            <p style={{
-              margin: '4px 0 0 0',
-              fontSize: '12px',
-              color: '#6b7280'
-            }}>
+            <p
+              style={{
+                margin: '4px 0 0 0',
+                fontSize: '12px',
+                color: '#6b7280',
+              }}
+            >
               {tripInfo.date}
             </p>
           </div>
@@ -132,22 +152,26 @@ const RatingModal = ({
         <form onSubmit={handleSubmit}>
           {/* Star Rating */}
           <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#374151',
-              textAlign: 'center'
-            }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#374151',
+                textAlign: 'center',
+              }}
+            >
               كيف تقيم تجربتك؟
             </label>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '8px',
-              marginBottom: '12px'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '8px',
+                marginBottom: '12px',
+              }}
+            >
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -163,22 +187,26 @@ const RatingModal = ({
                     padding: '4px',
                     borderRadius: '4px',
                     transition: 'transform 0.2s ease',
-                    transform: hoveredStar >= star ? 'scale(1.1)' : 'scale(1)'
+                    transform: hoveredStar >= star ? 'scale(1.1)' : 'scale(1)',
                   }}
                 >
-                  <span style={{
-                    color: (hoveredStar >= star || rating >= star) ? '#fbbf24' : '#d1d5db'
-                  }}>
+                  <span
+                    style={{
+                      color: hoveredStar >= star || rating >= star ? '#fbbf24' : '#d1d5db',
+                    }}
+                  >
                     ⭐
                   </span>
                 </button>
               ))}
             </div>
-            <div style={{
-              textAlign: 'center',
-              fontSize: '14px',
-              color: '#6b7280'
-            }}>
+            <div
+              style={{
+                textAlign: 'center',
+                fontSize: '14px',
+                color: '#6b7280',
+              }}
+            >
               {rating === 0 && 'اختر تقييمك'}
               {rating === 1 && '😞 سيء جداً'}
               {rating === 2 && '😕 سيء'}
@@ -190,13 +218,15 @@ const RatingModal = ({
 
           {/* Comment */}
           <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#374151'
-            }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#374151',
+              }}
+            >
               تعليق (اختياري)
             </label>
             <textarea
@@ -211,17 +241,19 @@ const RatingModal = ({
                 borderRadius: '8px',
                 fontSize: '14px',
                 resize: 'vertical',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
               }}
             />
           </div>
 
           {/* Action Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'flex-end',
+            }}
+          >
             <button
               type="button"
               onClick={handleClose}
@@ -234,7 +266,7 @@ const RatingModal = ({
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = '#e5e7eb';
@@ -249,7 +281,8 @@ const RatingModal = ({
               type="submit"
               disabled={rating === 0}
               style={{
-                background: rating === 0 ? '#d1d5db' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                background:
+                  rating === 0 ? '#d1d5db' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                 color: 'white',
                 border: 'none',
                 padding: '12px 24px',
@@ -258,7 +291,7 @@ const RatingModal = ({
                 fontWeight: '600',
                 cursor: rating === 0 ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
-                boxShadow: rating === 0 ? 'none' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                boxShadow: rating === 0 ? 'none' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
               }}
               onMouseEnter={(e) => {
                 if (rating > 0) {

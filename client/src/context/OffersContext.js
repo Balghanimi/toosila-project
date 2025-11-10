@@ -71,18 +71,32 @@ export function OffersProvider({ children }) {
 
   // دوال إدارة العروض - Memoized with useCallback
   const addOffer = useCallback((offer) => setOffers((prev) => [offer, ...prev]), []);
-  const updateOffer = useCallback((id, updates) => setOffers((prev) =>
-    prev.map(offer => offer.id === id ? { ...offer, ...updates } : offer)
-  ), []);
-  const deleteOffer = useCallback((id) => setOffers((prev) => prev.filter(offer => offer.id !== id)), []);
+  const updateOffer = useCallback(
+    (id, updates) =>
+      setOffers((prev) =>
+        prev.map((offer) => (offer.id === id ? { ...offer, ...updates } : offer))
+      ),
+    []
+  );
+  const deleteOffer = useCallback(
+    (id) => setOffers((prev) => prev.filter((offer) => offer.id !== id)),
+    []
+  );
   const clearOffers = useCallback(() => setOffers([]), []);
 
   // دوال إدارة طلبات الحجز - Memoized with useCallback
   const addBooking = useCallback((booking) => setBookings((prev) => [booking, ...prev]), []);
-  const updateBooking = useCallback((id, updates) => setBookings((prev) =>
-    prev.map(booking => booking.id === id ? { ...booking, ...updates } : booking)
-  ), []);
-  const deleteBooking = useCallback((id) => setBookings((prev) => prev.filter(booking => booking.id !== id)), []);
+  const updateBooking = useCallback(
+    (id, updates) =>
+      setBookings((prev) =>
+        prev.map((booking) => (booking.id === id ? { ...booking, ...updates } : booking))
+      ),
+    []
+  );
+  const deleteBooking = useCallback(
+    (id) => setBookings((prev) => prev.filter((booking) => booking.id !== id)),
+    []
+  );
   const clearBookings = useCallback(() => setBookings([]), []);
 
   // حفظ العروض في localStorage
@@ -104,16 +118,34 @@ export function OffersProvider({ children }) {
   }, [bookings]);
 
   // Memoize context value to prevent unnecessary re-renders
-  const contextValue = useMemo(() => ({
-    offers, addOffer, updateOffer, deleteOffer, clearOffers,
-    bookings, addBooking, updateBooking, deleteBooking, clearBookings
-  }), [offers, addOffer, updateOffer, deleteOffer, clearOffers, bookings, addBooking, updateBooking, deleteBooking, clearBookings]);
-
-  return (
-    <OffersContext.Provider value={contextValue}>
-      {children}
-    </OffersContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      offers,
+      addOffer,
+      updateOffer,
+      deleteOffer,
+      clearOffers,
+      bookings,
+      addBooking,
+      updateBooking,
+      deleteBooking,
+      clearBookings,
+    }),
+    [
+      offers,
+      addOffer,
+      updateOffer,
+      deleteOffer,
+      clearOffers,
+      bookings,
+      addBooking,
+      updateBooking,
+      deleteBooking,
+      clearBookings,
+    ]
   );
+
+  return <OffersContext.Provider value={contextValue}>{children}</OffersContext.Provider>;
 }
 
 export function useOffers() {

@@ -11,7 +11,7 @@ export function createDemoUsers() {
       verified: true,
       rating: 4.8,
       tripsCount: 45,
-      avatar: null
+      avatar: null,
     },
     {
       id: 'demo_passenger_1',
@@ -23,7 +23,7 @@ export function createDemoUsers() {
       verified: true,
       rating: 4.6,
       tripsCount: 23,
-      avatar: null
+      avatar: null,
     },
     {
       id: 'demo_driver_2',
@@ -35,7 +35,7 @@ export function createDemoUsers() {
       verified: true,
       rating: 4.9,
       tripsCount: 67,
-      avatar: null
+      avatar: null,
     },
     {
       id: 'demo_passenger_2',
@@ -47,8 +47,8 @@ export function createDemoUsers() {
       verified: false,
       rating: 4.3,
       tripsCount: 12,
-      avatar: null
-    }
+      avatar: null,
+    },
   ];
 
   // Check if demo users already exist
@@ -61,18 +61,18 @@ export function createDemoUsers() {
     const users = JSON.parse(existingUsers);
     // Add demo users if they don't exist
     let updated = false;
-    demoUsers.forEach(demoUser => {
-      if (!users.find(u => u.email === demoUser.email)) {
+    demoUsers.forEach((demoUser) => {
+      if (!users.find((u) => u.email === demoUser.email)) {
         users.push(demoUser);
         updated = true;
       }
     });
-    
+
     if (updated) {
       localStorage.setItem('users', JSON.stringify(users));
       console.log('Missing demo users added!');
     }
-    
+
     return users;
   }
 }
@@ -84,8 +84,7 @@ export function resetDemoData() {
   localStorage.removeItem('offers');
   localStorage.removeItem('demands');
   localStorage.removeItem('ratings');
-  
+
   createDemoUsers();
   console.log('Demo data reset successfully!');
 }
-

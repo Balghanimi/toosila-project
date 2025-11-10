@@ -29,5 +29,3 @@ export default function BottomNav({ current = 'home', onChange }) {
     </nav>
   );
 }
-
-

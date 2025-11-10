@@ -1,17 +1,20 @@
+/* Import Mobile Touch Target Sizing */
+@import './styles/mobile.css';
+
 /* CSS Variables & Design System */
 :root {
   /* Primary Colors - Calm Green Theme */
-  --primary: #34C759;
-  --primary-hover: #2CAB4E;
-  --primary-light: #9CE7A8;
-  --primary-dark: #1F8A35;
+  --primary: #34c759;
+  --primary-hover: #2cab4e;
+  --primary-light: #9ce7a8;
+  --primary-dark: #1f8a35;
 
   /* Success/Error/Warning */
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
-  
+
   /* Spacing Scale */
   --space-1: 4px;
   --space-2: 8px;
@@ -22,18 +25,18 @@
   --space-8: 32px;
   --space-12: 48px;
   --space-16: 64px;
-  
+
   /* Border Radius */
   --radius: 12px;
   --radius-sm: 6px;
   --radius-lg: 16px;
   --radius-full: 9999px;
-  
+
   /* Component Sizes */
   --button-height: 48px;
   --button-height-sm: 36px;
   --button-height-lg: 56px;
-  
+
   /* Typography Scale */
   --text-xs: 12px;
   --text-sm: 14px;
@@ -43,13 +46,13 @@
   --text-2xl: 24px;
   --text-3xl: 30px;
   --text-4xl: 36px;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-  
+
   /* Focus Ring */
   --focus-ring: 0 0 0 3px rgba(52, 199, 89, 0.2);
 
@@ -61,21 +64,22 @@
 body.light-mode {
   /* Text Colors */
   --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
-  --text-light: #D1D5DB;
-  --text-white: #FFFFFF;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280; /* Improved for WCAG AA compliance (4.5:1 contrast) */
+  --text-placeholder: #6b7280; /* Dedicated placeholder color */
+  --text-light: #d1d5db;
+  --text-white: #ffffff;
 
   /* Surface Colors */
-  --surface-primary: #FFFFFF;
-  --surface-secondary: #F9FAFB;
-  --surface-tertiary: #F3F4F6;
+  --surface-primary: #ffffff;
+  --surface-secondary: #f9fafb;
+  --surface-tertiary: #f3f4f6;
   --surface-overlay: rgba(0, 0, 0, 0.5);
 
   /* Border Colors */
-  --border-light: #E5E7EB;
-  --border-medium: #D1D5DB;
-  --border-dark: #9CA3AF;
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  --border-dark: #9ca3af;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -87,11 +91,12 @@ body.light-mode {
 /* Dark Mode */
 body.dark-mode {
   /* Text Colors */
-  --text-primary: #F9FAFB;
-  --text-secondary: #D1D5DB;
-  --text-muted: #9CA3AF;
-  --text-light: #6B7280;
-  --text-white: #FFFFFF;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af; /* Adequate contrast for dark mode */
+  --text-placeholder: #9ca3af; /* Dedicated placeholder color for dark mode */
+  --text-light: #6b7280;
+  --text-white: #ffffff;
 
   /* Surface Colors */
   --surface-primary: #0f172a;
@@ -122,8 +127,20 @@ body.dark-mode {
 
 body {
   margin: 0;
-  font-family: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'Cairo',
+    'Tajawal',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: var(--text-base);
@@ -133,7 +150,9 @@ body {
   direction: rtl;
   text-align: start;
   padding-bottom: 64px; /* Space for bottom navigation */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 code {
@@ -141,7 +160,15 @@ code {
 }
 
 /* RTL Support */
-h1, h2, h3, h4, h5, h6, p, div, span {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+div,
+span {
   text-align: start;
 }
 
@@ -305,7 +332,9 @@ h1, h2, h3, h4, h5, h6, p, div, span {
 }
 
 /* Form Elements */
-input, textarea, select {
+input,
+textarea,
+select {
   width: 100%;
   height: var(--button-height);
   padding: var(--space-3) var(--space-4);
@@ -321,7 +350,9 @@ input, textarea, select {
   outline: none;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   border-color: var(--primary);
   box-shadow: var(--focus-ring);
 }
@@ -440,7 +471,8 @@ a:focus-visible {
 
 /* Skeleton Loading */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -491,12 +523,12 @@ a:focus-visible {
   .container {
     padding-inline: var(--space-3);
   }
-  
+
   .nav {
     justify-content: space-between;
     direction: rtl;
   }
-  
+
   .nav-toggle {
     display: block;
     background: transparent;
@@ -506,27 +538,27 @@ a:focus-visible {
     direction: rtl;
     color: var(--text-primary);
   }
-  
+
   .nav-links {
     display: none;
     flex-direction: column;
     gap: var(--space-3);
     direction: rtl;
   }
-  
+
   .nav-links.open {
     display: flex;
     direction: rtl;
   }
-  
+
   .btn {
     width: 100%;
   }
-  
+
   .headline {
     font-size: var(--text-2xl);
   }
-  
+
   .subtitle {
     font-size: var(--text-lg);
   }
@@ -542,7 +574,13 @@ a:focus-visible {
 }
 
 /* Smooth transitions for all interactive elements */
-button, a, input, textarea, select, .card, .chip {
+button,
+a,
+input,
+textarea,
+select,
+.card,
+.chip {
   transition: var(--transition);
 }
 
@@ -561,10 +599,11 @@ button, a, input, textarea, select, .card, .chip {
 
 /* Print styles */
 @media print {
-  .btn, .nav-toggle {
+  .btn,
+  .nav-toggle {
     display: none;
   }
-  
+
   .card {
     border: 1px solid var(--border-dark);
     box-shadow: none;

@@ -24,14 +24,9 @@ const Button = ({
   const loadingClass = loading ? 'btn-pro-loading' : '';
   const fullWidthClass = fullWidth ? 'w-full' : '';
 
-  const classes = [
-    baseClass,
-    variantClass,
-    sizeClass,
-    loadingClass,
-    fullWidthClass,
-    className
-  ].filter(Boolean).join(' ');
+  const classes = [baseClass, variantClass, sizeClass, loadingClass, fullWidthClass, className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <button

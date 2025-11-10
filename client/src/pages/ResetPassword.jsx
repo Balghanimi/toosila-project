@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [tokenValid, setTokenValid] = useState(false);
   const [formData, setFormData] = useState({
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -41,9 +41,7 @@ const ResetPassword = () => {
       }
 
       try {
-        const response = await axios.get(
-          `${API_URL}/api/password-reset/verify/${token}`
-        );
+        const response = await axios.get(`${API_URL}/api/password-reset/verify/${token}`);
 
         if (response.data.success) {
           setTokenValid(true);
@@ -94,8 +92,8 @@ const ResetPassword = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
     setStatus(null);
   };
 
@@ -110,13 +108,10 @@ const ResetPassword = () => {
     setMessage('');
 
     try {
-      const response = await axios.post(
-        `${API_URL}/api/password-reset/reset`,
-        {
-          token,
-          newPassword: formData.newPassword
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/password-reset/reset`, {
+        token,
+        newPassword: formData.newPassword,
+      });
 
       if (response.data.success) {
         setStatus('success');
@@ -173,12 +168,8 @@ const ResetPassword = () => {
           <h2>تم بنجاح!</h2>
           <h3>Success!</h3>
           <p className="success-message">{message}</p>
-          <p className="redirect-message">
-            سيتم التوجيه لتسجيل الدخول خلال {countdown} ثوانٍ...
-          </p>
-          <p className="redirect-message-en">
-            Redirecting to login in {countdown} seconds...
-          </p>
+          <p className="redirect-message">سيتم التوجيه لتسجيل الدخول خلال {countdown} ثوانٍ...</p>
+          <p className="redirect-message-en">Redirecting to login in {countdown} seconds...</p>
           <Link to="/login" className="btn-primary">
             تسجيل الدخول الآن / Login Now
           </Link>
@@ -197,12 +188,8 @@ const ResetPassword = () => {
         <h2>إعادة تعيين كلمة المرور</h2>
         <h3>Reset Password</h3>
 
-        <p className="instruction">
-          أدخل كلمة المرور الجديدة
-        </p>
-        <p className="instruction-en">
-          Enter your new password
-        </p>
+        <p className="instruction">أدخل كلمة المرور الجديدة</p>
+        <p className="instruction-en">Enter your new password</p>
 
         <form onSubmit={handleSubmit} className="reset-password-form">
           {/* New Password */}
@@ -226,9 +213,7 @@ const ResetPassword = () => {
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
-            {errors.newPassword && (
-              <span className="error-text">{errors.newPassword}</span>
-            )}
+            {errors.newPassword && <span className="error-text">{errors.newPassword}</span>}
           </div>
 
           {/* Confirm Password */}
@@ -252,9 +237,7 @@ const ResetPassword = () => {
                 {showConfirmPassword ? '🙈' : '👁️'}
               </button>
             </div>
-            {errors.confirmPassword && (
-              <span className="error-text">{errors.confirmPassword}</span>
-            )}
+            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
           </div>
 
           {/* Password Requirements */}
@@ -274,11 +257,7 @@ const ResetPassword = () => {
             </div>
           )}
 
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={status === 'resetting'}
-          >
+          <button type="submit" className="btn-submit" disabled={status === 'resetting'}>
             {status === 'resetting' ? (
               <>
                 <span className="spinner"></span>

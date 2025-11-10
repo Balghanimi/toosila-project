@@ -34,8 +34,9 @@ const UserMenu = ({ onClose }) => {
         paddingTop: '80px',
         backdropFilter: 'blur(8px)',
         opacity: isAnimated ? 1 : 0,
-        transition: 'opacity 0.3s ease-out'
-      }}>
+        transition: 'opacity 0.3s ease-out',
+      }}
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -47,62 +48,77 @@ const UserMenu = ({ onClose }) => {
           boxShadow: 'var(--shadow-2xl)',
           border: '1px solid var(--border-light)',
           transform: isAnimated ? 'translateY(0)' : 'translateY(-20px)',
-          transition: 'transform 0.3s ease-out'
-        }}>
+          transition: 'transform 0.3s ease-out',
+        }}
+      >
         {/* User Info */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: 'var(--space-6)',
-          paddingBottom: 'var(--space-4)',
-          borderBottom: '1px solid var(--border-light)'
-        }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: user?.userType === 'driver' 
-              ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-              : 'linear-gradient(135deg, var(--secondary) 0%, #4338ca 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto var(--space-3) auto',
-            fontSize: '2rem',
-            boxShadow: 'var(--shadow-lg)'
-          }}>
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 'var(--space-6)',
+            paddingBottom: 'var(--space-4)',
+            borderBottom: '1px solid var(--border-light)',
+          }}
+        >
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background:
+                user?.userType === 'driver'
+                  ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                  : 'linear-gradient(135deg, var(--secondary) 0%, #4338ca 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto var(--space-3) auto',
+              fontSize: '2rem',
+              boxShadow: 'var(--shadow-lg)',
+            }}
+          >
             {user?.userType === 'driver' ? '🚗' : '🧑‍💼'}
           </div>
-          
-          <h3 style={{
-            fontSize: 'var(--text-xl)',
-            fontWeight: '700',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-1)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+
+          <h3
+            style={{
+              fontSize: 'var(--text-xl)',
+              fontWeight: '700',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-1)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             {user?.name}
           </h3>
-          
-          <p style={{
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-secondary)',
-            margin: 0,
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+
+          <p
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-secondary)',
+              margin: 0,
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             {user?.userType === 'driver' ? 'سائق' : 'راكب'} • {user?.city}
           </p>
         </div>
 
         {/* Menu Items */}
-        <div style={{
-          display: 'grid',
-          gap: 'var(--space-2)',
-          marginBottom: 'var(--space-6)'
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-6)',
+          }}
+        >
           {/* Admin Panel Link - Only for admins */}
           {user?.role === 'admin' && (
             <button
-              onClick={() => { navigate('/admin'); onClose(); }}
+              onClick={() => {
+                navigate('/admin');
+                onClose();
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -119,7 +135,7 @@ const UserMenu = ({ onClose }) => {
                 fontFamily: '"Cairo", sans-serif',
                 textAlign: 'start',
                 width: '100%',
-                boxShadow: '0 4px 12px rgba(52, 199, 89, 0.25)'
+                boxShadow: '0 4px 12px rgba(52, 199, 89, 0.25)',
               }}
               onMouseEnter={(e) => {
                 e.target.style.transform = 'translateY(-2px)';
@@ -136,10 +152,38 @@ const UserMenu = ({ onClose }) => {
           )}
 
           {[
-            { icon: '👤', label: 'الملف الشخصي', action: () => { navigate('/profile'); onClose(); } },
-            { icon: '🚗', label: 'رحلاتي', action: () => { navigate('/bookings'); onClose(); } },
-            { icon: '⭐', label: 'التقييمات', action: () => { navigate('/ratings'); onClose(); } },
-            { icon: '⚙️', label: 'الإعدادات', action: () => { navigate('/settings'); onClose(); } },
+            {
+              icon: '👤',
+              label: 'الملف الشخصي',
+              action: () => {
+                navigate('/profile');
+                onClose();
+              },
+            },
+            {
+              icon: '🚗',
+              label: 'رحلاتي',
+              action: () => {
+                navigate('/bookings');
+                onClose();
+              },
+            },
+            {
+              icon: '⭐',
+              label: 'التقييمات',
+              action: () => {
+                navigate('/ratings');
+                onClose();
+              },
+            },
+            {
+              icon: '⚙️',
+              label: 'الإعدادات',
+              action: () => {
+                navigate('/settings');
+                onClose();
+              },
+            },
           ].map((item, index) => (
             <button
               key={index}
@@ -159,7 +203,7 @@ const UserMenu = ({ onClose }) => {
                 transition: 'var(--transition)',
                 fontFamily: '"Cairo", sans-serif',
                 textAlign: 'start',
-                width: '100%'
+                width: '100%',
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = 'var(--surface-secondary)';
@@ -192,7 +236,7 @@ const UserMenu = ({ onClose }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--space-2)'
+            gap: 'var(--space-2)',
           }}
           onMouseEnter={(e) => {
             e.target.style.borderColor = 'var(--error)';

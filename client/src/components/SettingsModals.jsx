@@ -4,44 +4,52 @@ import { authAPI } from '../services/api';
 // Modal Wrapper Component
 export function Modal({ title, children, onClose }) {
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999,
-      padding: '20px',
-      animation: 'fadeIn 0.2s ease-in-out'
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-        maxWidth: '500px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        animation: 'slideUp 0.3s ease-out'
-      }}>
-        <div style={{
-          padding: '24px',
-          borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#111827',
-            margin: 0,
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '20px',
+        animation: 'fadeIn 0.2s ease-in-out',
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          maxWidth: '500px',
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          animation: 'slideUp 0.3s ease-out',
+        }}
+      >
+        <div
+          style={{
+            padding: '24px',
+            borderBottom: '1px solid #e5e7eb',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#111827',
+              margin: 0,
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             {title}
           </h2>
           <button
@@ -59,7 +67,7 @@ export function Modal({ title, children, onClose }) {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '50%',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#f3f4f6';
@@ -73,9 +81,7 @@ export function Modal({ title, children, onClose }) {
             ×
           </button>
         </div>
-        <div style={{ padding: '24px' }}>
-          {children}
-        </div>
+        <div style={{ padding: '24px' }}>{children}</div>
       </div>
       <style>{`
         @keyframes fadeIn {
@@ -248,21 +254,26 @@ export function DeleteAccountModal({ onClose, onSuccess }) {
       <form onSubmit={handleSubmit}>
         {error && <Alert type="error" message={error} />}
 
-        <div style={{
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '20px'
-        }}>
-          <p style={{
-            color: '#dc2626',
-            fontSize: '14px',
-            fontFamily: '"Cairo", sans-serif',
-            margin: 0,
-            lineHeight: 1.6
-          }}>
-            ⚠️ <strong>تحذير:</strong> هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك بشكل دائم.
+        <div
+          style={{
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '20px',
+          }}
+        >
+          <p
+            style={{
+              color: '#dc2626',
+              fontSize: '14px',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0,
+              lineHeight: 1.6,
+            }}
+          >
+            ⚠️ <strong>تحذير:</strong> هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك بشكل
+            دائم.
           </p>
         </div>
 
@@ -295,14 +306,16 @@ export function DeleteAccountModal({ onClose, onSuccess }) {
 function Input({ label, ...props }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <label style={{
-        display: 'block',
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#374151',
-        marginBottom: '8px',
-        fontFamily: '"Cairo", sans-serif'
-      }}>
+      <label
+        style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '600',
+          color: '#374151',
+          marginBottom: '8px',
+          fontFamily: '"Cairo", sans-serif',
+        }}
+      >
         {label}
       </label>
       <input
@@ -315,7 +328,7 @@ function Input({ label, ...props }) {
           fontSize: '16px',
           fontFamily: '"Cairo", sans-serif',
           transition: 'all 0.2s',
-          outline: 'none'
+          outline: 'none',
         }}
         onFocus={(e) => {
           e.target.style.borderColor = '#10b981';
@@ -350,7 +363,7 @@ function Button({ children, loading, danger, ...props }) {
         fontFamily: '"Cairo", sans-serif',
         opacity: loading ? 0.7 : 1,
         transition: 'all 0.2s',
-        marginTop: '8px'
+        marginTop: '8px',
       }}
       onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
       onMouseLeave={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
@@ -363,25 +376,29 @@ function Button({ children, loading, danger, ...props }) {
 function Alert({ type, message }) {
   const colors = {
     error: { bg: '#fef2f2', border: '#fecaca', text: '#dc2626' },
-    success: { bg: '#f0fdf4', border: '#bbf7d0', text: '#16a34a' }
+    success: { bg: '#f0fdf4', border: '#bbf7d0', text: '#16a34a' },
   };
 
   const color = colors[type];
 
   return (
-    <div style={{
-      background: color.bg,
-      border: `1px solid ${color.border}`,
-      borderRadius: '8px',
-      padding: '12px',
-      marginBottom: '16px'
-    }}>
-      <p style={{
-        color: color.text,
-        fontSize: '14px',
-        fontFamily: '"Cairo", sans-serif',
-        margin: 0
-      }}>
+    <div
+      style={{
+        background: color.bg,
+        border: `1px solid ${color.border}`,
+        borderRadius: '8px',
+        padding: '12px',
+        marginBottom: '16px',
+      }}
+    >
+      <p
+        style={{
+          color: color.text,
+          fontSize: '14px',
+          fontFamily: '"Cairo", sans-serif',
+          margin: 0,
+        }}
+      >
         {message}
       </p>
     </div>
@@ -439,37 +456,47 @@ export function UserTypeModal({ onClose, onSuccess }) {
   };
 
   return (
-    <Modal title={currentIsDriver ? '🚗 → 👤 تغيير إلى راكب' : '👤 → 🚗 تغيير إلى سائق'} onClose={onClose}>
+    <Modal
+      title={currentIsDriver ? '🚗 → 👤 تغيير إلى راكب' : '👤 → 🚗 تغيير إلى سائق'}
+      onClose={onClose}
+    >
       <form onSubmit={handleSubmit}>
         {error && <Alert type="error" message={error} />}
 
-        <div style={{
-          background: '#eff6ff',
-          border: '1px solid #bfdbfe',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '20px'
-        }}>
-          <p style={{
-            color: '#1e40af',
-            fontSize: '14px',
-            fontFamily: '"Cairo", sans-serif',
-            margin: 0,
-            lineHeight: 1.6
-          }}>
-            💡 <strong>ملاحظة:</strong> يمكنك التبديل بين نوعي الحساب في أي وقت. نوع حسابك الحالي: <strong>{currentIsDriver ? 'سائق 🚗' : 'راكب 👤'}</strong>
+        <div
+          style={{
+            background: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '20px',
+          }}
+        >
+          <p
+            style={{
+              color: '#1e40af',
+              fontSize: '14px',
+              fontFamily: '"Cairo", sans-serif',
+              margin: 0,
+              lineHeight: 1.6,
+            }}
+          >
+            💡 <strong>ملاحظة:</strong> يمكنك التبديل بين نوعي الحساب في أي وقت. نوع حسابك الحالي:{' '}
+            <strong>{currentIsDriver ? 'سائق 🚗' : 'راكب 👤'}</strong>
           </p>
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '12px',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '12px',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             اختر نوع الحساب الجديد:
           </label>
 
@@ -492,14 +519,12 @@ export function UserTypeModal({ onClose, onSuccess }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '8px',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               <span style={{ fontSize: '32px' }}>👤</span>
               <span>راكب</span>
-              {!currentIsDriver && (
-                <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>
-              )}
+              {!currentIsDriver && <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>}
             </button>
 
             <button
@@ -520,14 +545,12 @@ export function UserTypeModal({ onClose, onSuccess }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '8px',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               <span style={{ fontSize: '32px' }}>🚗</span>
               <span>سائق</span>
-              {currentIsDriver && (
-                <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>
-              )}
+              {currentIsDriver && <span style={{ fontSize: '12px', opacity: 0.7 }}>(الحالي)</span>}
             </button>
           </div>
         </div>

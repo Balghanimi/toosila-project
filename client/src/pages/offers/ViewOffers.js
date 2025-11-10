@@ -27,7 +27,7 @@ export default function ViewOffers() {
     minPrice: '',
     maxPrice: '',
     minSeats: '',
-    sortBy: 'date' // date, price, rating
+    sortBy: 'date', // date, price, rating
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
@@ -45,11 +45,11 @@ export default function ViewOffers() {
     // استقبال معايير البحث من Home
     if (location.state) {
       const searchParams = location.state;
-      setFilters(prev => ({
+      setFilters((prev) => ({
         ...prev,
         fromCity: searchParams.fromCity || '',
         toCity: searchParams.toCity || '',
-        departureDate: searchParams.departureDate || ''
+        departureDate: searchParams.departureDate || '',
       }));
       fetchOffers(searchParams);
     } else {
@@ -111,10 +111,10 @@ export default function ViewOffers() {
       let response;
       if (isDriver) {
         response = await demandsAPI.getAll(filterParams);
-        setOffers(prev => [...prev, ...(response.demands || [])]);
+        setOffers((prev) => [...prev, ...(response.demands || [])]);
       } else {
         response = await offersAPI.getAll(filterParams);
-        setOffers(prev => [...prev, ...(response.offers || [])]);
+        setOffers((prev) => [...prev, ...(response.offers || [])]);
       }
 
       setPage(page + 1);
@@ -168,7 +168,7 @@ export default function ViewOffers() {
     return date.toLocaleDateString('ar-EG', {
       weekday: 'long',
       day: 'numeric',
-      month: 'long'
+      month: 'long',
     });
   };
 
@@ -182,7 +182,7 @@ export default function ViewOffers() {
 
     return date.toLocaleTimeString('ar-EG', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -240,7 +240,7 @@ export default function ViewOffers() {
       await bookingsAPI.create({
         offerId: validOfferId,
         message: bookingMessage,
-        seats: 1 // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
+        seats: 1, // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
       });
 
       setShowBookingModal(false);
@@ -254,13 +254,7 @@ export default function ViewOffers() {
   };
 
   // Main cities (most popular routes)
-  const MAIN_CITIES = [
-    'بغداد',
-    'البصرة',
-    'النجف',
-    'أربيل',
-    'الموصل'
-  ];
+  const MAIN_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'];
 
   // All Iraqi cities (for advanced filters)
   const IRAQ_CITIES = [
@@ -274,134 +268,162 @@ export default function ViewOffers() {
     'ديالى',
     'الأنبار',
     'واسط',
-    'ميسان'
+    'ميسان',
   ];
 
   return (
-    <div className="offers-page-background" style={{
-      minHeight: '100vh',
-      background: `
+    <div
+      className="offers-page-background"
+      style={{
+        minHeight: '100vh',
+        background: `
         radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.05) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(52, 199, 89, 0.04) 0%, transparent 50%),
         radial-gradient(circle at 40% 20%, rgba(52, 199, 89, 0.03) 0%, transparent 40%),
         linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)
       `,
-      paddingBottom: '100px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
+        paddingBottom: '100px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       {/* Decorative geometric shapes */}
-      <div className="blur-circle-1" style={{
-        position: 'absolute',
-        top: '10%',
-        right: '5%',
-        width: '300px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
-      <div className="blur-circle-2" style={{
-        position: 'absolute',
-        bottom: '20%',
-        left: '10%',
-        width: '250px',
-        height: '250px',
-        background: 'radial-gradient(circle, rgba(52, 199, 89, 0.06) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
+      <div
+        className="blur-circle-1"
+        style={{
+          position: 'absolute',
+          top: '10%',
+          right: '5%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(60px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <div
+        className="blur-circle-2"
+        style={{
+          position: 'absolute',
+          bottom: '20%',
+          left: '10%',
+          width: '250px',
+          height: '250px',
+          background: 'radial-gradient(circle, rgba(52, 199, 89, 0.06) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(50px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
 
       {/* Subtle dot pattern overlay */}
-      <div className="dot-pattern" style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `radial-gradient(circle, rgba(52, 199, 89, 0.08) 1px, transparent 1px)`,
-        backgroundSize: '30px 30px',
-        opacity: 0.3,
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
-      <div className="container" style={{
-        paddingTop: 'var(--space-6)',
-        transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
-        opacity: isAnimated ? 1 : 0,
-        transition: 'all 0.6s ease',
-        position: 'relative',
-        zIndex: 1
-      }}>
-
+      <div
+        className="dot-pattern"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `radial-gradient(circle, rgba(52, 199, 89, 0.08) 1px, transparent 1px)`,
+          backgroundSize: '30px 30px',
+          opacity: 0.3,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--space-6)',
+          transform: isAnimated ? 'translateY(0)' : 'translateY(20px)',
+          opacity: isAnimated ? 1 : 0,
+          transition: 'all 0.6s ease',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
         {/* Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: 'var(--space-6)'
-        }}>
-          <h1 style={{
-            fontSize: 'var(--text-3xl)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: 'var(--space-2)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 'var(--space-6)',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 'var(--text-3xl)',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-2)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             {isDriver ? '📋 طلبات الركاب' : '🚗 العروض المتاحة'}
           </h1>
-          <p style={{
-            color: 'var(--text-primary)',
-            fontSize: 'var(--text-lg)',
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '600'
-          }}>
+          <p
+            style={{
+              color: 'var(--text-primary)',
+              fontSize: 'var(--text-lg)',
+              fontFamily: '"Cairo", sans-serif',
+              fontWeight: '600',
+            }}
+          >
             {isDriver ? 'ابحث عن ركاب يحتاجون رحلة' : 'ابحث عن رحلتك المثالية'}
           </p>
         </div>
 
         {/* Filters */}
-        <div style={{
-          background: 'var(--surface-primary)',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--space-6)',
-          marginBottom: 'var(--space-6)',
-          boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--border-light)',
-          overflow: 'visible'
-        }}>
-          <h3 style={{
-            fontSize: 'var(--text-lg)',
-            fontWeight: '600',
-            marginBottom: 'var(--space-4)',
-            fontFamily: '"Cairo", sans-serif',
-            color: 'var(--text-primary)'
-          }}>
+        <div
+          style={{
+            background: 'var(--surface-primary)',
+            borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-6)',
+            marginBottom: 'var(--space-6)',
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-light)',
+            overflow: 'visible',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: 'var(--text-lg)',
+              fontWeight: '600',
+              marginBottom: 'var(--space-4)',
+              fontFamily: '"Cairo", sans-serif',
+              color: 'var(--text-primary)',
+            }}
+          >
             🔍 البحث السريع
           </h3>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 'var(--space-4)',
-            marginBottom: 'var(--space-4)'
-          }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-secondary)'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-2)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-secondary)',
+                }}
+              >
                 من (المدن الرئيسية)
               </label>
               <select
                 value={filters.fromCity}
-                onChange={(e) => setFilters({...filters, fromCity: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, fromCity: e.target.value })}
                 style={{
                   width: '100%',
                   padding: 'var(--space-3)',
@@ -416,30 +438,34 @@ export default function ViewOffers() {
                   paddingLeft: 'var(--space-3)',
                   paddingRight: 'var(--space-3)',
                   position: 'relative',
-                  zIndex: 10
+                  zIndex: 10,
                 }}
               >
                 <option value="">جميع المدن الرئيسية</option>
-                {MAIN_CITIES.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                {MAIN_CITIES.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-secondary)'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-2)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-secondary)',
+                }}
+              >
                 إلى (المدن الرئيسية)
               </label>
               <select
                 value={filters.toCity}
-                onChange={(e) => setFilters({...filters, toCity: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, toCity: e.target.value })}
                 style={{
                   width: '100%',
                   padding: 'var(--space-3)',
@@ -454,31 +480,35 @@ export default function ViewOffers() {
                   paddingLeft: 'var(--space-3)',
                   paddingRight: 'var(--space-3)',
                   position: 'relative',
-                  zIndex: 10
+                  zIndex: 10,
                 }}
               >
                 <option value="">جميع المدن الرئيسية</option>
-                {MAIN_CITIES.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                {MAIN_CITIES.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-2)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-secondary)'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-2)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-secondary)',
+                }}
+              >
                 التاريخ
               </label>
               <input
                 type="date"
                 value={filters.departureDate}
-                onChange={(e) => setFilters({...filters, departureDate: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, departureDate: e.target.value })}
                 min={new Date().toISOString().split('T')[0]}
                 style={{
                   width: '100%',
@@ -491,7 +521,7 @@ export default function ViewOffers() {
                   textAlign: 'center',
                   direction: 'rtl',
                   paddingLeft: 'var(--space-3)',
-                  paddingRight: 'var(--space-3)'
+                  paddingRight: 'var(--space-3)',
                 }}
               />
             </div>
@@ -519,11 +549,12 @@ export default function ViewOffers() {
               justifyContent: 'center',
               gap: 'var(--space-2)',
               transition: 'all 0.3s ease',
-              boxShadow: showAdvancedFilters ? 'var(--shadow-sm)' : 'none'
+              boxShadow: showAdvancedFilters ? 'var(--shadow-sm)' : 'none',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'var(--primary)';
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)';
+              e.currentTarget.style.background =
+                'linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--border-light)';
@@ -537,58 +568,69 @@ export default function ViewOffers() {
           </button>
 
           {/* Advanced Filters Section */}
-          <div style={{
-            maxHeight: showAdvancedFilters ? '1000px' : '0',
-            overflow: 'hidden',
-            transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out',
-            opacity: showAdvancedFilters ? 1 : 0,
-            marginBottom: showAdvancedFilters ? 'var(--space-4)' : 0
-          }}>
-            <div style={{
-              padding: 'var(--space-4)',
-              background: 'var(--surface-secondary)',
-              borderRadius: 'var(--radius-lg)',
-              border: '2px dashed var(--border-light)'
-            }}>
-              <h4 style={{
-                fontSize: 'var(--text-base)',
-                fontWeight: '600',
-                marginBottom: 'var(--space-4)',
-                fontFamily: '"Cairo", sans-serif',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)'
-              }}>
+          <div
+            style={{
+              maxHeight: showAdvancedFilters ? '1000px' : '0',
+              overflow: 'hidden',
+              transition:
+                'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out',
+              opacity: showAdvancedFilters ? 1 : 0,
+              marginBottom: showAdvancedFilters ? 'var(--space-4)' : 0,
+            }}
+          >
+            <div
+              style={{
+                padding: 'var(--space-4)',
+                background: 'var(--surface-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                border: '2px dashed var(--border-light)',
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: '"Cairo", sans-serif',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                }}
+              >
                 <span>🎛️</span>
                 <span>خيارات البحث المتقدم</span>
               </h4>
 
               {/* Full City Lists */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: 'var(--space-3)',
-                marginBottom: 'var(--space-4)',
-                padding: 'var(--space-3)',
-                background: 'var(--surface-primary)',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--border-light)'
-              }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: 'var(--space-3)',
+                  marginBottom: 'var(--space-4)',
+                  padding: 'var(--space-3)',
+                  background: 'var(--surface-primary)',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-light)',
+                }}
+              >
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     من (جميع المدن)
                   </label>
                   <select
                     value={filters.fromCity}
-                    onChange={(e) => setFilters({...filters, fromCity: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, fromCity: e.target.value })}
                     style={{
                       width: '100%',
                       padding: 'var(--space-2)',
@@ -599,30 +641,34 @@ export default function ViewOffers() {
                       background: 'var(--surface-primary)',
                       textAlign: 'center',
                       textAlignLast: 'center',
-                      direction: 'rtl'
+                      direction: 'rtl',
                     }}
                   >
                     <option value="">جميع المدن</option>
-                    {IRAQ_CITIES.map(city => (
-                      <option key={city} value={city}>{city}</option>
+                    {IRAQ_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     إلى (جميع المدن)
                   </label>
                   <select
                     value={filters.toCity}
-                    onChange={(e) => setFilters({...filters, toCity: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, toCity: e.target.value })}
                     style={{
                       width: '100%',
                       padding: 'var(--space-2)',
@@ -633,38 +679,44 @@ export default function ViewOffers() {
                       background: 'var(--surface-primary)',
                       textAlign: 'center',
                       textAlignLast: 'center',
-                      direction: 'rtl'
+                      direction: 'rtl',
                     }}
                   >
                     <option value="">جميع المدن</option>
-                    {IRAQ_CITIES.map(city => (
-                      <option key={city} value={city}>{city}</option>
+                    {IRAQ_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: 'var(--space-3)'
-              }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                  gap: 'var(--space-3)',
+                }}
+              >
                 {/* Min Price */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     السعر الأدنى
                   </label>
                   <input
                     type="number"
                     value={filters.minPrice}
-                    onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                     placeholder="0"
                     min="0"
                     style={{
@@ -675,27 +727,29 @@ export default function ViewOffers() {
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      textAlign: 'center'
+                      textAlign: 'center',
                     }}
                   />
                 </div>
 
                 {/* Max Price */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     السعر الأعلى
                   </label>
                   <input
                     type="number"
                     value={filters.maxPrice}
-                    onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                     placeholder="∞"
                     min="0"
                     style={{
@@ -706,27 +760,29 @@ export default function ViewOffers() {
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      textAlign: 'center'
+                      textAlign: 'center',
                     }}
                   />
                 </div>
 
                 {/* Min Seats */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     الحد الأدنى للمقاعد
                   </label>
                   <input
                     type="number"
                     value={filters.minSeats}
-                    onChange={(e) => setFilters({...filters, minSeats: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, minSeats: e.target.value })}
                     placeholder="1"
                     min="1"
                     max="7"
@@ -738,26 +794,28 @@ export default function ViewOffers() {
                       fontSize: 'var(--text-sm)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
-                      textAlign: 'center'
+                      textAlign: 'center',
                     }}
                   />
                 </div>
 
                 {/* Sort By */}
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
-                  }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      fontFamily: '"Cairo", sans-serif',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     ترتيب حسب
                   </label>
                   <select
                     value={filters.sortBy}
-                    onChange={(e) => setFilters({...filters, sortBy: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
                     style={{
                       width: '100%',
                       padding: 'var(--space-2)',
@@ -767,7 +825,7 @@ export default function ViewOffers() {
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
                       textAlign: 'center',
-                      textAlignLast: 'center'
+                      textAlignLast: 'center',
                     }}
                   >
                     <option value="date">التاريخ (الأقرب أولاً)</option>
@@ -795,7 +853,7 @@ export default function ViewOffers() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontFamily: '"Cairo", sans-serif',
-                boxShadow: 'var(--shadow-md)'
+                boxShadow: 'var(--shadow-md)',
               }}
             >
               🔍 بحث
@@ -812,7 +870,7 @@ export default function ViewOffers() {
                 fontSize: 'var(--text-base)',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               ✖️ مسح الفلاتر
@@ -822,66 +880,78 @@ export default function ViewOffers() {
 
         {/* Error */}
         {error && (
-          <div style={{
-            background: '#fee',
-            border: '2px solid #f88',
-            borderRadius: 'var(--radius)',
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-6)',
-            color: '#c00',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+          <div
+            style={{
+              background: '#fee',
+              border: '2px solid #f88',
+              borderRadius: 'var(--radius)',
+              padding: 'var(--space-4)',
+              marginBottom: 'var(--space-6)',
+              color: '#c00',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             {error}
           </div>
         )}
 
         {/* Loading */}
         {loading && (
-          <div style={{
-            textAlign: 'center',
-            padding: 'var(--space-8)',
-            color: 'var(--text-secondary)',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
-            <div style={{
-              width: '50px',
-              height: '50px',
-              border: '4px solid var(--border-light)',
-              borderTop: '4px solid var(--primary)',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto var(--space-4) auto'
-            }} />
+          <div
+            style={{
+              textAlign: 'center',
+              padding: 'var(--space-8)',
+              color: 'var(--text-secondary)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
+            <div
+              style={{
+                width: '50px',
+                height: '50px',
+                border: '4px solid var(--border-light)',
+                borderTop: '4px solid var(--primary)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto var(--space-4) auto',
+              }}
+            />
             جاري التحميل...
           </div>
         )}
 
         {/* Offers List */}
         {!loading && offers.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            padding: 'var(--space-8)',
-            background: 'var(--surface-primary)',
-            borderRadius: 'var(--radius-xl)',
-            boxShadow: 'var(--shadow-md)'
-          }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: 'var(--space-8)',
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
             <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
               {isDriver ? '📋' : '🚗'}
             </div>
-            <h3 style={{
-              fontSize: 'var(--text-2xl)',
-              fontWeight: '700',
-              marginBottom: 'var(--space-2)',
-              fontFamily: '"Cairo", sans-serif',
-              color: 'var(--text-primary)'
-            }}>
+            <h3
+              style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: '700',
+                marginBottom: 'var(--space-2)',
+                fontFamily: '"Cairo", sans-serif',
+                color: 'var(--text-primary)',
+              }}
+            >
               {isDriver ? 'لا توجد طلبات متاحة' : 'لا توجد عروض متاحة'}
             </h3>
-            <p style={{
-              color: 'var(--text-secondary)',
-              fontFamily: '"Cairo", sans-serif',
-              marginBottom: 'var(--space-4)'
-            }}>
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: '"Cairo", sans-serif',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
               {isDriver ? 'لم نعثر على طلبات تطابق بحثك' : 'لم نعثر على رحلات تطابق بحثك'}
             </p>
             {currentUser && currentUser.isDriver && (
@@ -896,7 +966,7 @@ export default function ViewOffers() {
                   fontSize: 'var(--text-base)',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  fontFamily: '"Cairo", sans-serif'
+                  fontFamily: '"Cairo", sans-serif',
                 }}
               >
                 ➕ انشر رحلتك الآن
@@ -906,10 +976,12 @@ export default function ViewOffers() {
         )}
 
         {!loading && offers.length > 0 && (
-          <div style={{
-            display: 'grid',
-            gap: 'var(--space-4)'
-          }}>
+          <div
+            style={{
+              display: 'grid',
+              gap: 'var(--space-4)',
+            }}
+          >
             {offers.map((offer) => (
               <div
                 key={offer.id}
@@ -920,7 +992,7 @@ export default function ViewOffers() {
                   boxShadow: 'var(--shadow-md)',
                   border: '1px solid var(--border-light)',
                   transition: 'var(--transition)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
@@ -931,54 +1003,64 @@ export default function ViewOffers() {
                   e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                 }}
               >
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'start',
-                  marginBottom: 'var(--space-4)'
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    marginBottom: 'var(--space-4)',
+                  }}
+                >
                   <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: 'var(--text-lg)',
-                      fontWeight: '700',
-                      color: 'var(--text-primary)',
-                      marginBottom: 'var(--space-2)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: '700',
+                        color: 'var(--text-primary)',
+                        marginBottom: 'var(--space-2)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {offer.fromCity} ← {offer.toCity}
                     </div>
-                    <div style={{
-                      display: 'flex',
-                      gap: 'var(--space-4)',
-                      fontSize: 'var(--text-sm)',
-                      color: 'var(--text-secondary)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 'var(--space-4)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--text-secondary)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       <span>📅 {formatDate(offer.departureTime)}</span>
                       <span>🕐 {formatTime(offer.departureTime)}</span>
                       <span>💺 {offer.seats} مقعد</span>
                     </div>
                   </div>
 
-                  <div style={{
-                    fontSize: 'var(--text-2xl)',
-                    fontWeight: '800',
-                    color: 'var(--primary)',
-                    fontFamily: '"Cairo", sans-serif'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: 'var(--text-2xl)',
+                      fontWeight: '800',
+                      color: 'var(--primary)',
+                      fontFamily: '"Cairo", sans-serif',
+                    }}
+                  >
                     {offer.price ? Number(offer.price).toLocaleString() : '0'} د.ع
                   </div>
                 </div>
 
-                <div style={{
-                  padding: 'var(--space-3)',
-                  background: 'var(--surface-secondary)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--text-secondary)',
-                  fontFamily: '"Cairo", sans-serif',
-                  marginBottom: 'var(--space-3)'
-                }}>
+                <div
+                  style={{
+                    padding: 'var(--space-3)',
+                    background: 'var(--surface-secondary)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-secondary)',
+                    fontFamily: '"Cairo", sans-serif',
+                    marginBottom: 'var(--space-3)',
+                  }}
+                >
                   👤 السائق: {offer.name || 'غير متوفر'}
                 </div>
 
@@ -992,7 +1074,8 @@ export default function ViewOffers() {
                     style={{
                       width: '100%',
                       padding: 'var(--space-3)',
-                      background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                      background:
+                        'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: 'var(--radius)',
@@ -1001,7 +1084,7 @@ export default function ViewOffers() {
                       cursor: 'pointer',
                       fontFamily: '"Cairo", sans-serif',
                       boxShadow: 'var(--shadow-md)',
-                      transition: 'var(--transition)'
+                      transition: 'var(--transition)',
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.transform = 'translateY(-2px)';
@@ -1022,25 +1105,29 @@ export default function ViewOffers() {
 
         {/* Pagination Info and Load More Button */}
         {!loading && offers.length > 0 && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 'var(--space-4)',
-            marginTop: 'var(--space-6)',
-            padding: 'var(--space-4)',
-            background: 'var(--surface-primary)',
-            borderRadius: 'var(--radius-xl)',
-            boxShadow: 'var(--shadow-md)',
-            border: '1px solid var(--border-light)'
-          }}>
-            <p style={{
-              fontSize: 'var(--text-base)',
-              fontWeight: '600',
-              color: 'var(--text-secondary)',
-              fontFamily: '"Cairo", sans-serif',
-              margin: 0
-            }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginTop: 'var(--space-6)',
+              padding: 'var(--space-4)',
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-md)',
+              border: '1px solid var(--border-light)',
+            }}
+          >
+            <p
+              style={{
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                color: 'var(--text-secondary)',
+                fontFamily: '"Cairo", sans-serif',
+                margin: 0,
+              }}
+            >
               عرض {offers.length} من {total} نتيجة
             </p>
 
@@ -1062,7 +1149,7 @@ export default function ViewOffers() {
                   fontFamily: '"Cairo", sans-serif',
                   boxShadow: loadingMore ? 'none' : 'var(--shadow-md)',
                   transition: 'var(--transition)',
-                  opacity: loadingMore ? 0.7 : 1
+                  opacity: loadingMore ? 0.7 : 1,
                 }}
                 onMouseEnter={(e) => {
                   if (!loadingMore) {
@@ -1097,7 +1184,7 @@ export default function ViewOffers() {
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1000,
-              padding: 'var(--space-4)'
+              padding: 'var(--space-4)',
             }}
             onClick={() => setShowBookingModal(false)}
           >
@@ -1110,7 +1197,7 @@ export default function ViewOffers() {
                 width: '100%',
                 boxShadow: 'var(--shadow-xl)',
                 maxHeight: '90vh',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1121,7 +1208,7 @@ export default function ViewOffers() {
                   color: 'var(--text-primary)',
                   marginBottom: 'var(--space-4)',
                   fontFamily: '"Cairo", sans-serif',
-                  textAlign: 'center'
+                  textAlign: 'center',
                 }}
               >
                 🎫 تأكيد الحجز
@@ -1131,12 +1218,13 @@ export default function ViewOffers() {
               {selectedOffer.name && (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)',
+                    background:
+                      'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)',
                     borderRadius: 'var(--radius-lg)',
                     padding: 'var(--space-4)',
                     marginBottom: 'var(--space-4)',
                     color: 'white',
-                    boxShadow: 'var(--shadow-md)'
+                    boxShadow: 'var(--shadow-md)',
                   }}
                 >
                   <div
@@ -1145,7 +1233,7 @@ export default function ViewOffers() {
                       fontWeight: '600',
                       marginBottom: 'var(--space-2)',
                       fontFamily: '"Cairo", sans-serif',
-                      opacity: 0.9
+                      opacity: 0.9,
                     }}
                   >
                     معلومات السائق
@@ -1155,14 +1243,14 @@ export default function ViewOffers() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginBottom: 'var(--space-1)'
+                      marginBottom: 'var(--space-1)',
                     }}
                   >
                     <div
                       style={{
                         fontSize: 'var(--text-lg)',
                         fontWeight: '700',
-                        fontFamily: '"Cairo", sans-serif'
+                        fontFamily: '"Cairo", sans-serif',
                       }}
                     >
                       👤 {selectedOffer.name}
@@ -1175,7 +1263,7 @@ export default function ViewOffers() {
                           gap: 'var(--space-1)',
                           fontSize: 'var(--text-base)',
                           fontWeight: '600',
-                          fontFamily: '"Cairo", sans-serif'
+                          fontFamily: '"Cairo", sans-serif',
                         }}
                       >
                         ⭐ {Number(selectedOffer.ratingAvg).toFixed(1)}
@@ -1196,7 +1284,7 @@ export default function ViewOffers() {
                   background: 'var(--surface-secondary)',
                   borderRadius: 'var(--radius-lg)',
                   padding: 'var(--space-4)',
-                  marginBottom: 'var(--space-4)'
+                  marginBottom: 'var(--space-4)',
                 }}
               >
                 <div
@@ -1204,7 +1292,7 @@ export default function ViewOffers() {
                     fontSize: 'var(--text-lg)',
                     fontWeight: '700',
                     marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif'
+                    fontFamily: '"Cairo", sans-serif',
                   }}
                 >
                   {selectedOffer.fromCity} ← {selectedOffer.toCity}
@@ -1214,17 +1302,18 @@ export default function ViewOffers() {
                     fontSize: 'var(--text-sm)',
                     color: 'var(--text-secondary)',
                     fontFamily: '"Cairo", sans-serif',
-                    marginBottom: 'var(--space-1)'
+                    marginBottom: 'var(--space-1)',
                   }}
                 >
-                  📅 {formatDate(selectedOffer.departureTime)} - 🕐 {formatTime(selectedOffer.departureTime)}
+                  📅 {formatDate(selectedOffer.departureTime)} - 🕐{' '}
+                  {formatTime(selectedOffer.departureTime)}
                 </div>
                 <div
                   style={{
                     fontSize: 'var(--text-sm)',
                     color: 'var(--text-secondary)',
                     fontFamily: '"Cairo", sans-serif',
-                    marginBottom: 'var(--space-2)'
+                    marginBottom: 'var(--space-2)',
                   }}
                 >
                   💺 {selectedOffer.seats} مقعد متاح
@@ -1234,7 +1323,7 @@ export default function ViewOffers() {
                     fontSize: 'var(--text-xl)',
                     fontWeight: '800',
                     color: 'var(--primary)',
-                    fontFamily: '"Cairo", sans-serif'
+                    fontFamily: '"Cairo", sans-serif',
                   }}
                 >
                   💰 {selectedOffer.price ? Number(selectedOffer.price).toLocaleString() : '0'} د.ع
@@ -1249,7 +1338,7 @@ export default function ViewOffers() {
                     fontWeight: '600',
                     marginBottom: 'var(--space-2)',
                     fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)'
+                    color: 'var(--text-secondary)',
                   }}
                 >
                   رسالة للسائق (اختياري)
@@ -1267,7 +1356,7 @@ export default function ViewOffers() {
                     fontSize: 'var(--text-base)',
                     fontFamily: '"Cairo", sans-serif',
                     resize: 'vertical',
-                    textAlign: 'center'
+                    textAlign: 'center',
                   }}
                 />
               </div>
@@ -1289,7 +1378,7 @@ export default function ViewOffers() {
                     fontSize: 'var(--text-base)',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    fontFamily: '"Cairo", sans-serif'
+                    fontFamily: '"Cairo", sans-serif',
                   }}
                 >
                   إلغاء
@@ -1299,7 +1388,8 @@ export default function ViewOffers() {
                   style={{
                     flex: 1,
                     padding: 'var(--space-3)',
-                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                    background:
+                      'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-lg)',
@@ -1307,7 +1397,7 @@ export default function ViewOffers() {
                     fontWeight: '700',
                     cursor: 'pointer',
                     fontFamily: '"Cairo", sans-serif',
-                    boxShadow: 'var(--shadow-lg)'
+                    boxShadow: 'var(--shadow-lg)',
                   }}
                 >
                   ✅ تأكيد الحجز

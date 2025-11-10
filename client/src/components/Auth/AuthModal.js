@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import Login from './Login';
 import Register from './Register';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
+  const modalRef = useFocusTrap(isOpen);
+
+  // Handle Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -11,22 +24,29 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const handleSwitchToLogin = () => setMode('login');
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px 20px 100px 20px',
-      backdropFilter: 'blur(4px)',
-      overflowY: 'auto'
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px 20px 100px 20px',
+        backdropFilter: 'blur(4px)',
+        overflowY: 'auto',
+      }}
+      onClick={onClose}
+    >
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={mode === 'login' ? 'login-title' : 'register-title'}
         style={{
           width: '100%',
           maxWidth: mode === 'register' ? '480px' : '440px',
@@ -34,20 +54,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
           overflowY: 'auto',
           animation: 'fadeInScale 0.3s ease-out',
           transformOrigin: 'center',
-          margin: 'auto'
+          margin: 'auto',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {mode === 'login' ? (
-          <Login 
-            onSwitchToRegister={handleSwitchToRegister}
-            onClose={onClose}
-          />
+          <Login onSwitchToRegister={handleSwitchToRegister} onClose={onClose} />
         ) : (
-          <Register 
-            onSwitchToLogin={handleSwitchToLogin}
-            onClose={onClose}
-          />
+          <Register onSwitchToLogin={handleSwitchToLogin} onClose={onClose} />
         )}
       </div>
 
@@ -67,4 +81,3 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     </div>
   );
 }
-

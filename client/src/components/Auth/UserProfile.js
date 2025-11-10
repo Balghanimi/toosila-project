@@ -8,7 +8,7 @@ export default function UserProfile({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: user?.phone || ''
+    phone: user?.phone || '',
   });
   const [errors, setErrors] = useState({});
 
@@ -16,16 +16,16 @@ export default function UserProfile({ isOpen, onClose }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear field error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -63,7 +63,7 @@ export default function UserProfile({ isOpen, onClose }) {
     setFormData({
       name: user.name,
       email: user.email,
-      phone: user.phone
+      phone: user.phone,
     });
     setErrors({});
     setIsEditing(false);
@@ -83,31 +83,35 @@ export default function UserProfile({ isOpen, onClose }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px',
-      backdropFilter: 'blur(4px)'
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        padding: '32px',
-        width: '100%',
-        maxWidth: '460px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-        position: 'relative',
-        maxHeight: '90vh',
-        overflowY: 'auto'
-      }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px',
+        backdropFilter: 'blur(4px)',
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: '32px',
+          width: '100%',
+          maxWidth: '460px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          position: 'relative',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+        }}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -120,7 +124,7 @@ export default function UserProfile({ isOpen, onClose }) {
             fontSize: '24px',
             cursor: 'pointer',
             color: '#6b7280',
-            padding: '8px'
+            padding: '8px',
           }}
         >
           ×
@@ -128,29 +132,34 @@ export default function UserProfile({ isOpen, onClose }) {
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: user.userType === 'driver'
-              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px auto',
-            fontSize: '32px',
-            color: 'white',
-            transition: 'all 0.3s ease'
-          }}>
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background:
+                user.userType === 'driver'
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+              fontSize: '32px',
+              color: 'white',
+              transition: 'all 0.3s ease',
+            }}
+          >
             {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
           </div>
-          <h2 style={{
-            fontSize: '24px',
-            fontWeight: '700',
-            color: '#1f2937',
-            margin: '0 0 8px 0'
-          }}>
+          <h2
+            style={{
+              fontSize: '24px',
+              fontWeight: '700',
+              color: '#1f2937',
+              margin: '0 0 8px 0',
+            }}
+          >
             {user.name}
           </h2>
 
@@ -164,7 +173,9 @@ export default function UserProfile({ isOpen, onClose }) {
               gap: '8px',
               margin: '0 auto 12px auto',
               padding: '8px 16px',
-              background: isSwitchingRole ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
+              background: isSwitchingRole
+                ? '#9ca3af'
+                : 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
               border: 'none',
               borderRadius: '20px',
               color: 'white',
@@ -172,7 +183,7 @@ export default function UserProfile({ isOpen, onClose }) {
               fontWeight: '600',
               cursor: isSwitchingRole ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
             onMouseEnter={(e) => {
               if (!isSwitchingRole) {
@@ -185,95 +196,106 @@ export default function UserProfile({ isOpen, onClose }) {
               e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
             }}
           >
-            <span style={{ fontSize: '18px' }}>
-              {user.userType === 'driver' ? '🧑‍💼' : '🚗'}
-            </span>
+            <span style={{ fontSize: '18px' }}>{user.userType === 'driver' ? '🧑‍💼' : '🚗'}</span>
             <span>
-              {isSwitchingRole ? 'جاري التبديل...' :
-               user.userType === 'driver' ? 'التبديل إلى راكب' : 'التبديل إلى سائق'}
+              {isSwitchingRole
+                ? 'جاري التبديل...'
+                : user.userType === 'driver'
+                  ? 'التبديل إلى راكب'
+                  : 'التبديل إلى سائق'}
             </span>
             <span style={{ fontSize: '16px' }}>⇄</span>
           </button>
 
           {/* Current Role Badge */}
-          <div style={{
-            display: 'inline-block',
-            background: user.userType === 'driver' ? '#10b981' : '#3b82f6',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
+          <div
+            style={{
+              display: 'inline-block',
+              background: user.userType === 'driver' ? '#10b981' : '#3b82f6',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
             {user.userType === 'driver' ? '🚗 سائق' : '🧑‍💼 راكب'}
           </div>
 
           {/* Email Verification Status */}
-          <div style={{
-            display: 'inline-block',
-            background: user.emailVerified ? '#10b981' : '#f59e0b',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600',
-            marginLeft: '8px'
-          }}>
+          <div
+            style={{
+              display: 'inline-block',
+              background: user.emailVerified ? '#10b981' : '#f59e0b',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              marginLeft: '8px',
+            }}
+          >
             {user.emailVerified ? '✓ Email Verified' : '⚠ Not Verified'}
           </div>
         </div>
 
         {/* User Stats */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '16px',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            background: '#f0f9ff',
-            padding: '16px',
-            borderRadius: '12px',
-            textAlign: 'center',
-            border: '1px solid #0ea5e9'
-          }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '16px',
+            marginBottom: '24px',
+          }}
+        >
+          <div
+            style={{
+              background: '#f0f9ff',
+              padding: '16px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              border: '1px solid #0ea5e9',
+            }}
+          >
             <div style={{ fontSize: '24px', fontWeight: '700', color: '#0369a1' }}>
               {user.rating || '0.0'}
             </div>
-            <div style={{ fontSize: '12px', color: '#0369a1', fontWeight: '500' }}>
-              التقييم
-            </div>
+            <div style={{ fontSize: '12px', color: '#0369a1', fontWeight: '500' }}>التقييم</div>
           </div>
-          <div style={{
-            background: '#f0fdf4',
-            padding: '16px',
-            borderRadius: '12px',
-            textAlign: 'center',
-            border: '1px solid #10b981'
-          }}>
+          <div
+            style={{
+              background: '#f0fdf4',
+              padding: '16px',
+              borderRadius: '12px',
+              textAlign: 'center',
+              border: '1px solid #10b981',
+            }}
+          >
             <div style={{ fontSize: '24px', fontWeight: '700', color: '#059669' }}>
               {user.tripsCount || '0'}
             </div>
-            <div style={{ fontSize: '12px', color: '#059669', fontWeight: '500' }}>
-              الرحلات
-            </div>
+            <div style={{ fontSize: '12px', color: '#059669', fontWeight: '500' }}>الرحلات</div>
           </div>
         </div>
 
         {/* Profile Form */}
         <div style={{ marginBottom: '24px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '16px'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#1f2937',
-              margin: '0'
-            }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            <h3
+              style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: '#1f2937',
+                margin: '0',
+              }}
+            >
               المعلومات الشخصية
             </h3>
             {!isEditing && (
@@ -287,7 +309,7 @@ export default function UserProfile({ isOpen, onClose }) {
                   borderRadius: '8px',
                   fontSize: '14px',
                   cursor: 'pointer',
-                  fontWeight: '500'
+                  fontWeight: '500',
                 }}
               >
                 تعديل
@@ -298,13 +320,15 @@ export default function UserProfile({ isOpen, onClose }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* Name Field */}
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px',
+                }}
+              >
                 الاسم
               </label>
               {isEditing ? (
@@ -321,7 +345,7 @@ export default function UserProfile({ isOpen, onClose }) {
                       borderRadius: '8px',
                       fontSize: '16px',
                       outline: 'none',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
                     }}
                   />
                   {errors.name && (
@@ -331,13 +355,15 @@ export default function UserProfile({ isOpen, onClose }) {
                   )}
                 </div>
               ) : (
-                <div style={{
-                  padding: '12px 16px',
-                  background: '#f9fafb',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  color: '#374151'
-                }}>
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    color: '#374151',
+                  }}
+                >
                   {user.name}
                 </div>
               )}
@@ -345,13 +371,15 @@ export default function UserProfile({ isOpen, onClose }) {
 
             {/* Email Field */}
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px',
+                }}
+              >
                 البريد الإلكتروني
               </label>
               {isEditing ? (
@@ -368,7 +396,7 @@ export default function UserProfile({ isOpen, onClose }) {
                       borderRadius: '8px',
                       fontSize: '16px',
                       outline: 'none',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
                     }}
                   />
                   {errors.email && (
@@ -378,13 +406,15 @@ export default function UserProfile({ isOpen, onClose }) {
                   )}
                 </div>
               ) : (
-                <div style={{
-                  padding: '12px 16px',
-                  background: '#f9fafb',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  color: '#374151'
-                }}>
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    color: '#374151',
+                  }}
+                >
                   {user.email}
                 </div>
               )}
@@ -392,13 +422,15 @@ export default function UserProfile({ isOpen, onClose }) {
 
             {/* Phone Field */}
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px',
+                }}
+              >
                 رقم الهاتف
               </label>
               {isEditing ? (
@@ -415,7 +447,7 @@ export default function UserProfile({ isOpen, onClose }) {
                       borderRadius: '8px',
                       fontSize: '16px',
                       outline: 'none',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
                     }}
                   />
                   {errors.phone && (
@@ -425,13 +457,15 @@ export default function UserProfile({ isOpen, onClose }) {
                   )}
                 </div>
               ) : (
-                <div style={{
-                  padding: '12px 16px',
-                  background: '#f9fafb',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  color: '#374151'
-                }}>
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    color: '#374151',
+                  }}
+                >
                   {user.phone}
                 </div>
               )}
@@ -439,22 +473,26 @@ export default function UserProfile({ isOpen, onClose }) {
 
             {/* Join Date */}
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px',
+                }}
+              >
                 تاريخ الانضمام
               </label>
-              <div style={{
-                padding: '12px 16px',
-                background: '#f9fafb',
-                borderRadius: '8px',
-                fontSize: '16px',
-                color: '#374151'
-              }}>
+              <div
+                style={{
+                  padding: '12px 16px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  color: '#374151',
+                }}
+              >
                 {new Date(user.createdAt).toLocaleDateString('ar-IQ')}
               </div>
             </div>
@@ -462,24 +500,28 @@ export default function UserProfile({ isOpen, onClose }) {
 
           {/* Edit Buttons */}
           {isEditing && (
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              marginTop: '16px'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+                marginTop: '16px',
+              }}
+            >
               <button
                 onClick={handleSave}
                 disabled={loading}
                 style={{
                   flex: 1,
-                  background: loading ? '#9ca3af' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  background: loading
+                    ? '#9ca3af'
+                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: 'white',
                   border: 'none',
                   padding: '12px 20px',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer'
+                  cursor: loading ? 'not-allowed' : 'pointer',
                 }}
               >
                 {loading ? 'جارٍ الحفظ...' : 'حفظ'}
@@ -495,7 +537,7 @@ export default function UserProfile({ isOpen, onClose }) {
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 إلغاء
@@ -505,11 +547,13 @@ export default function UserProfile({ isOpen, onClose }) {
         </div>
 
         {/* Action Buttons */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
           <button
             onClick={handleLogout}
             style={{
@@ -524,7 +568,7 @@ export default function UserProfile({ isOpen, onClose }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px'
+              gap: '8px',
             }}
           >
             🚪 تسجيل الخروج
@@ -534,4 +578,3 @@ export default function UserProfile({ isOpen, onClose }) {
     </div>
   );
 }
-

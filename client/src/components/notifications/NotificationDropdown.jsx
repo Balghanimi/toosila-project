@@ -43,8 +43,8 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             navigate('/demands', {
               state: {
                 openDemandId: notification.relatedId,
-                action: 'viewResponses'
-              }
+                action: 'viewResponses',
+              },
             });
           } else {
             navigate('/demands');
@@ -56,8 +56,8 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             navigate('/demands', {
               state: {
                 openDemandId: notification.relatedId,
-                action: 'viewResponses'
-              }
+                action: 'viewResponses',
+              },
             });
           } else {
             navigate('/demands');
@@ -69,8 +69,8 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             navigate('/demands', {
               state: {
                 openDemandId: notification.relatedId,
-                action: 'viewResponses'
-              }
+                action: 'viewResponses',
+              },
             });
           } else {
             navigate('/demands');
@@ -81,8 +81,8 @@ function NotificationDropdown({ onClose, dropdownRef }) {
           navigate('/bookings', {
             state: {
               tab: 'received', // عرض تبويب الحجوزات المستلمة
-              highlightBookingId: notification.relatedId
-            }
+              highlightBookingId: notification.relatedId,
+            },
           });
         },
         booking_accepted: () => {
@@ -100,7 +100,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
         trip_reminder: () => {
           // تذكير برحلة قادمة
           navigate('/');
-        }
+        },
       };
 
       routes[notification.type]?.();
@@ -130,7 +130,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
         overflow: 'hidden',
         zIndex: 1000,
         animation: 'fadeIn 0.2s ease-out',
-        direction: 'rtl'
+        direction: 'rtl',
       }}
     >
       {/* Header */}
@@ -141,7 +141,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
           alignItems: 'center',
           padding: '16px',
           borderBottom: '1px solid #e5e7eb',
-          background: 'linear-gradient(to bottom, #f9fafb, white)'
+          background: 'linear-gradient(to bottom, #f9fafb, white)',
         }}
       >
         <h3
@@ -149,7 +149,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             fontWeight: '700',
             fontSize: '1.125rem',
             fontFamily: '"Cairo", sans-serif',
-            color: '#111827'
+            color: '#111827',
           }}
         >
           الإشعارات
@@ -167,7 +167,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
               fontFamily: '"Cairo", sans-serif',
               padding: '4px 8px',
               borderRadius: '4px',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#eff6ff';
@@ -187,7 +187,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
       <div
         style={{
           maxHeight: '320px',
-          overflowY: 'auto'
+          overflowY: 'auto',
         }}
       >
         {loading ? (
@@ -197,7 +197,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             style={{
               padding: '48px 32px',
               textAlign: 'center',
-              color: '#6b7280'
+              color: '#6b7280',
             }}
           >
             <div style={{ fontSize: '4rem', marginBottom: '12px' }}>🔔</div>
@@ -206,7 +206,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
                 fontWeight: '600',
                 marginBottom: '8px',
                 fontFamily: '"Cairo", sans-serif',
-                color: '#374151'
+                color: '#374151',
               }}
             >
               لا توجد إشعارات
@@ -214,7 +214,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             <p
               style={{
                 fontSize: '0.875rem',
-                fontFamily: '"Cairo", sans-serif'
+                fontFamily: '"Cairo", sans-serif',
               }}
             >
               ستظهر هنا جميع التحديثات المهمة
@@ -226,7 +226,8 @@ function NotificationDropdown({ onClose, dropdownRef }) {
               <div
                 key={notification.id}
                 style={{
-                  borderBottom: index < recentNotifications.length - 1 ? '1px solid #f3f4f6' : 'none'
+                  borderBottom:
+                    index < recentNotifications.length - 1 ? '1px solid #f3f4f6' : 'none',
                 }}
               >
                 <NotificationItem
@@ -247,7 +248,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
             padding: '12px',
             borderTop: '1px solid #e5e7eb',
             background: 'linear-gradient(to top, #f9fafb, white)',
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           <button
@@ -265,7 +266,7 @@ function NotificationDropdown({ onClose, dropdownRef }) {
               fontFamily: '"Cairo", sans-serif',
               padding: '6px 12px',
               borderRadius: '6px',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#eff6ff';

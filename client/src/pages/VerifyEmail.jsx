@@ -21,15 +21,12 @@ const VerifyEmail = () => {
       }
 
       try {
-        const response = await axios.get(
-          `${API_URL}/api/email-verification/verify/${token}`
-        );
+        const response = await axios.get(`${API_URL}/api/email-verification/verify/${token}`);
 
         if (response.data.success) {
           setStatus('success');
           setMessage(
-            response.data.message ||
-              'تم تأكيد بريدك الإلكتروني بنجاح! Email verified successfully!'
+            response.data.message || 'تم تأكيد بريدك الإلكتروني بنجاح! Email verified successfully!'
           );
 
           // Start countdown and redirect
@@ -75,9 +72,7 @@ const VerifyEmail = () => {
             <h2>Email Verified!</h2>
             <h3>تم تأكيد البريد الإلكتروني!</h3>
             <p className="success-message">{message}</p>
-            <p className="redirect-message">
-              Redirecting to login in {countdown} seconds...
-            </p>
+            <p className="redirect-message">Redirecting to login in {countdown} seconds...</p>
             <p className="redirect-message-ar">
               سيتم التوجيه لتسجيل الدخول خلال {countdown} ثوانٍ...
             </p>
@@ -97,9 +92,7 @@ const VerifyEmail = () => {
               <Link to="/login" className="btn-secondary">
                 Back to Login / العودة لتسجيل الدخول
               </Link>
-              <p className="help-text">
-                Need help? Contact support / تحتاج مساعدة؟ اتصل بالدعم
-              </p>
+              <p className="help-text">Need help? Contact support / تحتاج مساعدة؟ اتصل بالدعم</p>
             </div>
           </>
         )}

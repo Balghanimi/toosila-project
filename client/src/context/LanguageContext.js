@@ -18,7 +18,7 @@ const translations = {
     demands: 'الطلبات',
     messages: 'الرسائل',
     profile: 'الملف الشخصي',
-    
+
     // Auth
     login: 'تسجيل الدخول',
     register: 'إنشاء حساب',
@@ -35,7 +35,7 @@ const translations = {
     resendOTP: 'إعادة إرسال الرمز',
     verify: 'تحقق',
     completeProfile: 'إكمال الملف الشخصي',
-    
+
     // Home Page
     findRide: 'ابحث عن رحلة',
     offerRide: 'انشر رحلة',
@@ -46,7 +46,7 @@ const translations = {
     pricePerSeat: 'السعر لكل مقعد',
     search: 'بحث',
     next: 'التالي',
-    
+
     // Post Offer
     postRide: 'نشر رحلة',
     fromLocation: 'من',
@@ -62,7 +62,7 @@ const translations = {
     publish: 'نشر',
     cancel: 'إلغاء',
     back: 'رجوع',
-    
+
     // View Offers
     searchOffers: 'البحث في العروض',
     filterBy: 'فلترة حسب',
@@ -73,7 +73,7 @@ const translations = {
     noOffersFound: 'لم يتم العثور على عروض',
     bookRide: 'حجز الرحلة',
     contactDriver: 'تواصل مع السائق',
-    
+
     // Common
     today: 'اليوم',
     tomorrow: 'غداً',
@@ -84,12 +84,12 @@ const translations = {
     success: 'نجح',
     confirm: 'تأكيد',
     close: 'إغلاق',
-    
+
     // DateTime
     selectDateTime: 'اختر التاريخ والوقت',
     suggestedTimes: 'أوقات مقترحة',
     currentSelection: 'التحديد الحالي',
-    
+
     // Features
     ac: 'تكييف',
     wifi: 'واي فاي',
@@ -97,19 +97,19 @@ const translations = {
     smoking: 'تدخين',
     pets: 'حيوانات أليفة',
     luggage: 'أمتعة',
-    
+
     // User Menu
     myProfile: 'ملفي الشخصي',
     myRides: 'رحلاتي',
     myRatings: 'تقييماتي',
     settings: 'الإعدادات',
     help: 'المساعدة',
-    
+
     // Messages
     noMessages: 'لا توجد رسائل',
     sendMessage: 'إرسال رسالة',
     typeMessage: 'اكتب رسالة...',
-    
+
     // Profile
     personalInfo: 'المعلومات الشخصية',
     rideHistory: 'تاريخ الرحلات',
@@ -117,18 +117,18 @@ const translations = {
     totalTrips: 'إجمالي الرحلات',
     completedTrips: 'الرحلات المكتملة',
     averageRating: 'متوسط التقييم',
-    
+
     // Rating
     rateDriver: 'قيم السائق',
     ratePassenger: 'قيم الراكب',
     rating: 'التقييم',
     comment: 'تعليق',
     submitRating: 'إرسال التقييم',
-    
+
     // Time formats
     am: 'ص',
     pm: 'م',
-    
+
     // Days
     sunday: 'الأحد',
     monday: 'الإثنين',
@@ -137,7 +137,7 @@ const translations = {
     thursday: 'الخميس',
     friday: 'الجمعة',
     saturday: 'السبت',
-    
+
     // Months
     january: 'يناير',
     february: 'فبراير',
@@ -150,9 +150,9 @@ const translations = {
     september: 'سبتمبر',
     october: 'أكتوبر',
     november: 'نوفمبر',
-    december: 'ديسمبر'
+    december: 'ديسمبر',
   },
-  
+
   en: {
     // Navigation
     home: 'Home',
@@ -160,7 +160,7 @@ const translations = {
     demands: 'Demands',
     messages: 'Messages',
     profile: 'Profile',
-    
+
     // Auth
     login: 'Login',
     register: 'Register',
@@ -177,7 +177,7 @@ const translations = {
     resendOTP: 'Resend OTP',
     verify: 'Verify',
     completeProfile: 'Complete Profile',
-    
+
     // Home Page
     findRide: 'Find a Ride',
     offerRide: 'Offer a Ride',
@@ -188,7 +188,7 @@ const translations = {
     pricePerSeat: 'Price per Seat',
     search: 'Search',
     next: 'Next',
-    
+
     // Post Offer
     postRide: 'Post Ride',
     fromLocation: 'From',
@@ -204,7 +204,7 @@ const translations = {
     publish: 'Publish',
     cancel: 'Cancel',
     back: 'Back',
-    
+
     // View Offers
     searchOffers: 'Search Offers',
     filterBy: 'Filter by',
@@ -215,7 +215,7 @@ const translations = {
     noOffersFound: 'No offers found',
     bookRide: 'Book Ride',
     contactDriver: 'Contact Driver',
-    
+
     // Common
     today: 'Today',
     tomorrow: 'Tomorrow',
@@ -226,12 +226,12 @@ const translations = {
     success: 'Success',
     confirm: 'Confirm',
     close: 'Close',
-    
+
     // DateTime
     selectDateTime: 'Select Date & Time',
     suggestedTimes: 'Suggested Times',
     currentSelection: 'Current Selection',
-    
+
     // Features
     ac: 'AC',
     wifi: 'WiFi',
@@ -239,19 +239,19 @@ const translations = {
     smoking: 'Smoking',
     pets: 'Pets',
     luggage: 'Luggage',
-    
+
     // User Menu
     myProfile: 'My Profile',
     myRides: 'My Rides',
     myRatings: 'My Ratings',
     settings: 'Settings',
     help: 'Help',
-    
+
     // Messages
     noMessages: 'No Messages',
     sendMessage: 'Send Message',
     typeMessage: 'Type a message...',
-    
+
     // Profile
     personalInfo: 'Personal Info',
     rideHistory: 'Ride History',
@@ -259,18 +259,18 @@ const translations = {
     totalTrips: 'Total Trips',
     completedTrips: 'Completed Trips',
     averageRating: 'Average Rating',
-    
+
     // Rating
     rateDriver: 'Rate Driver',
     ratePassenger: 'Rate Passenger',
     rating: 'Rating',
     comment: 'Comment',
     submitRating: 'Submit Rating',
-    
+
     // Time formats
     am: 'AM',
     pm: 'PM',
-    
+
     // Days
     sunday: 'Sunday',
     monday: 'Monday',
@@ -279,7 +279,7 @@ const translations = {
     thursday: 'Thursday',
     friday: 'Friday',
     saturday: 'Saturday',
-    
+
     // Months
     january: 'January',
     february: 'February',
@@ -292,8 +292,8 @@ const translations = {
     september: 'September',
     october: 'October',
     november: 'November',
-    december: 'December'
-  }
+    december: 'December',
+  },
 };
 
 export const LanguageProvider = ({ children }) => {
@@ -309,17 +309,17 @@ export const LanguageProvider = ({ children }) => {
     // Update direction when language changes
     const newDirection = language === 'ar' ? 'rtl' : 'ltr';
     setDirection(newDirection);
-    
+
     // Update document direction
     document.documentElement.dir = newDirection;
     document.documentElement.lang = language;
-    
+
     // Save to localStorage
     localStorage.setItem('app-language', language);
   }, [language]);
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'ar' ? 'en' : 'ar');
+    setLanguage((prev) => (prev === 'ar' ? 'en' : 'ar'));
   };
 
   const t = (key) => {
@@ -331,9 +331,9 @@ export const LanguageProvider = ({ children }) => {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     };
-    
+
     const locale = language === 'ar' ? 'ar-EG' : 'en-US';
     return new Date(date).toLocaleDateString(locale, { ...defaultOptions, ...options });
   };
@@ -342,11 +342,14 @@ export const LanguageProvider = ({ children }) => {
     const defaultOptions = {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     };
-    
+
     const locale = language === 'ar' ? 'ar-EG' : 'en-US';
-    return new Date(`2000-01-01T${time}`).toLocaleTimeString(locale, { ...defaultOptions, ...options });
+    return new Date(`2000-01-01T${time}`).toLocaleTimeString(locale, {
+      ...defaultOptions,
+      ...options,
+    });
   };
 
   const value = {
@@ -358,15 +361,10 @@ export const LanguageProvider = ({ children }) => {
     formatTime,
     isRTL: direction === 'rtl',
     isArabic: language === 'ar',
-    isEnglish: language === 'en'
+    isEnglish: language === 'en',
   };
 
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export default LanguageContext;
-

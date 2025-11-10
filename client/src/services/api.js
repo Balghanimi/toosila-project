@@ -1,6 +1,7 @@
 // Determine API base URL based on environment
 // Force rebuild - updated 2025-10-22
-const API_BASE_URL = process.env.REACT_APP_API_URL ||
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'production'
     ? 'https://toosila-backend-production.up.railway.app/api'
     : 'http://localhost:5000/api');
@@ -11,7 +12,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
     const headers = {
       'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
 
@@ -50,7 +51,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
       // If there are validation details, include them
       if (data.details && Array.isArray(data.details) && data.details.length > 0) {
-        const detailMessages = data.details.map(d => `${d.field}: ${d.message}`).join(', ');
+        const detailMessages = data.details.map((d) => `${d.field}: ${d.message}`).join(', ');
         errorMessage = `${errorMessage} - ${detailMessages}`;
       }
 
@@ -73,7 +74,7 @@ export const authAPI = {
         email: userData.email.toLowerCase().trim(),
         password: userData.password,
         isDriver: userData.userType === 'driver', // Use selected userType from form
-        languagePreference: 'ar'
+        languagePreference: 'ar',
       }),
     });
   },
@@ -406,4 +407,3 @@ export const adminAPI = {
 };
 
 export default apiRequest;
-

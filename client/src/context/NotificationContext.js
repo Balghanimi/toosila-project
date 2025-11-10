@@ -17,7 +17,7 @@ export const NotificationProvider = ({ children }) => {
   const [pendingBookings, setPendingBookings] = useState({
     receivedPending: 0,
     sentPending: 0,
-    totalPending: 0
+    totalPending: 0,
   });
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [toasts, setToasts] = useState([]);
@@ -82,23 +82,26 @@ export const NotificationProvider = ({ children }) => {
 
   // Remove toast
   const removeToast = useCallback((id) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   // Show toast notification
-  const showToast = useCallback((message, type = 'info', duration = 5000) => {
-    const id = Date.now();
-    const toast = { id, message, type, duration };
+  const showToast = useCallback(
+    (message, type = 'info', duration = 5000) => {
+      const id = Date.now();
+      const toast = { id, message, type, duration };
 
-    setToasts(prev => [...prev, toast]);
+      setToasts((prev) => [...prev, toast]);
 
-    // Auto remove after duration
-    setTimeout(() => {
-      removeToast(id);
-    }, duration);
+      // Auto remove after duration
+      setTimeout(() => {
+        removeToast(id);
+      }, duration);
 
-    return id;
-  }, [removeToast]);
+      return id;
+    },
+    [removeToast]
+  );
 
   // Helper methods for different toast types
   const showSuccess = useCallback((message) => showToast(message, 'success'), [showToast]);
@@ -117,7 +120,7 @@ export const NotificationProvider = ({ children }) => {
     showError,
     showWarning,
     showInfo,
-    removeToast
+    removeToast,
   };
 
   return (
@@ -144,10 +147,10 @@ const ToastContainer = ({ toasts, removeToast }) => {
         flexDirection: 'column',
         gap: 'var(--space-2)',
         maxWidth: '90%',
-        width: '400px'
+        width: '400px',
       }}
     >
-      {toasts.map(toast => (
+      {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
     </div>
@@ -158,10 +161,14 @@ const ToastContainer = ({ toasts, removeToast }) => {
 const Toast = ({ toast, onClose }) => {
   const getToastColor = () => {
     switch (toast.type) {
-      case 'success': return { bg: '#34c759', icon: '✅' };
-      case 'error': return { bg: '#dc2626', icon: '❌' };
-      case 'warning': return { bg: '#fbbf24', icon: '⚠️' };
-      default: return { bg: '#3b82f6', icon: 'ℹ️' };
+      case 'success':
+        return { bg: '#34c759', icon: '✅' };
+      case 'error':
+        return { bg: '#dc2626', icon: '❌' };
+      case 'warning':
+        return { bg: '#fbbf24', icon: '⚠️' };
+      default:
+        return { bg: '#3b82f6', icon: 'ℹ️' };
     }
   };
 
@@ -181,7 +188,7 @@ const Toast = ({ toast, onClose }) => {
         gap: 'var(--space-3)',
         fontFamily: '"Cairo", sans-serif',
         animation: 'slideInDown 0.3s ease-out',
-        minHeight: '60px'
+        minHeight: '60px',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1 }}>
@@ -204,7 +211,7 @@ const Toast = ({ toast, onClose }) => {
           cursor: 'pointer',
           fontSize: 'var(--text-lg)',
           color: 'white',
-          flexShrink: 0
+          flexShrink: 0,
         }}
       >
         ✕

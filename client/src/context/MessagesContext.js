@@ -55,31 +55,34 @@ export const MessagesProvider = ({ children }) => {
   }, [currentUser]);
 
   // Fetch specific conversation messages
-  const fetchConversation = useCallback(async (userId) => {
-    if (!currentUser) return;
+  const fetchConversation = useCallback(
+    async (userId) => {
+      if (!currentUser) return;
 
-    try {
-      setLoading(true);
-      const response = await messagesAPI.getConversation(userId);
-      setCurrentConversation(response.messages || []);
+      try {
+        setLoading(true);
+        const response = await messagesAPI.getConversation(userId);
+        setCurrentConversation(response.messages || []);
 
-      // Auto mark as read when viewing conversation
-      if (response.messages && response.messages.length > 0) {
-        const unreadMessages = response.messages.filter(
-          msg => msg.sender_id !== currentUser.id && !msg.read
-        );
-        for (const msg of unreadMessages) {
-          await messagesAPI.markAsRead(msg.id);
+        // Auto mark as read when viewing conversation
+        if (response.messages && response.messages.length > 0) {
+          const unreadMessages = response.messages.filter(
+            (msg) => msg.sender_id !== currentUser.id && !msg.read
+          );
+          for (const msg of unreadMessages) {
+            await messagesAPI.markAsRead(msg.id);
+          }
+          // Refresh unread count after marking as read
+          fetchUnreadCount();
         }
-        // Refresh unread count after marking as read
-        fetchUnreadCount();
+      } catch (error) {
+        console.error('Error fetching conversation:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching conversation:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser, fetchUnreadCount]);
+    },
+    [currentUser, fetchUnreadCount]
+  );
 
   // Load conversations on mount
   useEffect(() => {
@@ -117,7 +120,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   // Get messages (wrapper for backward compatibility)
-  const getMessages = (userId) => {
+  const getMessages = () => {
     return currentConversation;
   };
 
@@ -149,12 +152,8 @@ export const MessagesProvider = ({ children }) => {
     getUserConversations,
     fetchConversations,
     fetchConversation,
-    fetchUnreadCount
+    fetchUnreadCount,
   };
 
-  return (
-    <MessagesContext.Provider value={value}>
-      {children}
-    </MessagesContext.Provider>
-  );
+  return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;
 };

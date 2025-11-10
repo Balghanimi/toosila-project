@@ -41,16 +41,16 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
       if (diffInHours < 1) {
         return 'الآن';
       } else if (diffInHours < 24) {
-        return date.toLocaleTimeString('ar-IQ', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
+        return date.toLocaleTimeString('ar-IQ', {
+          hour: '2-digit',
+          minute: '2-digit',
         });
       } else if (diffInHours < 48) {
         return 'أمس';
       } else {
-        return date.toLocaleDateString('ar-IQ', { 
-          month: 'short', 
-          day: 'numeric'
+        return date.toLocaleDateString('ar-IQ', {
+          month: 'short',
+          day: 'numeric',
         });
       }
     } catch {
@@ -60,22 +60,27 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
 
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
-    
+
     const regex = new RegExp(`(${searchTerm})`, 'gi');
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
+
+    return parts.map((part, index) =>
       regex.test(part) ? (
-        <mark key={index} style={{
-          background: 'var(--warning)',
-          color: 'var(--text-primary)',
-          padding: '2px 4px',
-          borderRadius: 'var(--radius)',
-          fontWeight: '600'
-        }}>
+        <mark
+          key={index}
+          style={{
+            background: 'var(--warning)',
+            color: 'var(--text-primary)',
+            padding: '2px 4px',
+            borderRadius: 'var(--radius)',
+            fontWeight: '600',
+          }}
+        >
           {part}
         </mark>
-      ) : part
+      ) : (
+        part
+      )
     );
   };
 
@@ -89,46 +94,54 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      paddingTop: '10vh',
-      zIndex: 1000
-    }}>
-      <div style={{
-        background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-xl)',
-        border: '1px solid var(--border-light)',
-        boxShadow: 'var(--shadow-xl)',
-        width: '90%',
-        maxWidth: '600px',
-        maxHeight: '80vh',
-        overflow: 'hidden',
-        direction: 'rtl'
-      }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '10vh',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          background: 'var(--surface-primary)',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid var(--border-light)',
+          boxShadow: 'var(--shadow-xl)',
+          width: '90%',
+          maxWidth: '600px',
+          maxHeight: '80vh',
+          overflow: 'hidden',
+          direction: 'rtl',
+        }}
+      >
         {/* Header */}
-        <div style={{
-          padding: 'var(--space-4)',
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-          color: 'white',
-          borderBottom: '1px solid var(--border-light)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <h3 style={{
-            margin: 0,
-            fontSize: 'var(--text-lg)',
-            fontWeight: '700',
-            fontFamily: '"Cairo", sans-serif'
-          }}>
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+            color: 'white',
+            borderBottom: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 'var(--text-lg)',
+              fontWeight: '700',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
             🔍 البحث في الرسائل
           </h3>
           <button
@@ -145,7 +158,7 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
               cursor: 'pointer',
               color: 'white',
               fontSize: 'var(--text-lg)',
-              transition: 'var(--transition)'
+              transition: 'var(--transition)',
             }}
             onMouseEnter={(e) => {
               e.target.style.background = 'rgba(255, 255, 255, 0.3)';
@@ -159,16 +172,20 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
         </div>
 
         {/* Search Controls */}
-        <div style={{
-          padding: 'var(--space-4)',
-          borderBottom: '1px solid var(--border-light)'
-        }}>
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            borderBottom: '1px solid var(--border-light)',
+          }}
+        >
           {/* Search Type Toggle */}
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-2)',
-            marginBottom: 'var(--space-3)'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 'var(--space-2)',
+              marginBottom: 'var(--space-3)',
+            }}
+          >
             <button
               onClick={() => setSearchType('messages')}
               style={{
@@ -180,12 +197,9 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
                 cursor: 'pointer',
                 transition: 'var(--transition)',
                 fontFamily: '"Cairo", sans-serif',
-                background: searchType === 'messages' 
-                  ? 'var(--primary)' 
-                  : 'var(--surface-secondary)',
-                color: searchType === 'messages' 
-                  ? 'white' 
-                  : 'var(--text-secondary)'
+                background:
+                  searchType === 'messages' ? 'var(--primary)' : 'var(--surface-secondary)',
+                color: searchType === 'messages' ? 'white' : 'var(--text-secondary)',
               }}
             >
               💬 الرسائل
@@ -201,12 +215,9 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
                 cursor: 'pointer',
                 transition: 'var(--transition)',
                 fontFamily: '"Cairo", sans-serif',
-                background: searchType === 'conversations' 
-                  ? 'var(--primary)' 
-                  : 'var(--surface-secondary)',
-                color: searchType === 'conversations' 
-                  ? 'white' 
-                  : 'var(--text-secondary)'
+                background:
+                  searchType === 'conversations' ? 'var(--primary)' : 'var(--surface-secondary)',
+                color: searchType === 'conversations' ? 'white' : 'var(--text-secondary)',
               }}
             >
               👥 المحادثات
@@ -231,7 +242,7 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
                 color: 'var(--text-primary)',
                 outline: 'none',
                 direction: 'rtl',
-                transition: 'var(--transition)'
+                transition: 'var(--transition)',
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -242,33 +253,39 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
                 e.target.style.boxShadow = 'none';
               }}
             />
-            <div style={{
-              position: 'absolute',
-              left: 'var(--space-3)',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              fontSize: 'var(--text-lg)',
-              color: isSearching ? 'var(--primary)' : 'var(--text-muted)',
-              animation: isSearching ? 'spin 1s linear infinite' : 'none'
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                left: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: 'var(--text-lg)',
+                color: isSearching ? 'var(--primary)' : 'var(--text-muted)',
+                animation: isSearching ? 'spin 1s linear infinite' : 'none',
+              }}
+            >
               {isSearching ? '⟳' : '🔍'}
             </div>
           </div>
         </div>
 
         {/* Search Results */}
-        <div style={{
-          maxHeight: '400px',
-          overflowY: 'auto',
-          padding: 'var(--space-2)'
-        }}>
+        <div
+          style={{
+            maxHeight: '400px',
+            overflowY: 'auto',
+            padding: 'var(--space-2)',
+          }}
+        >
           {searchTerm && !isSearching && searchResults.length === 0 && (
-            <div style={{
-              padding: 'var(--space-8)',
-              textAlign: 'center',
-              color: 'var(--text-muted)',
-              fontFamily: '"Cairo", sans-serif'
-            }}>
+            <div
+              style={{
+                padding: 'var(--space-8)',
+                textAlign: 'center',
+                color: 'var(--text-muted)',
+                fontFamily: '"Cairo", sans-serif',
+              }}
+            >
               <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>🔍</div>
               <div>لم يتم العثور على نتائج</div>
               <div style={{ fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)' }}>
@@ -288,7 +305,7 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
                 marginBottom: 'var(--space-2)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
-                background: 'var(--surface-primary)'
+                background: 'var(--surface-primary)',
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = 'var(--surface-secondary)';
@@ -303,67 +320,83 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
             >
               {searchType === 'messages' ? (
                 <div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 'var(--space-1)'
-                  }}>
-                    <span style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      color: 'var(--text-primary)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 'var(--space-1)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {result.otherUserId}
                     </span>
-                    <span style={{
-                      fontSize: 'var(--text-xs)',
-                      color: 'var(--text-muted)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: 'var(--text-muted)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {formatTime(result.timestamp)}
                     </span>
                   </div>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif',
-                    lineHeight: '1.4'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--text-secondary)',
+                      fontFamily: '"Cairo", sans-serif',
+                      lineHeight: '1.4',
+                    }}
+                  >
                     {highlightText(result.content, searchTerm)}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 'var(--space-1)'
-                  }}>
-                    <span style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      color: 'var(--text-primary)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 'var(--space-1)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {highlightText(result.otherUserName, searchTerm)}
                     </span>
-                    <span style={{
-                      fontSize: 'var(--text-xs)',
-                      color: 'var(--text-muted)',
-                      fontFamily: '"Cairo", sans-serif'
-                    }}>
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: 'var(--text-muted)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
                       {formatTime(result.lastMessage.timestamp)}
                     </span>
                   </div>
-                  <div style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif',
-                    lineHeight: '1.4'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--text-secondary)',
+                      fontFamily: '"Cairo", sans-serif',
+                      lineHeight: '1.4',
+                    }}
+                  >
                     {highlightText(result.lastMessage.content, searchTerm)}
                   </div>
                 </div>
@@ -384,5 +417,3 @@ const MessageSearch = ({ onSelectMessage, onClose }) => {
 };
 
 export default MessageSearch;
-
-

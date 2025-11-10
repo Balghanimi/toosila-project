@@ -12,7 +12,7 @@ const AdminDashboard = () => {
     offers: null,
     demands: null,
     messages: null,
-    verifications: null
+    verifications: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,12 +27,16 @@ const AdminDashboard = () => {
       setError(null);
 
       const [bookings, ratings, offers, demands, messages, verifications] = await Promise.all([
-        adminAPI.getBookingStats().catch(() => ({ data: { total: 0, pending: 0, confirmed: 0, completed: 0 } })),
+        adminAPI
+          .getBookingStats()
+          .catch(() => ({ data: { total: 0, pending: 0, confirmed: 0, completed: 0 } })),
         adminAPI.getRatingStats().catch(() => ({ data: { totalRatings: 0, averageRating: 0 } })),
         adminAPI.getOfferStats().catch(() => ({ data: { total: 0, active: 0 } })),
         adminAPI.getDemandStats().catch(() => ({ data: { total: 0, active: 0 } })),
         adminAPI.getMessageStats().catch(() => ({ data: { total: 0 } })),
-        adminAPI.getVerificationStats().catch(() => ({ data: { pending: 0, approved: 0, rejected: 0 } }))
+        adminAPI
+          .getVerificationStats()
+          .catch(() => ({ data: { pending: 0, approved: 0, rejected: 0 } })),
       ]);
 
       setStats({
@@ -41,7 +45,7 @@ const AdminDashboard = () => {
         offers: offers.data,
         demands: demands.data,
         messages: messages.data,
-        verifications: verifications.data
+        verifications: verifications.data,
       });
     } catch (err) {
       console.error('Error fetching stats:', err);
@@ -63,9 +67,7 @@ const AdminDashboard = () => {
   if (error) {
     return (
       <div className="admin-error">
-        <div className="alert-pro alert-pro-error">
-          {error}
-        </div>
+        <div className="alert-pro alert-pro-error">{error}</div>
         <button onClick={fetchAllStats} className="btn-pro btn-pro-primary">
           إعادة المحاولة
         </button>
@@ -91,10 +93,14 @@ const AdminDashboard = () => {
             <div className="stat-value">{stats.bookings?.total || 0}</div>
             <div className="stat-details">
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-warning">معلق: {stats.bookings?.pending || 0}</span>
+                <span className="badge-pro badge-pro-warning">
+                  معلق: {stats.bookings?.pending || 0}
+                </span>
               </span>
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-success">مكتمل: {stats.bookings?.completed || 0}</span>
+                <span className="badge-pro badge-pro-success">
+                  مكتمل: {stats.bookings?.completed || 0}
+                </span>
               </span>
             </div>
           </div>
@@ -108,10 +114,14 @@ const AdminDashboard = () => {
             <div className="stat-value">{stats.verifications?.pending || 0}</div>
             <div className="stat-details">
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-success">موافق: {stats.verifications?.approved || 0}</span>
+                <span className="badge-pro badge-pro-success">
+                  موافق: {stats.verifications?.approved || 0}
+                </span>
               </span>
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-error">مرفوض: {stats.verifications?.rejected || 0}</span>
+                <span className="badge-pro badge-pro-error">
+                  مرفوض: {stats.verifications?.rejected || 0}
+                </span>
               </span>
             </div>
           </div>
@@ -125,7 +135,9 @@ const AdminDashboard = () => {
             <div className="stat-value">{stats.offers?.total || 0}</div>
             <div className="stat-details">
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-success">نشط: {stats.offers?.active || 0}</span>
+                <span className="badge-pro badge-pro-success">
+                  نشط: {stats.offers?.active || 0}
+                </span>
               </span>
             </div>
           </div>
@@ -139,7 +151,9 @@ const AdminDashboard = () => {
             <div className="stat-value">{stats.demands?.total || 0}</div>
             <div className="stat-details">
               <span className="stat-detail-item">
-                <span className="badge-pro badge-pro-success">نشط: {stats.demands?.active || 0}</span>
+                <span className="badge-pro badge-pro-success">
+                  نشط: {stats.demands?.active || 0}
+                </span>
               </span>
             </div>
           </div>
@@ -175,18 +189,30 @@ const AdminDashboard = () => {
       <div className="admin-quick-actions">
         <h2 className="admin-section-title">إجراءات سريعة</h2>
         <div className="admin-actions-grid">
-          <Card interactive className="admin-action-card" onClick={() => window.location.href = '/admin/verification'}>
+          <Card
+            interactive
+            className="admin-action-card"
+            onClick={() => (window.location.href = '/admin/verification')}
+          >
             <div className="action-icon">✅</div>
             <div className="action-title">مراجعة طلبات التحقق</div>
             <div className="action-badge">{stats.verifications?.pending || 0} معلق</div>
           </Card>
 
-          <Card interactive className="admin-action-card" onClick={() => window.location.href = '/admin/users'}>
+          <Card
+            interactive
+            className="admin-action-card"
+            onClick={() => (window.location.href = '/admin/users')}
+          >
             <div className="action-icon">👥</div>
             <div className="action-title">إدارة المستخدمين</div>
           </Card>
 
-          <Card interactive className="admin-action-card" onClick={() => window.location.href = '/admin/statistics'}>
+          <Card
+            interactive
+            className="admin-action-card"
+            onClick={() => (window.location.href = '/admin/statistics')}
+          >
             <div className="action-icon">📊</div>
             <div className="action-title">عرض الإحصائيات التفصيلية</div>
           </Card>

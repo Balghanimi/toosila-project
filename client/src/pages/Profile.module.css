@@ -111,7 +111,8 @@ body.dark-mode .decorCircle2 {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -158,7 +159,8 @@ body.dark-mode .decorCircle2 {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
   }
   50% {
@@ -491,7 +493,9 @@ body.dark-mode .actionCard {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

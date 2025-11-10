@@ -303,7 +303,9 @@ body.dark-mode .header {
 }
 
 .loginButton:focus-visible {
-  box-shadow: var(--focus-ring), 0 4px 12px rgba(52, 199, 89, 0.35);
+  box-shadow:
+    var(--focus-ring),
+    0 4px 12px rgba(52, 199, 89, 0.35);
 }
 
 .loginButton:active {
@@ -598,7 +600,7 @@ body.dark-mode .header {
   .loginButton {
     display: none;
   }
-  
+
   .header {
     border-bottom: 1px solid var(--border-dark);
     box-shadow: none;

@@ -17,14 +17,16 @@ function NotificationSkeleton({ count = 3 }) {
           key={index}
           style={{
             padding: '16px',
-            borderBottom: index < count - 1 ? '1px solid #f3f4f6' : 'none'
+            borderBottom: index < count - 1 ? '1px solid #f3f4f6' : 'none',
           }}
         >
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            direction: 'rtl'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              direction: 'rtl',
+            }}
+          >
             {/* أيقونة Skeleton */}
             <div
               style={{
@@ -33,7 +35,7 @@ function NotificationSkeleton({ count = 3 }) {
                 backgroundColor: '#e5e7eb',
                 borderRadius: '50%',
                 flexShrink: 0,
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               }}
             ></div>
 
@@ -47,7 +49,7 @@ function NotificationSkeleton({ count = 3 }) {
                   borderRadius: '4px',
                   width: '75%',
                   marginBottom: '8px',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                 }}
               ></div>
 
@@ -60,7 +62,7 @@ function NotificationSkeleton({ count = 3 }) {
                   width: '100%',
                   marginBottom: '6px',
                   animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                  animationDelay: '0.1s'
+                  animationDelay: '0.1s',
                 }}
               ></div>
 
@@ -73,7 +75,7 @@ function NotificationSkeleton({ count = 3 }) {
                   width: '60%',
                   marginBottom: '8px',
                   animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                  animationDelay: '0.2s'
+                  animationDelay: '0.2s',
                 }}
               ></div>
 
@@ -85,7 +87,7 @@ function NotificationSkeleton({ count = 3 }) {
                   borderRadius: '4px',
                   width: '25%',
                   animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                  animationDelay: '0.3s'
+                  animationDelay: '0.3s',
                 }}
               ></div>
             </div>

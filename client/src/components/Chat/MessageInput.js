@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب رسالتك هنا...", maxLength = 1000 }) => {
+const MessageInput = ({
+  onSendMessage,
+  disabled = false,
+  placeholder = 'اكتب رسالتك هنا...',
+  maxLength = 1000,
+}) => {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -19,49 +24,49 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
   // Validate message content
   const validateMessage = (content) => {
     const trimmedContent = content.trim();
-    
+
     if (!trimmedContent) {
       return 'الرسالة لا يمكن أن تكون فارغة';
     }
-    
+
     if (trimmedContent.length < 2) {
       return 'الرسالة قصيرة جداً';
     }
-    
+
     if (trimmedContent.length > maxLength) {
       return `الرسالة طويلة جداً (الحد الأقصى ${maxLength} حرف)`;
     }
-    
+
     // Check for spam patterns
     const repeatedChars = /(.)\1{10,}/.test(trimmedContent);
     if (repeatedChars) {
       return 'الرسالة تحتوي على تكرار مفرط';
     }
-    
+
     // Check for excessive whitespace
     const excessiveWhitespace = /\s{5,}/.test(trimmedContent);
     if (excessiveWhitespace) {
       return 'الرسالة تحتوي على مسافات مفرطة';
     }
-    
+
     return null; // No errors
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (disabled || isSending) return;
-    
+
     const validationError = validateMessage(message);
     if (validationError) {
       setError(validationError);
       setTimeout(() => setError(''), 3000);
       return;
     }
-    
+
     setIsSending(true);
     setError('');
-    
+
     try {
       await onSendMessage(message.trim());
       setMessage('');
@@ -84,16 +89,16 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    
+
     // Limit character count
     if (value.length > maxLength) {
       return; // Don't update if exceeding limit
     }
-    
+
     setMessage(value);
     setCharCount(value.length);
     setError(''); // Clear any previous errors
-    
+
     // Typing indicator logic
     if (value.trim() && !isTyping) {
       setIsTyping(true);
@@ -112,24 +117,29 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      display: 'flex',
-      alignItems: 'flex-end',
-      gap: 'var(--space-2)',
-      padding: 'var(--space-3)',
-      background: 'var(--surface-primary)',
-      borderRadius: 'var(--radius-lg)',
-      border: '1px solid var(--border-light)',
-      boxShadow: 'var(--shadow-sm)',
-      direction: 'rtl'
-    }}>
-      {/* Message input */}
-      <div style={{
-        flex: 1,
-        position: 'relative',
+    <form
+      onSubmit={handleSubmit}
+      style={{
         display: 'flex',
-        alignItems: 'flex-end'
-      }}>
+        alignItems: 'flex-end',
+        gap: 'var(--space-2)',
+        padding: 'var(--space-3)',
+        background: 'var(--surface-primary)',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border-light)',
+        boxShadow: 'var(--shadow-sm)',
+        direction: 'rtl',
+      }}
+    >
+      {/* Message input */}
+      <div
+        style={{
+          flex: 1,
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'flex-end',
+        }}
+      >
         <textarea
           ref={textareaRef}
           value={message}
@@ -154,41 +164,50 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
             textAlign: 'right',
             lineHeight: '1.5',
             borderRadius: 'var(--radius)',
-            transition: 'var(--transition)'
+            transition: 'var(--transition)',
           }}
         />
-        
+
         {/* Character count */}
         {charCount > 0 && (
-          <div style={{
-            position: 'absolute',
-            bottom: '4px',
-            left: '8px',
-            fontSize: 'var(--text-xs)',
-            color: charCount > maxLength * 0.8 ? 'var(--warning)' : charCount > maxLength * 0.9 ? 'var(--error)' : 'var(--text-muted)',
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '500'
-          }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '4px',
+              left: '8px',
+              fontSize: 'var(--text-xs)',
+              color:
+                charCount > maxLength * 0.8
+                  ? 'var(--warning)'
+                  : charCount > maxLength * 0.9
+                    ? 'var(--error)'
+                    : 'var(--text-muted)',
+              fontFamily: '"Cairo", sans-serif',
+              fontWeight: '500',
+            }}
+          >
             {charCount}/{maxLength}
           </div>
         )}
-        
+
         {/* Error message */}
         {error && (
-          <div style={{
-            position: 'absolute',
-            top: '-30px',
-            right: '0',
-            background: 'var(--error)',
-            color: 'white',
-            padding: 'var(--space-2) var(--space-3)',
-            borderRadius: 'var(--radius-lg)',
-            fontSize: 'var(--text-sm)',
-            fontFamily: '"Cairo", sans-serif',
-            fontWeight: '500',
-            boxShadow: 'var(--shadow-md)',
-            animation: 'slideDown 0.3s ease-out'
-          }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '0',
+              background: 'var(--error)',
+              color: 'white',
+              padding: 'var(--space-2) var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 'var(--text-sm)',
+              fontFamily: '"Cairo", sans-serif',
+              fontWeight: '500',
+              boxShadow: 'var(--shadow-md)',
+              animation: 'slideDown 0.3s ease-out',
+            }}
+          >
             {error}
           </div>
         )}
@@ -203,9 +222,10 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
           height: '48px',
           borderRadius: '50%',
           border: 'none',
-          background: message.trim() && !disabled && !isSending
-            ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-            : 'var(--text-muted)',
+          background:
+            message.trim() && !disabled && !isSending
+              ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+              : 'var(--text-muted)',
           color: 'white',
           cursor: message.trim() && !disabled && !isSending ? 'pointer' : 'not-allowed',
           display: 'flex',
@@ -214,7 +234,7 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
           fontSize: 'var(--text-lg)',
           transition: 'var(--transition)',
           boxShadow: message.trim() && !disabled ? 'var(--shadow-md)' : 'none',
-          opacity: message.trim() && !disabled ? 1 : 0.5
+          opacity: message.trim() && !disabled ? 1 : 0.5,
         }}
         onMouseEnter={(e) => {
           if (message.trim() && !disabled) {
@@ -240,23 +260,27 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
         }}
       >
         {isSending ? (
-          <div style={{
-            width: '20px',
-            height: '20px',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            borderTop: '2px solid white',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid rgba(255, 255, 255, 0.3)',
+              borderTop: '2px solid white',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
         ) : disabled ? (
-          <div style={{
-            width: '16px',
-            height: '16px',
-            border: '2px solid rgba(255,255,255,0.3)',
-            borderTop: '2px solid white',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
+          <div
+            style={{
+              width: '16px',
+              height: '16px',
+              border: '2px solid rgba(255,255,255,0.3)',
+              borderTop: '2px solid white',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
         ) : (
           '📤'
         )}
@@ -264,44 +288,52 @@ const MessageInput = ({ onSendMessage, disabled = false, placeholder = "اكتب
 
       {/* Typing indicator */}
       {isTyping && (
-        <div style={{
-          position: 'absolute',
-          bottom: '60px',
-          right: 'var(--space-3)',
-          background: 'var(--surface-primary)',
-          padding: 'var(--space-2) var(--space-3)',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--border-light)',
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-secondary)',
-          fontFamily: '"Cairo", sans-serif',
-          boxShadow: 'var(--shadow-sm)',
-          animation: 'fadeInUp 0.3s ease-out'
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '60px',
+            right: 'var(--space-3)',
+            background: 'var(--surface-primary)',
+            padding: 'var(--space-2) var(--space-3)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-light)',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-secondary)',
+            fontFamily: '"Cairo", sans-serif',
+            boxShadow: 'var(--shadow-sm)',
+            animation: 'fadeInUp 0.3s ease-out',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
             <span>يكتب</span>
             <div style={{ display: 'flex', gap: '2px' }}>
-              <div style={{
-                width: '4px',
-                height: '4px',
-                background: 'var(--primary)',
-                borderRadius: '50%',
-                animation: 'bounce 1.4s infinite ease-in-out'
-              }} />
-              <div style={{
-                width: '4px',
-                height: '4px',
-                background: 'var(--primary)',
-                borderRadius: '50%',
-                animation: 'bounce 1.4s infinite ease-in-out 0.2s'
-              }} />
-              <div style={{
-                width: '4px',
-                height: '4px',
-                background: 'var(--primary)',
-                borderRadius: '50%',
-                animation: 'bounce 1.4s infinite ease-in-out 0.4s'
-              }} />
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out',
+                }}
+              />
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out 0.2s',
+                }}
+              />
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out 0.4s',
+                }}
+              />
             </div>
           </div>
         </div>

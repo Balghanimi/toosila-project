@@ -15,7 +15,7 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
@@ -95,9 +95,7 @@ class ErrorBoundary extends Component {
               </button>
             </div>
 
-            <p style={styles.helpText}>
-              If this problem persists, please contact support.
-            </p>
+            <p style={styles.helpText}>If this problem persists, please contact support.</p>
           </div>
         </div>
       );

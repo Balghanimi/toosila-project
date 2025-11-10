@@ -19,7 +19,7 @@ export const BookingsProvider = ({ children }) => {
     try {
       const savedBookings = localStorage.getItem('bookings');
       const savedRequests = localStorage.getItem('bookingRequests');
-      
+
       if (savedBookings) {
         setBookings(JSON.parse(savedBookings));
       }
@@ -58,7 +58,7 @@ export const BookingsProvider = ({ children }) => {
   const createBookingRequest = (passengerId, driverId, tripId, tripInfo, passengerInfo) => {
     const bookingId = generateBookingId();
     const timestamp = new Date().toISOString();
-    
+
     const bookingRequest = {
       id: bookingId,
       passengerId,
@@ -72,13 +72,13 @@ export const BookingsProvider = ({ children }) => {
       updatedAt: timestamp,
       messages: [],
       paymentStatus: 'pending', // pending, paid, refunded
-      rating: null
+      rating: null,
     };
 
     // Add to booking requests
-    setBookingRequests(prev => ({
+    setBookingRequests((prev) => ({
       ...prev,
-      [bookingId]: bookingRequest
+      [bookingId]: bookingRequest,
     }));
 
     return bookingRequest;
@@ -86,49 +86,50 @@ export const BookingsProvider = ({ children }) => {
 
   // Accept a booking request
   const acceptBooking = (bookingId) => {
-    setBookingRequests(prev => {
+    setBookingRequests((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       const updatedRequest = {
         ...prev[bookingId],
         status: 'accepted',
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Move to confirmed bookings
-      setBookings(prevBookings => ({
+      setBookings((prevBookings) => ({
         ...prevBookings,
-        [bookingId]: updatedRequest
+        [bookingId]: updatedRequest,
       }));
 
       // Remove from pending requests
-      const { [bookingId]: removed, ...remaining } = prev;
+      // eslint-disable-next-line no-unused-vars
+      const { [bookingId]: _removed, ...remaining } = prev;
       return remaining;
     });
   };
 
   // Reject a booking request
   const rejectBooking = (bookingId, reason = '') => {
-    setBookingRequests(prev => {
+    setBookingRequests((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       return {
         ...prev,
         [bookingId]: {
           ...prev[bookingId],
           status: 'rejected',
           rejectionReason: reason,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     });
   };
 
   // Cancel a booking
   const cancelBooking = (bookingId, reason = '', cancelledBy = 'passenger') => {
-    setBookings(prev => {
+    setBookings((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       return {
         ...prev,
         [bookingId]: {
@@ -136,25 +137,25 @@ export const BookingsProvider = ({ children }) => {
           status: 'cancelled',
           cancellationReason: reason,
           cancelledBy,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     });
   };
 
   // Complete a booking
   const completeBooking = (bookingId) => {
-    setBookings(prev => {
+    setBookings((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       return {
         ...prev,
         [bookingId]: {
           ...prev[bookingId],
           status: 'completed',
           completedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     });
   };
@@ -162,27 +163,29 @@ export const BookingsProvider = ({ children }) => {
   // Get bookings for a user
   const getUserBookings = (userId, userType = 'passenger') => {
     const userBookings = [];
-    
+
     // Check confirmed bookings
-    Object.values(bookings).forEach(booking => {
-      if ((userType === 'passenger' && booking.passengerId === userId) ||
-          (userType === 'driver' && booking.driverId === userId)) {
+    Object.values(bookings).forEach((booking) => {
+      if (
+        (userType === 'passenger' && booking.passengerId === userId) ||
+        (userType === 'driver' && booking.driverId === userId)
+      ) {
         userBookings.push(booking);
       }
     });
 
     // Check pending requests
-    Object.values(bookingRequests).forEach(request => {
-      if ((userType === 'passenger' && request.passengerId === userId) ||
-          (userType === 'driver' && request.driverId === userId)) {
+    Object.values(bookingRequests).forEach((request) => {
+      if (
+        (userType === 'passenger' && request.passengerId === userId) ||
+        (userType === 'driver' && request.driverId === userId)
+      ) {
         userBookings.push(request);
       }
     });
 
     // Sort by creation date (newest first)
-    return userBookings.sort((a, b) => 
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+    return userBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   };
 
   // Get booking by ID
@@ -193,24 +196,24 @@ export const BookingsProvider = ({ children }) => {
   // Get pending requests for a driver
   const getDriverPendingRequests = (driverId) => {
     return Object.values(bookingRequests).filter(
-      request => request.driverId === driverId && request.status === 'pending'
+      (request) => request.driverId === driverId && request.status === 'pending'
     );
   };
 
   // Get booking statistics
   const getBookingStats = (userId, userType = 'passenger') => {
     const userBookings = getUserBookings(userId, userType);
-    
+
     const stats = {
       total: userBookings.length,
       pending: 0,
       accepted: 0,
       completed: 0,
       cancelled: 0,
-      rejected: 0
+      rejected: 0,
     };
 
-    userBookings.forEach(booking => {
+    userBookings.forEach((booking) => {
       stats[booking.status] = (stats[booking.status] || 0) + 1;
     });
 
@@ -225,49 +228,49 @@ export const BookingsProvider = ({ children }) => {
     const updatedMessage = {
       ...message,
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (bookings[bookingId]) {
-      setBookings(prev => ({
+      setBookings((prev) => ({
         ...prev,
         [bookingId]: {
           ...prev[bookingId],
-          messages: [...(prev[bookingId].messages || []), updatedMessage]
-        }
+          messages: [...(prev[bookingId].messages || []), updatedMessage],
+        },
       }));
     } else if (bookingRequests[bookingId]) {
-      setBookingRequests(prev => ({
+      setBookingRequests((prev) => ({
         ...prev,
         [bookingId]: {
           ...prev[bookingId],
-          messages: [...(prev[bookingId].messages || []), updatedMessage]
-        }
+          messages: [...(prev[bookingId].messages || []), updatedMessage],
+        },
       }));
     }
   };
 
   // Update payment status
   const updatePaymentStatus = (bookingId, status) => {
-    setBookings(prev => {
+    setBookings((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       return {
         ...prev,
         [bookingId]: {
           ...prev[bookingId],
           paymentStatus: status,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     });
   };
 
   // Add rating to booking
   const addBookingRating = (bookingId, rating, comment) => {
-    setBookings(prev => {
+    setBookings((prev) => {
       if (!prev[bookingId]) return prev;
-      
+
       return {
         ...prev,
         [bookingId]: {
@@ -275,10 +278,10 @@ export const BookingsProvider = ({ children }) => {
           rating: {
             score: rating,
             comment,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     });
   };
@@ -304,14 +307,8 @@ export const BookingsProvider = ({ children }) => {
     addBookingMessage,
     updatePaymentStatus,
     addBookingRating,
-    clearAllBookings
+    clearAllBookings,
   };
 
-  return (
-    <BookingContext.Provider value={value}>
-      {children}
-    </BookingContext.Provider>
-  );
+  return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
 };
-
-

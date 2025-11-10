@@ -3,7 +3,7 @@ import { useRatings } from '../context/RatingContext';
 
 const RatingDisplay = ({ userId, userType, showCount = true, size = 'medium' }) => {
   const { getUserAverageRating, getUserRatingCount } = useRatings();
-  
+
   const rating = getUserAverageRating(userId);
   const count = getUserRatingCount(userId);
 
@@ -20,19 +20,19 @@ const RatingDisplay = ({ userId, userType, showCount = true, size = 'medium' }) 
         return {
           fontSize: '12px',
           starSize: '14px',
-          gap: '2px'
+          gap: '2px',
         };
       case 'large':
         return {
           fontSize: '16px',
           starSize: '20px',
-          gap: '4px'
+          gap: '4px',
         };
       default: // medium
         return {
           fontSize: '14px',
           starSize: '16px',
-          gap: '3px'
+          gap: '3px',
         };
     }
   };
@@ -70,13 +70,15 @@ const RatingDisplay = ({ userId, userType, showCount = true, size = 'medium' }) 
 
   if (rating === 0) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        fontSize: styles.fontSize,
-        color: '#9ca3af'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          fontSize: styles.fontSize,
+          color: '#9ca3af',
+        }}
+      >
         <span style={{ fontSize: styles.starSize }}>⭐</span>
         <span>لا توجد تقييمات</span>
       </div>
@@ -84,37 +86,45 @@ const RatingDisplay = ({ userId, userType, showCount = true, size = 'medium' }) 
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: styles.gap
-    }}>
-      {/* Stars */}
-      <div style={{
+    <div
+      style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '1px'
-      }}>
+        gap: styles.gap,
+      }}
+    >
+      {/* Stars */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1px',
+        }}
+      >
         {renderStars(rating)}
       </div>
-      
+
       {/* Rating Number */}
-      <span style={{
-        fontSize: styles.fontSize,
-        fontWeight: '600',
-        color: getRatingColor(rating),
-        marginLeft: '4px'
-      }}>
+      <span
+        style={{
+          fontSize: styles.fontSize,
+          fontWeight: '600',
+          color: getRatingColor(rating),
+          marginLeft: '4px',
+        }}
+      >
         {rating.toFixed(1)}
       </span>
-      
+
       {/* Count */}
       {showCount && (
-        <span style={{
-          fontSize: styles.fontSize,
-          color: '#6b7280',
-          marginLeft: '4px'
-        }}>
+        <span
+          style={{
+            fontSize: styles.fontSize,
+            color: '#6b7280',
+            marginLeft: '4px',
+          }}
+        >
           ({count})
         </span>
       )}

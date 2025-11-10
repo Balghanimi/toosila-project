@@ -33,7 +33,7 @@ export const RatingProvider = ({ children }) => {
   // إضافة تقييم جديد
   const addRating = (ratingData) => {
     const { tripId, ratedUserId, raterUserId, rating, comment, userType } = ratingData;
-    
+
     const newRating = {
       id: `${tripId}_${ratedUserId}_${raterUserId}`,
       tripId,
@@ -45,9 +45,9 @@ export const RatingProvider = ({ children }) => {
       timestamp: new Date().toISOString(),
     };
 
-    setRatings(prev => ({
+    setRatings((prev) => ({
       ...prev,
-      [newRating.id]: newRating
+      [newRating.id]: newRating,
     }));
 
     return newRating;
@@ -55,14 +55,14 @@ export const RatingProvider = ({ children }) => {
 
   // الحصول على تقييمات مستخدم معين
   const getUserRatings = (userId) => {
-    return Object.values(ratings).filter(rating => rating.ratedUserId === userId);
+    return Object.values(ratings).filter((rating) => rating.ratedUserId === userId);
   };
 
   // حساب متوسط التقييم لمستخدم معين
   const getUserAverageRating = (userId) => {
     const userRatings = getUserRatings(userId);
     if (userRatings.length === 0) return 0;
-    
+
     const totalRating = userRatings.reduce((sum, rating) => sum + rating.rating, 0);
     return Math.round((totalRating / userRatings.length) * 10) / 10; // تقريب لرقم عشري واحد
   };
@@ -80,7 +80,7 @@ export const RatingProvider = ({ children }) => {
 
   // حذف تقييم
   const removeRating = (ratingId) => {
-    setRatings(prev => {
+    setRatings((prev) => {
       const newRatings = { ...prev };
       delete newRatings[ratingId];
       return newRatings;
@@ -103,9 +103,5 @@ export const RatingProvider = ({ children }) => {
     clearAllRatings,
   };
 
-  return (
-    <RatingContext.Provider value={value}>
-      {children}
-    </RatingContext.Provider>
-  );
+  return <RatingContext.Provider value={value}>{children}</RatingContext.Provider>;
 };

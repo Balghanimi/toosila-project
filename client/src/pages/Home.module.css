@@ -6,11 +6,7 @@
 /* ===== Main Container ===== */
 .homeContainer {
   min-height: 100vh;
-  background: linear-gradient(180deg,
-    #f8fafc 0%,
-    #f1f5f9 50%,
-    #e8f4f0 100%
-  );
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e8f4f0 100%);
   position: relative;
   overflow-x: hidden;
 }
@@ -60,7 +56,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
   33% {
@@ -72,7 +69,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
     transform: translate(-50%, -50%) scale(1);
   }
@@ -279,7 +277,8 @@
   left: 0;
   right: 0;
   height: 5px;
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     var(--primary-500),
     var(--secondary-500),
     var(--accent-purple-500)
@@ -291,7 +290,7 @@
 .locationContainer {
   position: relative;
   background: var(--surface-secondary);
-  borderRadius: 20px;
+  borderradius: 20px;
   border: 2px solid var(--border-light);
   margin-bottom: 32px;
   overflow: visible;
@@ -349,8 +348,9 @@
 }
 
 .locationInput::placeholder {
-  color: var(--text-muted);
+  color: var(--text-placeholder, var(--text-muted));
   font-weight: 500;
+  opacity: 1; /* Ensure full opacity for proper contrast */
 }
 
 /* ===== Swap Button ===== */
@@ -521,7 +521,8 @@
   font-weight: 700;
 }
 
-.select, .input {
+.select,
+.input {
   width: 100%;
   padding: 16px 20px;
   border: 2px solid var(--border-light);
@@ -536,11 +537,13 @@
   cursor: pointer;
 }
 
-.select:hover, .input:hover {
+.select:hover,
+.input:hover {
   border-color: var(--border-medium);
 }
 
-.select:focus, .input:focus {
+.select:focus,
+.input:focus {
   border-color: var(--primary-500);
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
@@ -587,9 +590,10 @@
 }
 
 .submitButton:disabled {
-  opacity: 0.6;
+  opacity: 0.65; /* Improved for better visibility */
   cursor: not-allowed;
   transform: none;
+  filter: grayscale(0.3); /* Subtle indication of disabled state */
 }
 
 /* ===== Features Section ===== */
@@ -817,7 +821,8 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -842,9 +847,16 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 /* ===== Responsive Design ===== */
@@ -876,7 +888,8 @@
     grid-template-columns: 1fr;
   }
 
-  .featuresGrid, .stepsGrid {
+  .featuresGrid,
+  .stepsGrid {
     grid-template-columns: 1fr;
     gap: 24px;
   }

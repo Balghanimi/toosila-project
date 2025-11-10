@@ -45,10 +45,7 @@ const ForgotPassword = () => {
     setMessage('');
 
     try {
-      const response = await axios.post(
-        `${API_URL}/api/password-reset/request`,
-        { email }
-      );
+      const response = await axios.post(`${API_URL}/api/password-reset/request`, { email });
 
       if (response.data.success) {
         setStatus('success');
@@ -87,9 +84,7 @@ const ForgotPassword = () => {
             <div className="success-icon">✓</div>
             <h4>تم إرسال الرسالة!</h4>
             <p>{message}</p>
-            <p className="help-text">
-              تحقق من صندوق الوارد (ومجلد البريد المزعج)
-            </p>
+            <p className="help-text">تحقق من صندوق الوارد (ومجلد البريد المزعج)</p>
             <Link to="/login" className="btn-back">
               العودة لتسجيل الدخول
             </Link>
@@ -110,9 +105,7 @@ const ForgotPassword = () => {
                 className={errors.email ? 'error' : ''}
                 disabled={status === 'sending'}
               />
-              {errors.email && (
-                <span className="error-text">{errors.email}</span>
-              )}
+              {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
 
             {status === 'error' && message && (
@@ -122,11 +115,7 @@ const ForgotPassword = () => {
               </div>
             )}
 
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={status === 'sending'}
-            >
+            <button type="submit" className="btn-submit" disabled={status === 'sending'}>
               {status === 'sending' ? (
                 <>
                   <span className="spinner"></span>

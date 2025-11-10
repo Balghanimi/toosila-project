@@ -91,11 +91,7 @@ const VerificationManagement = () => {
       </div>
 
       {/* Error Display */}
-      {error && (
-        <div className="alert-pro alert-pro-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert-pro alert-pro-error">{error}</div>}
 
       {/* Verifications List */}
       {verifications.length === 0 ? (
@@ -219,7 +215,7 @@ const VerificationManagement = () => {
         <div className="pagination">
           <Button
             variant="secondary"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             السابق
@@ -229,7 +225,7 @@ const VerificationManagement = () => {
           </span>
           <Button
             variant="secondary"
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >
             التالي
