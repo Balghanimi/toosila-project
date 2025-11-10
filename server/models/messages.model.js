@@ -8,6 +8,10 @@ class Message {
     this.senderId = data.sender_id;
     this.content = data.content;
     this.createdAt = data.created_at;
+    this.isRead = data.is_read || false;
+    this.readAt = data.read_at || null;
+    this.readBy = data.read_by || null;
+    this.updatedAt = data.updated_at || null;
   }
 
   // Create a new message
@@ -241,9 +245,72 @@ class Message {
     };
   }
 
-  // Get conversation between two users (stub for compatibility)
+  // Mark a message as read
+  static async markAsRead(messageId, userId) {
+    const result = await query(
+      `UPDATE messages
+       SET is_read = TRUE, read_at = CURRENT_TIMESTAMP, read_by = $2
+       WHERE id = $1
+       RETURNING *`,
+      [messageId, userId]
+    );
+    return result.rows.length > 0 ? new Message(result.rows[0]) : null;
+  }
+
+  // Mark all messages in a ride conversation as read
+  static async markRideMessagesAsRead(rideType, rideId, userId) {
+    const result = await query(
+      `UPDATE messages
+       SET is_read = TRUE, read_at = CURRENT_TIMESTAMP, read_by = $3
+       WHERE ride_type = $1 AND ride_id = $2 AND sender_id != $3 AND is_read = FALSE
+       RETURNING *`,
+      [rideType, rideId, userId]
+    );
+    return result.rows.map(row => new Message(row));
+  }
+
+  // Get unread count for a user
+  static async getUnreadCount(userId) {
+    const result = await query(
+      `WITH user_rides AS (
+         -- Get all rides where user is involved
+         SELECT 'offer' as ride_type, id as ride_id FROM offers WHERE driver_id = $1
+         UNION ALL
+         SELECT 'demand' as ride_type, id as ride_id FROM demands WHERE passenger_id = $1
+         UNION ALL
+         SELECT 'offer' as ride_type, offer_id as ride_id
+         FROM bookings WHERE passenger_id = $1 AND status IN ('pending', 'accepted')
+         UNION ALL
+         SELECT 'demand' as ride_type, demand_id as ride_id
+         FROM demand_responses WHERE driver_id = $1 AND status IN ('pending', 'accepted')
+       )
+       SELECT COUNT(*)::int as count
+       FROM messages m
+       WHERE m.sender_id != $1
+         AND m.is_read = FALSE
+         AND EXISTS (
+           SELECT 1 FROM user_rides ur
+           WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id
+         )`,
+      [userId]
+    );
+    return parseInt(result.rows[0].count);
+  }
+
+  // Get unread count for a specific ride
+  static async getUnreadCountForRide(rideType, rideId, userId) {
+    const result = await query(
+      `SELECT COUNT(*)::int as count
+       FROM messages
+       WHERE ride_type = $1 AND ride_id = $2 AND sender_id != $3 AND is_read = FALSE`,
+      [rideType, rideId, userId]
+    );
+    return parseInt(result.rows[0].count);
+  }
+
+  // Get conversation between two users (deprecated - use ride-based instead)
   static async getConversation(userId1, userId2, page = 1, limit = 50) {
-    // This is a placeholder - implement based on your schema
+    // This is deprecated in favor of ride-based messaging
     return {
       messages: [],
       total: 0,
@@ -251,12 +318,6 @@ class Message {
       limit,
       totalPages: 0
     };
-  }
-
-  // Get unread count for a user (stub for compatibility)
-  static async getUnreadCount(userId) {
-    // This is a placeholder - implement based on your schema
-    return 0;
   }
 
   // Convert to JSON
@@ -267,7 +328,11 @@ class Message {
       rideId: this.rideId,
       senderId: this.senderId,
       content: this.content,
-      createdAt: this.createdAt
+      createdAt: this.createdAt,
+      isRead: this.isRead,
+      readAt: this.readAt,
+      readBy: this.readBy,
+      updatedAt: this.updatedAt
     };
   }
 }

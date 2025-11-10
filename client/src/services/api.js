@@ -174,20 +174,28 @@ export const messagesAPI = {
   getConversations: async () => {
     return apiRequest('/messages/conversations', { method: 'GET' });
   },
+  getRideMessages: async (rideType, rideId, page = 1, limit = 50) => {
+    return apiRequest(`/messages/${rideType}/${rideId}?page=${page}&limit=${limit}`, { method: 'GET' });
+  },
+  // Deprecated - use getRideMessages instead
   getConversation: async (userId) => {
     return apiRequest(`/messages/conversation/${userId}`, { method: 'GET' });
   },
+  // Deprecated - use getRideMessages instead
   getMessages: async (userId) => {
     return apiRequest(`/messages/conversation/${userId}`, { method: 'GET' });
   },
   sendMessage: async (rideType, rideId, content) => {
     return apiRequest('/messages', {
       method: 'POST',
-      body: JSON.stringify({ ride_type: rideType, ride_id: rideId, content }),
+      body: JSON.stringify({ rideType, rideId, content }),
     });
   },
   markAsRead: async (messageId) => {
     return apiRequest(`/messages/${messageId}/read`, { method: 'PUT' });
+  },
+  markConversationAsRead: async (rideType, rideId) => {
+    return apiRequest(`/messages/conversation/${rideType}/${rideId}/read`, { method: 'PUT' });
   },
   getUnreadCount: async () => {
     return apiRequest('/messages/unread-count', { method: 'GET' });

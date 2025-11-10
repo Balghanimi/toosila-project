@@ -2,34 +2,91 @@ const Message = require('../models/messages.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
 const { notifyNewMessage } = require('../socket');
 
-// Send a new message
+// Send a new message (ride-based)
 const sendMessage = asyncHandler(async (req, res) => {
-  const { recipientId, content } = req.body;
-  
-  // Check if recipient exists
-  const User = require('../models/users.model');
-  const recipient = await User.findById(recipientId);
-  if (!recipient) {
-    throw new AppError('Recipient not found', 404);
+  const { rideType, rideId, content } = req.body;
+
+  // Validate ride type
+  if (!['offer', 'demand'].includes(rideType)) {
+    throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
   }
 
-  // Check if user is not sending message to themselves
-  if (recipientId === req.user.id) {
-    throw new AppError('You cannot send a message to yourself', 400);
+  // Verify the ride exists and user has access
+  const { query } = require('../config/db');
+  let rideCheck;
+
+  if (rideType === 'offer') {
+    // Check if user is driver or has a booking for this offer
+    rideCheck = await query(
+      `SELECT o.id, o.driver_id, o.from_city, o.to_city
+       FROM offers o
+       WHERE o.id = $1 AND (
+         o.driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2 AND status IN ('pending', 'accepted'))
+       )`,
+      [rideId, req.user.id]
+    );
+  } else {
+    // Check if user is passenger or responded to this demand
+    rideCheck = await query(
+      `SELECT d.id, d.passenger_id, d.from_city, d.to_city
+       FROM demands d
+       WHERE d.id = $1 AND (
+         d.passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2 AND status IN ('pending', 'accepted'))
+       )`,
+      [rideId, req.user.id]
+    );
   }
 
+  if (rideCheck.rows.length === 0) {
+    throw new AppError('Ride not found or you do not have access to this conversation', 404);
+  }
+
+  // Create message
   const message = await Message.create({
+    rideType,
+    rideId,
     senderId: req.user.id,
-    recipientId,
     content
   });
 
-  // Send real-time notification to recipient
+  // Get other participants in the conversation to notify them
   const io = req.app.get('io');
   if (io) {
-    notifyNewMessage(io, recipientId, {
-      ...message.toJSON(),
-      senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`
+    let participantsQuery;
+
+    if (rideType === 'offer') {
+      // Notify driver and all passengers with accepted bookings
+      participantsQuery = await query(
+        `SELECT DISTINCT u.id, u.name
+         FROM users u
+         WHERE u.id != $1 AND (
+           u.id = (SELECT driver_id FROM offers WHERE id = $2) OR
+           u.id IN (SELECT passenger_id FROM bookings WHERE offer_id = $2 AND status IN ('pending', 'accepted'))
+         )`,
+        [req.user.id, rideId]
+      );
+    } else {
+      // Notify passenger and all drivers with accepted responses
+      participantsQuery = await query(
+        `SELECT DISTINCT u.id, u.name
+         FROM users u
+         WHERE u.id != $1 AND (
+           u.id = (SELECT passenger_id FROM demands WHERE id = $2) OR
+           u.id IN (SELECT driver_id FROM demand_responses WHERE demand_id = $2 AND status IN ('pending', 'accepted'))
+         )`,
+        [req.user.id, rideId]
+      );
+    }
+
+    // Send notification to each participant
+    participantsQuery.rows.forEach(participant => {
+      notifyNewMessage(io, participant.id, {
+        ...message.toJSON(),
+        senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
+        ride: rideCheck.rows[0]
+      });
     });
   }
 
@@ -39,77 +96,109 @@ const sendMessage = asyncHandler(async (req, res) => {
   });
 });
 
-// Get conversation between two users
-const getConversation = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+// Get messages for a specific ride
+const getRideMessages = asyncHandler(async (req, res) => {
+  const { rideType, rideId } = req.params;
   const { page = 1, limit = 50 } = req.query;
-  
-  // Check if the other user exists
-  const User = require('../models/users.model');
-  const otherUser = await User.findById(userId);
-  if (!otherUser) {
-    throw new AppError('User not found', 404);
+
+  // Validate ride type
+  if (!['offer', 'demand'].includes(rideType)) {
+    throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
   }
 
-  const result = await Message.getConversation(
-    req.user.id, 
-    parseInt(userId), 
-    parseInt(page), 
-    parseInt(limit)
-  );
-  
-  res.json({
-    ...result,
-    otherUser: {
-      id: otherUser.id,
-      firstName: otherUser.firstName,
-      lastName: otherUser.lastName
-    }
-  });
-});
+  // Verify user has access to this ride
+  const { query } = require('../config/db');
+  let accessCheck;
 
-// Get user's inbox (received messages)
-const getInbox = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
+  if (rideType === 'offer') {
+    accessCheck = await query(
+      `SELECT 1 FROM offers WHERE id = $1 AND (
+         driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+       )`,
+      [rideId, req.user.id]
+    );
+  } else {
+    accessCheck = await query(
+      `SELECT 1 FROM demands WHERE id = $1 AND (
+         passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+       )`,
+      [rideId, req.user.id]
+    );
+  }
 
-  const result = await Message.findByUserId(req.user.id, parseInt(page), parseInt(limit));
-  
+  if (accessCheck.rows.length === 0) {
+    throw new AppError('Access denied to this conversation', 403);
+  }
+
+  const result = await Message.getByRide(rideType, rideId, parseInt(page), parseInt(limit));
+
   res.json(result);
 });
 
-// Get user's sent messages
-const getSentMessages = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
-
-  const result = await Message.findSentByUserId(req.user.id, parseInt(page), parseInt(limit));
-  
-  res.json(result);
+// Get conversation between two users (deprecated - use ride-based instead)
+const getConversation = asyncHandler(async (req, res) => {
+  throw new AppError('This endpoint is deprecated. Use GET /messages/:rideType/:rideId instead', 410);
 });
 
-// Get conversation list
+// Get user's conversation list
 const getConversationList = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
 
   const result = await Message.getConversationList(req.user.id, parseInt(page), parseInt(limit));
-  
+
   res.json(result);
+});
+
+// Get recent messages for user
+const getRecentMessages = asyncHandler(async (req, res) => {
+  const { limit = 20 } = req.query;
+
+  const messages = await Message.getRecentForUser(req.user.id, parseInt(limit));
+
+  res.json({
+    messages,
+    total: messages.length
+  });
 });
 
 // Mark message as read
 const markAsRead = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   const message = await Message.findById(id);
   if (!message) {
     throw new AppError('Message not found', 404);
   }
 
-  // Check if user is the recipient
-  if (message.recipientId !== req.user.id) {
-    throw new AppError('You can only mark your own messages as read', 403);
+  // Check if user has access to this message
+  const { query } = require('../config/db');
+  let accessCheck;
+
+  if (message.rideType === 'offer') {
+    accessCheck = await query(
+      `SELECT 1 FROM offers WHERE id = $1 AND (
+         driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+       )`,
+      [message.rideId, req.user.id]
+    );
+  } else {
+    accessCheck = await query(
+      `SELECT 1 FROM demands WHERE id = $1 AND (
+         passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+       )`,
+      [message.rideId, req.user.id]
+    );
   }
 
-  const updatedMessage = await message.markAsRead();
+  if (accessCheck.rows.length === 0) {
+    throw new AppError('Access denied', 403);
+  }
+
+  const updatedMessage = await Message.markAsRead(id, req.user.id);
 
   res.json({
     message: 'Message marked as read',
@@ -117,18 +206,42 @@ const markAsRead = asyncHandler(async (req, res) => {
   });
 });
 
-// Mark conversation as read
+// Mark all messages in a ride conversation as read
 const markConversationAsRead = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
-  
-  // Check if the other user exists
-  const User = require('../models/users.model');
-  const otherUser = await User.findById(userId);
-  if (!otherUser) {
-    throw new AppError('User not found', 404);
+  const { rideType, rideId } = req.params;
+
+  // Validate ride type
+  if (!['offer', 'demand'].includes(rideType)) {
+    throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
   }
 
-  const updatedMessages = await Message.markConversationAsRead(req.user.id, parseInt(userId));
+  // Verify user has access to this ride
+  const { query } = require('../config/db');
+  let accessCheck;
+
+  if (rideType === 'offer') {
+    accessCheck = await query(
+      `SELECT 1 FROM offers WHERE id = $1 AND (
+         driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+       )`,
+      [rideId, req.user.id]
+    );
+  } else {
+    accessCheck = await query(
+      `SELECT 1 FROM demands WHERE id = $1 AND (
+         passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+       )`,
+      [rideId, req.user.id]
+    );
+  }
+
+  if (accessCheck.rows.length === 0) {
+    throw new AppError('Access denied to this conversation', 403);
+  }
+
+  const updatedMessages = await Message.markRideMessagesAsRead(rideType, rideId, req.user.id);
 
   res.json({
     message: 'Conversation marked as read',
@@ -139,7 +252,7 @@ const markConversationAsRead = asyncHandler(async (req, res) => {
 // Get unread message count
 const getUnreadCount = asyncHandler(async (req, res) => {
   const count = await Message.getUnreadCount(req.user.id);
-  
+
   res.json({
     unreadCount: count
   });
@@ -148,14 +261,35 @@ const getUnreadCount = asyncHandler(async (req, res) => {
 // Get message by ID
 const getMessageById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   const message = await Message.findById(id);
   if (!message) {
     throw new AppError('Message not found', 404);
   }
 
-  // Check if user is sender or recipient
-  if (message.senderId !== req.user.id && message.recipientId !== req.user.id) {
+  // Verify user has access to this message
+  const { query } = require('../config/db');
+  let accessCheck;
+
+  if (message.rideType === 'offer') {
+    accessCheck = await query(
+      `SELECT 1 FROM offers WHERE id = $1 AND (
+         driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+       )`,
+      [message.rideId, req.user.id]
+    );
+  } else {
+    accessCheck = await query(
+      `SELECT 1 FROM demands WHERE id = $1 AND (
+         passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+       )`,
+      [message.rideId, req.user.id]
+    );
+  }
+
+  if (accessCheck.rows.length === 0) {
     throw new AppError('Access denied', 403);
   }
 
@@ -164,15 +298,19 @@ const getMessageById = asyncHandler(async (req, res) => {
   });
 });
 
-// Get message statistics
+// Get message statistics (admin only)
 const getMessageStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
-  
+
   const result = await query(`
     SELECT
       COUNT(*)::int as total_messages,
       COUNT(DISTINCT sender_id)::int as unique_senders,
-      COUNT(DISTINCT recipient_id)::int as unique_recipients
+      COUNT(DISTINCT CONCAT(ride_type, ':', ride_id))::int as unique_conversations,
+      COUNT(CASE WHEN ride_type = 'offer' THEN 1 END)::int as offer_messages,
+      COUNT(CASE WHEN ride_type = 'demand' THEN 1 END)::int as demand_messages,
+      COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END)::int as messages_last_24h,
+      COUNT(CASE WHEN created_at > NOW() - INTERVAL '7 days' THEN 1 END)::int as messages_last_7d
     FROM messages
   `);
 
@@ -184,14 +322,19 @@ const getMessageStats = asyncHandler(async (req, res) => {
 // Get user message statistics
 const getUserMessageStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
-  
+
   const result = await query(`
     SELECT
       COUNT(*)::int as total_messages,
       COUNT(CASE WHEN sender_id = $1 THEN 1 END)::int as sent_messages,
-      COUNT(CASE WHEN recipient_id = $1 THEN 1 END)::int as received_messages
+      COUNT(DISTINCT CONCAT(ride_type, ':', ride_id))::int as conversations,
+      COUNT(CASE WHEN sender_id = $1 AND created_at > NOW() - INTERVAL '24 hours' THEN 1 END)::int as sent_today
     FROM messages
-    WHERE sender_id = $1 OR recipient_id = $1
+    WHERE sender_id = $1
+       OR (ride_type = 'offer' AND ride_id IN (SELECT id FROM offers WHERE driver_id = $1))
+       OR (ride_type = 'offer' AND ride_id IN (SELECT offer_id FROM bookings WHERE passenger_id = $1))
+       OR (ride_type = 'demand' AND ride_id IN (SELECT id FROM demands WHERE passenger_id = $1))
+       OR (ride_type = 'demand' AND ride_id IN (SELECT demand_id FROM demand_responses WHERE driver_id = $1))
   `, [req.user.id]);
 
   res.json({
@@ -199,17 +342,27 @@ const getUserMessageStats = asyncHandler(async (req, res) => {
   });
 });
 
+// Deprecated endpoints for backward compatibility
+const getInbox = asyncHandler(async (req, res) => {
+  throw new AppError('This endpoint is deprecated. Use GET /messages/conversations instead', 410);
+});
+
+const getSentMessages = asyncHandler(async (req, res) => {
+  throw new AppError('This endpoint is deprecated. Use GET /messages/conversations instead', 410);
+});
+
 module.exports = {
   sendMessage,
-  getConversation,
-  getInbox,
-  getSentMessages,
+  getRideMessages,
+  getConversation, // deprecated
+  getInbox, // deprecated
+  getSentMessages, // deprecated
   getConversationList,
-  markAsRead,
-  markConversationAsRead,
-  getUnreadCount,
+  getRecentMessages,
+  markAsRead, // requires migration
+  markConversationAsRead, // requires migration
+  getUnreadCount, // requires migration
   getMessageById,
   getMessageStats,
   getUserMessageStats
 };
-

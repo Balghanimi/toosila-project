@@ -4,10 +4,12 @@ const router = express.Router();
 // Import controllers
 const {
   sendMessage,
-  getConversation,
-  getInbox,
-  getSentMessages,
+  getRideMessages,
+  getConversation, // deprecated
+  getInbox, // deprecated
+  getSentMessages, // deprecated
   getConversationList,
+  getRecentMessages,
   markAsRead,
   markConversationAsRead,
   getUnreadCount,
@@ -30,19 +32,21 @@ router.use(authenticateToken);
 
 // Message management routes
 router.post('/', moderateLimiter, validateMessageCreation, sendMessage);
-router.get('/stats', getMessageStats);
-router.get('/my/stats', getUserMessageStats);
-router.get('/unread-count', getUnreadCount);
 router.get('/conversations', validatePagination, getConversationList);
-router.get('/inbox', validatePagination, getInbox);
-router.get('/sent', validatePagination, getSentMessages);
-router.get('/conversation/:userId', validateId, validatePagination, getConversation);
+router.get('/recent', getRecentMessages);
+router.get('/unread-count', getUnreadCount);
+router.get('/stats', getUserMessageStats);
+router.get('/:rideType/:rideId', validatePagination, getRideMessages);
 router.get('/:id', validateId, getMessageById);
-router.put('/:id/read', markAsRead);
-router.put('/conversation/:userId/read', validateId, markConversationAsRead);
+router.put('/:id/read', validateId, markAsRead);
+router.put('/conversation/:rideType/:rideId/read', markConversationAsRead);
+
+// Deprecated routes (return 410 Gone)
+router.get('/inbox', getInbox);
+router.get('/sent', getSentMessages);
+router.get('/conversation/:userId', getConversation);
 
 // Admin routes
 router.get('/admin/stats', requireAdmin, getMessageStats);
 
 module.exports = router;
-

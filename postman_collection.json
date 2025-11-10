@@ -1086,6 +1086,40 @@
           "response": []
         },
         {
+          "name": "Delete ride demand",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/demands/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "demands",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Permanently delete a ride demand (owner only)"
+          },
+          "response": []
+        },
+        {
           "name": "Deactivate ride demand",
           "request": {
             "method": "PUT",

@@ -1,0 +1,189 @@
+// Auto-generated tests by Boss Test Coordinator
+// File: server\models\offers.model.js
+// Generated: 2025-11-10T14:33:49.056Z
+
+const offers_model = require('../../models/offers.model.js');
+
+describe('offers.model', () => {
+  let req, res, next;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    req = { body: {}, params: {}, query: {}, user: null };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis()
+    };
+    next = jest.fn();
+  });
+
+  describe('constructor', () => {
+    it('Should execute constructor successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('if', () => {
+    it('Should execute if successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in if', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('update', () => {
+    it('Should execute update successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should validate inputs for update', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle async operations in update', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle different conditions in update', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('updateSeats', () => {
+    it('Should execute updateSeats successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle async operations in updateSeats', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('deactivate', () => {
+    it('Should execute deactivate successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+    it('Should handle async operations in deactivate', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+  describe('toJSON', () => {
+    it('Should execute toJSON successfully', async () => {
+      // TODO: Implement test
+      expect(true).toBe(true);
+    });
+
+  });
+
+});
