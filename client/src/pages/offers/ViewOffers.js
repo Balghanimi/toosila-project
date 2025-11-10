@@ -41,6 +41,12 @@ const ViewOffers = React.memo(function ViewOffers() {
   const isDriver = user?.isDriver || currentUser?.isDriver || false;
 
   useEffect(() => {
+    // Redirect drivers to demands page
+    if (isDriver) {
+      navigate('/demands', { replace: true, state: location.state });
+      return;
+    }
+
     setIsAnimated(true);
 
     // استقبال معايير البحث من Home
@@ -57,7 +63,7 @@ const ViewOffers = React.memo(function ViewOffers() {
       fetchOffers();
     }
     // eslint-disable-next-line
-  }, [location.state]);
+  }, [location.state, isDriver, navigate]);
 
   const fetchOffers = async (filterParams = {}) => {
     setLoading(true);

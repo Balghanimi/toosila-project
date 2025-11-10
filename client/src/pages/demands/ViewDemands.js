@@ -35,11 +35,20 @@ export default function ViewDemands() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Determine if user is a driver
+  const isDriver = currentUser?.isDriver || false;
+
   useEffect(() => {
+    // Redirect passengers to offers page
+    if (currentUser && !isDriver) {
+      navigate('/offers', { replace: true, state: location.state });
+      return;
+    }
+
     setIsAnimated(true);
     fetchDemands();
     // eslint-disable-next-line
-  }, []);
+  }, [currentUser, isDriver]);
 
   // Handle notification navigation
   useEffect(() => {
