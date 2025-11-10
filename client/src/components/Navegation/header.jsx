@@ -63,14 +63,38 @@ const Header = () => {
               <button
                 className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
                 onClick={() => navigate('/offers')}
+                title="عروض السائقين"
               >
+                <span style={{ marginLeft: '4px' }}>🚗</span>
                 العروض
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    opacity: 0.7,
+                    marginRight: '4px',
+                    fontWeight: '400',
+                  }}
+                >
+                  (سائق)
+                </span>
               </button>
               <button
                 className={`${styles.navLink} ${isActive('/demands') ? styles.navLinkActive : ''}`}
                 onClick={() => navigate('/demands')}
+                title="طلبات الركاب"
               >
+                <span style={{ marginLeft: '4px' }}>🙋</span>
                 الطلبات
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    opacity: 0.7,
+                    marginRight: '4px',
+                    fontWeight: '400',
+                  }}
+                >
+                  (راكب)
+                </span>
               </button>
               <button
                 className={`${styles.navLink} ${isActive('/bookings') ? styles.navLinkActive : ''}`}
