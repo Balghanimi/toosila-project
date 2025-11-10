@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { debounce } from '../utils/debounce';
 
 const OffersContext = createContext();
 
@@ -99,23 +100,36 @@ export function OffersProvider({ children }) {
   );
   const clearBookings = useCallback(() => setBookings([]), []);
 
-  // حفظ العروض في localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('offers', JSON.stringify(offers));
-    } catch (e) {
-      console.warn('فشل في حفظ العروض في localStorage', e);
-    }
-  }, [offers]);
+  // PERFORMANCE FIX: Debounced localStorage writes to prevent blocking UI
+  const debouncedSaveOffers = useRef(
+    debounce((offersData) => {
+      try {
+        localStorage.setItem('offers', JSON.stringify(offersData));
+      } catch (e) {
+        console.warn('فشل في حفظ العروض في localStorage', e);
+      }
+    }, 500)
+  ).current;
 
-  // حفظ طلبات الحجز في localStorage
+  const debouncedSaveBookings = useRef(
+    debounce((bookingsData) => {
+      try {
+        localStorage.setItem('bookings', JSON.stringify(bookingsData));
+      } catch (e) {
+        console.warn('فشل في حفظ طلبات الحجز في localStorage', e);
+      }
+    }, 500)
+  ).current;
+
+  // حفظ العروض في localStorage (debounced)
   useEffect(() => {
-    try {
-      localStorage.setItem('bookings', JSON.stringify(bookings));
-    } catch (e) {
-      console.warn('فشل في حفظ طلبات الحجز في localStorage', e);
-    }
-  }, [bookings]);
+    debouncedSaveOffers(offers);
+  }, [offers, debouncedSaveOffers]);
+
+  // حفظ طلبات الحجز في localStorage (debounced)
+  useEffect(() => {
+    debouncedSaveBookings(bookings);
+  }, [bookings, debouncedSaveBookings]);
 
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(

@@ -4,7 +4,8 @@ import { offersAPI, demandsAPI, bookingsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 
-export default function ViewOffers() {
+// PERFORMANCE FIX: Added React.memo to prevent unnecessary re-renders
+const ViewOffers = React.memo(function ViewOffers() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -146,7 +147,8 @@ export default function ViewOffers() {
     navigate('/');
   };
 
-  const formatDate = (dateString) => {
+  // PERFORMANCE FIX: Memoized expensive date/time formatting functions
+  const formatDate = React.useCallback((dateString) => {
     if (!dateString) return 'غير محدد';
 
     const date = new Date(dateString);
@@ -170,9 +172,9 @@ export default function ViewOffers() {
       day: 'numeric',
       month: 'long',
     });
-  };
+  }, []);
 
-  const formatTime = (dateString) => {
+  const formatTime = React.useCallback((dateString) => {
     if (!dateString) return '--:--';
 
     const date = new Date(dateString);
@@ -184,7 +186,7 @@ export default function ViewOffers() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
+  }, []);
 
   const handleBookNow = (offer) => {
     if (!currentUser) {
@@ -253,11 +255,11 @@ export default function ViewOffers() {
     }
   };
 
-  // Main cities (most popular routes)
-  const MAIN_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'];
+  // PERFORMANCE FIX: Memoized constant arrays to prevent recreation on every render
+  const MAIN_CITIES = React.useMemo(() => ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'], []);
 
   // All Iraqi cities (for advanced filters)
-  const IRAQ_CITIES = [
+  const IRAQ_CITIES = React.useMemo(() => [
     'بغداد',
     'البصرة',
     'النجف',
@@ -269,7 +271,7 @@ export default function ViewOffers() {
     'الأنبار',
     'واسط',
     'ميسان',
-  ];
+  ], []);
 
   return (
     <div
@@ -1447,4 +1449,6 @@ export default function ViewOffers() {
       `}</style>
     </div>
   );
-}
+});
+
+export default ViewOffers;

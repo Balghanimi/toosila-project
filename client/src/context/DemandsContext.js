@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { debounce } from '../utils/debounce';
 
 const DemandsContext = createContext();
 
@@ -99,23 +100,36 @@ export function DemandsProvider({ children }) {
   );
   const clearOffersToDemands = useCallback(() => setOffersToDemands([]), []);
 
-  // حفظ الطلبات في localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('demands', JSON.stringify(demands));
-    } catch (e) {
-      console.warn('فشل في حفظ الطلبات في localStorage', e);
-    }
-  }, [demands]);
+  // PERFORMANCE FIX: Debounced localStorage writes to prevent blocking UI
+  const debouncedSaveDemands = useRef(
+    debounce((demandsData) => {
+      try {
+        localStorage.setItem('demands', JSON.stringify(demandsData));
+      } catch (e) {
+        console.warn('فشل في حفظ الطلبات في localStorage', e);
+      }
+    }, 500)
+  ).current;
 
-  // حفظ العروض المقدمة للطلبات في localStorage
+  const debouncedSaveOffersToDemands = useRef(
+    debounce((offersData) => {
+      try {
+        localStorage.setItem('offersToDemands', JSON.stringify(offersData));
+      } catch (e) {
+        console.warn('فشل في حفظ العروض المقدمة للطلبات في localStorage', e);
+      }
+    }, 500)
+  ).current;
+
+  // حفظ الطلبات في localStorage (debounced)
   useEffect(() => {
-    try {
-      localStorage.setItem('offersToDemands', JSON.stringify(offersToDemands));
-    } catch (e) {
-      console.warn('فشل في حفظ العروض المقدمة للطلبات في localStorage', e);
-    }
-  }, [offersToDemands]);
+    debouncedSaveDemands(demands);
+  }, [demands, debouncedSaveDemands]);
+
+  // حفظ العروض المقدمة للطلبات في localStorage (debounced)
+  useEffect(() => {
+    debouncedSaveOffersToDemands(offersToDemands);
+  }, [offersToDemands, debouncedSaveOffersToDemands]);
 
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(

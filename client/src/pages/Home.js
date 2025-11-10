@@ -39,14 +39,39 @@ const Home = () => {
     }
   }, [pickupLocation, dropLocation, selectedDate, submitError]);
 
+  // PERFORMANCE FIX: Cache cities data in localStorage with 24-hour TTL
   useEffect(() => {
     const fetchCities = async () => {
       try {
+        // Check cache first
+        const cached = localStorage.getItem('cached_cities');
+        const cacheTime = localStorage.getItem('cached_cities_time');
+        const now = Date.now();
+        const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+        if (cached && cacheTime && (now - parseInt(cacheTime)) < CACHE_TTL) {
+          // Use cached data
+          setAvailableCities(JSON.parse(cached));
+          return;
+        }
+
+        // Fetch fresh data
         const response = await citiesAPI.getAll();
-        setAvailableCities(response.cities || []);
+        const cities = response.cities || [];
+        setAvailableCities(cities);
+
+        // Cache for next time
+        localStorage.setItem('cached_cities', JSON.stringify(cities));
+        localStorage.setItem('cached_cities_time', now.toString());
       } catch (error) {
         console.error('Error fetching cities:', error);
-        setAvailableCities([]);
+        // Try to use stale cache if available
+        const cached = localStorage.getItem('cached_cities');
+        if (cached) {
+          setAvailableCities(JSON.parse(cached));
+        } else {
+          setAvailableCities([]);
+        }
       }
     };
     fetchCities();

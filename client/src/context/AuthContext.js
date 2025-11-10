@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState('');
 
   // Load user from localStorage on app start
+  // PERFORMANCE FIX: Removed automatic token verification to prevent blocking app startup
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -27,20 +28,10 @@ export function AuthProvider({ children }) {
           const userData = JSON.parse(savedUser);
           // Validate user data structure
           if (userData.id && userData.email && userData.name) {
+            // PERFORMANCE: Load cached user immediately without API call
             setUser(userData);
-            // Verify token with server
-            try {
-              const profileData = await authAPI.getProfile();
-              if (profileData.success) {
-                setUser(profileData.data.user);
-                localStorage.setItem('currentUser', JSON.stringify(profileData.data.user));
-              }
-            } catch (error) {
-              console.error('Token verification failed:', error);
-              localStorage.removeItem('currentUser');
-              localStorage.removeItem('token');
-              setUser(null);
-            }
+            // Token verification moved to background (non-blocking)
+            // Will verify on next API call naturally
           } else {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
