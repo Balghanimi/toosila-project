@@ -191,6 +191,25 @@ export default function ViewDemands() {
     setDemandResponses([]);
   };
 
+  // Handle card click to view demand details
+  const handleDemandClick = (demand) => {
+    setSelectedDemand(demand);
+    setShowResponses(true);
+    setResponsesLoading(true);
+
+    demandResponsesAPI.getByDemandId(demand.id)
+      .then(response => {
+        setDemandResponses(response.data.responses || []);
+      })
+      .catch(err => {
+        console.error('Error fetching responses:', err);
+        setError('حدث خطأ أثناء تحميل الردود');
+      })
+      .finally(() => {
+        setResponsesLoading(false);
+      });
+  };
+
   // Main cities (most popular routes)
   const MAIN_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'];
 
@@ -722,6 +741,7 @@ export default function ViewDemands() {
             {demands.map((demand) => (
               <div
                 key={demand.id}
+                onClick={() => handleDemandClick(demand)}
                 style={{
                   background: 'var(--surface-primary)',
                   borderRadius: 'var(--radius-lg)',
