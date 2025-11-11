@@ -1,8 +1,7 @@
 const Demand = require('../models/demands.model');
 const { asyncHandler, AppError } = require('../middlewares/error');
-// const moderationAgent = require('../agents/moderation.agent'); // Temporarily disabled
-// const { query } = require('../config/db'); // Temporarily disabled
-
+// const moderationAgent = require('../agents/moderation.agent'); // Temporarily
+const { query } = require('../config/db');
 // Create a new demand
 const createDemand = asyncHandler(async (req, res) => {
   const { fromCity, toCity, earliestTime, latestTime, seats, budgetMax } = req.body;
@@ -168,13 +167,34 @@ const getDemandStats = asyncHandler(async (req, res) => {
     stats: result.rows[0]
   });
 });
+// Delete demand (hard delete)
+const deleteDemand = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
+  const demand = await Demand.findById(id);
+  if (!demand) {
+    throw new AppError('الطلب غير موجود', 404);
+  }
+
+  // Check if user owns the demand
+  if (demand.passengerId !== req.user.id && req.user.role !== 'admin') {
+    throw new AppError('يمكنك فقط حذف طلباتك الخاصة', 403);
+  }
+
+  await query('DELETE FROM demands WHERE id = $1', [id]);
+
+  res.json({
+    success: true,
+    message: 'تم حذف الطلب بنجاح'
+  });
+});
 module.exports = {
   createDemand,
   getDemands,
   getDemandById,
   updateDemand,
   deactivateDemand,
+  deleteDemand, 
   getUserDemands,
   searchDemands,
   getCategories,
