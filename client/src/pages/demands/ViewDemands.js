@@ -197,11 +197,12 @@ export default function ViewDemands() {
     setShowResponses(true);
     setResponsesLoading(true);
 
-    demandResponsesAPI.getByDemandId(demand.id)
-      .then(response => {
+    demandResponsesAPI
+      .getByDemandId(demand.id)
+      .then((response) => {
         setDemandResponses(response.data.responses || []);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error fetching responses:', err);
         setError('حدث خطأ أثناء تحميل الردود');
       })
