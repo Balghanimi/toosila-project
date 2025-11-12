@@ -162,7 +162,7 @@ export default function Bookings() {
       const response = await demandsAPI.update(editingDemand.id, updateData);
       console.log('✅ Update successful:', response);
 
-      // تحديث الـ demand في الـ state مباشرة
+      // تحديث الـ demand في الـ state مباشرة - التغييرات تظهر فوراً!
       setDemands((prevDemands) =>
         prevDemands.map((demand) =>
           demand.id === editingDemand.id
@@ -180,10 +180,7 @@ export default function Bookings() {
       showSuccess('✅ تم تحديث الطلب بنجاح!');
       setEditingDemand(null);
 
-      // إعادة جلب البيانات لضمان التزامن مع الـ server
-      if (activeTab === 'demands') {
-        fetchBookings();
-      }
+      // لا حاجة لـ fetchBookings() - الـ state تم تحديثه مباشرة!
     } catch (err) {
       console.error('❌ Update failed:', err);
       showError(err.message || 'حدث خطأ أثناء تحديث الطلب');
