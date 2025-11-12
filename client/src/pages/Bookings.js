@@ -91,18 +91,18 @@ export default function Bookings() {
         let demandsWithResponses = myDemands;
         if (myDemands.length > 0) {
           try {
-            const demandIds = myDemands.map(d => d.id);
+            const demandIds = myDemands.map((d) => d.id);
             const batchResponses = await demandResponsesAPI.getBatch(demandIds);
 
             // دمج الردود مع كل طلب
-            demandsWithResponses = myDemands.map(demand => ({
+            demandsWithResponses = myDemands.map((demand) => ({
               ...demand,
               responses: batchResponses.data[demand.id] || [],
             }));
           } catch (error) {
             console.error('Failed to fetch batch responses:', error);
             // في حالة الفشل، استخدم الطلبات بدون ردود
-            demandsWithResponses = myDemands.map(demand => ({
+            demandsWithResponses = myDemands.map((demand) => ({
               ...demand,
               responses: [],
             }));
