@@ -162,9 +162,28 @@ export default function Bookings() {
       const response = await demandsAPI.update(editingDemand.id, updateData);
       console.log('✅ Update successful:', response);
 
+      // تحديث الـ demand في الـ state مباشرة
+      setDemands((prevDemands) =>
+        prevDemands.map((demand) =>
+          demand.id === editingDemand.id
+            ? {
+                ...demand,
+                earliestTime: updateData.earliestTime,
+                latestTime: updateData.latestTime,
+                seats: updateData.seats,
+                budgetMax: updateData.budgetMax,
+              }
+            : demand
+        )
+      );
+
       showSuccess('✅ تم تحديث الطلب بنجاح!');
       setEditingDemand(null);
-      fetchBookings();
+
+      // إعادة جلب البيانات لضمان التزامن مع الـ server
+      if (activeTab === 'demands') {
+        fetchBookings();
+      }
     } catch (err) {
       console.error('❌ Update failed:', err);
       showError(err.message || 'حدث خطأ أثناء تحديث الطلب');
