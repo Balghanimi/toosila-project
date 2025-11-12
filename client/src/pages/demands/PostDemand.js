@@ -250,12 +250,13 @@ export default function PostDemand() {
       };
 
       console.log('PostDemand - Sending to API:', demandData);
-      await demandsAPI.create(demandData);
+      const response = await demandsAPI.create(demandData);
+      console.log('✅ Demand created successfully:', response);
       setSuccess(true);
 
       setTimeout(() => {
         navigate('/bookings', { state: { tab: 'demands' } });
-      }, 2000);
+      }, 3000);
     } catch (err) {
       console.error('Error creating demand:', err);
       setError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
