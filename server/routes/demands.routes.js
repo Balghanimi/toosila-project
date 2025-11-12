@@ -8,6 +8,7 @@ const {
   getDemandById,
   updateDemand,
   deactivateDemand,
+  deleteDemand,
   getUserDemands,
   searchDemands,
   getCategories,
@@ -364,42 +365,7 @@ router.put('/:id/deactivate', moderateLimiter, deactivateDemand);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:id', moderateLimiter, async (req, res, next) => {
-  try {
-    const pool = req.app.get('dbPool');
-    const userId = req.user.id;
-    const demandId = req.params.id;
-
-    // Check if demand exists and belongs to user
-    const checkQuery = 'SELECT passenger_id FROM demands WHERE id = $1';
-    const checkResult = await pool.query(checkQuery, [demandId]);
-
-    if (checkResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'الطلب غير موجود',
-      });
-    }
-
-    if (checkResult.rows[0].passenger_id !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'غير مصرح لك بحذف هذا الطلب',
-      });
-    }
-
-    // Delete the demand
-    const deleteQuery = 'DELETE FROM demands WHERE id = $1';
-    await pool.query(deleteQuery, [demandId]);
-
-    res.json({
-      success: true,
-      message: 'تم حذف الطلب بنجاح',
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+router.delete('/:id', authenticateToken, moderateLimiter, deleteDemand);
 
 /**
  * @swagger
