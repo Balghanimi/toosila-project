@@ -34,6 +34,9 @@ logger.info('Socket.io initialized for real-time notifications');
 // Make io instance available globally for controllers
 app.set('io', io);
 
+// Make database pool available globally for controllers
+app.set('dbPool', pool);
+
 // Log metrics summary every 15 minutes (optional)
 if (config.NODE_ENV === 'production') {
   setInterval(logMetricsSummary, 15 * 60 * 1000); // 15 minutes

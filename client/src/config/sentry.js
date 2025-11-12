@@ -15,11 +15,9 @@ import * as Sentry from '@sentry/react';
 export const initializeSentry = () => {
   // Only initialize if DSN is provided
   if (!process.env.REACT_APP_SENTRY_DSN) {
-    console.warn('REACT_APP_SENTRY_DSN not found. Sentry error tracking is disabled.');
-    console.warn('To enable Sentry:');
-    console.warn('1. Sign up at https://sentry.io');
-    console.warn('2. Create a React project');
-    console.warn('3. Add REACT_APP_SENTRY_DSN to your .env file');
+    if (process.env.NODE_ENV === 'development') {
+      console.info('ℹ️ Sentry not configured (optional). To enable: Add REACT_APP_SENTRY_DSN to .env');
+    }
     return;
   }
 
