@@ -41,42 +41,45 @@ function NotificationDropdown({ onClose, dropdownRef }) {
       // الانتقال حسب نوع الإشعار
       const routes = {
         demand_response: () => {
-          // السائق رد على طلبك - انتقل إلى الطلبات وافتح modal العروض
+          // السائق رد على طلبك - انتقل إلى صفحة "طلباتي" وافتح modal العروض
           if (data.demandId) {
-            navigate('/demands', {
+            navigate('/bookings', {
               state: {
+                tab: 'demands',
                 openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
           } else {
-            navigate('/demands');
+            navigate('/bookings', { state: { tab: 'demands' } });
           }
         },
         response_accepted: () => {
-          // تم قبول ردك - انتقل إلى الطلبات
+          // تم قبول ردك - انتقل إلى صفحة "طلباتي"
           if (data.demandId) {
-            navigate('/demands', {
+            navigate('/bookings', {
               state: {
+                tab: 'demands',
                 openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
           } else {
-            navigate('/demands');
+            navigate('/bookings', { state: { tab: 'demands' } });
           }
         },
         response_rejected: () => {
-          // تم رفض ردك - انتقل إلى الطلبات
+          // تم رفض ردك - انتقل إلى صفحة "طلباتي"
           if (data.demandId) {
-            navigate('/demands', {
+            navigate('/bookings', {
               state: {
+                tab: 'demands',
                 openDemandId: data.demandId,
                 action: 'viewResponses',
               },
             });
           } else {
-            navigate('/demands');
+            navigate('/bookings', { state: { tab: 'demands' } });
           }
         },
         booking_created: () => {
