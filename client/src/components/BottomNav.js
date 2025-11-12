@@ -84,12 +84,41 @@ const BottomNav = () => {
   const { unreadMessages } = useNotifications();
   const currentPath = location.pathname;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
   // Get total unread message count (using NotificationContext polling instead)
   const totalUnreadCount = unreadMessages;
 
   // Responsive detection
   const isSmallMobile = window.innerWidth <= 375;
+
+  // Check for updates function
+  const checkForUpdates = async () => {
+    setIsCheckingUpdate(true);
+
+    try {
+      // Simulate checking for updates (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Simulate random update availability for demo
+      const hasUpdate = Math.random() > 0.5;
+      setUpdateAvailable(hasUpdate);
+
+      if (hasUpdate) {
+        alert('تحديث جديد متاح! سيتم إعادة تحميل الصفحة...');
+        // In production, trigger actual update
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        alert('✅ التطبيق محدّث! لا توجد تحديثات جديدة.');
+      }
+    } catch (error) {
+      console.error('Error checking for updates:', error);
+      alert('حدث خطأ أثناء التحقق من التحديثات');
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   // More menu items
   const MORE_MENU_ITEMS = [
@@ -392,10 +421,13 @@ const BottomNav = () => {
               ))}
             </div>
 
-            {/* App Version */}
+            {/* App Version with Update Button */}
             <div
               style={{
-                textAlign: 'center',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gap: '12px',
+                alignItems: 'center',
                 padding: '16px',
                 background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
                 borderRadius: '12px',
@@ -405,7 +437,83 @@ const BottomNav = () => {
                 marginTop: '16px',
               }}
             >
-              إصدار التطبيق 2.1.15 - 25/10/2024
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>
+                  إصدار التطبيق
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: '800' }}>2.1.15 - 25/10/2024</div>
+              </div>
+
+              {/* Update Check Button */}
+              <button
+                onClick={checkForUpdates}
+                disabled={isCheckingUpdate}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  padding: '12px 16px',
+                  background: isCheckingUpdate
+                    ? 'rgba(255, 255, 255, 0.3)'
+                    : updateAvailable
+                      ? 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                  color: isCheckingUpdate ? 'white' : updateAvailable ? 'white' : '#34c759',
+                  border: isCheckingUpdate
+                    ? '2px solid rgba(255, 255, 255, 0.5)'
+                    : '2px solid white',
+                  borderRadius: '12px',
+                  cursor: isCheckingUpdate ? 'not-allowed' : 'pointer',
+                  fontFamily: '"Cairo", sans-serif',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  transition: 'all 0.3s ease',
+                  minWidth: '90px',
+                  boxShadow: isCheckingUpdate
+                    ? 'none'
+                    : '0 4px 12px rgba(0, 0, 0, 0.15)',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isCheckingUpdate) {
+                    e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.25)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isCheckingUpdate) {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  }
+                }}
+              >
+                {isCheckingUpdate ? (
+                  <>
+                    <div
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTop: '2px solid white',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                      }}
+                    />
+                    <span style={{ fontSize: '10px' }}>جاري الفحص...</span>
+                  </>
+                ) : updateAvailable ? (
+                  <>
+                    <div style={{ fontSize: '20px', animation: 'bounce 1s infinite' }}>🔄</div>
+                    <span>تحديث متاح!</span>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: '20px' }}>✓</div>
+                    <span>محدّث</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -629,6 +737,26 @@ const BottomNav = () => {
           }
           to {
             transform: translateY(0);
+          }
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-8px,0);
+          }
+          70% {
+            transform: translate3d(0,-4px,0);
+          }
+          90% {
+            transform: translate3d(0,-2px,0);
           }
         }
 
