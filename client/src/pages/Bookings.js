@@ -144,17 +144,29 @@ export default function Bookings() {
   const handleUpdateDemand = async () => {
     if (!editingDemand) return;
 
+    console.log('🔄 Starting demand update...', {
+      id: editingDemand.id,
+      oldData: editingDemand,
+      newData: editForm,
+    });
+
     try {
-      await demandsAPI.update(editingDemand.id, {
+      const updateData = {
         earliestTime: new Date(editForm.earliestTime).toISOString(),
         latestTime: new Date(editForm.latestTime).toISOString(),
         seats: parseInt(editForm.seats),
         budgetMax: parseFloat(editForm.budgetMax),
-      });
+      };
+
+      console.log('📤 Sending update to API:', updateData);
+      const response = await demandsAPI.update(editingDemand.id, updateData);
+      console.log('✅ Update successful:', response);
+
       showSuccess('✅ تم تحديث الطلب بنجاح!');
       setEditingDemand(null);
       fetchBookings();
     } catch (err) {
+      console.error('❌ Update failed:', err);
       showError(err.message || 'حدث خطأ أثناء تحديث الطلب');
     }
   };
