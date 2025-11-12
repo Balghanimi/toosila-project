@@ -16,7 +16,9 @@ export const initializeSentry = () => {
   // Only initialize if DSN is provided
   if (!process.env.REACT_APP_SENTRY_DSN) {
     if (process.env.NODE_ENV === 'development') {
-      console.info('ℹ️ Sentry not configured (optional). To enable: Add REACT_APP_SENTRY_DSN to .env');
+      console.info(
+        'ℹ️ Sentry not configured (optional). To enable: Add REACT_APP_SENTRY_DSN to .env'
+      );
     }
     return;
   }
