@@ -557,7 +557,6 @@ export default function Bookings() {
             aria-label="الحجوزات الواردة على عروضي - للسائقين"
             style={{
               padding: 'var(--space-3)',
-              border: 'none',
               borderRadius: 'var(--radius-sm)',
               background:
                 activeTab === 'received'
