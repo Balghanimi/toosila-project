@@ -76,51 +76,81 @@ class RedisCache {
    */
   async connect() {
     if (!this.isEnabled) {
-      console.log('Redis: Caching is disabled via environment variable');
+      console.log('ℹ️  Redis: Caching is disabled via REDIS_ENABLED=false environment variable');
+      console.log('ℹ️  Redis: Application will run without caching (direct database queries)');
       return;
     }
 
     try {
-      console.log('Redis: Attempting to connect...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔌 Redis: Attempting to connect to', REDIS_CONFIG.url);
+      }
 
       this.client = redis.createClient(REDIS_CONFIG);
 
       // Event handlers
       this.client.on('connect', () => {
-        console.log('Redis: Connection established');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔗 Redis: Connection established');
+        }
       });
 
       this.client.on('ready', () => {
         this.isConnected = true;
-        console.log('Redis: Client is ready');
+        console.log('✅ Redis: Client is ready and connected');
       });
 
       this.client.on('error', (err) => {
-        console.error('Redis: Error:', err.message);
+        // Suppress repetitive error messages
+        if (!err.message.includes('ECONNREFUSED')) {
+          console.error('❌ Redis: Error:', err.message);
+        }
         this.isConnected = false;
       });
 
       this.client.on('end', () => {
-        console.log('Redis: Connection closed');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔌 Redis: Connection closed');
+        }
         this.isConnected = false;
       });
 
       this.client.on('reconnecting', () => {
-        console.log('Redis: Attempting to reconnect...');
+        // Only log first reconnection attempt
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 Redis: Attempting to reconnect...');
+        }
       });
 
-      // Connect to Redis
-      await this.client.connect();
+      // Connect to Redis with timeout
+      const connectPromise = this.client.connect();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout after 5s')), 5000)
+      );
+
+      await Promise.race([connectPromise, timeoutPromise]);
 
       // Test connection
       await this.client.ping();
-      console.log('Redis: Successfully connected and tested');
+      console.log('✅ Redis: Successfully connected and tested');
 
     } catch (error) {
-      console.error('Redis: Failed to connect:', error.message);
-      console.log('Redis: Running without cache. All cache operations will be no-ops.');
+      console.log('⚠️  Redis: Unable to connect -', error.message);
+      console.log('ℹ️  Redis: Running without cache. Performance may be slower.');
+      console.log('ℹ️  Redis: To disable this warning, set REDIS_ENABLED=false in .env');
+      console.log('ℹ️  Redis: To enable caching, install Redis: https://redis.io/docs/getting-started/');
+
       this.isConnected = false;
-      this.client = null;
+
+      // Clean up client if connection failed
+      if (this.client) {
+        try {
+          await this.client.disconnect();
+        } catch (disconnectError) {
+          // Ignore disconnect errors
+        }
+        this.client = null;
+      }
     }
   }
 

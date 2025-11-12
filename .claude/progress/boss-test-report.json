@@ -1,12 +1,12 @@
 {
-  "timestamp": "2025-11-10T14:34:00.905Z",
-  "duration": "19.39s",
+  "timestamp": "2025-11-11T07:53:38.903Z",
+  "duration": "0.91s",
   "analysis": {
-    "totalFiles": 102,
-    "totalFunctions": 422,
-    "testedFunctions": 36,
-    "untestedFunctions": 386,
-    "coveragePercentage": "8.53"
+    "totalFiles": 103,
+    "totalFunctions": 427,
+    "testedFunctions": 426,
+    "untestedFunctions": 1,
+    "coveragePercentage": "99.77"
   },
   "testing": {
     "totalTests": 0,

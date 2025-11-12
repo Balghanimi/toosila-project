@@ -39,7 +39,16 @@
       "Bash(node:*)",
       "Bash(echo:*)",
       "Bash(\"C:\\Users\\a2z\\toosila-project\\PERFORMANCE_SUMMARY.md\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(psql:*)",
+      "Bash(set:*)",
+      "Bash(curl:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run:*)",
+      "Bash(del check-db-schema.js check-indexes.js)",
+      "Bash(redis-cli ping:*)",
+      "Bash(del nul 2)",
+      "Bash(NUL)"
     ],
     "deny": [],
     "ask": []
