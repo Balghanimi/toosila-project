@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 // Simple outline SVG icons
 const Icons = {
@@ -82,6 +83,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { unreadMessages } = useNotifications();
+  const { currentUser } = useAuth();
   const currentPath = location.pathname;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
@@ -261,7 +263,7 @@ const BottomNav = () => {
 
     // Navigate to the primary path for each section
     const navigationMap = {
-      carpool: '/',
+      carpool: currentUser && currentUser.isDriver ? '/demands' : '/offers',
       mytrips: '/bookings',
       messages: '/messages',
       profile: '/profile',
