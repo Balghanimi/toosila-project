@@ -99,7 +99,7 @@ const BottomNav = () => {
 
     try {
       // Simulate checking for updates (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Simulate random update availability for demo
       const hasUpdate = Math.random() > 0.5;
@@ -471,9 +471,7 @@ const BottomNav = () => {
                   fontWeight: '700',
                   transition: 'all 0.3s ease',
                   minWidth: '90px',
-                  boxShadow: isCheckingUpdate
-                    ? 'none'
-                    : '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  boxShadow: isCheckingUpdate ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.15)',
                 }}
                 onMouseEnter={(e) => {
                   if (!isCheckingUpdate) {
