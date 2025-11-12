@@ -62,6 +62,9 @@ export default function Bookings() {
         const response = await demandsAPI.getAll({ passengerId: currentUser?.id });
         const myDemands = response.demands || [];
 
+        console.log('📦 Fetched demands:', myDemands);
+        console.log('📦 First demand ID:', myDemands[0]?.id);
+
         // جلب الردود لكل طلب
         const demandsWithResponses = await Promise.all(
           myDemands.map(async (demand) => {
@@ -157,6 +160,10 @@ export default function Bookings() {
   };
 
   const handleDeleteDemand = async (demandId) => {
+    console.log('🔍 Attempting to delete demand with ID:', demandId);
+    console.log('🔍 ID type:', typeof demandId);
+    console.log('🔍 ID length:', demandId?.length);
+
     if (!window.confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
 
     try {
@@ -164,6 +171,7 @@ export default function Bookings() {
       showSuccess('✅ تم حذف الطلب بنجاح!');
       fetchBookings();
     } catch (err) {
+      console.error('❌ Delete error:', err);
       showError(err.message || 'حدث خطأ أثناء حذف الطلب');
     }
   };
