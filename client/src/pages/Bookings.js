@@ -90,6 +90,7 @@ export default function Bookings() {
             ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
             : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
 
+        console.log(`📦 Fetched bookings (${activeTab}):`, response.bookings || []);
         setBookings(response.bookings || []);
       }
     } catch (err) {
