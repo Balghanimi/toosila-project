@@ -23,7 +23,7 @@ npm run db:migrate:009
 إذا كان لديك Railway CLI مثبت:
 
 ```bash
-railway login
+railway login --browserless
 railway link
 railway run npm run db:migrate:009
 ```
