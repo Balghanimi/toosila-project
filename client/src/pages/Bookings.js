@@ -554,21 +554,48 @@ export default function Bookings() {
             role="tab"
             aria-selected={activeTab === 'received'}
             aria-controls="bookings-panel"
-            aria-label="الحجوزات الواردة على عروضي"
+            aria-label="الحجوزات الواردة على عروضي - للسائقين"
             style={{
               padding: 'var(--space-3)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
-              background: activeTab === 'received' ? 'var(--surface-primary)' : 'transparent',
-              color: activeTab === 'received' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              background:
+                activeTab === 'received'
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+              color: activeTab === 'received' ? 'white' : '#065f46',
               fontSize: 'var(--text-sm)',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'received' ? 'var(--shadow-sm)' : 'none',
+              boxShadow:
+                activeTab === 'received'
+                  ? '0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2)'
+                  : 'none',
+              border: '2px solid #10b981',
+              position: 'relative',
+              transition: 'all 0.3s ease',
             }}
           >
-            📬 الحجوزات الواردة
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '2px',
+              }}
+            >
+              <div>🚗 الحجوزات الواردة</div>
+              <div
+                style={{
+                  fontSize: '10px',
+                  fontWeight: '500',
+                  opacity: 0.9,
+                }}
+              >
+                (للسائقين)
+              </div>
+            </div>
           </button>
         </div>
 
@@ -796,21 +823,62 @@ export default function Bookings() {
             style={{
               textAlign: 'center',
               padding: 'var(--space-8)',
-              background: 'var(--surface-primary)',
+              background:
+                activeTab === 'received'
+                  ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)'
+                  : 'var(--surface-primary)',
               borderRadius: 'var(--radius-xl)',
               boxShadow: 'var(--shadow-md)',
+              border: activeTab === 'received' ? '2px solid #10b981' : 'none',
             }}
           >
-            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>📭</div>
+            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
+              {activeTab === 'received' ? '🚗' : '📭'}
+            </div>
             <p
               style={{
                 fontSize: 'var(--text-lg)',
-                color: 'var(--text-secondary)',
+                fontWeight: '700',
+                color: activeTab === 'received' ? '#065f46' : 'var(--text-secondary)',
+                marginBottom: 'var(--space-2)',
                 fontFamily: '"Cairo", sans-serif',
               }}
             >
-              {activeTab === 'received' ? 'لا توجد حجوزات واردة حالياً' : 'لم تقم بأي حجوزات بعد'}
+              {activeTab === 'received'
+                ? 'لا توجد حجوزات واردة على عروضك'
+                : 'لم تقم بأي حجوزات بعد'}
             </p>
+            {activeTab === 'received' && (
+              <div
+                style={{
+                  marginTop: 'var(--space-4)',
+                  padding: 'var(--space-4)',
+                  background: 'white',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid #10b981',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: '#047857',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  💡 <strong>للسائقين:</strong> هذا القسم يعرض حجوزات الركاب على عروضك
+                </p>
+                <p
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: '#047857',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  لاستقبال حجوزات، قم بإنشاء عرض جديد من صفحة "العروض"
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div>{bookings.map(renderBookingCard)}</div>
