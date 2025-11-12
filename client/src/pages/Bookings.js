@@ -91,14 +91,27 @@ export default function Bookings() {
         let demandsWithResponses = myDemands;
         if (myDemands.length > 0) {
           try {
-            const demandIds = myDemands.map((d) => d.id);
-            const batchResponses = await demandResponsesAPI.getBatch(demandIds);
+            // فلترة الـ IDs - التأكد من أنها صحيحة (UUID format)
+            const demandIds = myDemands
+              .map((d) => d.id)
+              .filter((id) => id && typeof id === 'string' && id.length === 36);
+
+            console.log('📤 Sending batch request for demand IDs:', demandIds);
 
             // دمج الردود مع كل طلب
-            demandsWithResponses = myDemands.map((demand) => ({
-              ...demand,
-              responses: batchResponses.data[demand.id] || [],
-            }));
+            if (demandIds.length > 0) {
+              const batchResponses = await demandResponsesAPI.getBatch(demandIds);
+              demandsWithResponses = myDemands.map((demand) => ({
+                ...demand,
+                responses: batchResponses.data[demand.id] || [],
+              }));
+            } else {
+              // إذا لم يكن هناك IDs صالحة، استخدم الطلبات بدون ردود
+              demandsWithResponses = myDemands.map((demand) => ({
+                ...demand,
+                responses: [],
+              }));
+            }
           } catch (error) {
             console.error('Failed to fetch batch responses:', error);
             // في حالة الفشل، استخدم الطلبات بدون ردود
@@ -223,8 +236,15 @@ export default function Bookings() {
 
     try {
       await demandsAPI.delete(demandId);
+      console.log('✅ Delete API call successful for:', demandId);
+
+      // تحديث الـ state مباشرة - إزالة الطلب المحذوف من القائمة
+      setDemands((prevDemands) => prevDemands.filter((demand) => demand.id !== demandId));
+
       showSuccess('✅ تم حذف الطلب بنجاح!');
-      fetchBookings();
+
+      // تحديث عدد الحجوزات المعلقة
+      fetchPendingCount();
     } catch (err) {
       console.error('❌ Delete error:', err);
       showError(err.message || 'حدث خطأ أثناء حذف الطلب');
