@@ -7,7 +7,7 @@ import DemandResponsesList from '../components/DemandResponsesList';
 
 export default function Bookings() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.state?.tab || 'received'); // 'received', 'sent', or 'demands'
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'demands'); // 'demands', 'sent', or 'received'
   const [bookings, setBookings] = useState([]);
   const [demands, setDemands] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -508,25 +508,25 @@ export default function Bookings() {
           }}
         >
           <button
-            onClick={() => setActiveTab('received')}
+            onClick={() => setActiveTab('demands')}
             role="tab"
-            aria-selected={activeTab === 'received'}
+            aria-selected={activeTab === 'demands'}
             aria-controls="bookings-panel"
-            aria-label="الحجوزات الواردة على عروضي"
+            aria-label="طلباتي التي أنشأتها"
             style={{
               padding: 'var(--space-3)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
-              background: activeTab === 'received' ? 'var(--surface-primary)' : 'transparent',
-              color: activeTab === 'received' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
+              color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
               fontSize: 'var(--text-sm)',
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'received' ? 'var(--shadow-sm)' : 'none',
+              boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
             }}
           >
-            📬 الحجوزات الواردة
+            🙋 طلباتي
           </button>
           <button
             onClick={() => setActiveTab('sent')}
@@ -550,25 +550,25 @@ export default function Bookings() {
             📤 حجوزاتي
           </button>
           <button
-            onClick={() => setActiveTab('demands')}
+            onClick={() => setActiveTab('received')}
             role="tab"
-            aria-selected={activeTab === 'demands'}
+            aria-selected={activeTab === 'received'}
             aria-controls="bookings-panel"
-            aria-label="طلباتي التي أنشأتها"
+            aria-label="الحجوزات الواردة على عروضي"
             style={{
               padding: 'var(--space-3)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
-              background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
-              color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              background: activeTab === 'received' ? 'var(--surface-primary)' : 'transparent',
+              color: activeTab === 'received' ? 'var(--text-primary)' : 'var(--text-secondary)',
               fontSize: 'var(--text-sm)',
               fontWeight: '600',
               cursor: 'pointer',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
+              boxShadow: activeTab === 'received' ? 'var(--shadow-sm)' : 'none',
             }}
           >
-            🙋 طلباتي
+            📬 الحجوزات الواردة
           </button>
         </div>
 
