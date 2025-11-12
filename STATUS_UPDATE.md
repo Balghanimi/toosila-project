@@ -107,11 +107,45 @@
 
 **الحالة / Status**: ✅ **تم الحل / RESOLVED**
 
+### 6. إشعارات الطلبات المحذوفة / Deleted Demand Notifications
+**المشكلة**: إشعار "عرض جديد على طلبك" يظهر رغم حذف الطلب
+**Problem**: Notification "New offer on your request" appears even though demand was deleted
+
+**السبب / Root Cause**:
+- الإشعارات لا تُحذف تلقائياً عند حذف الطلب
+- لا يوجد foreign key constraint بين notifications و demands
+- البيانات مخزنة في JSONB column بدون علاقة قاعدة بيانات
+
+**الحل المطبق**:
+- ✅ تم تطبيق Migration 014 على قاعدة البيانات
+- ✅ حذف الإشعارات اليتيمة (orphaned notifications)
+- ✅ إضافة triggers تلقائية لحذف الإشعارات عند حذف الطلب/الحجز
+- ✅ إضافة معالجة رشيقة في Frontend لعرض رسالة خطأ إذا كان الطلب محذوفاً
+
+**Solution Applied**:
+- ✅ Migration 014 applied to production database
+- ✅ Removed orphaned notifications (1 found and deleted)
+- ✅ Added automatic triggers to delete notifications when demand/booking deleted
+- ✅ Added graceful handling in Frontend to show error if demand doesn't exist
+
+**الملفات المعدلة / Files Modified**:
+- `server/database/migrations/014_cleanup_orphaned_notifications.sql`
+- `server/scripts/run-migration-014-notifications.js`
+- `client/src/pages/Bookings.js`
+
+**النتائج / Results**:
+- 🗑️ تم حذف إشعار يتيم واحد من قاعدة البيانات
+- 🔄 الإشعارات تُحذف تلقائياً عند حذف الطلب/الحجز
+- ✅ رسالة خطأ واضحة إذا حاول المستخدم فتح طلب محذوف
+- ⚡ فهارس أداء للاستعلامات الأسرع
+
+**الحالة / Status**: ✅ **تم الحل / RESOLVED**
+
 ---
 
 ## 🔍 تحت المراقبة / Under Investigation
 
-### 6. رسالة "تم نشر الطلب بنجاح" لا تظهر / Success Message Not Showing
+### 7. رسالة "تم نشر الطلب بنجاح" لا تظهر / Success Message Not Showing
 **المشكلة**: عند إنشاء طلب جديد، لا تظهر رسالة النجاح
 **Problem**: When creating new demand, success message doesn't show
 
@@ -137,7 +171,7 @@ console.log('✅ Demand created successfully:', response);
 
 ## 📋 معلومات فقط / Informational
 
-### 7. صفحة الإشعارات فارغة / Notifications Page Empty
+### 8. صفحة الإشعارات فارغة / Notifications Page Empty
 **الموقف**: عند النقر على جرس الإشعارات، تظهر رسالة "لا توجد إشعارات"
 **Situation**: When clicking notification bell, shows "No notifications"
 
@@ -180,6 +214,7 @@ console.log('✅ Demand created successfully:', response);
 | بطء صفحة الطلبات | ✅ تم الحل | لا شيء - أسرع 10-50x |
 | أيقونة Home في BottomNav | ✅ تم الحل | لا شيء - توجه للبحث مباشرة |
 | تعديل الطلبات لا يظهر | ✅ تم الحل | لا شيء - يظهر فوراً بدون refresh |
+| إشعارات الطلبات المحذوفة | ✅ تم الحل | لا شيء - تُحذف تلقائياً |
 | رسالة النجاح لا تظهر | ⏳ في الانتظار | اختبار + تأكيد |
 | صفحة الإشعارات فارغة | ℹ️ طبيعي | لا شيء - يعمل صحيح |
 
@@ -237,13 +272,47 @@ FOR EACH ROW EXECUTE FUNCTION update_demand_response_count();
 - Automatically updated via database trigger
 - 10-50x faster queries
 
+### Migration 014 Details
+```sql
+-- Delete orphaned notifications
+DELETE FROM notifications
+WHERE type IN ('demand_response', 'response_accepted', 'response_rejected')
+AND data->>'demandId' IS NOT NULL
+AND NOT EXISTS (
+  SELECT 1 FROM demands WHERE id::text = data->>'demandId'
+);
+
+-- Create trigger for automatic cleanup
+CREATE OR REPLACE FUNCTION cleanup_demand_notifications()
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM notifications
+  WHERE type IN ('demand_response', 'response_accepted', 'response_rejected')
+  AND data->>'demandId' = OLD.id::text;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_cleanup_demand_notifications
+AFTER DELETE ON demands
+FOR EACH ROW
+EXECUTE FUNCTION cleanup_demand_notifications();
+```
+
+**Why this works**:
+- Removes existing orphaned notifications (found 1)
+- Automatically deletes notifications when demand/booking is deleted
+- Prevents accumulation of stale notifications
+- Performance indexes for faster queries
+
 ### Deployment Status
 - ✅ All code changes pushed to GitHub
 - ✅ Migration 012 executed on Railway production database
 - ✅ Migration 013 executed on Railway production database
+- ✅ Migration 014 executed on Railway production database (1 orphaned notification deleted)
 - ✅ BottomNav fix deployed to Railway
 - ✅ All components deployed and live
 
 ---
 
-**آخر تحديث / Last Updated**: 2025-11-12 11:15 UTC
+**آخر تحديث / Last Updated**: 2025-11-12 17:52 UTC
