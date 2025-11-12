@@ -80,13 +80,31 @@ pool.on('remove', () => {
   }
 });
 
-// Helper function to execute queries
+// Helper function to execute queries with performance logging
 const query = async (text, params) => {
+  const start = Date.now();
   try {
     const res = await pool.query(text, params);
+    const duration = Date.now() - start;
+
+    // Log slow queries (> 100ms)
+    if (duration > 100) {
+      console.warn(`⚠️ Slow query (${duration}ms):`, text.substring(0, 100) + '...');
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('   Params:', params);
+      }
+    }
+
+    // Log very slow queries (> 1000ms) as errors
+    if (duration > 1000) {
+      console.error(`❌ VERY SLOW query (${duration}ms):`, text);
+    }
+
     return res;
   } catch (error) {
-    console.error('Query error:', error);
+    const duration = Date.now() - start;
+    console.error(`Query error after ${duration}ms:`, error.message);
+    console.error('Query:', text.substring(0, 200));
     throw error;
   }
 };

@@ -48,7 +48,12 @@
       "Bash(del check-db-schema.js check-indexes.js)",
       "Bash(redis-cli ping:*)",
       "Bash(del nul 2)",
-      "Bash(NUL)"
+      "Bash(NUL)",
+      "Bash(del servertest-dbpool.js)",
+      "Bash(railway unlink:*)",
+      "Bash(railway link:*)",
+      "Bash($env:DATABASE_URL = \"postgresql://postgres:AgceSqBLRSzBwSUBFoBLqjJwWmRpAoLl@postgres.railway.internal:5432/railway\")",
+      "Bash(railway run psql:*)"
     ],
     "deny": [],
     "ask": []

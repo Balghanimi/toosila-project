@@ -205,6 +205,36 @@ class DemandResponse {
   }
 
   /**
+   * جلب الردود لعدة طلبات دفعة واحدة (Batch fetch)
+   * @param {number[]} demandIds - مصفوفة معرفات الطلبات
+   * @returns {Promise<DemandResponse[]>}
+   *
+   * This method solves the N+1 query problem by fetching all responses in ONE query
+   */
+  static async findByDemandIds(demandIds) {
+    if (!demandIds || demandIds.length === 0) {
+      return [];
+    }
+
+    // Create placeholders for SQL IN clause: $1, $2, $3, etc.
+    const placeholders = demandIds.map((_, index) => `$${index + 1}`).join(', ');
+
+    const result = await query(
+      `SELECT dr.*,
+              u.name as driver_name,
+              u.rating_avg as driver_rating,
+              u.rating_count as driver_rating_count
+       FROM demand_responses dr
+       JOIN users u ON dr.driver_id = u.id
+       WHERE dr.demand_id IN (${placeholders})
+       ORDER BY dr.demand_id, dr.created_at DESC`,
+      demandIds
+    );
+
+    return result.rows.map(row => new DemandResponse(row));
+  }
+
+  /**
    * تحويل الكائن إلى JSON
    * @returns {Object}
    */

@@ -72,9 +72,11 @@ class Booking {
 
     values.push(limit, offset);
 
+    // Use window function to get count in same query - eliminates double query
     const result = await query(
       `SELECT b.*, o.from_city, o.to_city, o.departure_time, o.price, o.seats,
-              u1.name as passenger_name, u2.name as driver_name
+              u1.name as passenger_name, u2.name as driver_name,
+              COUNT(*) OVER() as total_count
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
        JOIN users u1 ON b.passenger_id = u1.id
@@ -85,19 +87,14 @@ class Booking {
       values
     );
 
-    const countResult = await query(
-      `SELECT COUNT(*) FROM bookings b
-       JOIN offers o ON b.offer_id = o.id
-       ${whereClause}`,
-      values.slice(0, -2)
-    );
+    const total = result.rows.length > 0 ? parseInt(result.rows[0].total_count) : 0;
 
     return {
       bookings: result.rows.map(row => new Booking(row)),
-      total: parseInt(countResult.rows[0].count),
+      total,
       page,
       limit,
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+      totalPages: Math.ceil(total / limit)
     };
   }
 

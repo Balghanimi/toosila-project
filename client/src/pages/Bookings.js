@@ -45,9 +45,31 @@ export default function Bookings() {
     }
   }, [highlightedBooking]);
 
-  // Clear location state after using it
+  // Handle notification navigation to specific demand
   useEffect(() => {
-    if (location.state) {
+    if (location.state?.openDemandId && demands.length > 0) {
+      const demandId = location.state.openDemandId;
+      const demand = demands.find((d) => d.id === demandId);
+
+      if (demand) {
+        // إذا وُجد الطلب، افتح modal الردود
+        console.log('✅ Found demand from notification:', demandId);
+        // TODO: Add logic to open responses modal here if needed
+      } else {
+        // إذا لم يُوجد الطلب، اعرض رسالة توضيحية
+        console.warn('⚠️ Demand not found (may be deleted):', demandId);
+        showError('هذا الطلب لم يعد موجوداً. ربما تم حذفه.');
+      }
+
+      // امسح الـ state لمنع إعادة التشغيل عند refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, demands]);
+
+  // Clear location state after using it (for other navigation states)
+  useEffect(() => {
+    if (location.state && !location.state.openDemandId) {
       navigate(location.pathname, { replace: true, state: {} });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,23 +87,27 @@ export default function Bookings() {
         console.log('📦 Fetched demands:', myDemands);
         console.log('📦 First demand ID:', myDemands[0]?.id);
 
-        // جلب الردود لكل طلب
-        const demandsWithResponses = await Promise.all(
-          myDemands.map(async (demand) => {
-            try {
-              const responsesData = await demandResponsesAPI.getByDemandId(demand.id);
-              return {
-                ...demand,
-                responses: responsesData.responses || [],
-              };
-            } catch {
-              return {
-                ...demand,
-                responses: [],
-              };
-            }
-          })
-        );
+        // جلب الردود لجميع الطلبات دفعة واحدة (يحل مشكلة N+1)
+        let demandsWithResponses = myDemands;
+        if (myDemands.length > 0) {
+          try {
+            const demandIds = myDemands.map(d => d.id);
+            const batchResponses = await demandResponsesAPI.getBatch(demandIds);
+
+            // دمج الردود مع كل طلب
+            demandsWithResponses = myDemands.map(demand => ({
+              ...demand,
+              responses: batchResponses.data[demand.id] || [],
+            }));
+          } catch (error) {
+            console.error('Failed to fetch batch responses:', error);
+            // في حالة الفشل، استخدم الطلبات بدون ردود
+            demandsWithResponses = myDemands.map(demand => ({
+              ...demand,
+              responses: [],
+            }));
+          }
+        }
 
         setDemands(demandsWithResponses);
       } else {

@@ -289,6 +289,14 @@ export const demandResponsesAPI = {
     });
   },
 
+  // جلب الردود لعدة طلبات دفعة واحدة (batch) - Fixes N+1 problem
+  getBatch: async (demandIds) => {
+    const idsString = Array.isArray(demandIds) ? demandIds.join(',') : demandIds;
+    return apiRequest(`/demand-responses/batch?demandIds=${idsString}`, {
+      method: 'GET',
+    });
+  },
+
   // جلب ردود السائق الحالي
   getMyResponses: async () => {
     return apiRequest('/demand-responses/my-responses', {

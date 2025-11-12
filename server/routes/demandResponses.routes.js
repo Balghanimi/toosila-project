@@ -10,7 +10,8 @@ const {
   getMyResponses,
   updateResponseStatus,
   deleteDemandResponse,
-  getResponseById
+  getResponseById,
+  getResponsesBatch
 } = require('../controllers/demandResponses.controller');
 
 /**
@@ -67,6 +68,18 @@ router.post(
   checkDriver,
   ...validateCreateResponse,
   createDemandResponse
+);
+
+/**
+ * GET /api/demand-responses/batch?demandIds=1,2,3
+ * جلب الردود لعدة طلبات دفعة واحدة (fixes N+1 query problem)
+ * للراكب صاحب الطلبات
+ * ملاحظة: يجب أن يكون هذا المسار قبل /:id لتجنب التعارض
+ */
+router.get(
+  '/batch',
+  authenticateToken,
+  getResponsesBatch
 );
 
 /**

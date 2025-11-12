@@ -336,11 +336,61 @@ const getResponseById = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * جلب الردود لعدة طلبات دفعة واحدة (Batch endpoint)
+ * GET /api/demand-responses/batch?demandIds=1,2,3
+ * للراكب صاحب الطلبات
+ *
+ * This fixes the N+1 query problem in the frontend
+ */
+const getResponsesBatch = asyncHandler(async (req, res) => {
+  const { demandIds } = req.query;
+
+  if (!demandIds) {
+    throw new AppError('demandIds parameter is required', 400);
+  }
+
+  // Parse comma-separated IDs
+  const ids = demandIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+
+  if (ids.length === 0) {
+    return res.json({
+      success: true,
+      data: {}
+    });
+  }
+
+  if (ids.length > 100) {
+    throw new AppError('Maximum 100 demand IDs allowed per request', 400);
+  }
+
+  // Fetch all responses for these demands in ONE query
+  const responses = await DemandResponse.findByDemandIds(ids);
+
+  // Group responses by demand_id
+  const responsesByDemand = {};
+  ids.forEach(id => {
+    responsesByDemand[id] = [];
+  });
+
+  responses.forEach(response => {
+    if (responsesByDemand[response.demandId] !== undefined) {
+      responsesByDemand[response.demandId].push(response.toJSON());
+    }
+  });
+
+  res.json({
+    success: true,
+    data: responsesByDemand
+  });
+});
+
 module.exports = {
   createDemandResponse,
   getResponsesByDemand,
   getMyResponses,
   updateResponseStatus,
   deleteDemandResponse,
-  getResponseById
+  getResponseById,
+  getResponsesBatch
 };

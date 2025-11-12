@@ -32,7 +32,7 @@
 
 أو استخدم Railway CLI:
 
-   railway login
+   railway login --browserless
    railway link
    railway run npm run db:migrate:012
 
