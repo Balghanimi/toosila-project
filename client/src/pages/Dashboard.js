@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { statsAPI } from '../services/api';
-import { SkeletonLoader } from '../components/UI/SkeletonLoader';
+import SkeletonLoader from '../components/UI/SkeletonLoader';
 
 const Dashboard = () => {
   const navigate = useNavigate();

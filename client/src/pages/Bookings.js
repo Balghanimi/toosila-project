@@ -5,7 +5,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { bookingsAPI, demandsAPI, demandResponsesAPI } from '../services/api';
 import DemandResponsesList from '../components/DemandResponsesList';
 import ConfirmDialog from '../components/UI/ConfirmDialog';
-import { SkeletonLoader } from '../components/UI/SkeletonLoader';
+import SkeletonLoader from '../components/UI/SkeletonLoader';
 
 export default function Bookings() {
   const location = useLocation();

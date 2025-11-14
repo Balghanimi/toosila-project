@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
 import MessageSearch from './MessageSearch';
-import { SkeletonLoader } from '../UI/SkeletonLoader';
+import SkeletonLoader from '../UI/SkeletonLoader';
 
 const ConversationList = ({ onSelectConversation, selectedConversation, loading }) => {
   const { conversations, fetchConversations } = useMessages();
