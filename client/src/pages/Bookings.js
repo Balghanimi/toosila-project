@@ -18,6 +18,7 @@ export default function Bookings() {
     location.state?.highlightBookingId || null
   );
   const [editingDemand, setEditingDemand] = useState(null);
+  const [expandedDemandId, setExpandedDemandId] = useState(null);
   const [editForm, setEditForm] = useState({
     earliestTime: '',
     latestTime: '',
@@ -61,9 +62,22 @@ export default function Bookings() {
       const demand = demands.find((d) => d.id === demandId);
 
       if (demand) {
-        // إذا وُجد الطلب، افتح modal الردود
+        // إذا وُجد الطلب، افتح قسم الردود
         console.log('✅ Found demand from notification:', demandId);
-        // TODO: Add logic to open responses modal here if needed
+        setExpandedDemandId(demandId);
+
+        // تمرير إلى الطلب المحدد
+        setTimeout(() => {
+          const element = document.getElementById(`demand-${demandId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+
+        // إزالة التمييز بعد 5 ثوان
+        setTimeout(() => {
+          setExpandedDemandId(null);
+        }, 5000);
       } else {
         // إذا لم يُوجد الطلب، اعرض رسالة توضيحية
         console.warn('⚠️ Demand not found (may be deleted):', demandId);
@@ -763,12 +777,22 @@ export default function Bookings() {
               {demands.map((demand) => (
                 <div
                   key={demand.id}
+                  id={`demand-${demand.id}`}
                   style={{
-                    background: 'var(--surface-primary)',
+                    background:
+                      expandedDemandId === demand.id
+                        ? 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)'
+                        : 'var(--surface-primary)',
                     borderRadius: 'var(--radius-lg)',
                     padding: 'var(--space-4)',
                     marginBottom: 'var(--space-6)',
-                    boxShadow: 'var(--shadow-md)',
+                    boxShadow:
+                      expandedDemandId === demand.id
+                        ? '0 10px 25px -5px rgba(59, 130, 246, 0.3)'
+                        : 'var(--shadow-md)',
+                    border:
+                      expandedDemandId === demand.id ? '2px solid #3b82f6' : '1px solid transparent',
+                    transition: 'all 0.3s ease',
                   }}
                 >
                   {/* معلومات الطلب */}
@@ -869,17 +893,38 @@ export default function Bookings() {
 
                   {/* الردود على الطلب */}
                   <div>
-                    <h4
+                    <div
                       style={{
-                        fontSize: 'var(--text-base)',
-                        fontWeight: '600',
-                        color: 'var(--text-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         marginBottom: 'var(--space-3)',
-                        fontFamily: '"Cairo", sans-serif',
                       }}
                     >
-                      الردود ({demand.responses?.length || 0})
-                    </h4>
+                      <h4
+                        style={{
+                          fontSize: 'var(--text-base)',
+                          fontWeight: '600',
+                          color: 'var(--text-primary)',
+                          fontFamily: '"Cairo", sans-serif',
+                        }}
+                      >
+                        الردود ({demand.responses?.length || 0})
+                      </h4>
+                      {expandedDemandId === demand.id && demand.responses?.length > 0 && (
+                        <span
+                          style={{
+                            fontSize: 'var(--text-sm)',
+                            color: '#3b82f6',
+                            fontWeight: '600',
+                            fontFamily: '"Cairo", sans-serif',
+                            animation: 'pulse 2s infinite',
+                          }}
+                        >
+                          👇 لديك ردود جديدة
+                        </span>
+                      )}
+                    </div>
                     {demand.responses && demand.responses.length > 0 ? (
                       <DemandResponsesList
                         responses={demand.responses}
