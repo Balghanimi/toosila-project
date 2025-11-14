@@ -19,6 +19,7 @@ export default function Bookings() {
   );
   const [editingDemand, setEditingDemand] = useState(null);
   const [expandedDemandId, setExpandedDemandId] = useState(null);
+  const [showResponsesFor, setShowResponsesFor] = useState(null); // ID of demand whose responses are shown
   const [editForm, setEditForm] = useState({
     earliestTime: '',
     latestTime: '',
@@ -65,6 +66,7 @@ export default function Bookings() {
         // إذا وُجد الطلب، افتح قسم الردود
         console.log('✅ Found demand from notification:', demandId);
         setExpandedDemandId(demandId);
+        setShowResponsesFor(demandId); // فتح قسم الردود تلقائياً
 
         // تمرير إلى الطلب المحدد
         setTimeout(() => {
@@ -74,10 +76,10 @@ export default function Bookings() {
           }
         }, 300);
 
-        // إزالة التمييز بعد 5 ثوان
+        // إزالة التمييز بعد 8 ثوان (وقت أطول لقراءة الردود)
         setTimeout(() => {
           setExpandedDemandId(null);
-        }, 5000);
+        }, 8000);
       } else {
         // إذا لم يُوجد الطلب، اعرض رسالة توضيحية
         console.warn('⚠️ Demand not found (may be deleted):', demandId);
@@ -911,26 +913,69 @@ export default function Bookings() {
                       >
                         الردود ({demand.responses?.length || 0})
                       </h4>
-                      {expandedDemandId === demand.id && demand.responses?.length > 0 && (
-                        <span
-                          style={{
-                            fontSize: 'var(--text-sm)',
-                            color: '#3b82f6',
-                            fontWeight: '600',
-                            fontFamily: '"Cairo", sans-serif',
-                            animation: 'pulse 2s infinite',
-                          }}
-                        >
-                          👇 لديك ردود جديدة
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                        {expandedDemandId === demand.id && demand.responses?.length > 0 && (
+                          <span
+                            style={{
+                              fontSize: 'var(--text-sm)',
+                              color: '#3b82f6',
+                              fontWeight: '600',
+                              fontFamily: '"Cairo", sans-serif',
+                              animation: 'pulse 2s infinite',
+                            }}
+                          >
+                            👇 لديك ردود جديدة
+                          </span>
+                        )}
+                        {demand.responses && demand.responses.length > 0 && (
+                          <button
+                            onClick={() =>
+                              setShowResponsesFor(
+                                showResponsesFor === demand.id ? null : demand.id
+                              )
+                            }
+                            style={{
+                              padding: 'var(--space-2) var(--space-3)',
+                              background:
+                                showResponsesFor === demand.id
+                                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: 'var(--radius)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              fontFamily: '"Cairo", sans-serif',
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            {showResponsesFor === demand.id ? '❌ إخفاء الردود' : '👁️ عرض الردود'}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    {demand.responses && demand.responses.length > 0 ? (
+                    {demand.responses && demand.responses.length > 0 && showResponsesFor === demand.id ? (
                       <DemandResponsesList
                         responses={demand.responses}
                         isOwner={true}
                         onResponseUpdate={fetchBookings}
                       />
+                    ) : demand.responses && demand.responses.length > 0 ? (
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: 'var(--space-4)',
+                          background: 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
+                          borderRadius: 'var(--radius)',
+                          color: '#1e40af',
+                          fontFamily: '"Cairo", sans-serif',
+                          fontWeight: '600',
+                          border: '2px dashed #3b82f6',
+                        }}
+                      >
+                        👆 اضغط على "عرض الردود" للاطلاع على العروض المقدمة
+                      </div>
                     ) : (
                       <div
                         style={{
