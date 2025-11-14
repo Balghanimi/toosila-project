@@ -3,6 +3,45 @@
  * Ensures all interactive elements meet WCAG 2.1 Level AA requirements (48x48px minimum)
  */
 
+/* Focus Indicators - WCAG 2.1 Level AA Compliance */
+/* Apply to all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--primary, #3b82f6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default focus outline but keep focus-visible */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast focus indicators for dark backgrounds */
+.dark button:focus-visible,
+.dark a:focus-visible,
+[data-theme='dark'] button:focus-visible,
+[data-theme='dark'] a:focus-visible {
+  outline-color: var(--accent, #60a5fa);
+}
+
+/* Focus indicators for checkboxes and radio buttons */
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+  outline: 3px solid var(--primary, #3b82f6);
+  outline-offset: 3px;
+}
+
 @media (max-width: 768px) {
   /* All interactive elements */
   button,

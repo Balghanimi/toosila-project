@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { bookingsAPI, demandsAPI, demandResponsesAPI } from '../services/api';
 import DemandResponsesList from '../components/DemandResponsesList';
+import ConfirmDialog from '../components/UI/ConfirmDialog';
+import { SkeletonLoader } from '../components/UI/SkeletonLoader';
 
 export default function Bookings() {
   const location = useLocation();
@@ -21,6 +23,13 @@ export default function Bookings() {
     latestTime: '',
     seats: '',
     budgetMax: '',
+  });
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+    variant: 'danger',
   });
   const { currentUser } = useAuth();
   const { showSuccess, showError, fetchPendingCount } = useNotifications();
@@ -157,18 +166,26 @@ export default function Bookings() {
     }
   };
 
-  const handleCancel = async (bookingId) => {
-    if (!window.confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) return;
-
-    try {
-      await bookingsAPI.cancel(bookingId);
-      showSuccess('تم إلغاء الحجز بنجاح');
-      fetchBookings();
-      fetchPendingCount();
-    } catch (err) {
-      showError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
-      setError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
-    }
+  const handleCancel = (bookingId) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'إلغاء الحجز',
+      message: 'هل أنت متأكد من إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.',
+      variant: 'warning',
+      onConfirm: async () => {
+        try {
+          await bookingsAPI.cancel(bookingId);
+          showSuccess('تم إلغاء الحجز بنجاح');
+          fetchBookings();
+          fetchPendingCount();
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        } catch (err) {
+          showError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
+          setError(err.message || 'حدث خطأ أثناء إلغاء الحجز');
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        }
+      },
+    });
   };
 
   const handleEditDemand = (demand) => {
@@ -227,28 +244,36 @@ export default function Bookings() {
     }
   };
 
-  const handleDeleteDemand = async (demandId) => {
+  const handleDeleteDemand = (demandId) => {
     console.log('🔍 Attempting to delete demand with ID:', demandId);
     console.log('🔍 ID type:', typeof demandId);
     console.log('🔍 ID length:', demandId?.length);
 
-    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+    setConfirmDialog({
+      isOpen: true,
+      title: 'حذف الطلب',
+      message: 'هل أنت متأكد من حذف هذا الطلب؟ سيتم حذف جميع الردود المرتبطة به. لا يمكن التراجع عن هذا الإجراء.',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await demandsAPI.delete(demandId);
+          console.log('✅ Delete API call successful for:', demandId);
 
-    try {
-      await demandsAPI.delete(demandId);
-      console.log('✅ Delete API call successful for:', demandId);
+          // تحديث الـ state مباشرة - إزالة الطلب المحذوف من القائمة
+          setDemands((prevDemands) => prevDemands.filter((demand) => demand.id !== demandId));
 
-      // تحديث الـ state مباشرة - إزالة الطلب المحذوف من القائمة
-      setDemands((prevDemands) => prevDemands.filter((demand) => demand.id !== demandId));
+          showSuccess('✅ تم حذف الطلب بنجاح!');
 
-      showSuccess('✅ تم حذف الطلب بنجاح!');
-
-      // تحديث عدد الحجوزات المعلقة
-      fetchPendingCount();
-    } catch (err) {
-      console.error('❌ Delete error:', err);
-      showError(err.message || 'حدث خطأ أثناء حذف الطلب');
-    }
+          // تحديث عدد الحجوزات المعلقة
+          fetchPendingCount();
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        } catch (err) {
+          console.error('❌ Delete error:', err);
+          showError(err.message || 'حدث خطأ أثناء حذف الطلب');
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        }
+      },
+    });
   };
 
   const getStatusColor = (status) => {
@@ -696,31 +721,18 @@ export default function Bookings() {
         {/* Loading */}
         {loading ? (
           <div
-            style={{ textAlign: 'center', padding: 'var(--space-8)' }}
+            style={{
+              display: 'grid',
+              gap: 'var(--space-4)',
+              padding: 'var(--space-4)',
+            }}
             role="status"
             aria-live="polite"
+            aria-label="جاري التحميل"
           >
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                border: '4px solid var(--border-light)',
-                borderTop: '4px solid var(--primary)',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-                margin: '0 auto',
-              }}
-              aria-label="جاري التحميل"
-            />
-            <p
-              style={{
-                marginTop: 'var(--space-4)',
-                color: 'var(--text-secondary)',
-                fontFamily: '"Cairo", sans-serif',
-              }}
-            >
-              جاري التحميل...
-            </p>
+            <SkeletonLoader variant="Card" />
+            <SkeletonLoader variant="Card" />
+            <SkeletonLoader variant="Card" />
           </div>
         ) : activeTab === 'demands' ? (
           // عرض الطلبات (Demands)
@@ -1190,6 +1202,18 @@ export default function Bookings() {
           }
         }
       `}</style>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmText="تأكيد"
+        cancelText="إلغاء"
+      />
     </div>
   );
 }

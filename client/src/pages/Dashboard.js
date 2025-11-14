@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { statsAPI } from '../services/api';
+import { SkeletonLoader } from '../components/UI/SkeletonLoader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -579,18 +580,10 @@ const Dashboard = () => {
           </h2>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 'var(--space-6)' }}>
-              <div
-                style={{
-                  display: 'inline-block',
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid var(--border-light)',
-                  borderTop: '4px solid var(--primary)',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              ></div>
+            <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+              <SkeletonLoader variant="ListItem" />
+              <SkeletonLoader variant="ListItem" />
+              <SkeletonLoader variant="ListItem" />
             </div>
           ) : recentActivity.recentBookings?.length > 0 ||
             recentActivity.recentOffers?.length > 0 ||

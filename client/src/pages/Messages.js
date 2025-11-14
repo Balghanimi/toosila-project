@@ -6,7 +6,7 @@ import ChatInterface from '../components/Chat/ChatInterface';
 
 const Messages = () => {
   const { user, isAuthenticated } = useAuth();
-  const { conversations, fetchConversations } = useMessages();
+  const { conversations, fetchConversations, loading } = useMessages();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [isAnimated, setIsAnimated] = useState(false);
 
@@ -138,6 +138,7 @@ const Messages = () => {
             <ConversationList
               onSelectConversation={handleSelectConversation}
               selectedConversation={selectedConversation}
+              loading={loading}
             />
           </div>
 

@@ -56,7 +56,8 @@
       "Bash(railway run psql:*)",
       "Bash(git restore:*)",
       "Bash(del \"server\\database\\migrations\\014_add_message_conversation_indexes.sql\")",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

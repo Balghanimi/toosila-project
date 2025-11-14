@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
 import MessageSearch from './MessageSearch';
+import { SkeletonLoader } from '../UI/SkeletonLoader';
 
-const ConversationList = ({ onSelectConversation, selectedConversation }) => {
+const ConversationList = ({ onSelectConversation, selectedConversation, loading }) => {
   const { conversations, fetchConversations } = useMessages();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,6 +56,26 @@ const ConversationList = ({ onSelectConversation, selectedConversation }) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
+
+  // Show loading skeletons
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-2)',
+          padding: 'var(--space-4)',
+        }}
+      >
+        <SkeletonLoader variant="Message" />
+        <SkeletonLoader variant="Message" />
+        <SkeletonLoader variant="Message" />
+        <SkeletonLoader variant="Message" />
+        <SkeletonLoader variant="Message" />
+      </div>
+    );
+  }
 
   if (conversations.length === 0) {
     return (
