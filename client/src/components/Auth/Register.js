@@ -189,6 +189,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
       {/* Close Button */}
       <button
         onClick={onClose}
+        aria-label="إغلاق"
         style={{
           position: 'absolute',
           top: '16px',
@@ -333,6 +334,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
             value={formData.name}
             onChange={handleChange}
             placeholder="أدخل اسمك الكامل"
+            aria-invalid={!!formErrors.name}
+            aria-describedby={formErrors.name ? 'name-error' : undefined}
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -347,7 +350,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             onBlur={(e) => !formErrors.name && (e.target.style.borderColor = '#e5e7eb')}
           />
           {formErrors.name && (
-            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div id="name-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
               {formErrors.name}
             </div>
           )}
@@ -372,6 +375,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
             value={formData.email}
             onChange={handleChange}
             placeholder="example@email.com"
+            aria-invalid={!!formErrors.email}
+            aria-describedby={formErrors.email ? 'email-error' : undefined}
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -386,7 +391,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             onBlur={(e) => !formErrors.email && (e.target.style.borderColor = '#e5e7eb')}
           />
           {formErrors.email && (
-            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div id="email-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
               {formErrors.email}
             </div>
           )}
@@ -501,7 +506,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
                 >
                   <img
                     src={selfiePreview}
-                    alt="Selfie preview"
+                    alt="معاينة صورة السيلفي الخاصة بك"
                     style={{
                       width: '100%',
                       height: '100%',
@@ -665,6 +670,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
               value={formData.password}
               onChange={handleChange}
               placeholder="أدخل كلمة المرور (5 أحرف أو أرقام على الأقل)"
+              aria-invalid={!!formErrors.password}
+              aria-describedby={formErrors.password ? 'password-error' : undefined}
               style={{
                 width: '100%',
                 padding: '12px 48px 12px 16px',
@@ -681,6 +688,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
               style={{
                 position: 'absolute',
                 left: '12px',
@@ -697,7 +705,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             </button>
           </div>
           {formErrors.password && (
-            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div id="password-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
               {formErrors.password}
             </div>
           )}
@@ -744,6 +752,8 @@ export default function Register({ onSwitchToLogin, onClose }) {
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="أعد كتابة كلمة المرور"
+              aria-invalid={!!formErrors.confirmPassword}
+              aria-describedby={formErrors.confirmPassword ? 'confirmPassword-error' : undefined}
               style={{
                 width: '100%',
                 padding: '12px 48px 12px 16px',
@@ -764,6 +774,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
               style={{
                 position: 'absolute',
                 left: '12px',
@@ -780,7 +791,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             </button>
           </div>
           {formErrors.confirmPassword && (
-            <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div id="confirmPassword-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
               {formErrors.confirmPassword}
             </div>
           )}
@@ -910,6 +921,7 @@ export default function Register({ onSwitchToLogin, onClose }) {
             {/* Close Button */}
             <button
               onClick={() => setShowTerms(false)}
+              aria-label="إغلاق الشروط والأحكام"
               style={{
                 position: 'absolute',
                 top: '16px',

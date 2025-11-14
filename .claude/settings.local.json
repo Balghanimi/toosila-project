@@ -53,7 +53,10 @@
       "Bash(railway unlink:*)",
       "Bash(railway link:*)",
       "Bash($env:DATABASE_URL = \"postgresql://postgres:AgceSqBLRSzBwSUBFoBLqjJwWmRpAoLl@postgres.railway.internal:5432/railway\")",
-      "Bash(railway run psql:*)"
+      "Bash(railway run psql:*)",
+      "Bash(git restore:*)",
+      "Bash(del \"server\\database\\migrations\\014_add_message_conversation_indexes.sql\")",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": []

@@ -105,6 +105,7 @@ export default function Login({ onSwitchToRegister, onClose }) {
       {/* Close Button */}
       <button
         onClick={onClose}
+        aria-label="إغلاق"
         style={{
           position: 'absolute',
           top: '16px',

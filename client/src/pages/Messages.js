@@ -125,12 +125,15 @@ const Messages = () => {
             maxWidth: '1200px',
             margin: '0 auto',
           }}
+          className="messages-grid"
         >
           {/* Conversations List */}
           <div
             style={{
               minHeight: '500px',
+              display: selectedConversation ? 'none' : 'block',
             }}
+            className="conversations-list"
           >
             <ConversationList
               onSelectConversation={handleSelectConversation}
@@ -145,6 +148,7 @@ const Messages = () => {
                 minHeight: '500px',
                 animation: 'slideInRight 0.3s ease-out',
               }}
+              className="chat-interface"
             >
               <ChatInterface
                 tripId={selectedConversation.tripId}

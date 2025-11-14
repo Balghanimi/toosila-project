@@ -176,4 +176,23 @@
     justify-content: center;
     text-align: center;
   }
+
+  /* Messages page responsive layout */
+  .messages-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .conversations-list {
+    display: block !important;
+  }
+
+  .chat-interface {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: 100;
+  }
 }

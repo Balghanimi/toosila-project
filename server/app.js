@@ -19,6 +19,7 @@ const { generalLimiter } = require('./middlewares/rateLimiters');
 const { errorHandler, notFound } = require('./middlewares/error');
 const { noCache, shortCache, mediumCache, etag } = require('./middlewares/cacheControl');
 const { metricsMiddleware } = require('./middlewares/metrics');
+const { performanceMiddleware } = require('./middlewares/performance');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -124,6 +125,9 @@ app.use(express.urlencoded({
 
 // Logging middleware - integrate Morgan with Winston
 app.use(morgan('combined', { stream: logger.stream }));
+
+// Performance middleware - track and log slow requests (>500ms)
+app.use(performanceMiddleware);
 
 // Metrics middleware - track request performance
 app.use(metricsMiddleware);

@@ -191,7 +191,7 @@ const Dashboard = () => {
               e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
             }}
           >
-            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>📋</div>
+            <div role="img" aria-label="أيقونة الحجوزات المعلقة" style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>📋</div>
             <div
               style={{
                 fontSize: 'var(--text-3xl)',
@@ -268,7 +268,7 @@ const Dashboard = () => {
               e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
             }}
           >
-            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>💬</div>
+            <div role="img" aria-label="أيقونة المحادثات النشطة" style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>💬</div>
             <div
               style={{
                 fontSize: 'var(--text-3xl)',
@@ -358,7 +358,7 @@ const Dashboard = () => {
               transition: 'var(--transition)',
             }}
           >
-            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>🚗</div>
+            <div role="img" aria-label="أيقونة الرحلات المكتملة" style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>🚗</div>
             <div
               style={{
                 fontSize: 'var(--text-3xl)',

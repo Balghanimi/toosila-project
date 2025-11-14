@@ -1004,6 +1004,7 @@ export default function Bookings() {
               {/* Earliest Time */}
               <div>
                 <label
+                  htmlFor="edit-earliest-time"
                   style={{
                     display: 'block',
                     marginBottom: 'var(--space-2)',
@@ -1016,6 +1017,7 @@ export default function Bookings() {
                   📅 أقرب وقت للمغادرة
                 </label>
                 <input
+                  id="edit-earliest-time"
                   type="datetime-local"
                   value={editForm.earliestTime}
                   onChange={(e) => setEditForm({ ...editForm, earliestTime: e.target.value })}
@@ -1033,6 +1035,7 @@ export default function Bookings() {
               {/* Latest Time */}
               <div>
                 <label
+                  htmlFor="edit-latest-time"
                   style={{
                     display: 'block',
                     marginBottom: 'var(--space-2)',
@@ -1045,6 +1048,7 @@ export default function Bookings() {
                   📅 آخر وقت للمغادرة
                 </label>
                 <input
+                  id="edit-latest-time"
                   type="datetime-local"
                   value={editForm.latestTime}
                   onChange={(e) => setEditForm({ ...editForm, latestTime: e.target.value })}
