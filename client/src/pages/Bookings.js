@@ -252,7 +252,8 @@ export default function Bookings() {
     setConfirmDialog({
       isOpen: true,
       title: 'حذف الطلب',
-      message: 'هل أنت متأكد من حذف هذا الطلب؟ سيتم حذف جميع الردود المرتبطة به. لا يمكن التراجع عن هذا الإجراء.',
+      message:
+        'هل أنت متأكد من حذف هذا الطلب؟ سيتم حذف جميع الردود المرتبطة به. لا يمكن التراجع عن هذا الإجراء.',
       variant: 'danger',
       onConfirm: async () => {
         try {

@@ -350,7 +350,11 @@ export default function Register({ onSwitchToLogin, onClose }) {
             onBlur={(e) => !formErrors.name && (e.target.style.borderColor = '#e5e7eb')}
           />
           {formErrors.name && (
-            <div id="name-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div
+              id="name-error"
+              role="alert"
+              style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}
+            >
               {formErrors.name}
             </div>
           )}
@@ -391,7 +395,11 @@ export default function Register({ onSwitchToLogin, onClose }) {
             onBlur={(e) => !formErrors.email && (e.target.style.borderColor = '#e5e7eb')}
           />
           {formErrors.email && (
-            <div id="email-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div
+              id="email-error"
+              role="alert"
+              style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}
+            >
               {formErrors.email}
             </div>
           )}
@@ -705,7 +713,11 @@ export default function Register({ onSwitchToLogin, onClose }) {
             </button>
           </div>
           {formErrors.password && (
-            <div id="password-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div
+              id="password-error"
+              role="alert"
+              style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}
+            >
               {formErrors.password}
             </div>
           )}
@@ -774,7 +786,9 @@ export default function Register({ onSwitchToLogin, onClose }) {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
+              aria-label={
+                showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'
+              }
               style={{
                 position: 'absolute',
                 left: '12px',
@@ -791,7 +805,11 @@ export default function Register({ onSwitchToLogin, onClose }) {
             </button>
           </div>
           {formErrors.confirmPassword && (
-            <div id="confirmPassword-error" role="alert" style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+            <div
+              id="confirmPassword-error"
+              role="alert"
+              style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}
+            >
               {formErrors.confirmPassword}
             </div>
           )}

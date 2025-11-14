@@ -13,7 +13,15 @@ export { default as EmptyState } from './EmptyState';
 
 // New enhanced components
 export { default as Toast, ToastContainer } from './Toast';
-export { default as SkeletonLoader, SkeletonCard, SkeletonListItem, SkeletonMessage, SkeletonStats, SkeletonTable, SkeletonForm } from './SkeletonLoader';
+export {
+  default as SkeletonLoader,
+  SkeletonCard,
+  SkeletonListItem,
+  SkeletonMessage,
+  SkeletonStats,
+  SkeletonTable,
+  SkeletonForm,
+} from './SkeletonLoader';
 export { default as ConfirmDialog } from './ConfirmDialog';
 
 // Legacy Skeleton export for backward compatibility

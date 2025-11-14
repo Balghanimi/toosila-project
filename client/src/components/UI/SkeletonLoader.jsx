@@ -29,9 +29,10 @@ const SkeletonLoader = ({
 
   const skeletonStyle = {
     display: 'block',
-    width: circle ? (height || variantStyle.width) : width,
+    width: circle ? height || variantStyle.width : width,
     height: height || variantStyle.height,
-    background: 'linear-gradient(90deg, var(--surface-tertiary) 25%, var(--surface-secondary) 50%, var(--surface-tertiary) 75%)',
+    background:
+      'linear-gradient(90deg, var(--surface-tertiary) 25%, var(--surface-secondary) 50%, var(--surface-tertiary) 75%)',
     backgroundSize: '200% 100%',
     borderRadius: circle ? '50%' : variantStyle.borderRadius,
     animation: animate ? 'skeleton-shimmer 1.5s ease-in-out infinite' : 'none',
@@ -98,7 +99,14 @@ export const SkeletonCard = ({ count = 1 }) => {
           }}
         >
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-3)',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
             <SkeletonLoader variant="avatar" />
             <div style={{ flex: 1 }}>
               <SkeletonLoader variant="subtitle" width="60%" />

@@ -87,26 +87,23 @@ export const NotificationProvider = ({ children }) => {
   }, []);
 
   // Show toast notification
-  const showToast = useCallback(
-    (message, variant = 'info', options = {}) => {
-      const id = Date.now() + Math.random();
-      const toast = {
-        id,
-        message,
-        variant,
-        duration: options.duration || 5000,
-        description: options.description,
-        position: options.position || 'top-center',
-        icon: options.icon,
-        action: options.action,
-      };
+  const showToast = useCallback((message, variant = 'info', options = {}) => {
+    const id = Date.now() + Math.random();
+    const toast = {
+      id,
+      message,
+      variant,
+      duration: options.duration || 5000,
+      description: options.description,
+      position: options.position || 'top-center',
+      icon: options.icon,
+      action: options.action,
+    };
 
-      setToasts((prev) => [...prev, toast]);
+    setToasts((prev) => [...prev, toast]);
 
-      return id;
-    },
-    []
-  );
+    return id;
+  }, []);
 
   // Helper methods for different toast types
   const showSuccess = useCallback((message) => showToast(message, 'success'), [showToast]);

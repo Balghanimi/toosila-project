@@ -313,10 +313,7 @@ export const ToastContainer = ({ toasts = [], onRemove }) => {
             marginBottom: index < toasts.length - 1 ? 'var(--space-2)' : 0,
           }}
         >
-          <Toast
-            {...toast}
-            onClose={() => onRemove && onRemove(toast.id || index)}
-          />
+          <Toast {...toast} onClose={() => onRemove && onRemove(toast.id || index)} />
         </div>
       ))}
     </>
