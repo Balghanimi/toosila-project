@@ -168,8 +168,8 @@ function notifyNewMessage(io, recipientId, message) {
 function notifyNewDemandResponse(io, passengerId, response) {
   emitToUser(io, passengerId, 'new-demand-response', {
     type: 'new-demand-response',
-    title: '🚗 عرض جديد على طلبك',
-    message: `لديك عرض جديد من سائق على طلبك ${response.fromCity} ← ${response.toCity}`,
+    title: '💬 رد جديد على طلبك',
+    message: `رد سائق على طلبك ${response.fromCity} ← ${response.toCity}. اضغط لعرض الرد`,
     response: response,
     timestamp: new Date().toISOString()
   });

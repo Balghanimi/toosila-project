@@ -48,8 +48,8 @@ async function notifyDemandResponse(demandId, driverId, driverName) {
     const notification = await NotificationModel.create(
       passengerId,
       'demand_response',
-      '🚗 عرض جديد على طلبك',
-      `قدم السائق ${driverName} عرضاً على طلبك من ${demand.from_city} إلى ${demand.to_city}`,
+      '💬 رد جديد على طلبك',
+      `رد السائق ${driverName} على طلبك من ${demand.from_city} إلى ${demand.to_city}. اضغط لعرض الرد`,
       {
         demandId,
         driverId,
