@@ -793,7 +793,9 @@ export default function Bookings() {
                         ? '0 10px 25px -5px rgba(59, 130, 246, 0.3)'
                         : 'var(--shadow-md)',
                     border:
-                      expandedDemandId === demand.id ? '2px solid #3b82f6' : '1px solid transparent',
+                      expandedDemandId === demand.id
+                        ? '2px solid #3b82f6'
+                        : '1px solid transparent',
                     transition: 'all 0.3s ease',
                   }}
                 >
@@ -930,9 +932,7 @@ export default function Bookings() {
                         {demand.responses && demand.responses.length > 0 && (
                           <button
                             onClick={() =>
-                              setShowResponsesFor(
-                                showResponsesFor === demand.id ? null : demand.id
-                              )
+                              setShowResponsesFor(showResponsesFor === demand.id ? null : demand.id)
                             }
                             style={{
                               padding: 'var(--space-2) var(--space-3)',
@@ -955,7 +955,9 @@ export default function Bookings() {
                         )}
                       </div>
                     </div>
-                    {demand.responses && demand.responses.length > 0 && showResponsesFor === demand.id ? (
+                    {demand.responses &&
+                    demand.responses.length > 0 &&
+                    showResponsesFor === demand.id ? (
                       <DemandResponsesList
                         responses={demand.responses}
                         isOwner={true}
