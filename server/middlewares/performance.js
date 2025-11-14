@@ -29,66 +29,77 @@ function performanceMiddleware(req, res, next) {
   const startTime = Date.now();
   const startMemory = process.memoryUsage().heapUsed;
 
-  // Track response finish
-  res.on('finish', () => {
+  // Override res.end to add performance headers before response is sent
+  const originalEnd = res.end;
+  res.end = function(...args) {
     const duration = Date.now() - startTime;
     const endMemory = process.memoryUsage().heapUsed;
     const memoryDelta = endMemory - startMemory;
 
-    // Update metrics
-    metrics.totalRequests++;
-    metrics.responseTimesSum += duration;
-    metrics.averageResponseTime = metrics.responseTimesSum / metrics.totalRequests;
-
-    // Track slow requests
-    if (duration >= THRESHOLDS.SLOW_REQUEST) {
-      metrics.slowRequests++;
-
-      const endpoint = `${req.method} ${req.route?.path || req.path}`;
-      const slowData = metrics.slowEndpoints.get(endpoint) || {
-        count: 0,
-        totalTime: 0,
-        maxTime: 0,
-        avgTime: 0
-      };
-
-      slowData.count++;
-      slowData.totalTime += duration;
-      slowData.maxTime = Math.max(slowData.maxTime, duration);
-      slowData.avgTime = slowData.totalTime / slowData.count;
-
-      metrics.slowEndpoints.set(endpoint, slowData);
-
-      // Log slow requests
-      if (duration >= THRESHOLDS.VERY_SLOW_REQUEST) {
-        logger.error('Very slow request detected', {
-          method: req.method,
-          url: req.originalUrl,
-          duration: `${duration}ms`,
-          statusCode: res.statusCode,
-          memoryDelta: `${Math.round(memoryDelta / 1024)}KB`,
-          userAgent: req.get('user-agent')
-        });
-      } else {
-        logger.warn('Slow request detected', {
-          method: req.method,
-          url: req.originalUrl,
-          duration: `${duration}ms`,
-          statusCode: res.statusCode
-        });
-      }
-    } else if (duration >= THRESHOLDS.WARNING_REQUEST) {
-      logger.debug('Request approaching slow threshold', {
-        method: req.method,
-        url: req.originalUrl,
-        duration: `${duration}ms`
-      });
+    // Add performance headers before sending response
+    try {
+      res.set('X-Response-Time', `${duration}ms`);
+      res.set('X-Memory-Delta', `${Math.round(memoryDelta / 1024)}KB`);
+    } catch (err) {
+      // Headers already sent, ignore
     }
 
-    // Add performance headers
-    res.set('X-Response-Time', `${duration}ms`);
-    res.set('X-Memory-Delta', `${Math.round(memoryDelta / 1024)}KB`);
-  });
+    // Call original end method
+    originalEnd.apply(res, args);
+
+    // Track metrics after response is sent
+    setImmediate(() => {
+      // Update metrics
+      metrics.totalRequests++;
+      metrics.responseTimesSum += duration;
+      metrics.averageResponseTime = metrics.responseTimesSum / metrics.totalRequests;
+
+      // Track slow requests
+      if (duration >= THRESHOLDS.SLOW_REQUEST) {
+        metrics.slowRequests++;
+
+        const endpoint = `${req.method} ${req.route?.path || req.path}`;
+        const slowData = metrics.slowEndpoints.get(endpoint) || {
+          count: 0,
+          totalTime: 0,
+          maxTime: 0,
+          avgTime: 0
+        };
+
+        slowData.count++;
+        slowData.totalTime += duration;
+        slowData.maxTime = Math.max(slowData.maxTime, duration);
+        slowData.avgTime = slowData.totalTime / slowData.count;
+
+        metrics.slowEndpoints.set(endpoint, slowData);
+
+        // Log slow requests
+        if (duration >= THRESHOLDS.VERY_SLOW_REQUEST) {
+          logger.error('Very slow request detected', {
+            method: req.method,
+            url: req.originalUrl,
+            duration: `${duration}ms`,
+            statusCode: res.statusCode,
+            memoryDelta: `${Math.round(memoryDelta / 1024)}KB`,
+            userAgent: req.get('user-agent')
+          });
+        } else {
+          logger.warn('Slow request detected', {
+            method: req.method,
+            url: req.originalUrl,
+            duration: `${duration}ms`,
+            statusCode: res.statusCode
+          });
+        }
+      } else if (duration >= THRESHOLDS.WARNING_REQUEST) {
+        logger.debug('Request approaching slow threshold', {
+          method: req.method,
+          url: req.originalUrl,
+          duration: `${duration}ms`
+        });
+      }
+    });
+  };
 
   next();
 }
