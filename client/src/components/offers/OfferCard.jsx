@@ -10,13 +10,7 @@ import styles from './OfferCard.module.css';
  * - Clear visual hierarchy
  * - Accessible and WCAG compliant
  */
-const OfferCard = ({
-  offer,
-  onBookNow,
-  formatDate,
-  formatTime,
-  currentUser,
-}) => {
+const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) => {
   const handleBookClick = () => {
     onBookNow(offer);
   };
@@ -58,9 +52,7 @@ const OfferCard = ({
 
         <div className={styles.detail}>
           <span className={styles.detailIcon}>👥</span>
-          <span className={styles.detailText}>
-            {offer.availableSeats || 0} متاح
-          </span>
+          <span className={styles.detailText}>{offer.availableSeats || 0} متاح</span>
         </div>
       </div>
 
@@ -72,9 +64,7 @@ const OfferCard = ({
             السائق: <strong>{offer.driverName}</strong>
           </span>
           {offer.driverRating && (
-            <span className={styles.rating}>
-              ⭐ {offer.driverRating.toFixed(1)}
-            </span>
+            <span className={styles.rating}>⭐ {offer.driverRating.toFixed(1)}</span>
           )}
         </div>
       )}
@@ -82,22 +72,14 @@ const OfferCard = ({
       {/* Additional Info (if available) */}
       {(offer.vehicleType || offer.additionalInfo) && (
         <div className={styles.additionalInfo}>
-          {offer.vehicleType && (
-            <span className={styles.badge}>{offer.vehicleType}</span>
-          )}
-          {offer.additionalInfo && (
-            <p className={styles.infoText}>{offer.additionalInfo}</p>
-          )}
+          {offer.vehicleType && <span className={styles.badge}>{offer.vehicleType}</span>}
+          {offer.additionalInfo && <p className={styles.infoText}>{offer.additionalInfo}</p>}
         </div>
       )}
 
       {/* Book Now Button */}
       {currentUser && !currentUser.isDriver && (
-        <button
-          type="button"
-          onClick={handleBookClick}
-          className={styles.bookButton}
-        >
+        <button type="button" onClick={handleBookClick} className={styles.bookButton}>
           <span>احجز الآن</span>
           <span className={styles.buttonIcon}>🎫</span>
         </button>

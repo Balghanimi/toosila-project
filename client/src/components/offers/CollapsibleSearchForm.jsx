@@ -16,7 +16,7 @@ const CollapsibleSearchForm = ({
   onClearFilters,
   mainCities = [],
   allCities = [],
-  isDriver = false,
+  // isDriver = false, // Reserved for future use
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
