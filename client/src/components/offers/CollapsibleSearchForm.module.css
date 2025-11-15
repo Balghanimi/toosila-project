@@ -1,0 +1,405 @@
+/**
+ * Collapsible Search Form - Mobile-First Responsive Styles
+ * Professional mobile-optimized search form with smooth animations
+ */
+
+.searchFormContainer {
+  margin-bottom: var(--space-4, 16px);
+  width: 100%;
+}
+
+/* ===== TOGGLE BUTTON ===== */
+.toggleButton {
+  width: 100%;
+  min-height: 56px; /* Mobile-friendly touch target */
+  padding: var(--space-4, 16px) var(--space-5, 20px);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl, 16px);
+  font-size: 18px; /* Large, readable */
+  font-weight: 700;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggleButton:hover {
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.35);
+  transform: translateY(-2px);
+}
+
+.toggleButton:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.toggleIcon {
+  font-size: 24px;
+}
+
+.toggleText {
+  flex: 1;
+  text-align: center;
+}
+
+.toggleArrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+/* ===== FORM CONTENT (Collapsible) ===== */
+.formContent {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0;
+}
+
+.formContent.expanded {
+  max-height: 2000px;
+  opacity: 1;
+  margin-top: var(--space-4, 16px);
+}
+
+.formInner {
+  background: var(--surface-primary, #ffffff);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-5, 20px);
+  box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--border-light, #e5e7eb);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== BASIC FILTERS GRID ===== */
+.basicFilters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4, 16px);
+  margin-bottom: var(--space-4, 16px);
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 640px) {
+  .basicFilters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 4 columns */
+@media (min-width: 1024px) {
+  .basicFilters {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== FORM GROUP ===== */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.label {
+  display: block;
+  font-size: 15px; /* Mobile-readable */
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  direction: rtl;
+}
+
+/* ===== INPUT & SELECT STYLES ===== */
+.input,
+.select {
+  width: 100%;
+  height: 48px; /* Fixed height */
+  min-height: 48px; /* iOS minimum touch target */
+  padding: 0 16px;
+  font-size: 16px; /* Prevents iOS auto-zoom */
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  color: var(--text-primary, #111827);
+  background: var(--surface-primary, #ffffff);
+  border: 2px solid var(--border-light, #e5e7eb);
+  border-radius: var(--radius, 12px);
+  direction: rtl;
+  text-align: center;
+  /* Vertical centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 48px; /* Match height for perfect vertical centering */
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2334c759' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  padding-left: 40px;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--primary, #34c759);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.1);
+}
+
+.input:hover,
+.select:hover {
+  border-color: var(--border-medium, #d1d5db);
+}
+
+/* ===== ADVANCED FILTERS TOGGLE ===== */
+.advancedToggle {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: transparent;
+  color: var(--primary, #34c759);
+  border: 2px solid var(--border-light, #e5e7eb);
+  border-radius: var(--radius, 12px);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  transition: all 0.2s ease;
+  margin-bottom: var(--space-4, 16px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.advancedToggle:hover {
+  border-color: var(--primary, #34c759);
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+}
+
+.advancedToggle:active {
+  transform: scale(0.98);
+}
+
+/* ===== ADVANCED FILTERS SECTION ===== */
+.advancedFilters {
+  padding: var(--space-4, 16px);
+  background: var(--surface-secondary, #f9fafb);
+  border-radius: var(--radius-lg, 14px);
+  border: 2px dashed var(--border-light, #e5e7eb);
+  margin-bottom: var(--space-4, 16px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.advancedTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  margin-bottom: var(--space-4, 16px);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  direction: rtl;
+}
+
+.advancedGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3, 12px);
+}
+
+/* Tablet: 2 columns for advanced filters */
+@media (min-width: 640px) {
+  .advancedGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 3 columns for advanced filters */
+@media (min-width: 1024px) {
+  .advancedGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== ACTION BUTTONS ===== */
+.actionButtons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3, 12px);
+  margin-top: var(--space-4, 16px);
+}
+
+/* Tablet & Desktop: 2 columns for buttons */
+@media (min-width: 640px) {
+  .actionButtons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.button {
+  min-height: 52px; /* Large touch target */
+  padding: var(--space-3, 12px) var(--space-5, 20px);
+  font-size: 17px; /* Large, readable */
+  font-weight: 700;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  border: none;
+  border-radius: var(--radius, 12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.buttonPrimary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.25);
+}
+
+.buttonPrimary:hover {
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.35);
+  transform: translateY(-2px);
+}
+
+.buttonPrimary:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.buttonSecondary {
+  background: var(--surface-secondary, #f9fafb);
+  color: var(--text-primary, #111827);
+  border: 2px solid var(--border-medium, #d1d5db);
+}
+
+.buttonSecondary:hover {
+  border-color: var(--primary, #34c759);
+  background: var(--surface-primary, #ffffff);
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 480px) {
+  .toggleButton {
+    font-size: 16px;
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    min-height: 52px;
+  }
+
+  .formInner {
+    padding: var(--space-4, 16px);
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .input,
+  .select {
+    font-size: 16px; /* Keep at 16px minimum for iOS */
+    padding: 0 14px;
+    height: 48px;
+    line-height: 48px;
+  }
+
+  .button {
+    font-size: 16px;
+    min-height: 50px;
+  }
+
+  .advancedTitle {
+    font-size: 15px;
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .formInner {
+  background: var(--surface-secondary, #1e293b);
+  border-color: var(--border-medium, #475569);
+}
+
+body.dark-mode .input,
+body.dark-mode .select {
+  background: var(--surface-tertiary, #334155);
+  border-color: var(--border-medium, #475569);
+  color: var(--text-primary, #f9fafb);
+}
+
+body.dark-mode .advancedFilters {
+  background: var(--surface-tertiary, #334155);
+  border-color: var(--border-dark, #64748b);
+}
+
+body.dark-mode .buttonSecondary {
+  background: var(--surface-tertiary, #334155);
+  color: var(--text-primary, #f9fafb);
+  border-color: var(--border-dark, #64748b);
+}
+
+/* ===== ACCESSIBILITY ===== */
+.toggleButton:focus-visible,
+.advancedToggle:focus-visible,
+.button:focus-visible {
+  outline: 3px solid var(--primary, #34c759);
+  outline-offset: 2px;
+}
+
+.input:focus-visible,
+.select:focus-visible {
+  outline: none; /* We use box-shadow instead */
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .formContent,
+  .toggleArrow,
+  .button,
+  .input,
+  .select,
+  .advancedToggle {
+    transition: none;
+  }
+
+  .formInner,
+  .advancedFilters {
+    animation: none;
+  }
+}
