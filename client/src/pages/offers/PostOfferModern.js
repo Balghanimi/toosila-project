@@ -594,9 +594,11 @@ export default function PostOfferModern() {
                       marginBottom: 'var(--space-2)',
                       fontFamily: '"Cairo", sans-serif',
                       color: 'var(--text-secondary)',
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    عدد المقاعد
+                    المقاعد المتاحة
                   </label>
                   <select
                     value={formData.seats}
@@ -610,6 +612,8 @@ export default function PostOfferModern() {
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
                       color: 'var(--text-primary)',
+                      textAlign: 'center',
+                      height: '48px',
                     }}
                   >
                     {[1, 2, 3, 4, 5, 6, 7].map((num) => (
@@ -641,6 +645,8 @@ export default function PostOfferModern() {
                       marginBottom: 'var(--space-2)',
                       fontFamily: '"Cairo", sans-serif',
                       color: 'var(--text-secondary)',
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     السعر لكل مقعد (د.ع)
@@ -657,6 +663,8 @@ export default function PostOfferModern() {
                       padding: 'var(--space-3)',
                       border: `2px solid ${errors.price ? '#f88' : 'var(--border-light)'}`,
                       borderRadius: 'var(--radius)',
+                      textAlign: 'center',
+                      height: '48px',
                       fontSize: 'var(--text-base)',
                       fontFamily: '"Cairo", sans-serif',
                       background: 'var(--surface-primary)',
