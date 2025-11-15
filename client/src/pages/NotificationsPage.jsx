@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/NotificationsContext';
 import NotificationItem from '../components/notifications/NotificationItem';
+import NotificationCard from '../components/notifications/NotificationCard';
 import NotificationSkeleton from '../components/notifications/NotificationSkeleton';
 
 function NotificationsPage() {
@@ -362,22 +363,39 @@ function NotificationsPage() {
                 </p>
               </div>
             ) : (
-              filteredNotifications.map((notification, index) => (
-                <div
-                  key={notification.id}
-                  style={{
-                    borderBottom:
-                      index < filteredNotifications.length - 1 ? '1px solid #f3f4f6' : 'none',
-                  }}
-                >
-                  <NotificationItem
-                    notification={notification}
-                    onClick={() => handleNotificationClick(notification)}
-                    showDelete={true}
-                    onDelete={handleDelete}
-                  />
-                </div>
-              ))
+              <div style={{ padding: '16px' }}>
+                {filteredNotifications.map((notification, index) => {
+                  // استخدام NotificationCard لإشعارات booking_created
+                  if (notification.type === 'booking_created') {
+                    return (
+                      <NotificationCard
+                        key={notification.id}
+                        notification={notification}
+                        onDelete={handleDelete}
+                        onMarkAsRead={markAsRead}
+                      />
+                    );
+                  }
+
+                  // استخدام NotificationItem العادي للإشعارات الأخرى
+                  return (
+                    <div
+                      key={notification.id}
+                      style={{
+                        borderBottom:
+                          index < filteredNotifications.length - 1 ? '1px solid #f3f4f6' : 'none',
+                      }}
+                    >
+                      <NotificationItem
+                        notification={notification}
+                        onClick={() => handleNotificationClick(notification)}
+                        showDelete={true}
+                        onDelete={handleDelete}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>

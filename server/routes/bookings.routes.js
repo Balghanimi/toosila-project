@@ -290,5 +290,175 @@ router.get('/my/offers', validatePagination, getOfferBookings);
  */
 router.get('/admin/stats', requireAdmin, getBookingStats);
 
+/**
+ * @swagger
+ * /bookings/{id}/accept:
+ *   post:
+ *     summary: Accept a booking
+ *     description: Driver accepts a booking request
+ *     tags: [Bookings]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Booking accepted successfully
+ */
+router.post('/:id/accept', validateId, async (req, res, next) => {
+  try {
+    const bookingId = req.params.id;
+    const driverId = req.user.userId;
+    const pool = req.app.get('db');
+
+    // التحقق من أن الحجز موجود وللسائق الحالي
+    const bookingResult = await pool.query(
+      `SELECT b.*, o.driver_id, o.from_city, o.to_city, o.departure_date, o.price
+       FROM bookings b
+       JOIN offers o ON b.offer_id = o.id
+       WHERE b.id = $1`,
+      [bookingId]
+    );
+
+    if (bookingResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'الحجز غير موجود',
+      });
+    }
+
+    const booking = bookingResult.rows[0];
+
+    if (booking.driver_id !== driverId) {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بتنفيذ هذا الإجراء',
+      });
+    }
+
+    // تحديث حالة الحجز إلى confirmed
+    await pool.query(
+      'UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2',
+      ['confirmed', bookingId]
+    );
+
+    // إرسال إشعار للراكب
+    await pool.query(
+      `INSERT INTO notifications (user_id, type, title, message, data, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [
+        booking.passenger_id,
+        'booking_accepted',
+        'تم قبول حجزك ✅',
+        'السائق وافق على طلب الحجز الخاص بك',
+        JSON.stringify({
+          bookingId: bookingId,
+          booking_id: bookingId,
+          route: `${booking.from_city} → ${booking.to_city}`,
+          date: booking.departure_date,
+          price: booking.price,
+        }),
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: 'تم قبول الحجز بنجاح',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /bookings/{id}/reject:
+ *   post:
+ *     summary: Reject a booking
+ *     description: Driver rejects a booking request
+ *     tags: [Bookings]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Booking rejected successfully
+ */
+router.post('/:id/reject', validateId, async (req, res, next) => {
+  try {
+    const bookingId = req.params.id;
+    const driverId = req.user.userId;
+    const pool = req.app.get('db');
+
+    // التحقق من أن الحجز موجود وللسائق الحالي
+    const bookingResult = await pool.query(
+      `SELECT b.*, o.driver_id, o.from_city, o.to_city, o.departure_date, o.price
+       FROM bookings b
+       JOIN offers o ON b.offer_id = o.id
+       WHERE b.id = $1`,
+      [bookingId]
+    );
+
+    if (bookingResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'الحجز غير موجود',
+      });
+    }
+
+    const booking = bookingResult.rows[0];
+
+    if (booking.driver_id !== driverId) {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بتنفيذ هذا الإجراء',
+      });
+    }
+
+    // تحديث حالة الحجز إلى rejected
+    await pool.query(
+      'UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2',
+      ['rejected', bookingId]
+    );
+
+    // إرسال إشعار للراكب
+    await pool.query(
+      `INSERT INTO notifications (user_id, type, title, message, data, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [
+        booking.passenger_id,
+        'booking_rejected',
+        'تم رفض حجزك ❌',
+        'السائق رفض طلب الحجز الخاص بك',
+        JSON.stringify({
+          bookingId: bookingId,
+          booking_id: bookingId,
+          route: `${booking.from_city} → ${booking.to_city}`,
+          date: booking.departure_date,
+          price: booking.price,
+        }),
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: 'تم رفض الحجز',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
 
