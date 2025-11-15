@@ -68,6 +68,16 @@ export default function Bookings() {
   useEffect(() => {
     if (location.state?.openDemandId && demands.length > 0) {
       const demandId = location.state.openDemandId;
+
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(demandId)) {
+        console.warn('⚠️ Invalid demand ID from notification (not UUID):', demandId);
+        showError('معرف الطلب غير صحيح - قد يكون الإشعار قديماً');
+        navigate(location.pathname, { replace: true, state: {} });
+        return;
+      }
+
       const demand = demands.find((d) => d.id === demandId);
 
       if (demand) {
@@ -125,9 +135,17 @@ export default function Bookings() {
         if (myDemands.length > 0) {
           try {
             // فلترة الـ IDs - التأكد من أنها صحيحة (UUID format)
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
             const demandIds = myDemands
               .map((d) => d.id)
-              .filter((id) => id && typeof id === 'string' && id.length === 36);
+              .filter((id) => {
+                if (!id || typeof id !== 'string') return false;
+                if (!uuidRegex.test(id)) {
+                  console.warn(`⚠️ Skipping invalid demand ID (not UUID): ${id}`);
+                  return false;
+                }
+                return true;
+              });
 
             console.log('📤 Sending batch request for demand IDs:', demandIds);
 
@@ -146,7 +164,13 @@ export default function Bookings() {
               }));
             }
           } catch (error) {
-            console.error('Failed to fetch batch responses:', error);
+            console.error('❌ Failed to fetch batch responses:', error);
+            if (error.message?.includes('uuid')) {
+              console.warn(
+                '⚠️ UUID Error detected - some demand IDs may be in wrong format (integer instead of UUID)'
+              );
+              console.warn('💡 Solution: Clean up old notifications with invalid demand IDs');
+            }
             // في حالة الفشل، استخدم الطلبات بدون ردود
             demandsWithResponses = myDemands.map((demand) => ({
               ...demand,
