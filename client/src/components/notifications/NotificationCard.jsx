@@ -351,9 +351,7 @@ function NotificationCard({ notification, onDelete, onMarkAsRead }) {
                 {data.price && (
                   <div>
                     <span style={{ color: '#6b7280' }}>السعر: </span>
-                    <span style={{ fontWeight: '600', color: '#22c55e' }}>
-                      {data.price} د.ع
-                    </span>
+                    <span style={{ fontWeight: '600', color: '#22c55e' }}>{data.price} د.ع</span>
                   </div>
                 )}
                 {data.seats && (
