@@ -42,6 +42,14 @@ export default function Bookings() {
       navigate('/');
       return;
     }
+
+    console.log('\n' + '='.repeat(60));
+    console.log('🔍 BOOKING DEBUG MODE ENABLED');
+    console.log('='.repeat(60));
+    console.log(`📍 Active Tab: ${activeTab}`);
+    console.log(`👤 Current User: ${currentUser?.name} (${currentUser?.id?.slice(0, 8)})`);
+    console.log('='.repeat(60) + '\n');
+
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, activeTab, navigate]);
@@ -155,6 +163,53 @@ export default function Bookings() {
             : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
 
         console.log(`📦 Fetched bookings (${activeTab}):`, response.bookings || []);
+
+        // 🔍 DEBUG: تفاصيل كل حجز
+        if (response.bookings && response.bookings.length > 0) {
+          console.log('🔍 DEBUG - Bookings Details:');
+          response.bookings.forEach((b, idx) => {
+            console.log(`  Booking ${idx + 1}:`, {
+              id: b.id?.slice(0, 8),
+              status: b.status,
+              from: b.offer?.fromCity,
+              to: b.offer?.toCity,
+              passenger: b.user?.name,
+              driver: b.offer?.driver?.name,
+            });
+          });
+
+          // ملخص الحالات
+          const statusCounts = response.bookings.reduce((acc, b) => {
+            acc[b.status] = (acc[b.status] || 0) + 1;
+            return acc;
+          }, {});
+
+          console.log('\n📊 STATUS SUMMARY:');
+          console.log(statusCounts);
+
+          const pendingCount = statusCounts.pending || 0;
+          if (activeTab === 'received') {
+            if (pendingCount > 0) {
+              console.log(
+                `\n✅ ${pendingCount} pending booking(s) - Accept/Reject buttons will show!`
+              );
+            } else {
+              console.log('\n⚠️ NO PENDING BOOKINGS - Accept/Reject buttons will NOT show!');
+              console.log(
+                '💡 Tip: Buttons only appear for bookings with status="pending" in "received" tab'
+              );
+            }
+          }
+        } else {
+          console.log(`⚠️ No bookings found for tab: ${activeTab}`);
+          if (activeTab === 'received') {
+            console.log('\n💡 To see Accept/Reject buttons:');
+            console.log('   1. Create an offer (as driver)');
+            console.log('   2. Have someone book your offer (as passenger)');
+            console.log('   3. Come back to this "Received Bookings" tab');
+          }
+        }
+
         setBookings(response.bookings || []);
       }
     } catch (err) {
@@ -344,6 +399,20 @@ export default function Bookings() {
     const canConfirm = isReceived && booking.status === 'pending';
     const canCancel = booking.status === 'pending' || booking.status === 'confirmed';
     const isHighlighted = highlightedBooking && booking.id === highlightedBooking;
+
+    // 🔍 DEBUG: لماذا لا تظهر الأزرار؟
+    console.log(`🎯 Render Booking ${booking.id?.slice(0, 8)}:`, {
+      activeTab,
+      isReceived,
+      bookingStatus: booking.status,
+      canConfirm,
+      willShowButtons: canConfirm,
+      reason: !canConfirm
+        ? !isReceived
+          ? 'Not in received tab'
+          : `Status is '${booking.status}' not 'pending'`
+        : 'Will show buttons ✅',
+    });
 
     return (
       <div
