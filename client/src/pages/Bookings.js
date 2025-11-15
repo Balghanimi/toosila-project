@@ -164,22 +164,48 @@ export default function Bookings() {
     }
   };
 
-  const handleStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      await bookingsAPI.updateStatus(bookingId, newStatus);
+  const handleAccept = (bookingId, passengerName) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'قبول الحجز',
+      message: `هل أنت متأكد من قبول حجز ${passengerName || 'الراكب'}؟`,
+      variant: 'success',
+      onConfirm: async () => {
+        try {
+          await bookingsAPI.accept(bookingId);
+          showSuccess('✅ تم قبول الحجز بنجاح!');
+          fetchBookings();
+          fetchPendingCount();
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        } catch (err) {
+          showError(err.message || 'حدث خطأ أثناء قبول الحجز');
+          setError(err.message || 'حدث خطأ أثناء قبول الحجز');
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        }
+      },
+    });
+  };
 
-      if (newStatus === 'confirmed') {
-        showSuccess('✅ تم قبول الحجز بنجاح!');
-      } else if (newStatus === 'cancelled') {
-        showError('❌ تم رفض الحجز');
-      }
-
-      fetchBookings(); // إعادة تحميل القائمة
-      fetchPendingCount(); // تحديث عداد الحجوزات المعلقة
-    } catch (err) {
-      showError(err.message || 'حدث خطأ أثناء تحديث الحجز');
-      setError(err.message || 'حدث خطأ أثناء تحديث الحجز');
-    }
+  const handleReject = (bookingId, passengerName) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'رفض الحجز',
+      message: `هل أنت متأكد من رفض حجز ${passengerName || 'الراكب'}؟ لا يمكن التراجع عن هذا الإجراء.`,
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await bookingsAPI.reject(bookingId);
+          showSuccess('تم رفض الحجز');
+          fetchBookings();
+          fetchPendingCount();
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        } catch (err) {
+          showError(err.message || 'حدث خطأ أثناء رفض الحجز');
+          setError(err.message || 'حدث خطأ أثناء رفض الحجز');
+          setConfirmDialog({ ...confirmDialog, isOpen: false });
+        }
+      },
+    });
   };
 
   const handleCancel = (bookingId) => {
@@ -489,12 +515,12 @@ export default function Bookings() {
               {canConfirm && (
                 <>
                   <button
-                    onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                    onClick={() => handleAccept(booking.id, booking.user?.name)}
                     aria-label={`قبول حجز ${booking.user?.name || 'الراكب'} من ${booking.offer?.fromCity} إلى ${booking.offer?.toCity}`}
                     style={{
                       flex: 1,
                       padding: 'var(--space-3)',
-                      background: 'var(--primary)',
+                      background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: 'var(--radius)',
@@ -502,17 +528,26 @@ export default function Bookings() {
                       fontWeight: '600',
                       cursor: 'pointer',
                       fontFamily: '"Cairo", sans-serif',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     ✅ قبول
                   </button>
                   <button
-                    onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                    onClick={() => handleReject(booking.id, booking.user?.name)}
                     aria-label={`رفض حجز ${booking.user?.name || 'الراكب'}`}
                     style={{
                       flex: 1,
                       padding: 'var(--space-3)',
-                      background: '#dc2626',
+                      background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: 'var(--radius)',
@@ -520,6 +555,15 @@ export default function Bookings() {
                       fontWeight: '600',
                       cursor: 'pointer',
                       fontFamily: '"Cairo", sans-serif',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     ❌ رفض
@@ -569,6 +613,15 @@ export default function Bookings() {
                 cursor: 'pointer',
                 fontFamily: '"Cairo", sans-serif',
                 boxShadow: 'var(--shadow-sm)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
               💬 مراسلة {isReceived ? 'الراكب' : 'السائق'}

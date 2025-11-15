@@ -237,6 +237,16 @@ export const bookingsAPI = {
   getPendingCount: async () => {
     return apiRequest('/bookings/my/pending-count', { method: 'GET' });
   },
+  accept: async (bookingId) => {
+    return apiRequest(`/bookings/${bookingId}/accept`, {
+      method: 'POST',
+    });
+  },
+  reject: async (bookingId) => {
+    return apiRequest(`/bookings/${bookingId}/reject`, {
+      method: 'POST',
+    });
+  },
 };
 
 export const ratingsAPI = {
