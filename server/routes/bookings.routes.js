@@ -316,60 +316,98 @@ router.post('/:id/accept', validateId, async (req, res, next) => {
     const driverId = req.user.userId;
     const pool = req.app.get('db');
 
-    // التحقق من أن الحجز موجود وللسائق الحالي
-    const bookingResult = await pool.query(
-      `SELECT b.*, o.driver_id, o.from_city, o.to_city, o.departure_date, o.price
-       FROM bookings b
-       JOIN offers o ON b.offer_id = o.id
-       WHERE b.id = $1`,
-      [bookingId]
-    );
+    // Start transaction to prevent race conditions
+    await pool.query('BEGIN');
 
-    if (bookingResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'الحجز غير موجود',
+    try {
+      // التحقق من أن الحجز موجود وللسائق الحالي
+      const bookingResult = await pool.query(
+        `SELECT b.*, o.id as offer_id, o.seats as offer_seats, o.driver_id,
+                o.from_city, o.to_city, o.departure_date, o.price
+         FROM bookings b
+         JOIN offers o ON b.offer_id = o.id
+         WHERE b.id = $1
+         FOR UPDATE`, // Lock row for update to prevent concurrent modifications
+        [bookingId]
+      );
+
+      if (bookingResult.rows.length === 0) {
+        await pool.query('ROLLBACK');
+        return res.status(404).json({
+          success: false,
+          message: 'الحجز غير موجود',
+        });
+      }
+
+      const booking = bookingResult.rows[0];
+
+      if (booking.driver_id !== driverId) {
+        await pool.query('ROLLBACK');
+        return res.status(403).json({
+          success: false,
+          message: 'غير مصرح لك بتنفيذ هذا الإجراء',
+        });
+      }
+
+      // ✅ CRITICAL FIX: Check seat availability BEFORE accepting
+      const seatsResult = await pool.query(
+        `SELECT COALESCE(SUM(seats), 0) as total_booked
+         FROM bookings
+         WHERE offer_id = $1
+         AND status = $2
+         AND id != $3`,
+        [booking.offer_id, 'confirmed', bookingId]
+      );
+
+      const totalBooked = parseInt(seatsResult.rows[0].total_booked) || 0;
+      const availableSeats = booking.offer_seats - totalBooked;
+
+      // Validate if enough seats are available
+      if (booking.seats > availableSeats) {
+        await pool.query('ROLLBACK');
+        return res.status(400).json({
+          success: false,
+          message: `عذراً، المقاعد المتاحة: ${availableSeats} فقط. لا يمكن قبول هذا الحجز (طلب ${booking.seats} مقاعد).`,
+        });
+      }
+
+      // تحديث حالة الحجز إلى confirmed
+      await pool.query(
+        'UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2',
+        ['confirmed', bookingId]
+      );
+
+      // إرسال إشعار للراكب
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, message, data, created_at)
+         VALUES ($1, $2, $3, $4, $5, NOW())`,
+        [
+          booking.passenger_id,
+          'booking_accepted',
+          'تم قبول حجزك ✅',
+          'السائق وافق على طلب الحجز الخاص بك',
+          JSON.stringify({
+            bookingId: bookingId,
+            booking_id: bookingId,
+            route: `${booking.from_city} → ${booking.to_city}`,
+            date: booking.departure_date,
+            price: booking.price,
+          }),
+        ]
+      );
+
+      // Commit transaction
+      await pool.query('COMMIT');
+
+      res.json({
+        success: true,
+        message: 'تم قبول الحجز بنجاح',
       });
+    } catch (innerError) {
+      // Rollback on any error
+      await pool.query('ROLLBACK');
+      throw innerError;
     }
-
-    const booking = bookingResult.rows[0];
-
-    if (booking.driver_id !== driverId) {
-      return res.status(403).json({
-        success: false,
-        message: 'غير مصرح لك بتنفيذ هذا الإجراء',
-      });
-    }
-
-    // تحديث حالة الحجز إلى confirmed
-    await pool.query(
-      'UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2',
-      ['confirmed', bookingId]
-    );
-
-    // إرسال إشعار للراكب
-    await pool.query(
-      `INSERT INTO notifications (user_id, type, title, message, data, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [
-        booking.passenger_id,
-        'booking_accepted',
-        'تم قبول حجزك ✅',
-        'السائق وافق على طلب الحجز الخاص بك',
-        JSON.stringify({
-          bookingId: bookingId,
-          booking_id: bookingId,
-          route: `${booking.from_city} → ${booking.to_city}`,
-          date: booking.departure_date,
-          price: booking.price,
-        }),
-      ]
-    );
-
-    res.json({
-      success: true,
-      message: 'تم قبول الحجز بنجاح',
-    });
   } catch (error) {
     next(error);
   }
