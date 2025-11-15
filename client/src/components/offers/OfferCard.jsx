@@ -1,0 +1,116 @@
+import React from 'react';
+import styles from './OfferCard.module.css';
+
+/**
+ * Mobile-Optimized Offer Card Component
+ * Features:
+ * - Full-width design for mobile
+ * - Large, readable text (16px+)
+ * - Touch-friendly buttons (48px+)
+ * - Clear visual hierarchy
+ * - Accessible and WCAG compliant
+ */
+const OfferCard = ({
+  offer,
+  onBookNow,
+  formatDate,
+  formatTime,
+  currentUser,
+}) => {
+  const handleBookClick = () => {
+    onBookNow(offer);
+  };
+
+  return (
+    <div className={styles.offerCard}>
+      {/* Price - Most prominent */}
+      <div className={styles.priceSection}>
+        <div className={styles.price}>
+          {offer.price?.toLocaleString('ar-EG') || '0'}
+          <span className={styles.currency}>د.ع</span>
+        </div>
+      </div>
+
+      {/* Route - Second most important */}
+      <div className={styles.routeSection}>
+        <div className={styles.route}>
+          <span className={styles.cityFrom}>{offer.fromCity || 'غير محدد'}</span>
+          <span className={styles.arrow}>←</span>
+          <span className={styles.cityTo}>{offer.toCity || 'غير محدد'}</span>
+        </div>
+      </div>
+
+      {/* Details Row - Icons + Text */}
+      <div className={styles.detailsRow}>
+        <div className={styles.detail}>
+          <span className={styles.detailIcon}>📅</span>
+          <span className={styles.detailText}>
+            {formatDate ? formatDate(offer.departureTime) : 'غير محدد'}
+          </span>
+        </div>
+
+        <div className={styles.detail}>
+          <span className={styles.detailIcon}>🕐</span>
+          <span className={styles.detailText}>
+            {formatTime ? formatTime(offer.departureTime) : '--:--'}
+          </span>
+        </div>
+
+        <div className={styles.detail}>
+          <span className={styles.detailIcon}>👥</span>
+          <span className={styles.detailText}>
+            {offer.availableSeats || 0} متاح
+          </span>
+        </div>
+      </div>
+
+      {/* Driver Info */}
+      {offer.driverName && (
+        <div className={styles.driverSection}>
+          <span className={styles.driverIcon}>🚗</span>
+          <span className={styles.driverText}>
+            السائق: <strong>{offer.driverName}</strong>
+          </span>
+          {offer.driverRating && (
+            <span className={styles.rating}>
+              ⭐ {offer.driverRating.toFixed(1)}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Additional Info (if available) */}
+      {(offer.vehicleType || offer.additionalInfo) && (
+        <div className={styles.additionalInfo}>
+          {offer.vehicleType && (
+            <span className={styles.badge}>{offer.vehicleType}</span>
+          )}
+          {offer.additionalInfo && (
+            <p className={styles.infoText}>{offer.additionalInfo}</p>
+          )}
+        </div>
+      )}
+
+      {/* Book Now Button */}
+      {currentUser && !currentUser.isDriver && (
+        <button
+          type="button"
+          onClick={handleBookClick}
+          className={styles.bookButton}
+        >
+          <span>احجز الآن</span>
+          <span className={styles.buttonIcon}>🎫</span>
+        </button>
+      )}
+
+      {/* Login Prompt for Non-authenticated Users */}
+      {!currentUser && (
+        <div className={styles.loginPrompt}>
+          <span>يجب تسجيل الدخول للحجز</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default OfferCard;

@@ -855,6 +855,64 @@
             "description": "Retrieve platform-wide booking statistics (Admin only)"
           },
           "response": []
+        },
+        {
+          "name": "Accept a booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/:id/accept",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                ":id",
+                "accept"
+              ]
+            },
+            "description": "Driver accepts a booking request"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject a booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/:id/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bookings",
+                ":id",
+                "reject"
+              ]
+            },
+            "description": "Driver rejects a booking request"
+          },
+          "response": []
         }
       ]
     },

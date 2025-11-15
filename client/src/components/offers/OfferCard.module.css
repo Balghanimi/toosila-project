@@ -1,0 +1,397 @@
+/**
+ * Offer Card - Mobile-First Professional Design
+ * Optimized for mobile rideshare app with clear visual hierarchy
+ */
+
+.offerCard {
+  background: var(--surface-primary, #ffffff);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-5, 20px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light, #e5e7eb);
+  margin-bottom: var(--space-4, 16px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.4s ease-out;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.offerCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  border-color: var(--primary, #34c759);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== PRICE SECTION (Most Prominent) ===== */
+.priceSection {
+  margin-bottom: var(--space-3, 12px);
+}
+
+.price {
+  font-size: clamp(32px, 8vw, 42px); /* Responsive huge text */
+  font-weight: 800;
+  color: var(--primary, #34c759);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  line-height: 1.2;
+  direction: rtl;
+  text-align: right;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1, 4px);
+}
+
+.currency {
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: 700;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* ===== ROUTE SECTION ===== */
+.routeSection {
+  margin-bottom: var(--space-4, 16px);
+  padding-bottom: var(--space-3, 12px);
+  border-bottom: 2px solid var(--border-light, #e5e7eb);
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2, 8px);
+  direction: rtl;
+}
+
+.cityFrom,
+.cityTo {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+}
+
+.arrow {
+  font-size: 20px;
+  color: var(--primary, #34c759);
+  font-weight: 700;
+}
+
+/* ===== DETAILS ROW ===== */
+.detailsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2, 8px);
+  margin-bottom: var(--space-4, 16px);
+  padding: var(--space-3, 12px);
+  background: var(--surface-secondary, #f9fafb);
+  border-radius: var(--radius, 12px);
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  text-align: center;
+}
+
+.detailIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.detailText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ===== DRIVER SECTION ===== */
+.driverSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  margin-bottom: var(--space-4, 16px);
+  padding: var(--space-3, 12px);
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(52, 199, 89, 0.02) 100%);
+  border-radius: var(--radius, 12px);
+  border: 1px solid rgba(52, 199, 89, 0.15);
+  direction: rtl;
+}
+
+.driverIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.driverText {
+  font-size: 15px;
+  color: var(--text-primary, #111827);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  flex: 1;
+}
+
+.driverText strong {
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+}
+
+.rating {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--warning, #f59e0b);
+  background: rgba(245, 158, 11, 0.1);
+  padding: var(--space-1, 4px) var(--space-2, 8px);
+  border-radius: var(--radius-full, 9999px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== ADDITIONAL INFO ===== */
+.additionalInfo {
+  margin-bottom: var(--space-3, 12px);
+  direction: rtl;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1, 4px) var(--space-3, 12px);
+  background: var(--info, #3b82f6);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-full, 9999px);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  margin-bottom: var(--space-2, 8px);
+}
+
+.infoText {
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== BOOK BUTTON ===== */
+.bookButton {
+  width: 100%;
+  min-height: 56px; /* Large touch target */
+  padding: var(--space-4, 16px) var(--space-5, 20px);
+  background: linear-gradient(135deg, var(--success, #10b981) 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius, 12px);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+  direction: rtl;
+}
+
+.bookButton:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+  transform: translateY(-2px);
+}
+
+.bookButton:active {
+  transform: scale(0.98) translateY(0);
+}
+
+.buttonIcon {
+  font-size: 20px;
+}
+
+/* ===== LOGIN PROMPT ===== */
+.loginPrompt {
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: var(--surface-secondary, #f9fafb);
+  color: var(--text-secondary, #6b7280);
+  border: 2px dashed var(--border-medium, #d1d5db);
+  border-radius: var(--radius, 12px);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  direction: rtl;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Extra Small Mobile (≤375px) - iPhone SE */
+@media (max-width: 375px) {
+  .offerCard {
+    padding: var(--space-4, 16px);
+  }
+
+  .price {
+    font-size: 30px;
+  }
+
+  .cityFrom,
+  .cityTo {
+    font-size: 18px;
+  }
+
+  .detailsRow {
+    gap: var(--space-1, 4px);
+    padding: var(--space-2, 8px);
+  }
+
+  .detailText {
+    font-size: 12px;
+  }
+
+  .detailIcon {
+    font-size: 18px;
+  }
+
+  .bookButton {
+    font-size: 16px;
+    min-height: 52px;
+  }
+}
+
+/* Tablet (≥640px) */
+@media (min-width: 640px) {
+  .offerCard {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .detailsRow {
+    padding: var(--space-4, 16px);
+  }
+
+  .detail {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .detailText {
+    font-size: 14px;
+  }
+}
+
+/* Desktop (≥1024px) */
+@media (min-width: 1024px) {
+  .offerCard {
+    max-width: 800px;
+  }
+
+  .price {
+    font-size: 48px;
+  }
+
+  .cityFrom,
+  .cityTo {
+    font-size: 28px;
+  }
+
+  .bookButton {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .bookButton:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+body.dark-mode .offerCard {
+  background: var(--surface-secondary, #1e293b);
+  border-color: var(--border-medium, #475569);
+}
+
+body.dark-mode .routeSection {
+  border-bottom-color: var(--border-dark, #64748b);
+}
+
+body.dark-mode .detailsRow {
+  background: var(--surface-tertiary, #334155);
+}
+
+body.dark-mode .driverSection {
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+body.dark-mode .loginPrompt {
+  background: var(--surface-tertiary, #334155);
+  border-color: var(--border-dark, #64748b);
+  color: var(--text-secondary, #d1d5db);
+}
+
+/* ===== ACCESSIBILITY ===== */
+.bookButton:focus-visible {
+  outline: 3px solid var(--success, #10b981);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .offerCard,
+  .bookButton {
+    animation: none;
+    transition: none;
+  }
+
+  .offerCard:hover {
+    transform: none;
+  }
+
+  .bookButton:hover,
+  .bookButton:active {
+    transform: none;
+  }
+}
+
+/* ===== LOADING SKELETON (Optional) ===== */
+.offerCard.skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
