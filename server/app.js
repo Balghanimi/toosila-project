@@ -68,7 +68,7 @@ app.use(helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // unsafe-inline needed for some React styles, allow Google Fonts
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://toosila-backend-production.up.railway.app"], // Allow API calls
       fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow Google Fonts
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
