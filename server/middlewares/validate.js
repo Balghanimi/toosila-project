@@ -202,8 +202,8 @@ const validateRatingCreation = [
 // Parameter validation
 const validateId = [
   param('id')
-    .isInt({ min: 1 })
-    .withMessage('Please provide a valid ID'),
+    .isUUID()
+    .withMessage('Please provide a valid UUID'),
   handleValidationErrors
 ];
 
