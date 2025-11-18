@@ -241,14 +241,15 @@ class BookingService {
   async getUserBookingStats(userId) {
     const result = await query(
       `SELECT
-        COUNT(*) as total_bookings,
-        COUNT(CASE WHEN status = $2 THEN 1 END) as pending_bookings,
-        COUNT(CASE WHEN status = $3 THEN 1 END) as confirmed_bookings,
-        COUNT(CASE WHEN status = $4 THEN 1 END) as cancelled_bookings,
-        COUNT(CASE WHEN status = $5 THEN 1 END) as completed_bookings,
-        AVG(total_price) as average_booking_value
-      FROM bookings
-      WHERE passenger_id = $1`,
+        COUNT(*)::int as total_bookings,
+        COUNT(CASE WHEN b.status = $2 THEN 1 END)::int as pending_bookings,
+        COUNT(CASE WHEN b.status = $3 THEN 1 END)::int as confirmed_bookings,
+        COUNT(CASE WHEN b.status = $4 THEN 1 END)::int as cancelled_bookings,
+        COUNT(CASE WHEN b.status = $5 THEN 1 END)::int as completed_bookings,
+        ROUND(AVG(o.price * b.seats)::numeric, 2) as average_booking_value
+      FROM bookings b
+      LEFT JOIN offers o ON b.offer_id = o.id
+      WHERE b.passenger_id = $1`,
       [
         userId,
         BOOKING_STATUS.PENDING,
