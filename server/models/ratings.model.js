@@ -159,7 +159,7 @@ class Rating {
   // Update user rating averages
   static async updateUserRating(userId) {
     const result = await query(
-      `UPDATE users 
+      `UPDATE users
        SET rating_avg = (
          SELECT COALESCE(AVG(rating), 0) FROM ratings WHERE to_user_id = $1
        ),
@@ -171,6 +171,28 @@ class Rating {
       [userId]
     );
     return result.rows[0];
+  }
+
+  // Get top rated users
+  static async getTopRatedUsers(limit = 10) {
+    const result = await query(
+      `SELECT
+        u.id,
+        u.name,
+        u.email,
+        u.is_driver,
+        COUNT(r.id)::int as rating_count,
+        ROUND(AVG(r.rating)::numeric, 2) as average_rating
+      FROM users u
+      INNER JOIN ratings r ON r.to_user_id = u.id
+      GROUP BY u.id, u.name, u.email, u.is_driver
+      HAVING COUNT(r.id) > 0
+      ORDER BY average_rating DESC, rating_count DESC
+      LIMIT $1`,
+      [limit]
+    );
+
+    return result.rows;
   }
 
   // Convert to JSON
