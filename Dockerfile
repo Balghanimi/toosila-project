@@ -19,6 +19,10 @@ RUN npm install
 # نسخ كود المصدر
 COPY client/ ./
 
+# Set API URL for production build - Railway will use /api on same domain
+ARG REACT_APP_API_URL=/api
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 # بناء تطبيق React
 RUN npm run build
 
