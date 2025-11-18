@@ -71,7 +71,7 @@ app.use(helmet({
       connectSrc: ["'self'", "https://toosila-backend-production.up.railway.app"], // Allow API calls
       fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow Google Fonts
       objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
+      mediaSrc: ["'self'", "data:"], // Allow data URIs for notification sounds
       frameSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
