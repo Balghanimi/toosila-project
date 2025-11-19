@@ -1,6 +1,34 @@
 -- Migration: Convert UUID IDs to INTEGER for demands, offers, bookings, and related tables
 -- This migration preserves all existing data by creating new integer IDs and remapping relationships
 
+-- Step 0: Create sequences if they don't exist
+DO $$
+BEGIN
+    -- Create demands sequence
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'demands_id_seq') THEN
+        CREATE SEQUENCE demands_id_seq;
+        PERFORM setval('demands_id_seq', COALESCE((SELECT MAX(id_new) FROM demands WHERE id_new IS NOT NULL), 0) + 1, false);
+    END IF;
+
+    -- Create offers sequence
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'offers_id_seq') THEN
+        CREATE SEQUENCE offers_id_seq;
+        PERFORM setval('offers_id_seq', COALESCE((SELECT MAX(id_new) FROM offers WHERE id_new IS NOT NULL), 0) + 1, false);
+    END IF;
+
+    -- Create bookings sequence
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'bookings_id_seq') THEN
+        CREATE SEQUENCE bookings_id_seq;
+        PERFORM setval('bookings_id_seq', COALESCE((SELECT MAX(id_new) FROM bookings WHERE id_new IS NOT NULL), 0) + 1, false);
+    END IF;
+
+    -- Create demand_responses sequence
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'demand_responses_id_seq') THEN
+        CREATE SEQUENCE demand_responses_id_seq;
+        PERFORM setval('demand_responses_id_seq', COALESCE((SELECT MAX(id_new) FROM demand_responses WHERE id_new IS NOT NULL), 0) + 1, false);
+    END IF;
+END $$;
+
 -- Step 1: Add new integer ID columns to main tables
 ALTER TABLE demands ADD COLUMN IF NOT EXISTS id_new SERIAL;
 ALTER TABLE offers ADD COLUMN IF NOT EXISTS id_new SERIAL;
@@ -174,10 +202,14 @@ ALTER TABLE demand_responses
     UNIQUE(demand_id, driver_id);
 
 -- Step 15: Update sequences to start from the correct value
-SELECT setval('demands_id_seq', (SELECT MAX(id) FROM demands) + 1);
-SELECT setval('offers_id_seq', (SELECT MAX(id) FROM offers) + 1);
-SELECT setval('bookings_id_seq', (SELECT MAX(id) FROM bookings) + 1);
-SELECT setval('demand_responses_id_seq', (SELECT MAX(id) FROM demand_responses) + 1);
+-- Use COALESCE to handle empty tables and ensure sequences start correctly
+DO $$
+BEGIN
+    PERFORM setval('demands_id_seq', COALESCE((SELECT MAX(id) FROM demands), 0) + 1, false);
+    PERFORM setval('offers_id_seq', COALESCE((SELECT MAX(id) FROM offers), 0) + 1, false);
+    PERFORM setval('bookings_id_seq', COALESCE((SELECT MAX(id) FROM bookings), 0) + 1, false);
+    PERFORM setval('demand_responses_id_seq', COALESCE((SELECT MAX(id) FROM demand_responses), 0) + 1, false);
+END $$;
 
 -- Step 16: Recreate indexes with integer columns
 DROP INDEX IF EXISTS idx_bookings_offer_id;
