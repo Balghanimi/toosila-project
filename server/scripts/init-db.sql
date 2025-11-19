@@ -25,8 +25,9 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 -- Demands table (according to architecture.md)
+-- Updated to use INTEGER IDs instead of UUID
 CREATE TABLE IF NOT EXISTS demands (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id SERIAL PRIMARY KEY,
     passenger_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     from_city VARCHAR(255) NOT NULL,
     to_city VARCHAR(255) NOT NULL,
@@ -40,8 +41,9 @@ CREATE TABLE IF NOT EXISTS demands (
 );
 
 -- Offers table (according to architecture.md)
+-- Updated to use INTEGER IDs instead of UUID
 CREATE TABLE IF NOT EXISTS offers (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id SERIAL PRIMARY KEY,
     driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     from_city VARCHAR(255) NOT NULL,
     to_city VARCHAR(255) NOT NULL,
@@ -54,9 +56,10 @@ CREATE TABLE IF NOT EXISTS offers (
 );
 
 -- Bookings table (according to architecture.md)
+-- Updated to use INTEGER IDs instead of UUID
 CREATE TABLE IF NOT EXISTS bookings (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    offer_id UUID NOT NULL REFERENCES offers(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    offer_id INTEGER NOT NULL REFERENCES offers(id) ON DELETE CASCADE,
     passenger_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status VARCHAR(20) DEFAULT 'pending', -- pending, accepted, rejected, cancelled
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -65,19 +68,21 @@ CREATE TABLE IF NOT EXISTS bookings (
 );
 
 -- Messages table (according to architecture.md)
+-- Updated ride_id to INTEGER to reference demands/offers
 CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     ride_type VARCHAR(10) NOT NULL, -- 'offer' or 'demand'
-    ride_id UUID NOT NULL,
+    ride_id INTEGER NOT NULL,
     sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL CHECK (length(content) <= 2000),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Ratings table (according to architecture.md)
+-- Updated ride_id to INTEGER to reference demands/offers
 CREATE TABLE IF NOT EXISTS ratings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    ride_id UUID NOT NULL, -- can be offer_id or demand_id
+    ride_id INTEGER NOT NULL, -- can be offer_id or demand_id (INTEGER)
     from_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     to_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
@@ -97,9 +102,10 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 );
 
 -- Demand responses table (responses from drivers to passenger demands)
+-- Updated to use INTEGER IDs instead of UUID
 CREATE TABLE IF NOT EXISTS demand_responses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    demand_id UUID NOT NULL REFERENCES demands(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    demand_id INTEGER NOT NULL REFERENCES demands(id) ON DELETE CASCADE,
     driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     offer_price DECIMAL(10,2) NOT NULL,
     available_seats INTEGER NOT NULL CHECK (available_seats >= 1 AND available_seats <= 7),
