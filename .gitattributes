@@ -1,0 +1,5 @@
+# Ensure shell scripts always use LF line endings (Unix)
+*.sh text eol=lf
+
+# Ensure SQL files use LF
+*.sql text eol=lf
