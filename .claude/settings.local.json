@@ -66,7 +66,8 @@
       "Bash(railway status:*)",
       "Bash(tee:*)",
       "Bash(for:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(bookings_offer_id_passenger_id_key\" because duplicate bookings exist \nin the database (same offer_id + passenger_id combinations).\n\nSolution: Add cleanup step before adding unique constraints.\n\nChanges to 016_convert_ids_to_integer.sql:\n- Add Step 13.5: Clean up duplicate bookings\n  * Uses ROW_NUMBER() window function to identify duplicates\n  * Keeps oldest booking (by created_at, then id)\n  * Deletes all other duplicates\n  * Reports count of deleted duplicates\n\n- Add cleanup for demand_responses duplicates\n  * Same logic for demand_id + driver_id combinations\n  * Prevents future unique constraint violations\n\nLogic:\n1. Partition bookings by (offer_id, passenger_id)\n2. Assign row numbers ordered by created_at ASC, id ASC\n3. Keep only row_number = 1 (the oldest)\n4. Delete all rows with row_number > 1\n\nThis ensures:\n✅ No data loss - keeps the original booking\n✅ Unique constraint can be added successfully\n✅ Reports cleanup activity via RAISE NOTICE\n✅ Same logic applied to demand_responses\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

@@ -120,10 +120,54 @@ ALTER TABLE demand_responses
     ADD CONSTRAINT demand_responses_demand_id_fkey
     FOREIGN KEY (demand_id) REFERENCES demands(id) ON DELETE CASCADE;
 
+-- Step 13.5: Clean up duplicate bookings before adding unique constraint
+-- Find and remove duplicate bookings (same offer_id + passenger_id)
+-- Keep only the earliest booking (MIN(id))
+DO $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  -- Delete duplicate bookings, keeping only the oldest one for each offer_id + passenger_id combination
+  WITH duplicates AS (
+    SELECT
+      id,
+      ROW_NUMBER() OVER (PARTITION BY offer_id, passenger_id ORDER BY created_at ASC, id ASC) as rn
+    FROM bookings
+  )
+  DELETE FROM bookings
+  WHERE id IN (
+    SELECT id FROM duplicates WHERE rn > 1
+  );
+
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RAISE NOTICE 'Cleaned up % duplicate booking(s)', deleted_count;
+END $$;
+
 -- Step 14: Add unique constraints
 ALTER TABLE bookings
     ADD CONSTRAINT bookings_offer_id_passenger_id_key
     UNIQUE(offer_id, passenger_id);
+
+-- Clean up duplicate demand_responses before adding unique constraint
+DO $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  -- Delete duplicate demand_responses, keeping only the oldest one for each demand_id + driver_id combination
+  WITH duplicates AS (
+    SELECT
+      id,
+      ROW_NUMBER() OVER (PARTITION BY demand_id, driver_id ORDER BY created_at ASC, id ASC) as rn
+    FROM demand_responses
+  )
+  DELETE FROM demand_responses
+  WHERE id IN (
+    SELECT id FROM duplicates WHERE rn > 1
+  );
+
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RAISE NOTICE 'Cleaned up % duplicate demand_response(s)', deleted_count;
+END $$;
 
 ALTER TABLE demand_responses
     ADD CONSTRAINT demand_responses_demand_id_driver_id_key

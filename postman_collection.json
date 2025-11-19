@@ -39,6 +39,59 @@
   ],
   "item": [
     {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Run database migration 016 (UUID to INTEGER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/run-migration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "run-migration"
+              ]
+            },
+            "description": "Executes the migration to convert demands, offers, bookings IDs from UUID to INTEGER"
+          },
+          "response": []
+        },
+        {
+          "name": "Check migration status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/migration-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "migration-status"
+              ]
+            },
+            "description": "Check if migration 016 has been executed"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Authentication",
       "item": [
         {
