@@ -36,6 +36,7 @@ const verificationRoutes = require('./routes/verification.routes');
 const emailVerificationRoutes = require('./routes/emailVerification.routes');
 const passwordResetRoutes = require('./routes/passwordReset.routes');
 const healthRoutes = require('./routes/health.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
 
@@ -47,81 +48,91 @@ initializeSentry(app);
 app.set('trust proxy', 1);
 
 // Compression middleware - must be early in the middleware chain
-app.use(compression({
-  filter: (req, res) => {
-    // Don't compress responses if client doesn't accept encoding
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    // Use compression for all requests
-    return compression.filter(req, res);
-  },
-  threshold: 1024, // Only compress responses larger than 1KB
-  level: 6 // Compression level (0-9, 6 is balanced)
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      // Don't compress responses if client doesn't accept encoding
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Use compression for all requests
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses larger than 1KB
+    level: 6, // Compression level (0-9, 6 is balanced)
+  })
+);
 
 // Enhanced Security middleware with comprehensive CSP
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // unsafe-inline needed for some React styles, allow Google Fonts
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://toosila-backend-production.up.railway.app"], // Allow API calls
-      fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow Google Fonts
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'", "data:"], // Allow data URIs for notification sounds
-      frameSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      frameAncestors: ["'none'"],
-      upgradeInsecureRequests: config.NODE_ENV === 'production' ? [] : null
-    }
-  },
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true
-  },
-  frameguard: {
-    action: 'deny'
-  },
-  noSniff: true,
-  xssFilter: true,
-  referrerPolicy: {
-    policy: 'strict-origin-when-cross-origin'
-  },
-  permittedCrossDomainPolicies: {
-    permittedPolicies: 'none'
-  },
-  dnsPrefetchControl: {
-    allow: false
-  }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'], // unsafe-inline needed for some React styles, allow Google Fonts
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https://toosila-backend-production.up.railway.app'], // Allow API calls
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'], // Allow Google Fonts
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'", 'data:'], // Allow data URIs for notification sounds
+        frameSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
+        upgradeInsecureRequests: config.NODE_ENV === 'production' ? [] : null,
+      },
+    },
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    },
+    frameguard: {
+      action: 'deny',
+    },
+    noSniff: true,
+    xssFilter: true,
+    referrerPolicy: {
+      policy: 'strict-origin-when-cross-origin',
+    },
+    permittedCrossDomainPolicies: {
+      permittedPolicies: 'none',
+    },
+    dnsPrefetchControl: {
+      allow: false,
+    },
+  })
+);
 
 // CORS configuration
-app.use(cors({
-  origin: config.corsOrigin, // ← ✅ متوافق مع architecture.md,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+app.use(
+  cors({
+    origin: config.corsOrigin, // ← ✅ متوافق مع architecture.md,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  })
+);
 
 // Rate limiting
 app.use('/api/', generalLimiter);
 
 // Body parsing middleware
-app.use(express.json({ 
-  limit: config.MAX_FILE_SIZE,
-  verify: (req, res, buf) => {
-    req.rawBody = buf;
-  }
-}));
-app.use(express.urlencoded({ 
-  extended: true, 
-  limit: config.MAX_FILE_SIZE 
-}));
+app.use(
+  express.json({
+    limit: config.MAX_FILE_SIZE,
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: config.MAX_FILE_SIZE,
+  })
+);
 
 // Logging middleware - integrate Morgan with Winston
 app.use(morgan('combined', { stream: logger.stream }));
@@ -133,10 +144,14 @@ app.use(performanceMiddleware);
 app.use(metricsMiddleware);
 
 // Swagger API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Toosila API Documentation'
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Toosila API Documentation',
+  })
+);
 
 // Health check routes (comprehensive monitoring)
 app.use('/api/health', healthRoutes);
@@ -155,6 +170,7 @@ app.use('/api/notifications', noCache, notificationsRoutes); // No cache for not
 app.use('/api/verification', noCache, verificationRoutes);
 app.use('/api/email-verification', noCache, emailVerificationRoutes);
 app.use('/api/password-reset', noCache, passwordResetRoutes);
+app.use('/api/admin', noCache, adminRoutes); // Admin routes for migrations
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {
@@ -174,4 +190,3 @@ app.use(sentryErrorHandler());
 app.use(errorHandler);
 
 module.exports = app;
-
