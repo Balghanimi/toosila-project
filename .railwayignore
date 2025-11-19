@@ -1,14 +1,6 @@
-# Force Railway to use Dockerfile instead of auto-detection
-package.json
-package-lock.json
+# Ignore node_modules (will be installed in Docker)
 node_modules/
-
-# Ignore client and server package files to prevent auto-detection
-client/package.json
-client/package-lock.json
 client/node_modules/
-server/package.json
-server/package-lock.json
 server/node_modules/
 
 # Ignore development files
