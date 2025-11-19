@@ -7,6 +7,43 @@ const logger = require('../config/logger');
 
 /**
  * @swagger
+ * /admin/check-schema:
+ *   get:
+ *     summary: Check current database schema
+ *     description: Inspect ID column types for demands, offers, bookings, and demand_responses tables
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: Schema information retrieved successfully
+ *       500:
+ *         description: Failed to retrieve schema
+ */
+router.get('/check-schema', async (req, res) => {
+  try {
+    const tables = ['demands', 'offers', 'bookings', 'demand_responses'];
+    const schemas = {};
+
+    for (const table of tables) {
+      const result = await pool.query(
+        `
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = $1 AND column_name = 'id'
+      `,
+        [table]
+      );
+
+      schemas[table] = result.rows[0] || { error: 'table not found' };
+    }
+
+    res.json({ success: true, schemas });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * @swagger
  * /admin/run-migration:
  *   post:
  *     summary: Run database migration 016 (UUID to INTEGER)
