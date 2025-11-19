@@ -16,10 +16,18 @@ const apiRequest = async (endpoint, options = {}) => {
       ...options.headers,
     };
 
+    // Set default timeout to 30 seconds if not specified
+    const timeout = options.timeout || 30000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers,
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -33,6 +41,19 @@ const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
+      // Handle 401 Unauthorized - Token expired or invalid
+      if (response.status === 401) {
+        console.warn('401 Unauthorized - Token expired or invalid');
+        // Clear local storage
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
+        // Redirect to login with expired parameter
+        window.location.href = '/dashboard?expired=true';
+        throw new Error(
+          'جلستك انتهت. يرجى تسجيل الدخول مرة أخرى / Session expired. Please login again.'
+        );
+      }
+
       // Log full error response for debugging
       console.error('API Error Response:', data);
 
@@ -60,6 +81,24 @@ const apiRequest = async (endpoint, options = {}) => {
 
     return data;
   } catch (error) {
+    // Handle network errors and timeouts
+    if (error.name === 'AbortError') {
+      const timeoutError = new Error(
+        'انتهت مهلة الطلب. يرجى التحقق من اتصال الإنترنت / Request timeout. Please check your internet connection.'
+      );
+      console.error('Request timeout:', error);
+      throw timeoutError;
+    }
+
+    // Handle other network errors
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      const networkError = new Error(
+        'خطأ في الاتصال بالشبكة. يرجى التحقق من اتصال الإنترنت / Network connection error. Please check your internet connection.'
+      );
+      console.error('Network error:', error);
+      throw networkError;
+    }
+
     console.error('API Error:', error);
     throw error;
   }

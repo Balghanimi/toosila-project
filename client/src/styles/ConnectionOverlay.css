@@ -1,0 +1,173 @@
+.connection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.connection-overlay-content {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 30px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.connection-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.connection-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+}
+
+.connection-title .ar {
+  font-family: 'Cairo', sans-serif;
+}
+
+.connection-title .en {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.connection-title .divider {
+  color: #95a5a6;
+  font-weight: 400;
+}
+
+.connection-message {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #7f8c8d;
+  margin: 0 0 32px 0;
+}
+
+.connection-message .ar {
+  font-family: 'Cairo', sans-serif;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.connection-message .en {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  display: block;
+}
+
+.connection-retry-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.connection-retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+.connection-retry-btn:active {
+  transform: translateY(0);
+}
+
+.connection-retry-btn .ar {
+  font-family: 'Cairo', sans-serif;
+}
+
+.connection-retry-btn .en {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.connection-retry-btn .divider {
+  opacity: 0.7;
+  margin: 0 8px;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .connection-overlay-content {
+    padding: 30px 20px;
+  }
+
+  .connection-title {
+    font-size: 20px;
+  }
+
+  .connection-message {
+    font-size: 14px;
+  }
+
+  .connection-retry-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+}

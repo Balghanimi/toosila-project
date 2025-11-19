@@ -7,11 +7,13 @@ Professional React components for the Offers page (`/offers`) with mobile-first 
 ## Components
 
 ### 1. CollapsibleSearchForm
+
 **Purpose:** Mobile-optimized collapsible search form with smooth animations.
 
 **File:** `CollapsibleSearchForm.jsx` + `CollapsibleSearchForm.module.css`
 
 **Usage:**
+
 ```jsx
 import CollapsibleSearchForm from './components/offers/CollapsibleSearchForm';
 
@@ -23,10 +25,11 @@ import CollapsibleSearchForm from './components/offers/CollapsibleSearchForm';
   mainCities={['بغداد', 'البصرة', 'النجف']}
   allCities={ALL_IRAQ_CITIES}
   isDriver={false}
-/>
+/>;
 ```
 
 **Props:**
+
 - `filters` (object) - Current filter values
 - `onFiltersChange` (function) - Filter change handler
 - `onSearch` (function) - Search button handler
@@ -36,6 +39,7 @@ import CollapsibleSearchForm from './components/offers/CollapsibleSearchForm';
 - `isDriver` (boolean) - User type (optional)
 
 **Features:**
+
 - ✅ Collapsible (collapsed by default)
 - ✅ Auto-collapse after search on mobile
 - ✅ Advanced filters toggle
@@ -46,11 +50,13 @@ import CollapsibleSearchForm from './components/offers/CollapsibleSearchForm';
 ---
 
 ### 2. OfferCard
+
 **Purpose:** Mobile-optimized offer card with clear visual hierarchy.
 
 **File:** `OfferCard.jsx` + `OfferCard.module.css`
 
 **Usage:**
+
 ```jsx
 import OfferCard from './components/offers/OfferCard';
 
@@ -60,10 +66,11 @@ import OfferCard from './components/offers/OfferCard';
   formatDate={formatDateFunc}
   formatTime={formatTimeFunc}
   currentUser={user}
-/>
+/>;
 ```
 
 **Props:**
+
 - `offer` (object) - Offer data:
   - `price` (number) - Price in IQD
   - `fromCity` (string) - Departure city
@@ -80,6 +87,7 @@ import OfferCard from './components/offers/OfferCard';
 - `currentUser` (object) - Current user data
 
 **Features:**
+
 - ✅ Full-width on mobile
 - ✅ Large price (32-42px)
 - ✅ Clear route (20-24px)

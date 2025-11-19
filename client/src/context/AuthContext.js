@@ -16,8 +16,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Load user from localStorage on app start
-  // PERFORMANCE FIX: Removed automatic token verification to prevent blocking app startup
+  // Load user from localStorage on app start and validate token
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -28,10 +27,48 @@ export function AuthProvider({ children }) {
           const userData = JSON.parse(savedUser);
           // Validate user data structure
           if (userData.id && userData.email && userData.name) {
-            // PERFORMANCE: Load cached user immediately without API call
+            // Load cached user first for immediate UI rendering
             setUser(userData);
-            // Token verification moved to background (non-blocking)
-            // Will verify on next API call naturally
+
+            // Validate token with backend (5-second timeout)
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+              const response = await fetch(
+                `${process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://toosila-backend-production.up.railway.app/api' : 'http://localhost:5000/api')}/auth/me`,
+                {
+                  method: 'GET',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                  signal: controller.signal,
+                }
+              );
+
+              clearTimeout(timeoutId);
+
+              if (!response.ok) {
+                // Token is invalid or expired
+                console.warn('Token validation failed:', response.status);
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('token');
+                setUser(null);
+              } else {
+                // Token is valid, update user data if needed
+                const result = await response.json();
+                if (result.data && result.data.user) {
+                  const freshUserData = result.data.user;
+                  localStorage.setItem('currentUser', JSON.stringify(freshUserData));
+                  setUser(freshUserData);
+                }
+              }
+            } catch (tokenError) {
+              // Network error or timeout - keep cached user (offline mode)
+              // Token will be validated on next API call
+              console.warn('Token validation failed (network error):', tokenError.message);
+            }
           } else {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');

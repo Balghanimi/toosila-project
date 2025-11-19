@@ -15,6 +15,8 @@ import { NotificationProvider } from './context/NotificationContext';
 import { NotificationsProvider } from './context/NotificationsContext';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ConnectionProvider } from './context/ConnectionContext';
+import ConnectionOverlay from './components/ConnectionOverlay';
 import './App.css';
 import './styles/enhancements.css';
 import './styles/professional-ui.css';
@@ -72,116 +74,122 @@ const AdminStatistics = lazy(() => import('./pages/admin/AdminStatistics'));
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <SocketProvider>
-            <NotificationsProvider>
-              <NotificationProvider>
-                <MessagesProvider>
-                  <BookingsProvider>
-                    <OffersProvider>
-                      <DemandsProvider>
-                        <RatingProvider>
-                          <div>
-                            <Header title="توصيلة" />
-                            <main className="appContent">
-                              <Suspense fallback={<LoadingSpinner />}>
-                                <Routes>
-                                  <Route path="/" element={<Home />} />
-                                  <Route path="/dashboard" element={<Dashboard />} />
-                                  <Route path="/messages" element={<Messages />} />
-                                  <Route path="/profile" element={<Profile />} />
-                                  <Route path="/bookings" element={<Bookings />} />
-                                  <Route path="/settings" element={<Settings />} />
-                                  {/* مسارات العروض */}
-                                  <Route path="/post-offer" element={<PostOfferModern />} />
-                                  <Route path="/offers" element={<ViewOffers />} />
-                                  {/* مسارات الطلبات */}
-                                  <Route path="/demands" element={<ViewDemands />} />
+    <ConnectionProvider>
+      <ConnectionOverlay />
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <SocketProvider>
+              <NotificationsProvider>
+                <NotificationProvider>
+                  <MessagesProvider>
+                    <BookingsProvider>
+                      <OffersProvider>
+                        <DemandsProvider>
+                          <RatingProvider>
+                            <div>
+                              <Header title="توصيلة" />
+                              <main className="appContent">
+                                <Suspense fallback={<LoadingSpinner />}>
+                                  <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/messages" element={<Messages />} />
+                                    <Route path="/profile" element={<Profile />} />
+                                    <Route path="/bookings" element={<Bookings />} />
+                                    <Route path="/settings" element={<Settings />} />
+                                    {/* مسارات العروض */}
+                                    <Route path="/post-offer" element={<PostOfferModern />} />
+                                    <Route path="/offers" element={<ViewOffers />} />
+                                    {/* مسارات الطلبات */}
+                                    <Route path="/demands" element={<ViewDemands />} />
 
-                                  {/* إدارة التقييمات */}
-                                  <Route path="/ratings" element={<RatingManagement />} />
-                                  <Route path="/rating-stats" element={<RatingStats />} />
-                                  <Route path="/user-ratings/:userId" element={<UserRatings />} />
-                                  <Route path="/top-ratings" element={<TopRatings />} />
-                                  <Route path="/recent-ratings" element={<RecentRatings />} />
-                                  <Route path="/bad-ratings" element={<BadRatings />} />
-                                  <Route
-                                    path="/ratings-by-location"
-                                    element={<RatingsByLocation />}
-                                  />
-                                  <Route
-                                    path="/ratings-by-user-type"
-                                    element={<RatingsByUserType />}
-                                  />
-                                  <Route path="/ratings-by-date" element={<RatingsByDate />} />
-                                  <Route
-                                    path="/ratings-by-comments"
-                                    element={<RatingsByComments />}
-                                  />
-                                  <Route path="/ratings-by-rating" element={<RatingsByRating />} />
-                                  {/* صفحة اختبار API */}
-                                  <Route path="/test-api" element={<TestAPI />} />
-                                  {/* صفحة الإشعارات */}
-                                  <Route path="/notifications" element={<NotificationsPage />} />
-                                  {/* صفحة سياسة الخصوصية */}
-                                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                                  {/* صفحة حول التطبيق */}
-                                  <Route path="/about" element={<About />} />
-                                  {/* صفحة تحميل التطبيق */}
-                                  <Route path="/download" element={<Download />} />
-                                  {/* صفحة اتصل بنا */}
-                                  <Route path="/contact" element={<Contact />} />
-                                  {/* Email Verification */}
-                                  <Route path="/verify-email/:token" element={<VerifyEmail />} />
-                                  <Route
-                                    path="/email-verification-reminder"
-                                    element={<EmailVerificationReminder />}
-                                  />
-                                  {/* Password Reset */}
-                                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                                  <Route
-                                    path="/reset-password/:token"
-                                    element={<ResetPassword />}
-                                  />
-
-                                  {/* Admin Test Page - temporarily disabled */}
-                                  {/* <Route path="/admin-test" element={<AdminTest />} /> */}
-
-                                  {/* Admin Routes */}
-                                  <Route
-                                    path="/admin"
-                                    element={
-                                      <AdminRoute>
-                                        <AdminLayout />
-                                      </AdminRoute>
-                                    }
-                                  >
-                                    <Route index element={<AdminDashboard />} />
-                                    <Route path="users" element={<UserManagement />} />
+                                    {/* إدارة التقييمات */}
+                                    <Route path="/ratings" element={<RatingManagement />} />
+                                    <Route path="/rating-stats" element={<RatingStats />} />
+                                    <Route path="/user-ratings/:userId" element={<UserRatings />} />
+                                    <Route path="/top-ratings" element={<TopRatings />} />
+                                    <Route path="/recent-ratings" element={<RecentRatings />} />
+                                    <Route path="/bad-ratings" element={<BadRatings />} />
                                     <Route
-                                      path="verification"
-                                      element={<VerificationManagement />}
+                                      path="/ratings-by-location"
+                                      element={<RatingsByLocation />}
                                     />
-                                    <Route path="statistics" element={<AdminStatistics />} />
-                                  </Route>
-                                </Routes>
-                              </Suspense>
-                            </main>
-                            <BottomNav />
-                            <FloatingDownloadButton />
-                          </div>
-                        </RatingProvider>
-                      </DemandsProvider>
-                    </OffersProvider>
-                  </BookingsProvider>
-                </MessagesProvider>
-              </NotificationProvider>
-            </NotificationsProvider>
-          </SocketProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+                                    <Route
+                                      path="/ratings-by-user-type"
+                                      element={<RatingsByUserType />}
+                                    />
+                                    <Route path="/ratings-by-date" element={<RatingsByDate />} />
+                                    <Route
+                                      path="/ratings-by-comments"
+                                      element={<RatingsByComments />}
+                                    />
+                                    <Route
+                                      path="/ratings-by-rating"
+                                      element={<RatingsByRating />}
+                                    />
+                                    {/* صفحة اختبار API */}
+                                    <Route path="/test-api" element={<TestAPI />} />
+                                    {/* صفحة الإشعارات */}
+                                    <Route path="/notifications" element={<NotificationsPage />} />
+                                    {/* صفحة سياسة الخصوصية */}
+                                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                                    {/* صفحة حول التطبيق */}
+                                    <Route path="/about" element={<About />} />
+                                    {/* صفحة تحميل التطبيق */}
+                                    <Route path="/download" element={<Download />} />
+                                    {/* صفحة اتصل بنا */}
+                                    <Route path="/contact" element={<Contact />} />
+                                    {/* Email Verification */}
+                                    <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                                    <Route
+                                      path="/email-verification-reminder"
+                                      element={<EmailVerificationReminder />}
+                                    />
+                                    {/* Password Reset */}
+                                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                                    <Route
+                                      path="/reset-password/:token"
+                                      element={<ResetPassword />}
+                                    />
+
+                                    {/* Admin Test Page - temporarily disabled */}
+                                    {/* <Route path="/admin-test" element={<AdminTest />} /> */}
+
+                                    {/* Admin Routes */}
+                                    <Route
+                                      path="/admin"
+                                      element={
+                                        <AdminRoute>
+                                          <AdminLayout />
+                                        </AdminRoute>
+                                      }
+                                    >
+                                      <Route index element={<AdminDashboard />} />
+                                      <Route path="users" element={<UserManagement />} />
+                                      <Route
+                                        path="verification"
+                                        element={<VerificationManagement />}
+                                      />
+                                      <Route path="statistics" element={<AdminStatistics />} />
+                                    </Route>
+                                  </Routes>
+                                </Suspense>
+                              </main>
+                              <BottomNav />
+                              <FloatingDownloadButton />
+                            </div>
+                          </RatingProvider>
+                        </DemandsProvider>
+                      </OffersProvider>
+                    </BookingsProvider>
+                  </MessagesProvider>
+                </NotificationProvider>
+              </NotificationsProvider>
+            </SocketProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </ConnectionProvider>
   );
 }

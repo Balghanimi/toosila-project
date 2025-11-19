@@ -171,6 +171,36 @@ router.use(authenticateToken); // All routes below require authentication
 
 /**
  * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current user (token validation)
+ *     description: Validate JWT token and return current user data. Used by frontend to check token validity on app load.
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token valid, user data returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Invalid or expired token
+ */
+router.get('/me', getProfile);
+
+/**
+ * @swagger
  * /auth/profile:
  *   get:
  *     summary: Get user profile
@@ -198,7 +228,7 @@ router.use(authenticateToken); // All routes below require authentication
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/profile', getProfile);
+router.get('/profile', authenticateToken, getProfile);
 
 /**
  * @swagger

@@ -5,10 +5,22 @@ const { getMetrics } = require('../middlewares/metrics');
 const logger = require('../config/logger');
 
 /**
+ * Simple health check endpoint for client connectivity monitoring
+ * Returns: { ok: true, timestamp: ISO string, uptime: seconds }
+ */
+router.get('/', (req, res) => {
+  res.json({
+    ok: true,
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
+
+/**
  * Comprehensive health check endpoint
  * Returns detailed system health including database, memory, and uptime
  */
-router.get('/', async (req, res) => {
+router.get('/detailed', async (req, res) => {
   try {
     const health = {
       status: 'healthy',
