@@ -1,217 +1,84 @@
--- Migration: Convert UUID IDs to INTEGER for demands, offers, bookings, and related tables
--- This migration preserves all existing data by creating new integer IDs and remapping relationships
+-- Simplified Migration: Convert UUID IDs to INTEGER (One table at a time)
+BEGIN;
 
--- Step 0: Create sequences if they don't exist
-DO $$
-BEGIN
-    -- Create demands sequence
-    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'demands_id_seq') THEN
-        CREATE SEQUENCE demands_id_seq;
-        PERFORM setval('demands_id_seq', COALESCE((SELECT MAX(id_new) FROM demands WHERE id_new IS NOT NULL), 0) + 1, false);
-    END IF;
+-- Step 1: Clean up duplicate bookings first
+DELETE FROM bookings a USING (
+  SELECT MIN(ctid) as ctid, offer_id, passenger_id
+  FROM bookings
+  GROUP BY offer_id, passenger_id
+  HAVING COUNT(*) > 1
+) b
+WHERE a.offer_id = b.offer_id
+  AND a.passenger_id = b.passenger_id
+  AND a.ctid <> b.ctid;
 
-    -- Create offers sequence
-    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'offers_id_seq') THEN
-        CREATE SEQUENCE offers_id_seq;
-        PERFORM setval('offers_id_seq', COALESCE((SELECT MAX(id_new) FROM offers WHERE id_new IS NOT NULL), 0) + 1, false);
-    END IF;
+-- Step 2: Clean up duplicate demand_responses
+DELETE FROM demand_responses a USING (
+  SELECT MIN(ctid) as ctid, demand_id, driver_id
+  FROM demand_responses
+  GROUP BY demand_id, driver_id
+  HAVING COUNT(*) > 1
+) b
+WHERE a.demand_id = b.demand_id
+  AND a.driver_id = b.driver_id
+  AND a.ctid <> b.ctid;
 
-    -- Create bookings sequence
-    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'bookings_id_seq') THEN
-        CREATE SEQUENCE bookings_id_seq;
-        PERFORM setval('bookings_id_seq', COALESCE((SELECT MAX(id_new) FROM bookings WHERE id_new IS NOT NULL), 0) + 1, false);
-    END IF;
+-- Step 3: Convert demands table
+ALTER TABLE demands DROP CONSTRAINT IF EXISTS demands_pkey CASCADE;
+ALTER TABLE demands ADD COLUMN id_temp SERIAL;
+UPDATE demands SET id_temp = (ROW_NUMBER() OVER (ORDER BY created_at))::integer;
+ALTER TABLE demands DROP COLUMN id;
+ALTER TABLE demands RENAME COLUMN id_temp TO id;
+ALTER TABLE demands ADD PRIMARY KEY (id);
 
-    -- Create demand_responses sequence
-    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'demand_responses_id_seq') THEN
-        CREATE SEQUENCE demand_responses_id_seq;
-        PERFORM setval('demand_responses_id_seq', COALESCE((SELECT MAX(id_new) FROM demand_responses WHERE id_new IS NOT NULL), 0) + 1, false);
-    END IF;
-END $$;
+-- Step 4: Convert offers table
+ALTER TABLE offers DROP CONSTRAINT IF EXISTS offers_pkey CASCADE;
+ALTER TABLE offers ADD COLUMN id_temp SERIAL;
+UPDATE offers SET id_temp = (ROW_NUMBER() OVER (ORDER BY created_at))::integer;
+ALTER TABLE offers DROP COLUMN id;
+ALTER TABLE offers RENAME COLUMN id_temp TO id;
+ALTER TABLE offers ADD PRIMARY KEY (id);
 
--- Step 1: Add new integer ID columns to main tables
-ALTER TABLE demands ADD COLUMN IF NOT EXISTS id_new SERIAL;
-ALTER TABLE offers ADD COLUMN IF NOT EXISTS id_new SERIAL;
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS id_new SERIAL;
-ALTER TABLE demand_responses ADD COLUMN IF NOT EXISTS id_new SERIAL;
-
--- Step 2: Create temporary mapping tables to track UUID to INTEGER conversions
-CREATE TEMPORARY TABLE demand_id_map AS
-SELECT id as old_id, ROW_NUMBER() OVER (ORDER BY created_at) as new_id
-FROM demands;
-
-CREATE TEMPORARY TABLE offer_id_map AS
-SELECT id as old_id, ROW_NUMBER() OVER (ORDER BY created_at) as new_id
-FROM offers;
-
-CREATE TEMPORARY TABLE booking_id_map AS
-SELECT id as old_id, ROW_NUMBER() OVER (ORDER BY created_at) as new_id
-FROM bookings;
-
-CREATE TEMPORARY TABLE demand_response_id_map AS
-SELECT id as old_id, ROW_NUMBER() OVER (ORDER BY created_at) as new_id
-FROM demand_responses;
-
--- Step 3: Update id_new with sequential integers based on creation order
-UPDATE demands d SET id_new = m.new_id FROM demand_id_map m WHERE d.id = m.old_id;
-UPDATE offers o SET id_new = m.new_id FROM offer_id_map m WHERE o.id = m.old_id;
-UPDATE bookings b SET id_new = m.new_id FROM booking_id_map m WHERE b.id = m.old_id;
-UPDATE demand_responses dr SET id_new = m.new_id FROM demand_response_id_map m WHERE dr.id = m.old_id;
-
--- Step 4: Add new integer foreign key columns
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS offer_id_new INTEGER;
-ALTER TABLE demand_responses ADD COLUMN IF NOT EXISTS demand_id_new INTEGER;
-
--- Step 5: Populate new foreign key columns using the mapping
-UPDATE bookings b
-SET offer_id_new = m.new_id
-FROM offer_id_map m
-WHERE b.offer_id = m.old_id;
-
-UPDATE demand_responses dr
-SET demand_id_new = m.new_id
-FROM demand_id_map m
-WHERE dr.demand_id = m.old_id;
-
--- Step 6: Add new integer columns to messages and ratings for ride_id
-ALTER TABLE messages ADD COLUMN IF NOT EXISTS ride_id_new INTEGER;
-ALTER TABLE ratings ADD COLUMN IF NOT EXISTS ride_id_new INTEGER;
-
--- Step 7: Update messages ride_id_new based on ride_type
--- For offers
-UPDATE messages m
-SET ride_id_new = om.new_id
-FROM offer_id_map om
-WHERE m.ride_type = 'offer' AND m.ride_id = om.old_id;
-
--- For demands
-UPDATE messages m
-SET ride_id_new = dm.new_id
-FROM demand_id_map dm
-WHERE m.ride_type = 'demand' AND m.ride_id = dm.old_id;
-
--- Step 8: Update ratings ride_id_new (assuming they can reference either offers or demands)
--- Try to match with offers first
-UPDATE ratings r
-SET ride_id_new = om.new_id
-FROM offer_id_map om
-WHERE r.ride_id = om.old_id;
-
--- Then try demands for any remaining NULL values
-UPDATE ratings r
-SET ride_id_new = dm.new_id
-FROM demand_id_map dm
-WHERE r.ride_id = dm.old_id AND r.ride_id_new IS NULL;
-
--- Step 9: Drop old constraints and indexes
-ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_offer_id_fkey;
-ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_pkey;
-ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_demand_id_fkey;
-ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_pkey;
-ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_demand_id_driver_id_key;
-ALTER TABLE demands DROP CONSTRAINT IF EXISTS demands_pkey;
-ALTER TABLE offers DROP CONSTRAINT IF EXISTS offers_pkey;
-ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_offer_id_passenger_id_key;
-
--- Step 10: Drop old UUID columns
+-- Step 5: Convert bookings table
+ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_pkey CASCADE;
+ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_offer_id_fkey CASCADE;
+ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_offer_id_passenger_id_key CASCADE;
+ALTER TABLE bookings ADD COLUMN id_temp SERIAL;
+ALTER TABLE bookings ADD COLUMN offer_id_temp INTEGER;
+UPDATE bookings b SET offer_id_temp = o.id
+FROM offers o WHERE b.offer_id::text = o.id::text;
+UPDATE bookings SET id_temp = (ROW_NUMBER() OVER (ORDER BY created_at))::integer;
 ALTER TABLE bookings DROP COLUMN id;
 ALTER TABLE bookings DROP COLUMN offer_id;
+ALTER TABLE bookings RENAME COLUMN id_temp TO id;
+ALTER TABLE bookings RENAME COLUMN offer_id_temp TO offer_id;
+ALTER TABLE bookings ADD PRIMARY KEY (id);
+ALTER TABLE bookings ADD FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE;
+ALTER TABLE bookings ADD UNIQUE (offer_id, passenger_id);
+
+-- Step 6: Convert demand_responses table
+ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_pkey CASCADE;
+ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_demand_id_fkey CASCADE;
+ALTER TABLE demand_responses DROP CONSTRAINT IF EXISTS demand_responses_demand_id_driver_id_key CASCADE;
+ALTER TABLE demand_responses ADD COLUMN id_temp SERIAL;
+ALTER TABLE demand_responses ADD COLUMN demand_id_temp INTEGER;
+UPDATE demand_responses dr SET demand_id_temp = d.id
+FROM demands d WHERE dr.demand_id::text = d.id::text;
+UPDATE demand_responses SET id_temp = (ROW_NUMBER() OVER (ORDER BY created_at))::integer;
 ALTER TABLE demand_responses DROP COLUMN id;
 ALTER TABLE demand_responses DROP COLUMN demand_id;
-ALTER TABLE demands DROP COLUMN id;
-ALTER TABLE offers DROP COLUMN id;
-ALTER TABLE messages DROP COLUMN ride_id;
-ALTER TABLE ratings DROP COLUMN ride_id;
-
--- Step 11: Rename new columns to original names
-ALTER TABLE demands RENAME COLUMN id_new TO id;
-ALTER TABLE offers RENAME COLUMN id_new TO id;
-ALTER TABLE bookings RENAME COLUMN id_new TO id;
-ALTER TABLE bookings RENAME COLUMN offer_id_new TO offer_id;
-ALTER TABLE demand_responses RENAME COLUMN id_new TO id;
-ALTER TABLE demand_responses RENAME COLUMN demand_id_new TO demand_id;
-ALTER TABLE messages RENAME COLUMN ride_id_new TO ride_id;
-ALTER TABLE ratings RENAME COLUMN ride_id_new TO ride_id;
-
--- Step 12: Add primary key constraints
-ALTER TABLE demands ADD PRIMARY KEY (id);
-ALTER TABLE offers ADD PRIMARY KEY (id);
-ALTER TABLE bookings ADD PRIMARY KEY (id);
+ALTER TABLE demand_responses RENAME COLUMN id_temp TO id;
+ALTER TABLE demand_responses RENAME COLUMN demand_id_temp TO demand_id;
 ALTER TABLE demand_responses ADD PRIMARY KEY (id);
+ALTER TABLE demand_responses ADD FOREIGN KEY (demand_id) REFERENCES demands(id) ON DELETE CASCADE;
+ALTER TABLE demand_responses ADD UNIQUE (demand_id, driver_id);
 
--- Step 13: Add foreign key constraints
-ALTER TABLE bookings
-    ADD CONSTRAINT bookings_offer_id_fkey
-    FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE;
+-- Step 7: Fix messages and ratings ride_id references
+-- Messages can reference either demands or offers, so we'll keep them as integers
+ALTER TABLE messages ALTER COLUMN ride_id TYPE INTEGER USING (ride_id::text)::integer;
+ALTER TABLE ratings ALTER COLUMN ride_id TYPE INTEGER USING (ride_id::text)::integer;
 
-ALTER TABLE demand_responses
-    ADD CONSTRAINT demand_responses_demand_id_fkey
-    FOREIGN KEY (demand_id) REFERENCES demands(id) ON DELETE CASCADE;
-
--- Step 13.5: Clean up duplicate bookings before adding unique constraint
--- Find and remove duplicate bookings (same offer_id + passenger_id)
--- Keep only the earliest booking (MIN(id))
-DO $$
-DECLARE
-  deleted_count INTEGER;
-BEGIN
-  -- Delete duplicate bookings, keeping only the oldest one for each offer_id + passenger_id combination
-  WITH duplicates AS (
-    SELECT
-      id,
-      ROW_NUMBER() OVER (PARTITION BY offer_id, passenger_id ORDER BY created_at ASC, id ASC) as rn
-    FROM bookings
-  )
-  DELETE FROM bookings
-  WHERE id IN (
-    SELECT id FROM duplicates WHERE rn > 1
-  );
-
-  GET DIAGNOSTICS deleted_count = ROW_COUNT;
-  RAISE NOTICE 'Cleaned up % duplicate booking(s)', deleted_count;
-END $$;
-
--- Step 14: Add unique constraints
-ALTER TABLE bookings
-    ADD CONSTRAINT bookings_offer_id_passenger_id_key
-    UNIQUE(offer_id, passenger_id);
-
--- Clean up duplicate demand_responses before adding unique constraint
-DO $$
-DECLARE
-  deleted_count INTEGER;
-BEGIN
-  -- Delete duplicate demand_responses, keeping only the oldest one for each demand_id + driver_id combination
-  WITH duplicates AS (
-    SELECT
-      id,
-      ROW_NUMBER() OVER (PARTITION BY demand_id, driver_id ORDER BY created_at ASC, id ASC) as rn
-    FROM demand_responses
-  )
-  DELETE FROM demand_responses
-  WHERE id IN (
-    SELECT id FROM duplicates WHERE rn > 1
-  );
-
-  GET DIAGNOSTICS deleted_count = ROW_COUNT;
-  RAISE NOTICE 'Cleaned up % duplicate demand_response(s)', deleted_count;
-END $$;
-
-ALTER TABLE demand_responses
-    ADD CONSTRAINT demand_responses_demand_id_driver_id_key
-    UNIQUE(demand_id, driver_id);
-
--- Step 15: Update sequences to start from the correct value
--- Use COALESCE to handle empty tables and ensure sequences start correctly
-DO $$
-BEGIN
-    PERFORM setval('demands_id_seq', COALESCE((SELECT MAX(id) FROM demands), 0) + 1, false);
-    PERFORM setval('offers_id_seq', COALESCE((SELECT MAX(id) FROM offers), 0) + 1, false);
-    PERFORM setval('bookings_id_seq', COALESCE((SELECT MAX(id) FROM bookings), 0) + 1, false);
-    PERFORM setval('demand_responses_id_seq', COALESCE((SELECT MAX(id) FROM demand_responses), 0) + 1, false);
-END $$;
-
--- Step 16: Recreate indexes with integer columns
+-- Step 8: Recreate indexes
 DROP INDEX IF EXISTS idx_bookings_offer_id;
 DROP INDEX IF EXISTS idx_demand_responses_demand_id;
 DROP INDEX IF EXISTS idx_messages_ride_type_ride_id;
@@ -222,15 +89,15 @@ CREATE INDEX idx_demand_responses_demand_id ON demand_responses(demand_id);
 CREATE INDEX idx_messages_ride_type_ride_id ON messages(ride_type, ride_id);
 CREATE INDEX idx_ratings_ride_id ON ratings(ride_id);
 
--- Verification queries (optional - comment out in production)
--- SELECT 'Demands count:', COUNT(*) FROM demands;
--- SELECT 'Offers count:', COUNT(*) FROM offers;
--- SELECT 'Bookings count:', COUNT(*) FROM bookings;
--- SELECT 'Demand responses count:', COUNT(*) FROM demand_responses;
--- SELECT 'Messages count:', COUNT(*) FROM messages;
--- SELECT 'Ratings count:', COUNT(*) FROM ratings;
+-- Mark migration as complete
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  id SERIAL PRIMARY KEY,
+  migration_name VARCHAR(255) UNIQUE NOT NULL,
+  executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-COMMENT ON TABLE demands IS 'Updated to use INTEGER IDs instead of UUID';
-COMMENT ON TABLE offers IS 'Updated to use INTEGER IDs instead of UUID';
-COMMENT ON TABLE bookings IS 'Updated to use INTEGER IDs instead of UUID';
-COMMENT ON TABLE demand_responses IS 'Updated to use INTEGER IDs instead of UUID';
+INSERT INTO schema_migrations (migration_name)
+VALUES ('016_convert_ids_to_integer')
+ON CONFLICT (migration_name) DO NOTHING;
+
+COMMIT;
