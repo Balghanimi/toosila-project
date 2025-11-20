@@ -112,9 +112,8 @@ const validateDemandCreation = [
 // Booking validation rules
 const validateBookingCreation = [
   body('offerId')
-    .isInt({ min: 1 })
-    .withMessage('Please provide a valid offer ID (positive integer)')
-    .toInt(),
+    .isUUID(4)
+    .withMessage('Invalid offer ID format / معرّف العرض غير صالح'),
   body('seats').optional().isInt({ min: 1, max: 7 }).withMessage('Seats must be between 1 and 7'),
   body('message')
     .optional()
@@ -126,7 +125,7 @@ const validateBookingCreation = [
 
 // Message validation rules
 const validateMessageCreation = [
-  body('recipientId').isInt({ min: 1 }).withMessage('Please provide a valid recipient ID'),
+  body('recipientId').isUUID(4).withMessage('Invalid recipient ID format / معرّف المستلم غير صالح'),
   body('content')
     .trim()
     .isLength({ min: 1, max: 1000 })
@@ -136,7 +135,7 @@ const validateMessageCreation = [
 
 // Rating validation rules
 const validateRatingCreation = [
-  body('targetUserId').isInt({ min: 1 }).withMessage('Please provide a valid user ID'),
+  body('targetUserId').isUUID(4).withMessage('Invalid user ID format / معرّف المستخدم غير صالح'),
   body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
   body('comment')
     .optional()
@@ -148,7 +147,7 @@ const validateRatingCreation = [
 
 // Parameter validation
 const validateId = [
-  param('id').isInt({ min: 1 }).withMessage('Please provide a valid ID (positive integer)').toInt(),
+  param('id').isUUID(4).withMessage('Invalid ID format / معرّف غير صالح'),
   handleValidationErrors,
 ];
 
