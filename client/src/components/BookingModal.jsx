@@ -15,12 +15,13 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
   // منع scroll عند فتح Modal + إضافة animation
   useEffect(() => {
     if (isOpen) {
-      // Prevent body scroll
+      // Prevent body scroll while modal is open
       document.body.style.overflow = 'hidden';
 
-      // Reset any page scroll to ensure modal is visible
-      // This ensures the modal overlay starts at viewport top
-      window.scrollTo({ top: window.pageYOffset, behavior: 'instant' });
+      // DO NOT use window.scrollTo() here!
+      // Modal with position:fixed will appear centered in the CURRENT viewport
+      // (wherever the user has scrolled to on the page)
+      // This is the correct behavior - user stays at their current scroll position
 
       // Trigger animation after a tiny delay
       setTimeout(() => setShow(true), 10);
