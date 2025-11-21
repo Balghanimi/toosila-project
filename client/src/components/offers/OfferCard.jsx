@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPrice, formatDate as formatDateUtil, formatTime as formatTimeUtil, formatSeats, toEnglishNumber } from '../../utils/formatters';
 import styles from './OfferCard.module.css';
 
 /**
@@ -9,6 +10,7 @@ import styles from './OfferCard.module.css';
  * - Touch-friendly buttons (48px+)
  * - Clear visual hierarchy
  * - Accessible and WCAG compliant
+ * - English numerals (0-9) everywhere
  */
 const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) => {
   const handleBookClick = () => {
@@ -17,10 +19,10 @@ const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) =>
 
   return (
     <div className={styles.offerCard}>
-      {/* Price - Most prominent */}
+      {/* Price - Most prominent - ENGLISH NUMERALS */}
       <div className={styles.priceSection}>
-        <div className={styles.price}>
-          {offer.price?.toLocaleString('ar-EG') || '0'}
+        <div className={styles.price} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+          {formatPrice(offer.price)}
           <span className={styles.currency}>د.ع</span>
         </div>
       </div>
@@ -34,29 +36,31 @@ const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) =>
         </div>
       </div>
 
-      {/* Details Row - Icons + Text */}
+      {/* Details Row - Icons + Text - ENGLISH NUMERALS */}
       <div className={styles.detailsRow}>
         <div className={styles.detail}>
           <span className={styles.detailIcon}>📅</span>
-          <span className={styles.detailText}>
-            {formatDate ? formatDate(offer.departureTime) : 'غير محدد'}
+          <span className={styles.detailText} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {formatDate ? formatDate(offer.departureTime) : formatDateUtil(offer.departureTime)}
           </span>
         </div>
 
         <div className={styles.detail}>
           <span className={styles.detailIcon}>🕐</span>
-          <span className={styles.detailText}>
-            {formatTime ? formatTime(offer.departureTime) : '--:--'}
+          <span className={styles.detailText} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {formatTime ? formatTime(offer.departureTime) : formatTimeUtil(offer.departureTime)}
           </span>
         </div>
 
         <div className={styles.detail}>
           <span className={styles.detailIcon}>👥</span>
-          <span className={styles.detailText}>{offer.availableSeats || 0} متاح</span>
+          <span className={styles.detailText} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {formatSeats(offer.availableSeats)} متاح
+          </span>
         </div>
       </div>
 
-      {/* Driver Info */}
+      {/* Driver Info - ENGLISH NUMERALS */}
       {offer.driverName && (
         <div className={styles.driverSection}>
           <span className={styles.driverIcon}>🚗</span>
@@ -64,7 +68,9 @@ const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) =>
             السائق: <strong>{offer.driverName}</strong>
           </span>
           {offer.driverRating && (
-            <span className={styles.rating}>⭐ {offer.driverRating.toFixed(1)}</span>
+            <span className={styles.rating} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              ⭐ {toEnglishNumber(offer.driverRating.toFixed(1))}
+            </span>
           )}
         </div>
       )}

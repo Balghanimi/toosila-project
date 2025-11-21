@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { demandsAPI, citiesAPI } from '../services/api';
+import { formatLargeNumber, toEnglishNumber } from '../utils/formatters';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -230,7 +231,7 @@ const Home = () => {
     const today = new Date();
     const day = today.getDate();
     const month = today.toLocaleDateString('ar-EG', { month: 'long' });
-    return `${day} ${month}`;
+    return `${toEnglishNumber(day)} ${month}`;
   };
 
   return (
@@ -240,32 +241,34 @@ const Home = () => {
       <div className={styles.backgroundBlob2} />
       <div className={styles.backgroundBlob3} />
 
-      {/* Hero Section */}
-      <section className={styles.heroSection}>
-        <h1 className={styles.heroTitle}>توصيلة</h1>
-        <p className={styles.heroSubtitle}>رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق</p>
-        <p className={styles.heroTagline}>
-          اربط بين المسافرين والسائقين بطريقة آمنة ومريحة وبأسعار معقولة
+      {/* COMPACT HERO - 15% of viewport */}
+      <section className={styles.heroSection} style={{ minHeight: '15vh', paddingTop: '2rem', paddingBottom: '1rem' }}>
+        <h1 className={styles.heroTitle} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>توصيلة</h1>
+        <p className={styles.heroSubtitle} style={{ fontSize: '1rem', marginBottom: '0' }}>
+          رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
         </p>
+      </section>
 
-        {/* Statistics Bar */}
-        <div className={styles.statsBar}>
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>500+</div>
-            <div className={styles.statLabel}>رحلة يومياً</div>
-          </div>
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>10K+</div>
-            <div className={styles.statLabel}>مستخدم نشط</div>
-          </div>
-          <div className={styles.statItem}>
-            <div className={styles.statNumber}>98%</div>
-            <div className={styles.statLabel}>تقييم إيجابي</div>
-          </div>
+      {/* Error Message */}
+      {submitError && (
+        <div className={styles.errorMessage} role="alert" aria-live="assertive">
+          ⚠️ {submitError}
         </div>
+      )}
 
-        {/* Mode Buttons */}
-        <div className={styles.modeButtons} role="group" aria-label="خيارات البحث والنشر">
+      {/* MAIN SEARCH FORM - PRIMARY FOCUS - 60% of above fold */}
+      <div
+        className={styles.mainCard}
+        style={{
+          border: '3px solid #10b981',
+          boxShadow: '0 20px 50px rgba(16, 185, 129, 0.3)',
+          transform: 'scale(1.02)',
+          maxWidth: '700px',
+          margin: '0 auto 2rem',
+        }}
+      >
+        {/* Mode Buttons - Inside Form */}
+        <div className={styles.modeButtons} role="group" aria-label="خيارات البحث والنشر" style={{ marginBottom: '1.5rem' }}>
           {!currentUser?.isDriver && (
             <button
               onClick={() => setMode('demand')}
@@ -308,33 +311,6 @@ const Home = () => {
             📋 تصفح الرحلات
           </button>
         </div>
-
-        {/* Trust Indicators */}
-        <div className={styles.trustIndicators}>
-          <div className={styles.trustItem}>
-            <span className={styles.trustIcon}>✓</span>
-            <span>آمن وموثوق</span>
-          </div>
-          <div className={styles.trustItem}>
-            <span className={styles.trustIcon}>✓</span>
-            <span>أسعار معقولة</span>
-          </div>
-          <div className={styles.trustItem}>
-            <span className={styles.trustIcon}>✓</span>
-            <span>تقييمات موثقة</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Error Message */}
-      {submitError && (
-        <div className={styles.errorMessage} role="alert" aria-live="assertive">
-          ⚠️ {submitError}
-        </div>
-      )}
-
-      {/* Main Search/Booking Card */}
-      <div className={styles.mainCard}>
         {/* Location Container */}
         <div className={styles.locationContainer}>
           {/* Pickup Location */}
@@ -471,8 +447,8 @@ const Home = () => {
         {/* Date Time Section */}
         <div className={styles.dateTimeSection}>
           <div className={styles.dateTimeHeader}>
-            <div className={styles.dateTimeLabel}>
-              📅 {getCurrentDate()}، {departureTime}
+            <div className={styles.dateTimeLabel} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              📅 {getCurrentDate()}، {toEnglishNumber(departureTime)}
             </div>
             <button
               onClick={() => {
@@ -616,11 +592,16 @@ const Home = () => {
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submit Button - LARGE AND PROMINENT */}
         <button
           onClick={handleNext}
           disabled={isSubmitting}
           className={styles.submitButton}
+          style={{
+            fontSize: '1.25rem',
+            padding: '1rem 2rem',
+            fontWeight: '700',
+          }}
           aria-label={
             mode === 'find'
               ? 'البحث عن رحلات متاحة'
@@ -645,6 +626,44 @@ const Home = () => {
         </button>
       </div>
 
+      {/* QUICK BENEFITS BADGES - Below Search */}
+      <div className={styles.trustIndicators} style={{ margin: '2rem auto', justifyContent: 'center', maxWidth: '600px' }}>
+        <div className={styles.trustItem}>
+          <span className={styles.trustIcon}>✓</span>
+          <span>آمن وموثوق</span>
+        </div>
+        <div className={styles.trustItem}>
+          <span className={styles.trustIcon}>✓</span>
+          <span>أسعار معقولة</span>
+        </div>
+        <div className={styles.trustItem}>
+          <span className={styles.trustIcon}>✓</span>
+          <span>تقييمات موثقة</span>
+        </div>
+      </div>
+
+      {/* STATISTICS BAR - Below Benefits - WITH ENGLISH NUMERALS */}
+      <div className={styles.statsBar} style={{ margin: '3rem auto', maxWidth: '800px' }}>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {toEnglishNumber('500+')}
+          </div>
+          <div className={styles.statLabel}>رحلة يومياً</div>
+        </div>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {formatLargeNumber(10000)}+
+          </div>
+          <div className={styles.statLabel}>مستخدم نشط</div>
+        </div>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            {toEnglishNumber('98%')}
+          </div>
+          <div className={styles.statLabel}>تقييم إيجابي</div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <section className={styles.featuresSection}>
         <h2 className={styles.sectionTitle}>لماذا تختار توصيلة؟</h2>
@@ -663,7 +682,7 @@ const Home = () => {
             <span className={styles.featureIcon}>💰</span>
             <h3 className={styles.featureTitle}>أسعار معقولة</h3>
             <p className={styles.featureDescription}>
-              وفر حتى 70% من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
+              وفر حتى <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>{toEnglishNumber('70%')}</span> من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
             </p>
           </div>
 

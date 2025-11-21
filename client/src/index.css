@@ -661,3 +661,42 @@ body.modal-open {
     box-shadow: none;
   }
 }
+
+/* ========================================
+   ENGLISH NUMERALS ENFORCEMENT (0-9)
+   Force all numbers to display in English
+   ======================================== */
+
+/* Force English numerals globally */
+* {
+  font-variant-numeric: lining-nums;
+}
+
+/* Target number displays specifically */
+input[type="number"],
+input[type="tel"],
+input[type="time"],
+input[type="date"],
+.price,
+.stat-number,
+.rating,
+.seats,
+[data-numeric="true"] {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-variant-numeric: lining-nums !important;
+  direction: ltr !important;
+  unicode-bidi: embed !important;
+}
+
+/* Ensure number inputs show English numerals */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Override any Arabic numeral fonts */
+@supports (font-variant-numeric: lining-nums) {
+  body {
+    font-variant-numeric: lining-nums;
+  }
+}
