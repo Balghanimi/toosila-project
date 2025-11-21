@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm';
 import OfferCard from '../../components/offers/OfferCard';
+import BookingModal from '../../components/BookingModal';
 
 // PERFORMANCE FIX: Added React.memo to prevent unnecessary re-renders
 const ViewOffers = React.memo(function ViewOffers() {
@@ -600,244 +601,30 @@ const ViewOffers = React.memo(function ViewOffers() {
           </div>
         )}
 
-        {/* Booking Modal */}
-        {showBookingModal && selectedOffer && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.6)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-              padding: 'var(--space-4)',
-            }}
-            onClick={() => setShowBookingModal(false)}
-          >
-            <div
-              style={{
-                background: 'var(--surface-primary)',
-                borderRadius: 'var(--radius-xl)',
-                padding: 'var(--space-6)',
-                maxWidth: '500px',
-                width: '100%',
-                boxShadow: 'var(--shadow-xl)',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2
-                style={{
-                  fontSize: 'var(--text-2xl)',
-                  fontWeight: '800',
-                  color: 'var(--text-primary)',
-                  marginBottom: 'var(--space-4)',
-                  fontFamily: '"Cairo", sans-serif',
-                  textAlign: 'center',
-                }}
-              >
-                🎫 تأكيد الحجز
-              </h2>
-
-              {/* Driver Information */}
-              {selectedOffer.name && (
-                <div
-                  style={{
-                    background:
-                      'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: 'var(--space-4)',
-                    marginBottom: 'var(--space-4)',
-                    color: 'white',
-                    boxShadow: 'var(--shadow-md)',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      marginBottom: 'var(--space-2)',
-                      fontFamily: '"Cairo", sans-serif',
-                      opacity: 0.9,
-                    }}
-                  >
-                    معلومات السائق
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: 'var(--space-1)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 'var(--text-lg)',
-                        fontWeight: '700',
-                        fontFamily: '"Cairo", sans-serif',
-                      }}
-                    >
-                      👤 {selectedOffer.name}
-                    </div>
-                    {selectedOffer.ratingAvg && (
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-1)',
-                          fontSize: 'var(--text-base)',
-                          fontWeight: '600',
-                          fontFamily: '"Cairo", sans-serif',
-                        }}
-                      >
-                        ⭐ {Number(selectedOffer.ratingAvg).toFixed(1)}
-                        {selectedOffer.ratingCount && (
-                          <span style={{ fontSize: 'var(--text-sm)', opacity: 0.9 }}>
-                            ({selectedOffer.ratingCount})
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Trip Details */}
-              <div
-                style={{
-                  background: 'var(--surface-secondary)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-4)',
-                  marginBottom: 'var(--space-4)',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 'var(--text-lg)',
-                    fontWeight: '700',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                  }}
-                >
-                  {selectedOffer.fromCity} ← {selectedOffer.toCity}
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif',
-                    marginBottom: 'var(--space-1)',
-                  }}
-                >
-                  📅 {formatDate(selectedOffer.departureTime)} - 🕐{' '}
-                  <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
-                    {formatTime(selectedOffer.departureTime)}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    fontFamily: '"Cairo", sans-serif',
-                    marginBottom: 'var(--space-2)',
-                  }}
-                >
-                  💺 {selectedOffer.seats} مقعد متاح
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--text-xl)',
-                    fontWeight: '800',
-                    color: 'var(--primary)',
-                    fontFamily: '"Cairo", sans-serif',
-                  }}
-                >
-                  💰 {selectedOffer.price ? Number(selectedOffer.price).toLocaleString() : '0'} د.ع
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '600',
-                    marginBottom: 'var(--space-2)',
-                    fontFamily: '"Cairo", sans-serif',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  رسالة للسائق (اختياري)
-                </label>
-                <textarea
-                  value={bookingMessage}
-                  onChange={(e) => setBookingMessage(e.target.value)}
-                  placeholder="مثال: مرحباً، أود الحجز من موقع محدد..."
-                  style={{
-                    width: '100%',
-                    minHeight: '100px',
-                    padding: 'var(--space-3)',
-                    border: '2px solid var(--border-light)',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-base)',
-                    fontFamily: '"Cairo", sans-serif',
-                    resize: 'vertical',
-                    textAlign: 'center',
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                <button
-                  onClick={() => {
-                    setShowBookingModal(false);
-                    setBookingMessage('');
-                    setSelectedOffer(null);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3)',
-                    background: 'var(--surface-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '2px solid var(--border-light)',
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontFamily: '"Cairo", sans-serif',
-                  }}
-                >
-                  إلغاء
-                </button>
-                <button
-                  onClick={handleConfirmBooking}
-                  style={{
-                    flex: 1,
-                    padding: 'var(--space-3)',
-                    background:
-                      'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: 'var(--text-base)',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    fontFamily: '"Cairo", sans-serif',
-                    boxShadow: 'var(--shadow-lg)',
-                  }}
-                >
-                  ✅ تأكيد الحجز
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Booking Modal - Using Portal-based BookingModal component for proper fixed positioning */}
+        <BookingModal
+          isOpen={showBookingModal}
+          onClose={() => {
+            setShowBookingModal(false);
+            setBookingMessage('');
+            setSelectedOffer(null);
+          }}
+          offerDetails={
+            selectedOffer
+              ? {
+                  id: selectedOffer.id,
+                  fromCity: selectedOffer.fromCity,
+                  toCity: selectedOffer.toCity,
+                  departureDate: selectedOffer.departureTime,
+                  departureTime: selectedOffer.departureTime,
+                  price: selectedOffer.price,
+                  driverName: selectedOffer.name || 'غير متوفر',
+                  availableSeats: selectedOffer.seats || selectedOffer.seatsAvailable || 0,
+                }
+              : null
+          }
+          onConfirm={handleConfirmBooking}
+        />
       </div>
 
       <style>{`
