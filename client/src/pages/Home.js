@@ -300,10 +300,16 @@ const Home = () => {
             </button>
           )}
           <button
-            onClick={() => setMode('find')}
+            onClick={() => {
+              console.log('🔍 ابحث عن رحلة button clicked - navigating to offers');
+              if (currentUser && currentUser.isDriver) {
+                navigate('/demands');
+              } else {
+                navigate('/offers');
+              }
+            }}
             className={`${styles.modeButton} ${mode === 'find' ? styles.find : ''}`}
             aria-label="البحث عن رحلة متاحة"
-            aria-pressed={mode === 'find'}
           >
             🔍 ابحث عن رحلة
           </button>
