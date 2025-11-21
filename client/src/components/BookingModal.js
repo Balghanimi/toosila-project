@@ -31,7 +31,7 @@ const BookingModal = ({
       setFormData({
         passengerName: user?.name || '',
         passengerPhone: user?.phone || '',
-        passengerSeats: tripType === 'offer' ? (tripData?.seats || 1) : 1,
+        passengerSeats: tripType === 'offer' ? tripData?.seats || 1 : 1,
         specialRequests: '',
         pickupTime: '',
         notes: '',
@@ -87,7 +87,8 @@ const BookingModal = ({
     try {
       // Determine IDs based on trip type
       const passengerId = user?.id || 'current_user';
-      const driverId = tripType === 'offer' ? `driver_${tripData?.id || 'unknown'}` : user?.id || 'current_user';
+      const driverId =
+        tripType === 'offer' ? `driver_${tripData?.id || 'unknown'}` : user?.id || 'current_user';
 
       const tripInfo = {
         from: tripData?.pickupLocation || tripData?.from || 'N/A',
@@ -425,7 +426,7 @@ const BookingModal = ({
                   <input
                     type="number"
                     min="1"
-                    max={tripType === 'offer' ? (tripData?.seats || 10) : 10}
+                    max={tripType === 'offer' ? tripData?.seats || 10 : 10}
                     value={formData.passengerSeats}
                     onChange={(e) =>
                       handleInputChange('passengerSeats', parseInt(e.target.value) || 1)
