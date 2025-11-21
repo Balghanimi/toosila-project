@@ -206,7 +206,7 @@ class DemandResponse {
 
   /**
    * جلب الردود لعدة طلبات دفعة واحدة (Batch fetch)
-   * @param {number[]} demandIds - مصفوفة معرفات الطلبات
+   * @param {string[]} demandIds - مصفوفة معرفات الطلبات (UUIDs)
    * @returns {Promise<DemandResponse[]>}
    *
    * This method solves the N+1 query problem by fetching all responses in ONE query

@@ -338,10 +338,11 @@ const getResponseById = asyncHandler(async (req, res) => {
 
 /**
  * جلب الردود لعدة طلبات دفعة واحدة (Batch endpoint)
- * GET /api/demand-responses/batch?demandIds=1,2,3
+ * GET /api/demand-responses/batch?demandIds=uuid1,uuid2,uuid3
  * للراكب صاحب الطلبات
  *
  * This fixes the N+1 query problem in the frontend
+ * FIXED: Now accepts UUID demand IDs instead of integers
  */
 const getResponsesBatch = asyncHandler(async (req, res) => {
   const { demandIds } = req.query;
@@ -350,8 +351,11 @@ const getResponsesBatch = asyncHandler(async (req, res) => {
     throw new AppError('demandIds parameter is required', 400);
   }
 
-  // Parse comma-separated IDs
-  const ids = demandIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+  // Parse comma-separated UUIDs (NOT integers!)
+  const ids = demandIds
+    .split(',')
+    .map(id => id.trim())
+    .filter(id => id.length > 0);
 
   if (ids.length === 0) {
     return res.json({
@@ -362,6 +366,13 @@ const getResponsesBatch = asyncHandler(async (req, res) => {
 
   if (ids.length > 100) {
     throw new AppError('Maximum 100 demand IDs allowed per request', 400);
+  }
+
+  // Validate UUID format for each ID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const invalidIds = ids.filter(id => !uuidRegex.test(id));
+  if (invalidIds.length > 0) {
+    throw new AppError(`Invalid UUID format for demand IDs: ${invalidIds.join(', ')}`, 400);
   }
 
   // Fetch all responses for these demands in ONE query
