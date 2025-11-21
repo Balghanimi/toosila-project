@@ -31,7 +31,7 @@ const BookingModal = ({
       setFormData({
         passengerName: user?.name || '',
         passengerPhone: user?.phone || '',
-        passengerSeats: tripType === 'offer' ? tripData?.seats || 1 : 1,
+        passengerSeats: tripType === 'offer' ? (tripData?.seats || 1) : 1,
         specialRequests: '',
         pickupTime: '',
         notes: '',
@@ -58,7 +58,7 @@ const BookingModal = ({
       newErrors.passengerSeats = 'عدد المقاعد يجب أن يكون على الأقل 1';
     }
 
-    if (tripType === 'offer' && formData.passengerSeats > tripData.seats) {
+    if (tripType === 'offer' && tripData?.seats && formData.passengerSeats > tripData.seats) {
       newErrors.passengerSeats = `عدد المقاعد المتاحة: ${tripData.seats}`;
     }
 
@@ -87,15 +87,15 @@ const BookingModal = ({
     try {
       // Determine IDs based on trip type
       const passengerId = user?.id || 'current_user';
-      const driverId = tripType === 'offer' ? `driver_${tripData.id}` : user?.id || 'current_user';
+      const driverId = tripType === 'offer' ? `driver_${tripData?.id || 'unknown'}` : user?.id || 'current_user';
 
       const tripInfo = {
-        from: tripData.pickupLocation || tripData.from,
-        to: tripData.dropLocation || tripData.to,
-        date: tripData.date,
-        time: tripData.time,
-        price: tripData.price || tripData.maxPrice,
-        seats: tripData.seats || formData.passengerSeats,
+        from: tripData?.pickupLocation || tripData?.from || 'N/A',
+        to: tripData?.dropLocation || tripData?.to || 'N/A',
+        date: tripData?.date || '',
+        time: tripData?.time || '',
+        price: tripData?.price || tripData?.maxPrice || 0,
+        seats: tripData?.seats || formData.passengerSeats || 1,
       };
 
       const passengerInfo = {
@@ -110,7 +110,7 @@ const BookingModal = ({
       const booking = createBookingRequest(
         passengerId,
         driverId,
-        `trip_${tripData.id}`,
+        `trip_${tripData?.id || 'unknown'}`,
         tripInfo,
         passengerInfo
       );
@@ -156,7 +156,12 @@ const BookingModal = ({
     }
   };
 
+  // CRITICAL: Guard against undefined tripData to prevent crashes
   if (!isOpen) return null;
+  if (!tripData) {
+    console.error('❌ BookingModal: tripData is undefined! Modal cannot render.');
+    return null;
+  }
 
   return (
     <div
@@ -305,10 +310,10 @@ const BookingModal = ({
                   📍 تفاصيل الرحلة
                 </h4>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-                  <div>من: {tripData.pickupLocation || tripData.from}</div>
-                  <div>إلى: {tripData.dropLocation || tripData.to}</div>
-                  <div>التاريخ: {formatDate(tripData.date)}</div>
-                  <div>السعر: {formatPrice(tripData.price || tripData.maxPrice)}</div>
+                  <div>من: {tripData?.pickupLocation || tripData?.from || 'N/A'}</div>
+                  <div>إلى: {tripData?.dropLocation || tripData?.to || 'N/A'}</div>
+                  <div>التاريخ: {formatDate(tripData?.date)}</div>
+                  <div>السعر: {formatPrice(tripData?.price || tripData?.maxPrice)}</div>
                 </div>
               </div>
 
@@ -420,7 +425,7 @@ const BookingModal = ({
                   <input
                     type="number"
                     min="1"
-                    max={tripType === 'offer' ? tripData.seats : 10}
+                    max={tripType === 'offer' ? (tripData?.seats || 10) : 10}
                     value={formData.passengerSeats}
                     onChange={(e) =>
                       handleInputChange('passengerSeats', parseInt(e.target.value) || 1)
@@ -529,18 +534,18 @@ const BookingModal = ({
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>المسار:</span>
                     <span style={{ fontWeight: '600' }}>
-                      {tripData.pickupLocation || tripData.from} →{' '}
-                      {tripData.dropLocation || tripData.to}
+                      {tripData?.pickupLocation || tripData?.from || 'N/A'} →{' '}
+                      {tripData?.dropLocation || tripData?.to || 'N/A'}
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>التاريخ:</span>
-                    <span style={{ fontWeight: '600' }}>{formatDate(tripData.date)}</span>
+                    <span style={{ fontWeight: '600' }}>{formatDate(tripData?.date)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>السعر:</span>
                     <span style={{ fontWeight: '700', color: 'var(--primary)' }}>
-                      {formatPrice(tripData.price || tripData.maxPrice)}
+                      {formatPrice(tripData?.price || tripData?.maxPrice)}
                     </span>
                   </div>
                 </div>
