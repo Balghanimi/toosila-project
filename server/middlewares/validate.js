@@ -112,9 +112,8 @@ const validateDemandCreation = [
 // Booking validation rules
 const validateBookingCreation = [
   body('offerId')
-    .isInt({ min: 1 })
-    .withMessage('Please provide a valid offer ID (positive integer)')
-    .toInt(),
+    .isUUID(4)
+    .withMessage('Invalid offer ID format / معرّف العرض غير صالح'),
   body('seats').optional().isInt({ min: 1, max: 7 }).withMessage('Seats must be between 1 and 7'),
   body('message')
     .optional()
@@ -148,7 +147,7 @@ const validateRatingCreation = [
 
 // Parameter validation
 const validateId = [
-  param('id').isInt({ min: 1 }).withMessage('Please provide a valid ID (positive integer)').toInt(),
+  param('id').isUUID(4).withMessage('Invalid ID format / معرّف غير صالح'),
   handleValidationErrors,
 ];
 
