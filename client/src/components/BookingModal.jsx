@@ -23,6 +23,26 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
       // (wherever the user has scrolled to on the page)
       // This is the correct behavior - user stays at their current scroll position
 
+      // DEBUG: Log modal positioning info
+      console.log('🔍 MODAL DEBUG v2.1:');
+      console.log('- Body overflow:', document.body.style.overflow);
+      console.log('- Window scrollY:', window.scrollY);
+      console.log('- Viewport height:', window.innerHeight);
+
+      // Check if modal overlay has correct styles after render
+      setTimeout(() => {
+        const overlay = document.querySelector('[data-modal-overlay="true"]');
+        if (overlay) {
+          const styles = window.getComputedStyle(overlay);
+          console.log('- Overlay position:', styles.position);
+          console.log('- Overlay display:', styles.display);
+          console.log('- Overlay top:', styles.top);
+          console.log('- Overlay zIndex:', styles.zIndex);
+        } else {
+          console.warn('⚠️ Modal overlay not found in DOM!');
+        }
+      }, 50);
+
       // Trigger animation after a tiny delay
       setTimeout(() => setShow(true), 10);
     } else {
@@ -58,6 +78,7 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
   // Modal JSX
   const modalContent = (
     <div
+      data-modal-overlay="true"
       className="fixed inset-0 flex items-center justify-center p-4"
       style={{
         position: 'fixed',

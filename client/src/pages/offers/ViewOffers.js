@@ -155,6 +155,7 @@ const ViewOffers = React.memo(function ViewOffers() {
   };
 
   // PERFORMANCE FIX: Memoized expensive date/time formatting functions
+  // FIXED: Use English numerals (0-9) instead of Arabic numerals (٠-٩)
   const formatDate = React.useCallback((dateString) => {
     if (!dateString) return 'غير محدد';
 
@@ -174,11 +175,15 @@ const ViewOffers = React.memo(function ViewOffers() {
     if (dateOnly === todayOnly) return 'اليوم';
     if (dateOnly === tomorrowOnly) return 'غداً';
 
-    return date.toLocaleDateString('ar-EG', {
+    // Use Arabic locale for text but extract numbers and convert to English
+    const arabicFormatted = date.toLocaleDateString('ar-EG', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
     });
+
+    // Convert Arabic numerals (٠-٩) to English numerals (0-9)
+    return arabicFormatted.replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
   }, []);
 
   const formatTime = React.useCallback((dateString) => {
@@ -189,9 +194,11 @@ const ViewOffers = React.memo(function ViewOffers() {
     // Check if date is valid
     if (isNaN(date.getTime())) return '--:--';
 
-    return date.toLocaleTimeString('ar-EG', {
+    // FIXED: Use 'en-US' locale to get English numerals (0-9) instead of Arabic (٠-٩)
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     });
   }, []);
 
@@ -729,7 +736,9 @@ const ViewOffers = React.memo(function ViewOffers() {
                   }}
                 >
                   📅 {formatDate(selectedOffer.departureTime)} - 🕐{' '}
-                  {formatTime(selectedOffer.departureTime)}
+                  <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                    {formatTime(selectedOffer.departureTime)}
+                  </span>
                 </div>
                 <div
                   style={{
