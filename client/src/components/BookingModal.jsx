@@ -1,21 +1,34 @@
 /**
  * BookingModal Component
  * نافذة تأكيد الحجز - تظهر في منتصف الشاشة
- * FIXED: Sticky footer always visible + English numerals
+ * FIXED: Sticky footer + English numerals + ALWAYS centered in viewport
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { formatPrice, formatDate, formatTime, formatSeats } from '../utils/formatters';
 
 const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
-  // منع scroll عند فتح Modal
+  const [show, setShow] = useState(false);
+
+  // منع scroll عند فتح Modal + إضافة animation
   useEffect(() => {
     if (isOpen) {
+      // Prevent body scroll
       document.body.style.overflow = 'hidden';
+
+      // Reset any page scroll to ensure modal is visible
+      // This ensures the modal overlay starts at viewport top
+      window.scrollTo({ top: window.pageYOffset, behavior: 'instant' });
+
+      // Trigger animation after a tiny delay
+      setTimeout(() => setShow(true), 10);
     } else {
       document.body.style.overflow = 'unset';
+      setShow(false);
     }
+
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -41,19 +54,59 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  // Modal JSX
+  const modalContent = (
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+        overflow: 'auto',
+        opacity: show ? 1 : 0,
+        transition: 'opacity 0.2s ease-out',
+      }}
+    >
       {/* Backdrop - الخلفية المعتمة */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+        }}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal Content - المحتوى */}
+      {/* Modal Content - المحتوى - GUARANTEED CENTERED */}
       <div
-        className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl transform transition-all animate-modalSlideIn z-10 flex flex-col"
-        style={{ maxHeight: '85vh' }}
+        className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl transform transition-all z-10 flex flex-col"
+        style={{
+          position: 'relative',
+          maxWidth: '28rem',
+          width: '100%',
+          maxHeight: '85vh',
+          backgroundColor: 'white',
+          borderRadius: '1rem',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          margin: 'auto',
+          transform: show ? 'scale(1)' : 'scale(0.95)',
+          transition: 'transform 0.2s ease-out',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Fixed */}
@@ -161,6 +214,9 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
       </div>
     </div>
   );
+
+  // Use React Portal to render modal at body level (guarantees proper z-index and positioning)
+  return createPortal(modalContent, document.body);
 };
 
 BookingModal.propTypes = {
