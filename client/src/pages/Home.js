@@ -242,8 +242,13 @@ const Home = () => {
       <div className={styles.backgroundBlob3} />
 
       {/* COMPACT HERO - 15% of viewport */}
-      <section className={styles.heroSection} style={{ minHeight: '15vh', paddingTop: '2rem', paddingBottom: '1rem' }}>
-        <h1 className={styles.heroTitle} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>توصيلة</h1>
+      <section
+        className={styles.heroSection}
+        style={{ minHeight: '15vh', paddingTop: '2rem', paddingBottom: '1rem' }}
+      >
+        <h1 className={styles.heroTitle} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+          توصيلة
+        </h1>
         <p className={styles.heroSubtitle} style={{ fontSize: '1rem', marginBottom: '0' }}>
           رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
         </p>
@@ -268,7 +273,12 @@ const Home = () => {
         }}
       >
         {/* Mode Buttons - Inside Form */}
-        <div className={styles.modeButtons} role="group" aria-label="خيارات البحث والنشر" style={{ marginBottom: '1.5rem' }}>
+        <div
+          className={styles.modeButtons}
+          role="group"
+          aria-label="خيارات البحث والنشر"
+          style={{ marginBottom: '1.5rem' }}
+        >
           {!currentUser?.isDriver && (
             <button
               onClick={() => setMode('demand')}
@@ -447,7 +457,10 @@ const Home = () => {
         {/* Date Time Section */}
         <div className={styles.dateTimeSection}>
           <div className={styles.dateTimeHeader}>
-            <div className={styles.dateTimeLabel} style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+            <div
+              className={styles.dateTimeLabel}
+              style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+            >
               📅 {getCurrentDate()}، {toEnglishNumber(departureTime)}
             </div>
             <button
@@ -627,7 +640,10 @@ const Home = () => {
       </div>
 
       {/* QUICK BENEFITS BADGES - Below Search */}
-      <div className={styles.trustIndicators} style={{ margin: '2rem auto', justifyContent: 'center', maxWidth: '600px' }}>
+      <div
+        className={styles.trustIndicators}
+        style={{ margin: '2rem auto', justifyContent: 'center', maxWidth: '600px' }}
+      >
         <div className={styles.trustItem}>
           <span className={styles.trustIcon}>✓</span>
           <span>آمن وموثوق</span>
@@ -682,7 +698,11 @@ const Home = () => {
             <span className={styles.featureIcon}>💰</span>
             <h3 className={styles.featureTitle}>أسعار معقولة</h3>
             <p className={styles.featureDescription}>
-              وفر حتى <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>{toEnglishNumber('70%')}</span> من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
+              وفر حتى{' '}
+              <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                {toEnglishNumber('70%')}
+              </span>{' '}
+              من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
             </p>
           </div>
 

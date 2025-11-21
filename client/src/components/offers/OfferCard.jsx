@@ -1,5 +1,11 @@
 import React from 'react';
-import { formatPrice, formatDate as formatDateUtil, formatTime as formatTimeUtil, formatSeats, toEnglishNumber } from '../../utils/formatters';
+import {
+  formatPrice,
+  formatDate as formatDateUtil,
+  formatTime as formatTimeUtil,
+  formatSeats,
+  toEnglishNumber,
+} from '../../utils/formatters';
 import styles from './OfferCard.module.css';
 
 /**
