@@ -8,6 +8,7 @@ class Offer {
     this.toCity = data.to_city;
     this.departureTime = data.departure_time;
     this.seats = data.seats;
+    this.availableSeats = data.available_seats !== undefined ? parseInt(data.available_seats) : data.seats;
     this.price = parseFloat(data.price);
     this.isActive = data.is_active;
     this.createdAt = data.created_at;
@@ -33,10 +34,13 @@ class Offer {
   // Find offer by ID
   static async findById(id) {
     const result = await query(
-      `SELECT o.*, u.name, u.rating_avg, u.rating_count
+      `SELECT o.*, u.name, u.rating_avg, u.rating_count,
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'accepted')), 0))::int as available_seats
        FROM offers o
        JOIN users u ON o.driver_id = u.id
-       WHERE o.id = $1`,
+       LEFT JOIN bookings b ON o.id = b.offer_id
+       WHERE o.id = $1
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count`,
       [id]
     );
     return result.rows.length > 0 ? new Offer(result.rows[0]) : null;
@@ -116,10 +120,13 @@ class Offer {
     values.push(limit, offset);
 
     const result = await query(
-      `SELECT o.*, u.name, u.rating_avg, u.rating_count
+      `SELECT o.*, u.name, u.rating_avg, u.rating_count,
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'accepted')), 0))::int as available_seats
        FROM offers o
        JOIN users u ON o.driver_id = u.id
+       LEFT JOIN bookings b ON o.id = b.offer_id
        ${whereClause}
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count
        ORDER BY ${orderBy}
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
       values
@@ -225,13 +232,16 @@ class Offer {
   // Search offers
   static async search(searchTerm, page = 1, limit = 10) {
     const offset = (page - 1) * limit;
-    
+
     const result = await query(
-      `SELECT o.*, u.name, u.rating_avg, u.rating_count
+      `SELECT o.*, u.name, u.rating_avg, u.rating_count,
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'accepted')), 0))::int as available_seats
        FROM offers o
        JOIN users u ON o.driver_id = u.id
-       WHERE o.is_active = true 
+       LEFT JOIN bookings b ON o.id = b.offer_id
+       WHERE o.is_active = true
        AND (o.from_city ILIKE $1 OR o.to_city ILIKE $1)
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count
        ORDER BY o.departure_time ASC
        LIMIT $2 OFFSET $3`,
       [`%${searchTerm}%`, limit, offset]
@@ -262,6 +272,7 @@ class Offer {
       toCity: this.toCity,
       departureTime: this.departureTime,
       seats: this.seats,
+      availableSeats: this.availableSeats,
       price: this.price,
       isActive: this.isActive,
       createdAt: this.createdAt,

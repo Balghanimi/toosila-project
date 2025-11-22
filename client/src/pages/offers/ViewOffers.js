@@ -515,7 +515,7 @@ const ViewOffers = React.memo(function ViewOffers() {
               // Normalize offer data for OfferCard component
               const normalizedOffer = {
                 ...offer,
-                availableSeats: offer.seats || offer.seatsAvailable || 0,
+                availableSeats: offer.availableSeats ?? offer.seatsAvailable ?? offer.seats ?? 0,
                 driverName: offer.name || offer.userName,
                 driverRating: offer.ratingAvg ? Number(offer.ratingAvg) : null,
               };
@@ -619,7 +619,7 @@ const ViewOffers = React.memo(function ViewOffers() {
                   departureTime: selectedOffer.departureTime,
                   price: selectedOffer.price,
                   driverName: selectedOffer.name || 'غير متوفر',
-                  availableSeats: selectedOffer.seats || selectedOffer.seatsAvailable || 0,
+                  availableSeats: selectedOffer.availableSeats ?? selectedOffer.seatsAvailable ?? selectedOffer.seats ?? 0,
                 }
               : null
           }
