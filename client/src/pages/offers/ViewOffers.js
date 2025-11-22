@@ -619,7 +619,11 @@ const ViewOffers = React.memo(function ViewOffers() {
                   departureTime: selectedOffer.departureTime,
                   price: selectedOffer.price,
                   driverName: selectedOffer.name || 'غير متوفر',
-                  availableSeats: selectedOffer.availableSeats ?? selectedOffer.seatsAvailable ?? selectedOffer.seats ?? 0,
+                  availableSeats:
+                    selectedOffer.availableSeats ??
+                    selectedOffer.seatsAvailable ??
+                    selectedOffer.seats ??
+                    0,
                 }
               : null
           }
