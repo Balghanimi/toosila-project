@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm';
 import OfferCard from '../../components/offers/OfferCard';
-import BookingModal from '../../components/BookingModal';
+import BookingModal from '../../components/BookingModal.jsx';
 
 // PERFORMANCE FIX: Added React.memo to prevent unnecessary re-renders
 const ViewOffers = React.memo(function ViewOffers() {
