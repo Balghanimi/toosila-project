@@ -153,19 +153,29 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
           <div className="space-y-3">
             {/* Route - Large and prominent */}
             <div className="text-center pb-3 border-b-2">
-              <div className="text-2xl font-bold text-gray-800" style={{ fontFamily: '"Cairo", sans-serif' }}>
+              <div
+                className="text-2xl font-bold text-gray-800"
+                style={{ fontFamily: '"Cairo", sans-serif' }}
+              >
                 {offerDetails.fromCity} ← {offerDetails.toCity}
               </div>
             </div>
 
             {/* Price - Eye-catching */}
             <div className="text-center py-3 bg-green-50 rounded-lg">
-              <div className="text-sm text-gray-600 mb-1" style={{ fontFamily: '"Cairo", sans-serif' }}>
+              <div
+                className="text-sm text-gray-600 mb-1"
+                style={{ fontFamily: '"Cairo", sans-serif' }}
+              >
                 السعر
               </div>
               <div
                 className="text-3xl font-bold text-green-600"
-                style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr', unicodeBidi: 'embed' }}
+                style={{
+                  fontFamily: '"Cairo", sans-serif',
+                  direction: 'ltr',
+                  unicodeBidi: 'embed',
+                }}
               >
                 {formatPrice(offerDetails.price)} د.ع
               </div>
@@ -175,13 +185,19 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
             <div className="flex gap-3">
               <div className="flex-1 bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-xs text-gray-600 mb-1">📅</div>
-                <div className="font-semibold text-sm" style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}>
+                <div
+                  className="font-semibold text-sm"
+                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+                >
                   {formatDate(offerDetails.departureDate)}
                 </div>
               </div>
               <div className="flex-1 bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-xs text-gray-600 mb-1">⏰</div>
-                <div className="font-semibold text-sm" style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}>
+                <div
+                  className="font-semibold text-sm"
+                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+                >
                   {formatTime(offerDetails.departureTime)}
                 </div>
               </div>
@@ -190,18 +206,30 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
             {/* Driver and Seats - Compact */}
             <div className="flex gap-3">
               <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-600 mb-1" style={{ fontFamily: '"Cairo", sans-serif' }}>
+                <div
+                  className="text-xs text-gray-600 mb-1"
+                  style={{ fontFamily: '"Cairo", sans-serif' }}
+                >
                   السائق
                 </div>
-                <div className="font-semibold text-sm" style={{ fontFamily: '"Cairo", sans-serif' }}>
+                <div
+                  className="font-semibold text-sm"
+                  style={{ fontFamily: '"Cairo", sans-serif' }}
+                >
                   {offerDetails.driverName || 'غير متوفر'}
                 </div>
               </div>
               <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-600 mb-1" style={{ fontFamily: '"Cairo", sans-serif' }}>
+                <div
+                  className="text-xs text-gray-600 mb-1"
+                  style={{ fontFamily: '"Cairo", sans-serif' }}
+                >
                   المقاعد المتاحة 💺
                 </div>
-                <div className="font-semibold text-sm" style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}>
+                <div
+                  className="font-semibold text-sm"
+                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+                >
                   {formatSeats(offerDetails.availableSeats)}
                 </div>
               </div>
