@@ -10,9 +10,15 @@ if (process.env.DATABASE_URL) {
   if (process.env.NODE_ENV === 'development') {
     console.log('📦 Using DATABASE_URL for database connection');
   }
+
+  // Check if SSL should be disabled (for local postgres without SSL)
+  const sslMode = process.env.DATABASE_URL.includes('sslmode=disable') ||
+                  process.env.DATABASE_URL.includes('localhost') ||
+                  process.env.DATABASE_URL.includes('127.0.0.1');
+
   poolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    ssl: sslMode ? false : { rejectUnauthorized: false },
     max: 20, // Maximum number of clients in the pool
     min: 2, // Minimum number of clients in the pool
     idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
