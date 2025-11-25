@@ -11,6 +11,14 @@ import { formatPrice, formatDate, formatTime, formatSeats } from '../utils/forma
 
 const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
   const [show, setShow] = useState(false);
+  const [seatCount, setSeatCount] = useState(1);
+
+  // Reset seat count when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSeatCount(1);
+    }
+  }, [isOpen]);
 
   // منع scroll عند فتح Modal + إضافة animation
   useEffect(() => {
@@ -70,7 +78,7 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
 
   const handleConfirm = () => {
     if (onConfirm) {
-      onConfirm(offerDetails);
+      onConfirm({ ...offerDetails, seats: seatCount });
     }
     onClose();
   };
@@ -233,6 +241,68 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
                   {formatSeats(offerDetails.availableSeats)}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Seat Selector */}
+          <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
+            <div
+              className="text-center mb-3 font-semibold text-gray-700"
+              style={{ fontFamily: '"Cairo", sans-serif' }}
+            >
+              🪑 عدد المقاعد
+            </div>
+            <div className="flex justify-center items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setSeatCount((prev) => Math.max(1, prev - 1))}
+                disabled={seatCount <= 1}
+                className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-2xl font-bold text-gray-700 transition-colors flex items-center justify-center"
+                aria-label="تقليل عدد المقاعد"
+              >
+                −
+              </button>
+              <span
+                className="text-3xl font-bold text-green-600 min-w-[50px] text-center"
+                style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+              >
+                {seatCount}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setSeatCount((prev) => Math.min(offerDetails.availableSeats || 4, prev + 1))
+                }
+                disabled={seatCount >= (offerDetails.availableSeats || 4)}
+                className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-2xl font-bold text-white transition-colors flex items-center justify-center"
+                aria-label="زيادة عدد المقاعد"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Total Price */}
+          <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 rounded-lg p-4">
+            <div className="flex justify-between items-center">
+              <span
+                className="text-gray-700 font-semibold"
+                style={{ fontFamily: '"Cairo", sans-serif' }}
+              >
+                💰 المجموع الكلي:
+              </span>
+              <span
+                className="text-2xl font-bold text-green-600"
+                style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+              >
+                {formatPrice(offerDetails.price * seatCount)} د.ع
+              </span>
+            </div>
+            <div
+              className="text-xs text-gray-600 mt-1 text-center"
+              style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
+            >
+              ({formatPrice(offerDetails.price)} × {seatCount})
             </div>
           </div>
 

@@ -221,11 +221,14 @@ const ViewOffers = React.memo(function ViewOffers() {
     setShowBookingModal(true);
   };
 
-  const handleConfirmBooking = async () => {
+  const handleConfirmBooking = async (modalData) => {
     if (!selectedOffer) return;
+
+    const seats = modalData?.seats || 1; // Get seats from modal
 
     console.log('Selected Offer:', selectedOffer);
     console.log('Offer ID:', selectedOffer.id);
+    console.log('Seats requested:', seats);
 
     // Make sure we have a valid offerId
     const offerId = selectedOffer.id || selectedOffer.offerId;
@@ -258,7 +261,7 @@ const ViewOffers = React.memo(function ViewOffers() {
       console.log('🎯 BOOKING ATTEMPT STARTED');
       console.log('📦 Booking Data:', {
         offerId: validOfferId,
-        seats: 1,
+        seats: seats,
         message: bookingMessage,
         offerRoute: `${selectedOffer.fromCity} → ${selectedOffer.toCity}`,
       });
@@ -269,7 +272,7 @@ const ViewOffers = React.memo(function ViewOffers() {
       const response = await bookingsAPI.create({
         offerId: validOfferId,
         message: bookingMessage,
-        seats: 1, // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
+        seats: seats,
       });
 
       const duration = Date.now() - startTime;
