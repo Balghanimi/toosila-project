@@ -293,7 +293,8 @@ const ViewOffers = React.memo(function ViewOffers() {
         // Backend returned but success !== true
         console.error('❌ Backend returned success: false or missing');
         console.error('❌ Response:', response);
-        const errorMsg = response?.error || response?.message || 'فشل إنشاء الحجز - لم يتم التأكيد من الخادم';
+        const errorMsg =
+          response?.error || response?.message || 'فشل إنشاء الحجز - لم يتم التأكيد من الخادم';
         showError(errorMsg);
       }
     } catch (err) {
@@ -303,7 +304,10 @@ const ViewOffers = React.memo(function ViewOffers() {
       console.error('❌ Full Error:', err);
 
       const errorMessage =
-        err.response?.data?.error || err.response?.data?.message || err.message || 'حدث خطأ أثناء الحجز';
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        'حدث خطأ أثناء الحجز';
 
       showError(errorMessage);
     }
