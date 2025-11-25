@@ -278,7 +278,8 @@ const ViewOffers = React.memo(function ViewOffers() {
       // CRITICAL FIX: Check if backend confirmed success
       if (response && response.success === true) {
         console.log('✅ Booking confirmed as successful by backend');
-        console.log('📝 Booking ID:', response.booking?.id);
+        console.log('📝 Booking ID:', response.data?.booking?.id);
+        console.log('📝 Full Booking Object:', response.data?.booking);
 
         setShowBookingModal(false);
         setBookingMessage('');
