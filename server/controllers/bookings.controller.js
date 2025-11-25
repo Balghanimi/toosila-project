@@ -23,12 +23,43 @@ const { RESPONSE_MESSAGES, HTTP_STATUS, BOOKING_STATUS } = require('../constants
  * @returns {Promise<void>}
  */
 const createBooking = catchAsync(async (req, res) => {
+  console.log('🎯 BOOKING CREATION STARTED');
+  console.log('📦 Request Body:', req.body);
+  console.log('👤 User:', { id: req.user?.id, name: req.user?.name, email: req.user?.email });
+
   const { offerId, seats = 1, message } = req.body;
 
+  console.log('🔍 Validating input...');
+  if (!offerId) {
+    console.error('❌ Validation failed: Missing offerId');
+    return res.status(400).json({
+      success: false,
+      error: 'offerId is required',
+    });
+  }
+
+  if (!seats || seats < 1 || seats > 7) {
+    console.error('❌ Validation failed: Invalid seats value');
+    return res.status(400).json({
+      success: false,
+      error: 'seats must be between 1 and 7',
+    });
+  }
+
+  console.log('🔍 Creating booking via service...');
   const result = await bookingService.createBooking(req.user.id, {
     offerId,
     seats,
     message,
+  });
+
+  console.log('✅ Booking created successfully');
+  console.log('📝 Booking Details:', {
+    id: result.booking.id,
+    offerId: result.booking.offerId,
+    passengerId: result.booking.passengerId,
+    seats: result.booking.seats,
+    status: result.booking.status,
   });
 
   // Send real-time notification to driver

@@ -254,19 +254,58 @@ const ViewOffers = React.memo(function ViewOffers() {
     console.log('Valid Offer ID to send:', validOfferId);
 
     try {
-      await bookingsAPI.create({
+      console.log('🎯 BOOKING ATTEMPT STARTED');
+      console.log('📦 Booking Data:', {
+        offerId: validOfferId,
+        seats: 1,
+        message: bookingMessage,
+        offerRoute: `${selectedOffer.fromCity} → ${selectedOffer.toCity}`,
+      });
+
+      console.log('📤 Sending POST request to /api/bookings...');
+      const startTime = Date.now();
+
+      const response = await bookingsAPI.create({
         offerId: validOfferId,
         message: bookingMessage,
         seats: 1, // يمكن تحسينه لاحقاً لاختيار عدد المقاعد
       });
 
-      setShowBookingModal(false);
-      setBookingMessage('');
-      setSelectedOffer(null);
-      showSuccess('✅ تم إرسال طلب الحجز بنجاح! يمكنك متابعة حالته من صفحة الحجوزات');
-      navigate('/bookings');
+      const duration = Date.now() - startTime;
+      console.log(`✅ Response received in ${duration}ms`);
+      console.log('📥 Response Data:', response);
+
+      // CRITICAL FIX: Check if backend confirmed success
+      if (response && response.success === true) {
+        console.log('✅ Booking confirmed as successful by backend');
+        console.log('📝 Booking ID:', response.booking?.id);
+
+        setShowBookingModal(false);
+        setBookingMessage('');
+        setSelectedOffer(null);
+        showSuccess('✅ تم إرسال طلب الحجز بنجاح! يمكنك متابعة حالته من صفحة الحجوزات');
+
+        // Navigate to bookings page after brief delay
+        setTimeout(() => {
+          navigate('/bookings');
+        }, 1500);
+      } else {
+        // Backend returned but success !== true
+        console.error('❌ Backend returned success: false or missing');
+        console.error('❌ Response:', response);
+        const errorMsg = response?.error || response?.message || 'فشل إنشاء الحجز - لم يتم التأكيد من الخادم';
+        showError(errorMsg);
+      }
     } catch (err) {
-      showError(err.message || 'حدث خطأ أثناء الحجز');
+      console.error('❌ BOOKING FAILED WITH EXCEPTION');
+      console.error('❌ Error Type:', err.name);
+      console.error('❌ Error Message:', err.message);
+      console.error('❌ Full Error:', err);
+
+      const errorMessage =
+        err.response?.data?.error || err.response?.data?.message || err.message || 'حدث خطأ أثناء الحجز';
+
+      showError(errorMessage);
     }
   };
 
