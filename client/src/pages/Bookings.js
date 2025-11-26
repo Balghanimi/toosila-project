@@ -6,6 +6,7 @@ import { bookingsAPI, demandsAPI, demandResponsesAPI } from '../services/api';
 import DemandResponsesList from '../components/DemandResponsesList';
 import ConfirmDialog from '../components/UI/ConfirmDialog';
 import SkeletonLoader from '../components/UI/SkeletonLoader';
+import { formatDate, formatTime, formatPrice, formatSeats } from '../utils/formatters';
 
 export default function Bookings() {
   const location = useLocation();
@@ -499,23 +500,18 @@ export default function Bookings() {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            <div>
-              📅{' '}
-              {booking.offer?.departureTime
-                ? new Date(booking.offer.departureTime).toLocaleDateString('ar-EG')
-                : 'غير محدد'}
+            <div style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              📅 {formatDate(booking.offer?.departureTime) || 'غير محدد'}
             </div>
-            <div>
-              🕐{' '}
-              {booking.offer?.departureTime
-                ? new Date(booking.offer.departureTime).toLocaleTimeString('ar-EG', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : '--:--'}
+            <div style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              🕐 {formatTime(booking.offer?.departureTime) || '--:--'}
             </div>
-            <div>💺 {booking.offer?.seats || '--'} مقعد</div>
-            <div>💰 {booking.totalPrice || booking.offer?.price || '0'} د.ع</div>
+            <div style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              💺 {formatSeats(booking.offer?.seats) || '--'} مقعد
+            </div>
+            <div style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+              💰 {formatPrice(booking.totalPrice || booking.offer?.price || 0)} د.ع
+            </div>
           </div>
 
           {/* Passenger/Driver Details Card */}
