@@ -236,13 +236,14 @@ class Offer {
 
     const result = await query(
       `SELECT o.*, u.name, u.rating_avg, u.rating_count,
-              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'accepted')), 0))::int as available_seats
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0))::int as available_seats
        FROM offers o
        JOIN users u ON o.driver_id = u.id
        LEFT JOIN bookings b ON o.id = b.offer_id
        WHERE o.is_active = true
        AND (o.from_city ILIKE $1 OR o.to_city ILIKE $1)
        GROUP BY o.id, u.name, u.rating_avg, u.rating_count
+       HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
        ORDER BY o.departure_time ASC
        LIMIT $2 OFFSET $3`,
       [`%${searchTerm}%`, limit, offset]
