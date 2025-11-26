@@ -207,11 +207,23 @@ const getUserBookings = catchAsync(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const passengerId = req.params.userId || req.user.id;
 
+  console.log('🔍 getUserBookings DEBUG:');
+  console.log('  - passengerId:', passengerId);
+  console.log('  - req.user.id:', req.user?.id);
+  console.log('  - req.params.userId:', req.params.userId);
+
   const result = await Booking.getSentBookings(
     passengerId,
     parseInt(page, 10),
     parseInt(limit, 10)
   );
+
+  console.log('  - result.total:', result.total);
+  console.log('  - result.bookings.length:', result.bookings?.length);
+  if (result.bookings?.length > 0) {
+    console.log('  - first booking raw:', result.bookings[0]);
+    console.log('  - first booking JSON:', result.bookings[0].toJSON());
+  }
 
   sendSuccess(res, result, RESPONSE_MESSAGES.SUCCESS);
 });
