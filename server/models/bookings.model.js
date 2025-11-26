@@ -20,10 +20,8 @@ class Booking {
     this.driverName = data.driver_name;
     this.driverId = data.driver_id;
     this.driverEmail = data.driver_email;
-    this.driverPhone = data.driver_phone;
     this.passengerName = data.passenger_name;
     this.passengerEmail = data.passenger_email;
-    this.passengerPhone = data.passenger_phone;
     this.totalPrice = data.total_price;
   }
 
@@ -43,8 +41,8 @@ class Booking {
   static async findById(id) {
     const result = await query(
       `SELECT b.*, o.from_city, o.to_city, o.departure_time, o.price, o.seats as offer_seats,
-              o.driver_id, u1.name as passenger_name, u1.email as passenger_email, u1.phone as passenger_phone,
-              u2.name as driver_name, u2.email as driver_email, u2.phone as driver_phone
+              o.driver_id, u1.name as passenger_name, u1.email as passenger_email,
+              u2.name as driver_name, u2.email as driver_email
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
        JOIN users u1 ON b.passenger_id = u1.id
@@ -90,8 +88,8 @@ class Booking {
 
     const result = await query(
       `SELECT b.*, o.from_city, o.to_city, o.departure_time, o.price, o.seats as offer_seats,
-              o.driver_id, u1.name as passenger_name, u1.email as passenger_email, u1.phone as passenger_phone,
-              u2.name as driver_name, u2.email as driver_email, u2.phone as driver_phone,
+              o.driver_id, u1.name as passenger_name, u1.email as passenger_email,
+              u2.name as driver_name, u2.email as driver_email,
               COUNT(*) OVER() as total_count
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
@@ -155,7 +153,7 @@ class Booking {
 
     const result = await query(
       `SELECT b.*, o.from_city, o.to_city, o.departure_time, o.price, o.seats as offer_seats,
-              o.driver_id, u.name as driver_name, u.email as driver_email, u.phone as driver_phone
+              o.driver_id, u.name as driver_name, u.email as driver_email
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
        JOIN users u ON o.driver_id = u.id
@@ -185,7 +183,7 @@ class Booking {
 
     const result = await query(
       `SELECT b.*, o.from_city, o.to_city, o.departure_time, o.price, o.seats as offer_seats,
-              o.driver_id, u.name as passenger_name, u.id as passenger_id, u.email as passenger_email, u.phone as passenger_phone
+              o.driver_id, u.name as passenger_name, u.id as passenger_id, u.email as passenger_email
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
        JOIN users u ON b.passenger_id = u.id
@@ -251,7 +249,6 @@ class Booking {
           id: this.driverId,
           name: this.driverName,
           email: this.driverEmail,
-          phone: this.driverPhone,
         };
       }
     }
@@ -262,7 +259,6 @@ class Booking {
         id: this.passengerId,
         name: this.passengerName,
         email: this.passengerEmail,
-        phone: this.passengerPhone,
       };
     }
 
