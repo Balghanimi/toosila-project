@@ -73,9 +73,9 @@ const ViewOffers = React.memo(function ViewOffers() {
     setError('');
 
     try {
-      // Add page and limit to params
+      // Add page and limit to params - increased limit to show more offers
       filterParams.page = 1;
-      filterParams.limit = 20;
+      filterParams.limit = 50;
 
       let response;
       // If user is a driver, show demands (passenger requests)
@@ -116,7 +116,7 @@ const ViewOffers = React.memo(function ViewOffers() {
       if (filters.sortBy) filterParams.sortBy = filters.sortBy;
 
       filterParams.page = page + 1;
-      filterParams.limit = 20;
+      filterParams.limit = 50;
 
       let response;
       if (isDriver) {

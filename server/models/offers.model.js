@@ -96,24 +96,28 @@ class Offer {
     }
 
     // Determine ORDER BY clause
-    let orderBy = 'o.departure_time ASC';
+    // Default: soonest departure first, then newest created as tiebreaker
+    let orderBy = 'o.departure_time ASC, o.created_at DESC';
     if (filters.sortBy) {
       switch(filters.sortBy) {
         case 'price_asc':
-          orderBy = 'o.price ASC';
+          orderBy = 'o.price ASC, o.departure_time ASC';
           break;
         case 'price_desc':
-          orderBy = 'o.price DESC';
+          orderBy = 'o.price DESC, o.departure_time ASC';
           break;
         case 'rating':
-          orderBy = 'u.rating_avg DESC NULLS LAST';
+          orderBy = 'u.rating_avg DESC NULLS LAST, o.departure_time ASC';
           break;
         case 'seats':
-          orderBy = 'o.seats DESC';
+          orderBy = 'o.seats DESC, o.departure_time ASC';
+          break;
+        case 'newest':
+          orderBy = 'o.created_at DESC, o.departure_time ASC';
           break;
         case 'date':
         default:
-          orderBy = 'o.departure_time ASC';
+          orderBy = 'o.departure_time ASC, o.created_at DESC';
       }
     }
 
@@ -244,7 +248,7 @@ class Offer {
        AND (o.from_city ILIKE $1 OR o.to_city ILIKE $1)
        GROUP BY o.id, u.name, u.rating_avg, u.rating_count
        HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
-       ORDER BY o.departure_time ASC
+       ORDER BY o.departure_time ASC, o.created_at DESC
        LIMIT $2 OFFSET $3`,
       [`%${searchTerm}%`, limit, offset]
     );
