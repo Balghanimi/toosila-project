@@ -49,13 +49,27 @@ export const formatDate = (date) => {
 
 /**
  * Format time to show English numerals in HH:MM format
+ * Handles both time strings ("09:30") and ISO datetime strings ("2025-10-31T14:12:00.000Z")
  * Example: "٠٩:٣٠" → "09:30"
+ * Example: "2025-10-31T14:12:00.000Z" → "14:12"
  * @param {string} time - Time to format
  * @returns {string} Formatted time
  */
 export const formatTime = (time) => {
   if (!time) return '';
-  return toEnglishNumber(time);
+  try {
+    const d = new Date(time);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    }
+    return toEnglishNumber(time);
+  } catch {
+    return toEnglishNumber(time);
+  }
 };
 
 /**
