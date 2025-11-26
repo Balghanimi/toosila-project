@@ -186,12 +186,14 @@ export default function Bookings() {
             ? await bookingsAPI.getMyOffers() // حجوزات على عروضي
             : await bookingsAPI.getMyBookings(); // حجوزاتي على عروض الآخرين
 
-        console.log(`📦 Fetched bookings (${activeTab}):`, response.bookings || []);
+        // Extract bookings from response.data (API returns { success, message, data: { bookings, ... } })
+        const bookingsData = response.data?.bookings || response.bookings || [];
+        console.log(`📦 Fetched bookings (${activeTab}):`, bookingsData);
 
         // 🔍 DEBUG: تفاصيل كل حجز
-        if (response.bookings && response.bookings.length > 0) {
+        if (bookingsData.length > 0) {
           console.log('🔍 DEBUG - Bookings Details:');
-          response.bookings.forEach((b, idx) => {
+          bookingsData.forEach((b, idx) => {
             console.log(`  Booking ${idx + 1}:`, {
               id: b.id?.slice(0, 8),
               status: b.status,
@@ -203,7 +205,7 @@ export default function Bookings() {
           });
 
           // ملخص الحالات
-          const statusCounts = response.bookings.reduce((acc, b) => {
+          const statusCounts = bookingsData.reduce((acc, b) => {
             acc[b.status] = (acc[b.status] || 0) + 1;
             return acc;
           }, {});
@@ -234,7 +236,7 @@ export default function Bookings() {
           }
         }
 
-        setBookings(response.bookings || []);
+        setBookings(bookingsData);
       }
     } catch (err) {
       setError(err.message || 'حدث خطأ أثناء تحميل البيانات');
