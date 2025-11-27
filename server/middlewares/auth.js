@@ -50,10 +50,32 @@ const authenticateRefreshToken = (req, res, next) => {
   });
 };
 
+// Optional authentication - sets req.user if token is valid, otherwise continues without user
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    // No token provided - continue without user
+    req.user = null;
+    return next();
+  }
+
+  jwt.verify(token, config.JWT_SECRET, (err, user) => {
+    if (err) {
+      // Invalid token - continue without user
+      req.user = null;
+    } else {
+      req.user = user;
+    }
+    next();
+  });
+};
+
 // Middleware to check if user is admin
 const requireAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ 
+    return res.status(403).json({
       error: 'Admin access required',
       message: 'This action requires admin privileges'
     });
@@ -106,6 +128,7 @@ const generateRefreshToken = (user) => {
 module.exports = {
   authenticateToken,
   authenticateRefreshToken,
+  optionalAuth,
   requireAdmin,
   requireOwnership,
   generateAccessToken,
