@@ -467,9 +467,10 @@ body.dark-mode .header {
   align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Allow text to show fully */
+  white-space: normal;
+  overflow: visible;
+  word-break: keep-all;
 }
 
 .drawerItem:hover {

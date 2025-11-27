@@ -177,7 +177,10 @@ const Header = () => {
                 ✕
               </button>
             </div>
-            <div className={styles.drawerBody}>
+            <div
+              className={styles.drawerBody}
+              style={{ padding: '16px 20px', width: '100%' }}
+            >
               {/* الصفحة الرئيسية */}
               <button
                 className={styles.drawerItem}

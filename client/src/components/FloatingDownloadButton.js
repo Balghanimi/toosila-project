@@ -148,21 +148,21 @@ const FloatingDownloadButton = () => {
           ⬇️
         </div>
 
-        {/* Close button */}
+        {/* Close button - tiny */}
         <button
           onClick={handleDismiss}
           style={{
             position: 'absolute',
-            top: '-6px',
-            right: '-6px',
-            width: '20px',
-            height: '20px',
+            top: '-4px',
+            right: '-4px',
+            width: '16px',
+            height: '16px',
             borderRadius: '50%',
             background: isDarkMode ? '#1e293b' : 'white',
-            color: isDarkMode ? 'white' : '#1a1a1a',
-            border: '1.5px solid #34c759',
-            fontSize: '10px',
-            fontWeight: '700',
+            color: isDarkMode ? '#94a3b8' : '#6b7280',
+            border: '1px solid #d1d5db',
+            fontSize: '9px',
+            fontWeight: '400',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -170,19 +170,20 @@ const FloatingDownloadButton = () => {
             transition: 'all 0.2s ease',
             padding: 0,
             lineHeight: 1,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#ff3b30';
+            e.currentTarget.style.background = '#ef4444';
             e.currentTarget.style.color = 'white';
-            e.currentTarget.style.borderColor = '#ff3b30';
+            e.currentTarget.style.borderColor = '#ef4444';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = isDarkMode ? '#1e293b' : 'white';
-            e.currentTarget.style.color = isDarkMode ? 'white' : '#1a1a1a';
-            e.currentTarget.style.borderColor = '#34c759';
+            e.currentTarget.style.color = isDarkMode ? '#94a3b8' : '#6b7280';
+            e.currentTarget.style.borderColor = '#d1d5db';
           }}
         >
-          ×
+          ✕
         </button>
       </div>
 
