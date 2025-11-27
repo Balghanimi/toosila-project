@@ -163,7 +163,10 @@ const Header = () => {
       {drawerOpen && (
         <div className={styles.drawer}>
           <div className={styles.drawerOverlay} onClick={toggleDrawer} />
-          <nav className={styles.drawerContent} style={{ width: 'clamp(280px, 85vw, 320px)', minWidth: '280px' }}>
+          <nav
+            className={styles.drawerContent}
+            style={{ width: 'clamp(280px, 85vw, 320px)', minWidth: '280px' }}
+          >
             <div className={styles.drawerHeader}>
               <h3>القائمة</h3>
               <button
