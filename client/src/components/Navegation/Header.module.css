@@ -362,7 +362,8 @@ body.dark-mode .header {
 
 .drawerContent {
   position: relative;
-  width: 280px;
+  width: min(320px, 85vw);
+  min-width: 280px;
   height: 100vh;
   background: var(--surface-primary);
   border-left: 1px solid var(--border-light);
@@ -371,6 +372,8 @@ body.dark-mode .header {
   flex-direction: column;
   margin-right: auto;
   animation: slideInRight 0.3s ease-out;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @keyframes slideInRight {
@@ -428,8 +431,9 @@ body.dark-mode .header {
 
 .drawerBody {
   flex: 1;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   direction: rtl;
+  overflow-y: auto;
 }
 
 .placeholder {
@@ -456,8 +460,11 @@ body.dark-mode .header {
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin-bottom: var(--space-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .drawerItem:hover {
@@ -536,7 +543,12 @@ body.dark-mode .header {
   }
 
   .drawerContent {
-    width: 260px;
+    width: min(300px, 80vw);
+    min-width: 280px;
+  }
+
+  .drawerItem {
+    font-size: 15px;
   }
 }
 
@@ -589,7 +601,23 @@ body.dark-mode .header {
   }
 
   .drawerContent {
-    width: 240px;
+    width: min(300px, 85vw);
+    min-width: 270px;
+  }
+
+  .drawerBody {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .drawerItem {
+    padding: var(--space-2) var(--space-3);
+    font-size: 14px;
+    gap: var(--space-2);
+  }
+
+  .drawerSection {
+    font-size: 12px;
+    padding: var(--space-2) var(--space-2);
   }
 }
 
