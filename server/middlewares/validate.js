@@ -123,9 +123,14 @@ const validateBookingCreation = [
   handleValidationErrors,
 ];
 
-// Message validation rules
+// Message validation rules (ride-based messaging)
 const validateMessageCreation = [
-  body('recipientId').isUUID(4).withMessage('Invalid recipient ID format / معرّف المستلم غير صالح'),
+  body('rideType')
+    .isIn(['offer', 'demand'])
+    .withMessage('Invalid ride type. Must be "offer" or "demand"'),
+  body('rideId')
+    .isUUID(4)
+    .withMessage('Invalid ride ID format / معرّف الرحلة غير صالح'),
   body('content')
     .trim()
     .isLength({ min: 1, max: 1000 })
