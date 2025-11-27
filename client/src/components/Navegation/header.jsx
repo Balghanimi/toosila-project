@@ -8,6 +8,7 @@ import NotificationBell from '../notifications/NotificationBell';
 import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
 import ThemeToggle from '../ThemeToggle';
+import logoHeader from '../../assets/logo-header.png';
 
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -46,7 +47,7 @@ const Header = () => {
             onClick={() => navigate('/')}
             aria-label="الصفحة الرئيسية"
           >
-            <img src="/toosila-logo-text.svg" alt="توصيلة" className={styles.logoText} />
+            <img src={logoHeader} alt="توصيلة" className={styles.logoText} />
           </button>
         </div>
 

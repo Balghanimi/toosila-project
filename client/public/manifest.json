@@ -1,41 +1,30 @@
 {
   "short_name": "توصيلة",
-  "name": "توصيلة - رحلات مشتركة آمنة وموثوقة",
+  "name": "توصيلة - Toosila",
+  "description": "شاركني الطريق - تطبيق مشاركة الرحلات العراقي",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
     },
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.svg",
-      "type": "image/svg+xml",
+      "src": "logo-192.png",
+      "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo512.svg",
-      "type": "image/svg+xml",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.svg",
-      "type": "image/svg+xml",
+      "src": "logo-512.png",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#10b981",
+  "theme_color": "#10B981",
   "background_color": "#ffffff",
   "orientation": "portrait",
-  "categories": ["travel", "transportation"],
-  "description": "تطبيق توصيلة للرحلات المشتركة الآمنة والموثوقة داخل العراق"
+  "categories": ["travel", "transportation"]
 }
