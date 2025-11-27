@@ -57,6 +57,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
   };
 
   const truncateMessage = (content, maxLength = 50) => {
+    if (!content) return '';
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
@@ -223,7 +224,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
         }}
       >
         {filteredConversations
-          .filter((conv) => conv && (conv.lastMessage || conv.last_message))
+          .filter((conv) => conv != null)
           .map((conversation, index) => {
             // Handle field name variations from backend (snake_case vs camelCase)
             const tripId = conversation.tripId || conversation.ride_id;
