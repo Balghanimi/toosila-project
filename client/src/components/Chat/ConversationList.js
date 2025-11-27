@@ -21,8 +21,12 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
   const filteredConversations = searchTerm
     ? conversations.filter(
         (conv) =>
-          conv.otherUserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          conv.lastMessage?.content?.toLowerCase().includes(searchTerm.toLowerCase())
+          (conv.otherUserName || conv.other_user_name || '')
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          (conv.lastMessage?.content || conv.last_message || '')
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       )
     : conversations;
 
@@ -219,18 +223,44 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
         }}
       >
         {filteredConversations
-          .filter((conv) => conv && conv.lastMessage)
+          .filter((conv) => conv && (conv.lastMessage || conv.last_message))
           .map((conversation, index) => {
-            const isSelected = selectedConversation?.tripId === conversation.tripId;
-            const hasUnread = conversation.unreadCount > 0;
-            const lastMessage = conversation.lastMessage || {};
+            // Handle field name variations from backend (snake_case vs camelCase)
+            const tripId = conversation.tripId || conversation.ride_id;
+            const rideType = conversation.rideType || conversation.ride_type || 'offer';
+            const otherUserId = conversation.otherUserId || conversation.other_user_id;
+            const otherUserName =
+              conversation.otherUserName || conversation.other_user_name || 'مستخدم';
+            const lastMessageContent =
+              conversation.lastMessage?.content || conversation.last_message || '';
             const timestamp =
-              lastMessage.timestamp || lastMessage.created_at || lastMessage.createdAt || null;
+              conversation.lastMessage?.timestamp ||
+              conversation.lastMessage?.created_at ||
+              conversation.last_message_time ||
+              null;
+
+            const isSelected =
+              selectedConversation?.tripId === tripId || selectedConversation?.ride_id === tripId;
+            const hasUnread = conversation.unreadCount > 0 || conversation.unread_count > 0;
 
             return (
               <div
-                key={`${conversation.tripId}_${conversation.otherUserId}`}
-                onClick={() => onSelectConversation(conversation)}
+                key={`${tripId}_${otherUserId}_${index}`}
+                onClick={() =>
+                  onSelectConversation({
+                    tripId,
+                    rideId: tripId,
+                    rideType,
+                    otherUserId,
+                    otherUserName,
+                    fromCity: conversation.from_city || conversation.fromCity,
+                    toCity: conversation.to_city || conversation.toCity,
+                    tripInfo: {
+                      from: conversation.from_city || conversation.fromCity || '',
+                      to: conversation.to_city || conversation.toCity || '',
+                    },
+                  })
+                }
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -274,7 +304,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
                     position: 'relative',
                   }}
                 >
-                  {conversation.otherUserName?.charAt(0) || '👤'}
+                  {otherUserName?.charAt(0) || '👤'}
 
                   {/* Unread indicator */}
                   {hasUnread && (
@@ -296,7 +326,9 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
                         border: '2px solid white',
                       }}
                     >
-                      {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                      {(conversation.unreadCount || conversation.unread_count || 0) > 9
+                        ? '9+'
+                        : conversation.unreadCount || conversation.unread_count || 0}
                     </div>
                   )}
                 </div>
@@ -323,7 +355,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {conversation.otherUserName || 'مستخدم'}
+                      {otherUserName}
                     </h4>
 
                     <span
@@ -353,7 +385,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {truncateMessage(lastMessage.content || '')}
+                    {truncateMessage(lastMessageContent)}
                   </p>
                 </div>
 
@@ -367,14 +399,15 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
                     marginRight: 'var(--space-2)',
                   }}
                 >
-                  {lastMessage.senderId === user?.id && (
+                  {(conversation.lastMessage?.senderId || conversation.last_sender_id) ===
+                    user?.id && (
                     <div
                       style={{
                         fontSize: 'var(--text-xs)',
-                        color: lastMessage.read ? 'var(--success)' : 'var(--text-muted)',
+                        color: 'var(--text-muted)',
                       }}
                     >
-                      {lastMessage.read ? '✓✓' : '✓'}
+                      ✓
                     </div>
                   )}
 
