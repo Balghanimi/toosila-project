@@ -5,8 +5,16 @@ import { useNotifications } from '../../context/NotificationContext';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 
-const ChatInterface = ({ tripId, otherUserId, otherUserName, tripInfo, onClose }) => {
-  const { sendMessage, currentConversation, fetchConversation } = useMessages();
+const ChatInterface = ({
+  tripId,
+  rideType = 'offer',
+  otherUserId,
+  otherUserName,
+  tripInfo,
+  onClose,
+}) => {
+  const { sendMessage, currentConversation, fetchConversation, fetchRideConversation } =
+    useMessages();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +22,14 @@ const ChatInterface = ({ tripId, otherUserId, otherUserName, tripInfo, onClose }
 
   // Load messages for this conversation
   useEffect(() => {
-    if (otherUserId && user?.id) {
+    if (tripId && user?.id) {
+      // Use ride-based conversation fetching
+      fetchRideConversation(rideType, tripId);
+    } else if (otherUserId && user?.id) {
+      // Fallback to user-based conversation (deprecated)
       fetchConversation(otherUserId);
     }
-  }, [otherUserId, user?.id, fetchConversation]);
+  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
 
   // Handle sending a message
   const handleSendMessage = async (content) => {
@@ -29,13 +41,17 @@ const ChatInterface = ({ tripId, otherUserId, otherUserName, tripInfo, onClose }
     setError('');
 
     try {
-      // Assuming rideType is 'offer' for now - this should be passed as prop
-      await sendMessage('offer', tripId, content);
+      // Use the rideType prop for flexibility (offer or demand)
+      await sendMessage(rideType, tripId, content);
 
       showSuccess('✅ تم إرسال الرسالة بنجاح!');
 
-      // Refresh conversation
-      fetchConversation(otherUserId);
+      // Refresh conversation (use ride-based if tripId exists)
+      if (tripId) {
+        fetchRideConversation(rideType, tripId);
+      } else if (otherUserId) {
+        fetchConversation(otherUserId);
+      }
     } catch (err) {
       const errorMsg = err.message || 'فشل في إرسال الرسالة. حاول مرة أخرى.';
       setError(errorMsg);

@@ -221,6 +221,25 @@ const ViewOffers = React.memo(function ViewOffers() {
     setShowBookingModal(true);
   };
 
+  const handleMessageDriver = (offer) => {
+    if (!currentUser) {
+      showError('⚠️ يجب تسجيل الدخول أولاً للمراسلة');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Navigate to messages page with offer context
+    navigate(`/messages`, {
+      state: {
+        rideType: 'offer',
+        rideId: offer.id,
+        driverName: offer.driverName || offer.name,
+        fromCity: offer.fromCity,
+        toCity: offer.toCity,
+      },
+    });
+  };
+
   const handleConfirmBooking = async (modalData) => {
     if (!selectedOffer) return;
 
@@ -568,6 +587,7 @@ const ViewOffers = React.memo(function ViewOffers() {
                 availableSeats: offer.availableSeats ?? offer.seatsAvailable ?? offer.seats ?? 0,
                 driverName: offer.name || offer.userName,
                 driverRating: offer.ratingAvg ? Number(offer.ratingAvg) : null,
+                driverId: offer.driverId || offer.driver_id,
               };
 
               return (
@@ -575,6 +595,7 @@ const ViewOffers = React.memo(function ViewOffers() {
                   key={offer.id}
                   offer={normalizedOffer}
                   onBookNow={handleBookNow}
+                  onMessageDriver={handleMessageDriver}
                   formatDate={formatDate}
                   formatTime={formatTime}
                   currentUser={currentUser}

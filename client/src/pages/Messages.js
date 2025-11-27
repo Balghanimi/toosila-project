@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessagesContext';
 import ConversationList from '../components/Chat/ConversationList';
@@ -9,6 +10,8 @@ const Messages = () => {
   const { conversations, fetchConversations, loading } = useMessages();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [isAnimated, setIsAnimated] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsAnimated(true);
@@ -20,6 +23,27 @@ const Messages = () => {
       fetchConversations();
     }
   }, [user?.id, fetchConversations]);
+
+  // Handle incoming navigation state (from ViewOffers "Message Driver" button)
+  useEffect(() => {
+    if (location.state && location.state.rideType && location.state.rideId) {
+      const { rideType, rideId, driverName, fromCity, toCity } = location.state;
+      // Auto-select the conversation based on navigation state
+      setSelectedConversation({
+        rideType,
+        rideId,
+        tripId: rideId,
+        otherUserName: driverName || 'السائق',
+        tripInfo: {
+          from: fromCity || '',
+          to: toCity || '',
+        },
+        isNewConversation: true, // Flag to indicate this might be a new conversation
+      });
+      // Clear the state to prevent re-triggering on page refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
@@ -152,15 +176,16 @@ const Messages = () => {
               className="chat-interface"
             >
               <ChatInterface
-                tripId={selectedConversation.tripId}
+                tripId={selectedConversation.tripId || selectedConversation.rideId}
+                rideType={selectedConversation.rideType || 'offer'}
                 otherUserId={selectedConversation.otherUserId}
                 otherUserName={selectedConversation.otherUserName}
-                tripInfo={{
-                  from: 'الكرادة', // This would come from the actual trip data
-                  to: 'الجادرية',
-                  date: 'اليوم',
-                  time: '08:00 ص',
-                }}
+                tripInfo={
+                  selectedConversation.tripInfo || {
+                    from: selectedConversation.fromCity || '',
+                    to: selectedConversation.toCity || '',
+                  }
+                }
                 onClose={handleCloseChat}
               />
             </div>

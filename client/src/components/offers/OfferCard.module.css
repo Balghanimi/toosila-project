@@ -192,6 +192,13 @@
   text-align: right;
 }
 
+/* ===== ACTION BUTTONS CONTAINER ===== */
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
 /* ===== BOOK BUTTON ===== */
 .bookButton {
   width: 100%;
@@ -222,6 +229,40 @@
 }
 
 .bookButton:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* ===== MESSAGE DRIVER BUTTON ===== */
+.messageButton {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: var(--surface-secondary, #f9fafb);
+  color: var(--text-primary, #111827);
+  border: 2px solid var(--border-medium, #d1d5db);
+  border-radius: var(--radius, 12px);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+  direction: rtl;
+}
+
+.messageButton:hover {
+  background: var(--surface-primary, #ffffff);
+  border-color: var(--primary, #34c759);
+  color: var(--primary, #34c759);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.15);
+}
+
+.messageButton:active {
   transform: scale(0.98) translateY(0);
 }
 
@@ -356,9 +397,26 @@ body.dark-mode .loginPrompt {
   color: var(--text-secondary, #d1d5db);
 }
 
+body.dark-mode .messageButton {
+  background: var(--surface-tertiary, #334155);
+  border-color: var(--border-dark, #64748b);
+  color: var(--text-primary, #e5e7eb);
+}
+
+body.dark-mode .messageButton:hover {
+  background: var(--surface-secondary, #1e293b);
+  border-color: var(--primary, #34c759);
+  color: var(--primary, #34c759);
+}
+
 /* ===== ACCESSIBILITY ===== */
 .bookButton:focus-visible {
   outline: 3px solid var(--success, #10b981);
+  outline-offset: 2px;
+}
+
+.messageButton:focus-visible {
+  outline: 3px solid var(--primary, #34c759);
   outline-offset: 2px;
 }
 

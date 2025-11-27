@@ -18,10 +18,20 @@ import styles from './OfferCard.module.css';
  * - Accessible and WCAG compliant
  * - English numerals (0-9) everywhere
  */
-const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) => {
+const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, currentUser }) => {
   const handleBookClick = () => {
     onBookNow(offer);
   };
+
+  const handleMessageClick = () => {
+    if (onMessageDriver) {
+      onMessageDriver(offer);
+    }
+  };
+
+  // Check if current user is the driver of this offer
+  const isOwnOffer =
+    currentUser && (currentUser.id === offer.driverId || currentUser.id === offer.driver_id);
 
   return (
     <div className={styles.offerCard}>
@@ -89,18 +99,27 @@ const OfferCard = ({ offer, onBookNow, formatDate, formatTime, currentUser }) =>
         </div>
       )}
 
-      {/* Book Now Button */}
+      {/* Action Buttons */}
       {currentUser && !currentUser.isDriver && (
-        <button type="button" onClick={handleBookClick} className={styles.bookButton}>
-          <span>احجز الآن</span>
-          <span className={styles.buttonIcon}>🎫</span>
-        </button>
+        <div className={styles.actionButtons}>
+          <button type="button" onClick={handleBookClick} className={styles.bookButton}>
+            <span>احجز الآن</span>
+            <span className={styles.buttonIcon}>🎫</span>
+          </button>
+          {/* Message Driver Button - Only show if not own offer */}
+          {!isOwnOffer && (
+            <button type="button" onClick={handleMessageClick} className={styles.messageButton}>
+              <span>مراسلة السائق</span>
+              <span className={styles.buttonIcon}>💬</span>
+            </button>
+          )}
+        </div>
       )}
 
       {/* Login Prompt for Non-authenticated Users */}
       {!currentUser && (
         <div className={styles.loginPrompt}>
-          <span>يجب تسجيل الدخول للحجز</span>
+          <span>يجب تسجيل الدخول للحجز أو المراسلة</span>
         </div>
       )}
     </div>

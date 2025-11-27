@@ -11,23 +11,26 @@ const sendMessage = asyncHandler(async (req, res) => {
     throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
   }
 
-  // Verify the ride exists and user has access
+  // Verify the ride exists
   const { query } = require('../config/db');
   let rideCheck;
 
   if (rideType === 'offer') {
-    // Check if user is driver or has a booking for this offer
+    // For offers: any authenticated user can message (except their own offer)
+    // This allows passengers to ask questions before booking
     rideCheck = await query(
       `SELECT o.id, o.driver_id, o.from_city, o.to_city
        FROM offers o
-       WHERE o.id = $1 AND (
-         o.driver_id = $2 OR
-         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2 AND status IN ('pending', 'accepted'))
-       )`,
-      [rideId, req.user.id]
+       WHERE o.id = $1 AND o.is_active = true`,
+      [rideId]
     );
+
+    // Prevent users from messaging their own offer
+    if (rideCheck.rows.length > 0 && rideCheck.rows[0].driver_id === req.user.id) {
+      throw new AppError('You cannot message your own offer', 400);
+    }
   } else {
-    // Check if user is passenger or responded to this demand
+    // For demands: check if user is passenger or responded to this demand
     rideCheck = await query(
       `SELECT d.id, d.passenger_id, d.from_city, d.to_city
        FROM demands d
@@ -57,13 +60,14 @@ const sendMessage = asyncHandler(async (req, res) => {
     let participantsQuery;
 
     if (rideType === 'offer') {
-      // Notify driver and all passengers with accepted bookings
+      // Notify driver and all users who have messaged about this offer
       participantsQuery = await query(
         `SELECT DISTINCT u.id, u.name
          FROM users u
          WHERE u.id != $1 AND (
            u.id = (SELECT driver_id FROM offers WHERE id = $2) OR
-           u.id IN (SELECT passenger_id FROM bookings WHERE offer_id = $2 AND status IN ('pending', 'accepted'))
+           u.id IN (SELECT passenger_id FROM bookings WHERE offer_id = $2 AND status IN ('pending', 'accepted')) OR
+           u.id IN (SELECT DISTINCT sender_id FROM messages WHERE ride_type = 'offer' AND ride_id = $2)
          )`,
         [req.user.id, rideId]
       );
@@ -111,10 +115,12 @@ const getRideMessages = asyncHandler(async (req, res) => {
   let accessCheck;
 
   if (rideType === 'offer') {
+    // For offers: driver, passengers with bookings, OR users who have sent messages can access
     accessCheck = await query(
       `SELECT 1 FROM offers WHERE id = $1 AND (
          driver_id = $2 OR
-         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id = $2)
        )`,
       [rideId, req.user.id]
     );

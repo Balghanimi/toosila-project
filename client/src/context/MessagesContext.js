@@ -54,7 +54,7 @@ export const MessagesProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  // Fetch specific conversation messages
+  // Fetch specific conversation messages (by user ID - deprecated)
   const fetchConversation = useCallback(
     async (userId) => {
       if (!currentUser) return;
@@ -77,6 +77,36 @@ export const MessagesProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error fetching conversation:', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [currentUser, fetchUnreadCount]
+  );
+
+  // Fetch ride-specific conversation messages (offer or demand)
+  const fetchRideConversation = useCallback(
+    async (rideType, rideId) => {
+      if (!currentUser) return;
+
+      try {
+        setLoading(true);
+        const response = await messagesAPI.getRideMessages(rideType, rideId);
+        setCurrentConversation(response.messages || []);
+
+        // Auto mark conversation as read
+        if (response.messages && response.messages.length > 0) {
+          try {
+            await messagesAPI.markConversationAsRead(rideType, rideId);
+            fetchUnreadCount();
+          } catch (markError) {
+            // Silently fail - marking as read is not critical
+            console.warn('Could not mark conversation as read:', markError);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching ride conversation:', error);
+        setCurrentConversation([]);
       } finally {
         setLoading(false);
       }
@@ -152,6 +182,7 @@ export const MessagesProvider = ({ children }) => {
     getUserConversations,
     fetchConversations,
     fetchConversation,
+    fetchRideConversation,
     fetchUnreadCount,
   };
 
