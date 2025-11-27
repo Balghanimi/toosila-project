@@ -73,9 +73,7 @@ export default function ViewDemands() {
 
       // If user is a passenger, filter to show only their own demands
       if (currentUser && !isDriver) {
-        fetchedDemands = fetchedDemands.filter(
-          (demand) => demand.passengerId === currentUser.id
-        );
+        fetchedDemands = fetchedDemands.filter((demand) => demand.passengerId === currentUser.id);
       }
 
       setDemands(fetchedDemands);
@@ -851,7 +849,12 @@ export default function ViewDemands() {
                 {/* Action buttons for drivers */}
                 {currentUser && currentUser.isDriver && (
                   <div
-                    style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}
+                    style={{
+                      display: 'flex',
+                      gap: 'var(--space-3)',
+                      marginTop: 'var(--space-3)',
+                      flexWrap: 'wrap',
+                    }}
                   >
                     <button
                       onClick={(e) => handleSendOffer(demand, e)}
