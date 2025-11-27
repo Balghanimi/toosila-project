@@ -188,160 +188,160 @@ const MessageInput = ({
           boxShadow: 'var(--shadow-sm)',
         }}
       >
-      {/* Message input */}
-      <div
-        style={{
-          flex: 1,
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'flex-end',
-        }}
-      >
-        <textarea
-          ref={textareaRef}
-          value={message}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          onFocus={handleFocus}
-          placeholder={placeholder}
-          disabled={disabled}
+        {/* Message input */}
+        <div
           style={{
-            width: '100%',
-            minHeight: '40px',
-            maxHeight: '120px',
-            padding: 'var(--space-3)',
-            border: 'none',
-            outline: 'none',
-            background: 'transparent',
-            fontSize: 'var(--text-base)',
-            fontFamily: '"Cairo", sans-serif',
-            color: 'var(--text-primary)',
-            resize: 'none',
-            direction: 'rtl',
-            textAlign: 'right',
-            lineHeight: '1.5',
-            borderRadius: 'var(--radius)',
-            transition: 'var(--transition)',
+            flex: 1,
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'flex-end',
           }}
-        />
-
-        {/* Character count */}
-        {charCount > 0 && (
-          <div
+        >
+          <textarea
+            ref={textareaRef}
+            value={message}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            onFocus={handleFocus}
+            placeholder={placeholder}
+            disabled={disabled}
             style={{
-              position: 'absolute',
-              bottom: '4px',
-              left: '8px',
-              fontSize: 'var(--text-xs)',
-              color:
-                charCount > maxLength * 0.8
-                  ? 'var(--warning)'
-                  : charCount > maxLength * 0.9
-                    ? 'var(--error)'
-                    : 'var(--text-muted)',
+              width: '100%',
+              minHeight: '40px',
+              maxHeight: '120px',
+              padding: 'var(--space-3)',
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+              fontSize: 'var(--text-base)',
               fontFamily: '"Cairo", sans-serif',
-              fontWeight: '500',
-            }}
-          >
-            {charCount}/{maxLength}
-          </div>
-        )}
-
-        {/* Error message */}
-        {error && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '-30px',
-              right: '0',
-              background: 'var(--error)',
-              color: 'white',
-              padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-lg)',
-              fontSize: 'var(--text-sm)',
-              fontFamily: '"Cairo", sans-serif',
-              fontWeight: '500',
-              boxShadow: 'var(--shadow-md)',
-              animation: 'slideDown 0.3s ease-out',
-            }}
-          >
-            {error}
-          </div>
-        )}
-      </div>
-
-      {/* Send button */}
-      <button
-        type="submit"
-        disabled={!message.trim() || disabled || isSending}
-        style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          border: 'none',
-          background:
-            message.trim() && !disabled && !isSending
-              ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-              : 'var(--text-muted)',
-          color: 'white',
-          cursor: message.trim() && !disabled && !isSending ? 'pointer' : 'not-allowed',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 'var(--text-lg)',
-          transition: 'var(--transition)',
-          boxShadow: message.trim() && !disabled ? 'var(--shadow-md)' : 'none',
-          opacity: message.trim() && !disabled ? 1 : 0.5,
-        }}
-        onMouseEnter={(e) => {
-          if (message.trim() && !disabled) {
-            e.target.style.transform = 'scale(1.05)';
-            e.target.style.boxShadow = 'var(--shadow-lg)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (message.trim() && !disabled) {
-            e.target.style.transform = 'scale(1)';
-            e.target.style.boxShadow = 'var(--shadow-md)';
-          }
-        }}
-        onMouseDown={(e) => {
-          if (message.trim() && !disabled) {
-            e.target.style.transform = 'scale(0.95)';
-          }
-        }}
-        onMouseUp={(e) => {
-          if (message.trim() && !disabled) {
-            e.target.style.transform = 'scale(1.05)';
-          }
-        }}
-      >
-        {isSending ? (
-          <div
-            style={{
-              width: '20px',
-              height: '20px',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              borderTop: '2px solid white',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
+              color: 'var(--text-primary)',
+              resize: 'none',
+              direction: 'rtl',
+              textAlign: 'right',
+              lineHeight: '1.5',
+              borderRadius: 'var(--radius)',
+              transition: 'var(--transition)',
             }}
           />
-        ) : disabled ? (
-          <div
-            style={{
-              width: '16px',
-              height: '16px',
-              border: '2px solid rgba(255,255,255,0.3)',
-              borderTop: '2px solid white',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }}
-          />
-        ) : (
-          '📤'
-        )}
-      </button>
+
+          {/* Character count */}
+          {charCount > 0 && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '4px',
+                left: '8px',
+                fontSize: 'var(--text-xs)',
+                color:
+                  charCount > maxLength * 0.8
+                    ? 'var(--warning)'
+                    : charCount > maxLength * 0.9
+                      ? 'var(--error)'
+                      : 'var(--text-muted)',
+                fontFamily: '"Cairo", sans-serif',
+                fontWeight: '500',
+              }}
+            >
+              {charCount}/{maxLength}
+            </div>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '-30px',
+                right: '0',
+                background: 'var(--error)',
+                color: 'white',
+                padding: 'var(--space-2) var(--space-3)',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-sm)',
+                fontFamily: '"Cairo", sans-serif',
+                fontWeight: '500',
+                boxShadow: 'var(--shadow-md)',
+                animation: 'slideDown 0.3s ease-out',
+              }}
+            >
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Send button */}
+        <button
+          type="submit"
+          disabled={!message.trim() || disabled || isSending}
+          style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            border: 'none',
+            background:
+              message.trim() && !disabled && !isSending
+                ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                : 'var(--text-muted)',
+            color: 'white',
+            cursor: message.trim() && !disabled && !isSending ? 'pointer' : 'not-allowed',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 'var(--text-lg)',
+            transition: 'var(--transition)',
+            boxShadow: message.trim() && !disabled ? 'var(--shadow-md)' : 'none',
+            opacity: message.trim() && !disabled ? 1 : 0.5,
+          }}
+          onMouseEnter={(e) => {
+            if (message.trim() && !disabled) {
+              e.target.style.transform = 'scale(1.05)';
+              e.target.style.boxShadow = 'var(--shadow-lg)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (message.trim() && !disabled) {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = 'var(--shadow-md)';
+            }
+          }}
+          onMouseDown={(e) => {
+            if (message.trim() && !disabled) {
+              e.target.style.transform = 'scale(0.95)';
+            }
+          }}
+          onMouseUp={(e) => {
+            if (message.trim() && !disabled) {
+              e.target.style.transform = 'scale(1.05)';
+            }
+          }}
+        >
+          {isSending ? (
+            <div
+              style={{
+                width: '20px',
+                height: '20px',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                borderTop: '2px solid white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+          ) : disabled ? (
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderTop: '2px solid white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+          ) : (
+            '📤'
+          )}
+        </button>
       </div>
 
       <style>{`
