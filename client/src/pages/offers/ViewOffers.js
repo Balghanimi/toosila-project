@@ -16,7 +16,7 @@ const ViewOffers = React.memo(function ViewOffers() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [bookingMessage, setBookingMessage] = useState('');
-  const [sortBy, setSortBy] = useState('time'); // time, from_city, to_city
+  // Sorting is now handled server-side (newest first by default)
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -339,38 +339,7 @@ const ViewOffers = React.memo(function ViewOffers() {
     []
   );
 
-  // SORTING LOGIC: Sort offers by time, from_city, or to_city
-  const sortedOffers = useMemo(() => {
-    if (!offers || offers.length === 0) return [];
-
-    const offersCopy = [...offers];
-
-    switch (sortBy) {
-      case 'time':
-        return offersCopy.sort((a, b) => {
-          const timeA = new Date(a.departureTime || a.departure_time);
-          const timeB = new Date(b.departureTime || b.departure_time);
-          return timeA - timeB;
-        });
-
-      case 'from_city':
-        return offersCopy.sort((a, b) => {
-          const cityA = a.fromCity || a.from_city || '';
-          const cityB = b.fromCity || b.from_city || '';
-          return cityA.localeCompare(cityB, 'ar');
-        });
-
-      case 'to_city':
-        return offersCopy.sort((a, b) => {
-          const cityA = a.toCity || a.to_city || '';
-          const cityB = b.toCity || b.to_city || '';
-          return cityA.localeCompare(cityB, 'ar');
-        });
-
-      default:
-        return offersCopy;
-    }
-  }, [offers, sortBy]);
+  // Sorting is handled server-side (created_at DESC by default)
 
   return (
     <div
@@ -530,97 +499,6 @@ const ViewOffers = React.memo(function ViewOffers() {
           </div>
         )}
 
-        {/* Sort Bar */}
-        {!loading && offers.length > 0 && (
-          <div
-            style={{
-              background: 'var(--surface-primary)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-4)',
-              marginBottom: 'var(--space-4)',
-              boxShadow: 'var(--shadow-sm)',
-              border: '1px solid var(--border-light)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-3)',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: '"Cairo", sans-serif',
-                fontWeight: '600',
-                color: 'var(--text-primary)',
-                fontSize: 'var(--text-base)',
-              }}
-            >
-              ترتيب حسب:
-            </span>
-            <button
-              onClick={() => setSortBy('time')}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                background: sortBy === 'time' ? 'var(--primary)' : 'var(--surface-secondary)',
-                color: sortBy === 'time' ? 'white' : 'var(--text-primary)',
-                border:
-                  sortBy === 'time' ? '2px solid var(--primary)' : '2px solid var(--border-light)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif',
-                transition: 'all 0.2s ease',
-                boxShadow: sortBy === 'time' ? 'var(--shadow-sm)' : 'none',
-              }}
-            >
-              ⏰ الوقت
-            </button>
-            <button
-              onClick={() => setSortBy('from_city')}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                background: sortBy === 'from_city' ? 'var(--primary)' : 'var(--surface-secondary)',
-                color: sortBy === 'from_city' ? 'white' : 'var(--text-primary)',
-                border:
-                  sortBy === 'from_city'
-                    ? '2px solid var(--primary)'
-                    : '2px solid var(--border-light)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif',
-                transition: 'all 0.2s ease',
-                boxShadow: sortBy === 'from_city' ? 'var(--shadow-sm)' : 'none',
-              }}
-            >
-              📍 مدينة الانطلاق
-            </button>
-            <button
-              onClick={() => setSortBy('to_city')}
-              style={{
-                padding: 'var(--space-2) var(--space-4)',
-                background: sortBy === 'to_city' ? 'var(--primary)' : 'var(--surface-secondary)',
-                color: sortBy === 'to_city' ? 'white' : 'var(--text-primary)',
-                border:
-                  sortBy === 'to_city'
-                    ? '2px solid var(--primary)'
-                    : '2px solid var(--border-light)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif',
-                transition: 'all 0.2s ease',
-                boxShadow: sortBy === 'to_city' ? 'var(--shadow-sm)' : 'none',
-              }}
-            >
-              🎯 مدينة الوصول
-            </button>
-          </div>
-        )}
-
         {/* Offers List */}
         {!loading && offers.length === 0 && (
           <div
@@ -683,7 +561,7 @@ const ViewOffers = React.memo(function ViewOffers() {
               gap: 'var(--space-4)',
             }}
           >
-            {sortedOffers.map((offer) => {
+            {offers.map((offer) => {
               // Normalize offer data for OfferCard component
               const normalizedOffer = {
                 ...offer,
