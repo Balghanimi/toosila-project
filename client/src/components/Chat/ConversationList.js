@@ -218,175 +218,180 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
           overflowY: 'auto',
         }}
       >
-        {filteredConversations.map((conversation, index) => {
-          const isSelected = selectedConversation?.tripId === conversation.tripId;
-          const hasUnread = conversation.unreadCount > 0;
+        {filteredConversations
+          .filter((conv) => conv && conv.lastMessage)
+          .map((conversation, index) => {
+            const isSelected = selectedConversation?.tripId === conversation.tripId;
+            const hasUnread = conversation.unreadCount > 0;
+            const lastMessage = conversation.lastMessage || {};
+            const timestamp =
+              lastMessage.timestamp || lastMessage.created_at || lastMessage.createdAt || null;
 
-          return (
-            <div
-              key={`${conversation.tripId}_${conversation.otherUserId}`}
-              onClick={() => onSelectConversation(conversation)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: 'var(--space-4)',
-                borderBottom: '1px solid var(--border-light)',
-                cursor: 'pointer',
-                background: isSelected ? 'var(--surface-secondary)' : 'transparent',
-                transition: 'var(--transition)',
-                animationDelay: `${index * 0.05}s`,
-                animation: 'fadeInUp 0.3s ease-out',
-              }}
-              onMouseEnter={(e) => {
-                if (!isSelected) {
-                  e.target.style.background = 'var(--surface-secondary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) {
-                  e.target.style.background = 'transparent';
-                }
-              }}
-            >
-              {/* User Avatar */}
+            return (
               <div
+                key={`${conversation.tripId}_${conversation.otherUserId}`}
+                onClick={() => onSelectConversation(conversation)}
                 style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: hasUnread
-                    ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                    : 'var(--surface-tertiary)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 'var(--text-lg)',
-                  fontWeight: '700',
-                  color: hasUnread ? 'white' : 'var(--text-primary)',
-                  fontFamily: '"Cairo", sans-serif',
-                  marginLeft: 'var(--space-3)',
-                  flexShrink: 0,
-                  position: 'relative',
+                  padding: 'var(--space-4)',
+                  borderBottom: '1px solid var(--border-light)',
+                  cursor: 'pointer',
+                  background: isSelected ? 'var(--surface-secondary)' : 'transparent',
+                  transition: 'var(--transition)',
+                  animationDelay: `${index * 0.05}s`,
+                  animation: 'fadeInUp 0.3s ease-out',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    e.target.style.background = 'var(--surface-secondary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) {
+                    e.target.style.background = 'transparent';
+                  }
                 }}
               >
-                {conversation.otherUserName?.charAt(0) || '👤'}
-
-                {/* Unread indicator */}
-                {hasUnread && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '-4px',
-                      right: '-4px',
-                      width: '16px',
-                      height: '16px',
-                      background: 'var(--error)',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: '700',
-                      color: 'white',
-                      border: '2px solid white',
-                    }}
-                  >
-                    {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
-                  </div>
-                )}
-              </div>
-
-              {/* Conversation Info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
+                {/* User Avatar */}
                 <div
                   style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
+                    background: hasUnread
+                      ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                      : 'var(--surface-tertiary)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 'var(--space-1)',
+                    justifyContent: 'center',
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: '700',
+                    color: hasUnread ? 'white' : 'var(--text-primary)',
+                    fontFamily: '"Cairo", sans-serif',
+                    marginLeft: 'var(--space-3)',
+                    flexShrink: 0,
+                    position: 'relative',
                   }}
                 >
-                  <h4
+                  {conversation.otherUserName?.charAt(0) || '👤'}
+
+                  {/* Unread indicator */}
+                  {hasUnread && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-4px',
+                        width: '16px',
+                        height: '16px',
+                        background: 'var(--error)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: '700',
+                        color: 'white',
+                        border: '2px solid white',
+                      }}
+                    >
+                      {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                    </div>
+                  )}
+                </div>
+
+                {/* Conversation Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 'var(--space-1)',
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: 0,
+                        fontSize: 'var(--text-base)',
+                        fontWeight: hasUnread ? '700' : '600',
+                        color: hasUnread ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        fontFamily: '"Cairo", sans-serif',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {conversation.otherUserName || 'مستخدم'}
+                    </h4>
+
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: hasUnread ? 'var(--primary)' : 'var(--text-muted)',
+                        fontFamily: '"Cairo", sans-serif',
+                        fontWeight: hasUnread ? '600' : '500',
+                        flexShrink: 0,
+                        marginRight: 'var(--space-2)',
+                      }}
+                    >
+                      {timestamp ? formatTime(timestamp) : ''}
+                    </span>
+                  </div>
+
+                  <p
                     style={{
                       margin: 0,
-                      fontSize: 'var(--text-base)',
-                      fontWeight: hasUnread ? '700' : '600',
-                      color: hasUnread ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      fontSize: 'var(--text-sm)',
+                      color: hasUnread ? 'var(--text-primary)' : 'var(--text-muted)',
                       fontFamily: '"Cairo", sans-serif',
+                      fontWeight: hasUnread ? '600' : '500',
+                      lineHeight: '1.4',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {conversation.otherUserName || 'مستخدم'}
-                  </h4>
-
-                  <span
-                    style={{
-                      fontSize: 'var(--text-xs)',
-                      color: hasUnread ? 'var(--primary)' : 'var(--text-muted)',
-                      fontFamily: '"Cairo", sans-serif',
-                      fontWeight: hasUnread ? '600' : '500',
-                      flexShrink: 0,
-                      marginRight: 'var(--space-2)',
-                    }}
-                  >
-                    {formatTime(conversation.lastMessage.timestamp)}
-                  </span>
+                    {truncateMessage(lastMessage.content || '')}
+                  </p>
                 </div>
 
-                <p
+                {/* Status Indicator */}
+                <div
                   style={{
-                    margin: 0,
-                    fontSize: 'var(--text-sm)',
-                    color: hasUnread ? 'var(--text-primary)' : 'var(--text-muted)',
-                    fontFamily: '"Cairo", sans-serif',
-                    fontWeight: hasUnread ? '600' : '500',
-                    lineHeight: '1.4',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 'var(--space-1)',
+                    marginRight: 'var(--space-2)',
                   }}
                 >
-                  {truncateMessage(conversation.lastMessage.content)}
-                </p>
-              </div>
+                  {lastMessage.senderId === user?.id && (
+                    <div
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: lastMessage.read ? 'var(--success)' : 'var(--text-muted)',
+                      }}
+                    >
+                      {lastMessage.read ? '✓✓' : '✓'}
+                    </div>
+                  )}
 
-              {/* Status Indicator */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 'var(--space-1)',
-                  marginRight: 'var(--space-2)',
-                }}
-              >
-                {conversation.lastMessage.senderId === user?.id && (
-                  <div
-                    style={{
-                      fontSize: 'var(--text-xs)',
-                      color: conversation.lastMessage.read ? 'var(--success)' : 'var(--text-muted)',
-                    }}
-                  >
-                    {conversation.lastMessage.read ? '✓✓' : '✓'}
-                  </div>
-                )}
-
-                {hasUnread && (
-                  <div
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      background: 'var(--primary)',
-                      borderRadius: '50%',
-                    }}
-                  />
-                )}
+                  {hasUnread && (
+                    <div
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        background: 'var(--primary)',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Empty State for Search */}
