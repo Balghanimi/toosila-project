@@ -56,8 +56,24 @@ const initializeTransporter = () => {
 // Initialize transporter
 try {
   initializeTransporter();
+
+  // Log email configuration status on startup
+  const emailConfigured = !!(process.env.SENDGRID_API_KEY ||
+    process.env.MAILGUN_API_KEY ||
+    (config.EMAIL_USER && config.EMAIL_PASS));
+
+  if (emailConfigured) {
+    console.log('✅ Email service initialized with provider:',
+      process.env.SENDGRID_API_KEY ? 'SendGrid' :
+      process.env.MAILGUN_API_KEY ? 'Mailgun' :
+      `SMTP (${config.EMAIL_HOST})`
+    );
+  } else {
+    console.warn('⚠️ EMAIL SERVICE NOT CONFIGURED - No email credentials found!');
+    console.warn('   Set one of: SENDGRID_API_KEY, MAILGUN_API_KEY, or EMAIL_USER+EMAIL_PASS');
+  }
 } catch (error) {
-  console.error('Failed to initialize email transporter:', error);
+  console.error('❌ Failed to initialize email transporter:', error);
 }
 
 /**
@@ -134,12 +150,23 @@ const sendVerificationEmail = async (email, name, verificationToken) => {
   };
 
   try {
+    console.log('📧 Sending verification email...', {
+      to: email,
+      from: config.EMAIL_FROM,
+      host: config.EMAIL_HOST,
+      hasCredentials: !!(config.EMAIL_USER && config.EMAIL_PASS)
+    });
     const info = await transporter.sendMail(mailOptions);
-    console.log('Verification email sent:', info.messageId);
+    console.log('✅ Verification email sent:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending verification email:', error);
-    throw new Error('Failed to send verification email');
+    console.error('❌ Error sending verification email:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      responseCode: error.responseCode
+    });
+    throw new Error(`Failed to send verification email: ${error.message}`);
   }
 };
 

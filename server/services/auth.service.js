@@ -254,10 +254,21 @@ class AuthService {
    */
   async sendVerificationEmailSafe(email, name, token) {
     try {
+      console.log('📧 Attempting to send verification email to:', email);
       await sendVerificationEmail(email, name, token);
+      console.log('✅ Verification email sent successfully to:', email);
       logger.info('Verification email sent successfully', { email });
     } catch (emailError) {
-      logger.error('Failed to send verification email', { email, error: emailError.message });
+      console.error('❌ Failed to send verification email:', {
+        email,
+        error: emailError.message,
+        stack: emailError.stack
+      });
+      logger.error('Failed to send verification email', {
+        email,
+        error: emailError.message,
+        stack: emailError.stack
+      });
       // Don't throw - continue with registration even if email fails
     }
   }
