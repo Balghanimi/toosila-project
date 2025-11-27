@@ -89,9 +89,9 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
         <div className={styles.topInfoRow}>
           <div className={styles.price}>{formatPrice(offerDetails.price)} د.ع</div>
           <div className={styles.timeDate}>
-            <span className={styles.time}>{formatTime(offerDetails.departureTime)} ⏰</span>
+            <span className={styles.time}>⏰ {formatTime(offerDetails.departureTime)}</span>
             <span className={styles.date}>
-              {formatDate(offerDetails.departureDate || offerDetails.departureTime)} 📅
+              📅 {formatDate(offerDetails.departureDate || offerDetails.departureTime)}
             </span>
           </div>
         </div>
@@ -117,19 +117,17 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
         <div className={styles.infoCards}>
           <div className={styles.infoCard}>
             <span className={styles.cardIcon}>💰</span>
-            <span className={styles.cardLabel}>سعر المقعد:</span>
             <span className={styles.cardValue}>{formatPrice(offerDetails.price)} د.ع</span>
           </div>
           <div className={styles.infoCard}>
             <span className={styles.cardIcon}>💺</span>
-            <span className={styles.cardLabel}>المقاعد المتاحة:</span>
-            <span className={styles.cardValue}>{availableSeats}</span>
+            <span className={styles.cardValue}>{availableSeats} متاح</span>
           </div>
         </div>
 
         {/* Seat Selector */}
         <div className={styles.seatSelector}>
-          <span className={styles.seatLabel}>عدد المقاعد المطلوب</span>
+          <span className={styles.seatLabel}>عدد المقاعد</span>
           <div className={styles.seatControls}>
             <button
               type="button"
@@ -155,10 +153,10 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
 
         {/* Total Section */}
         <div className={styles.totalSection}>
-          <span className={styles.totalLabel}>المجموع الكلي:</span>
+          <span className={styles.totalLabel}>المجموع:</span>
           <span className={styles.totalAmount}>{formatPrice(totalPrice)} د.ع</span>
           <span className={styles.totalBreakdown}>
-            ({seatCount} × {formatPrice(offerDetails.price)} د.ع)
+            ({seatCount}×{formatPrice(offerDetails.price)})
           </span>
         </div>
 

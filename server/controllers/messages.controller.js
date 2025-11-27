@@ -16,8 +16,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   let rideCheck;
 
   if (rideType === 'offer') {
-    // For offers: any authenticated user can message (except their own offer)
-    // This allows passengers to ask questions before booking
+    // For offers: check if offer exists and is active
     rideCheck = await query(
       `SELECT o.id, o.driver_id, o.from_city, o.to_city
        FROM offers o
@@ -25,9 +24,22 @@ const sendMessage = asyncHandler(async (req, res) => {
       [rideId]
     );
 
-    // Prevent users from messaging their own offer
+    // If user is the driver of this offer, only allow if they're REPLYING to existing messages
+    // (i.e., there are already messages from other users in this conversation)
     if (rideCheck.rows.length > 0 && rideCheck.rows[0].driver_id === req.user.id) {
-      throw new AppError('You cannot message your own offer', 400);
+      // Check if there are any messages from OTHER users in this conversation
+      const existingMessages = await query(
+        `SELECT 1 FROM messages
+         WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id != $2
+         LIMIT 1`,
+        [rideId, req.user.id]
+      );
+
+      if (existingMessages.rows.length === 0) {
+        // Driver is trying to start a conversation with themselves - block this
+        throw new AppError('You cannot start a conversation on your own offer', 400);
+      }
+      // Otherwise, driver is replying to a passenger - allow it
     }
   } else {
     // For demands: check if user is passenger or responded to this demand

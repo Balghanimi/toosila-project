@@ -22,9 +22,18 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     }
   }, [messages, currentUserId, onMarkAsRead]);
 
+  // Get the timestamp from various possible field names
+  const getTimestamp = (message) => {
+    return message.timestamp || message.createdAt || message.created_at || null;
+  };
+
   const formatTime = (timestamp) => {
+    if (!timestamp) return '';
     try {
       const date = new Date(timestamp);
+      // Check if date is valid
+      if (isNaN(date.getTime())) return '';
+
       const now = new Date();
       const diffInHours = (now - date) / (1000 * 60 * 60);
 
@@ -42,7 +51,23 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
         });
       }
     } catch {
-      return timestamp;
+      return '';
+    }
+  };
+
+  const formatDateSeparator = (timestamp) => {
+    if (!timestamp) return '';
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('ar-IQ', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return '';
     }
   };
 
@@ -85,15 +110,28 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     >
       {messages.map((message, index) => {
         const isOwnMessage = message.senderId === currentUserId;
-        const showDate =
-          index === 0 ||
-          new Date(message.timestamp).toDateString() !==
-            new Date(messages[index - 1].timestamp).toDateString();
+        const msgTimestamp = getTimestamp(message);
+        const prevMsgTimestamp = index > 0 ? getTimestamp(messages[index - 1]) : null;
+
+        // Check if we should show date separator
+        let showDate = index === 0;
+        if (!showDate && msgTimestamp && prevMsgTimestamp) {
+          try {
+            const currentDate = new Date(msgTimestamp);
+            const prevDate = new Date(prevMsgTimestamp);
+            showDate =
+              !isNaN(currentDate.getTime()) &&
+              !isNaN(prevDate.getTime()) &&
+              currentDate.toDateString() !== prevDate.toDateString();
+          } catch {
+            showDate = false;
+          }
+        }
 
         return (
-          <div key={message.id}>
+          <div key={message.id || index}>
             {/* Date separator */}
-            {showDate && (
+            {showDate && msgTimestamp && (
               <div
                 style={{
                   textAlign: 'center',
@@ -103,12 +141,7 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                   fontFamily: '"Cairo", sans-serif',
                 }}
               >
-                {new Date(message.timestamp).toLocaleDateString('ar-IQ', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {formatDateSeparator(msgTimestamp)}
               </div>
             )}
 
@@ -137,6 +170,21 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                   position: 'relative',
                 }}
               >
+                {/* Sender name for received messages */}
+                {!isOwnMessage && message.senderName && (
+                  <div
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: '600',
+                      color: 'var(--primary)',
+                      marginBottom: 'var(--space-1)',
+                      fontFamily: '"Cairo", sans-serif',
+                    }}
+                  >
+                    {message.senderName}
+                  </div>
+                )}
+
                 {/* Message content */}
                 <div
                   style={{
@@ -168,7 +216,7 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                       color: isOwnMessage ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-muted)',
                     }}
                   >
-                    {formatTime(message.timestamp)}
+                    {formatTime(msgTimestamp)}
                   </span>
 
                   {/* Message status indicators for own messages */}

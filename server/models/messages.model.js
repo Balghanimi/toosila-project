@@ -6,6 +6,7 @@ class Message {
     this.rideType = data.ride_type;
     this.rideId = data.ride_id;
     this.senderId = data.sender_id;
+    this.senderName = data.sender_name || null;
     this.content = data.content;
     this.createdAt = data.created_at;
     this.isRead = data.is_read || false;
@@ -23,7 +24,17 @@ class Message {
        RETURNING *`,
       [rideType, rideId, senderId, content]
     );
-    return new Message(result.rows[0]);
+
+    // Fetch sender name
+    const senderResult = await query(
+      'SELECT name FROM users WHERE id = $1',
+      [senderId]
+    );
+
+    const messageRow = result.rows[0];
+    messageRow.sender_name = senderResult.rows[0]?.name || null;
+
+    return new Message(messageRow);
   }
 
   // Find message by ID
@@ -327,8 +338,10 @@ class Message {
       rideType: this.rideType,
       rideId: this.rideId,
       senderId: this.senderId,
+      senderName: this.senderName,
       content: this.content,
       createdAt: this.createdAt,
+      timestamp: this.createdAt, // Alias for frontend compatibility
       isRead: this.isRead,
       readAt: this.readAt,
       readBy: this.readBy,
