@@ -39,12 +39,6 @@ export default function ViewDemands() {
   const isDriver = currentUser?.isDriver || false;
 
   useEffect(() => {
-    // Redirect passengers to offers page
-    if (currentUser && !isDriver) {
-      navigate('/offers', { replace: true, state: location.state });
-      return;
-    }
-
     setIsAnimated(true);
     fetchDemands();
     // eslint-disable-next-line
@@ -75,11 +69,25 @@ export default function ViewDemands() {
       filterParams.limit = 20;
 
       const response = await demandsAPI.getAll(filterParams);
-      setDemands(response.demands || []);
+      let fetchedDemands = response.demands || [];
 
-      // Save pagination data
-      setTotal(response.total || 0);
-      setTotalPages(response.totalPages || 1);
+      // If user is a passenger, filter to show only their own demands
+      if (currentUser && !isDriver) {
+        fetchedDemands = fetchedDemands.filter(
+          (demand) => demand.passengerId === currentUser.id
+        );
+      }
+
+      setDemands(fetchedDemands);
+
+      // Save pagination data (adjusted for filtered results if passenger)
+      if (currentUser && !isDriver) {
+        setTotal(fetchedDemands.length);
+        setTotalPages(1);
+      } else {
+        setTotal(response.total || 0);
+        setTotalPages(response.totalPages || 1);
+      }
       setPage(1);
     } catch (err) {
       console.error('Error fetching demands:', err);
@@ -191,6 +199,23 @@ export default function ViewDemands() {
     setDemandResponses([]);
   };
 
+  // Handle messaging the passenger (for drivers)
+  const handleMessagePassenger = (demand, e) => {
+    e.stopPropagation();
+    navigate('/messages', {
+      state: {
+        recipientId: demand.passengerId,
+        recipientName: demand.name || 'الراكب',
+        rideType: 'demand',
+        rideId: demand.id,
+        rideInfo: {
+          fromCity: demand.fromCity,
+          toCity: demand.toCity,
+        },
+      },
+    });
+  };
+
   // Handle card click to view demand details
   const handleDemandClick = (demand) => {
     setSelectedDemand(demand);
@@ -261,7 +286,7 @@ export default function ViewDemands() {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            🙋 الطلبات المتاحة
+            {isDriver ? '🙋 الطلبات المتاحة' : '📋 طلباتي'}
           </h1>
           <p
             style={{
@@ -270,7 +295,7 @@ export default function ViewDemands() {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            ابحث عن طلب يناسبك
+            {isDriver ? 'ابحث عن طلب يناسبك' : 'طلبات الرحلات التي أنشأتها'}
           </p>
         </div>
 
@@ -695,7 +720,9 @@ export default function ViewDemands() {
               boxShadow: 'var(--shadow-md)',
             }}
           >
-            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🙋</div>
+            <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
+              {isDriver ? '🙋' : '📋'}
+            </div>
             <h3
               style={{
                 fontSize: 'var(--text-2xl)',
@@ -705,7 +732,7 @@ export default function ViewDemands() {
                 color: 'var(--text-primary)',
               }}
             >
-              لا توجد طلبات متاحة
+              {isDriver ? 'لا توجد طلبات متاحة' : 'لا توجد طلبات'}
             </h3>
             <p
               style={{
@@ -714,7 +741,7 @@ export default function ViewDemands() {
                 marginBottom: 'var(--space-4)',
               }}
             >
-              لم نعثر على طلبات تطابق بحثك
+              {isDriver ? 'لم نعثر على طلبات تطابق بحثك' : 'لم تقم بإنشاء أي طلبات رحلات بعد'}
             </p>
             {currentUser && !currentUser.isDriver && (
               <button
@@ -824,12 +851,13 @@ export default function ViewDemands() {
                 {/* Action buttons for drivers */}
                 {currentUser && currentUser.isDriver && (
                   <div
-                    style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}
+                    style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}
                   >
                     <button
                       onClick={(e) => handleSendOffer(demand, e)}
                       style={{
                         flex: 1,
+                        minWidth: '120px',
                         padding: 'var(--space-3)',
                         background:
                           'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
@@ -855,9 +883,38 @@ export default function ViewDemands() {
                       💼 إرسال عرض
                     </button>
                     <button
+                      onClick={(e) => handleMessagePassenger(demand, e)}
+                      style={{
+                        flex: 1,
+                        minWidth: '120px',
+                        padding: 'var(--space-3)',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        boxShadow: 'var(--shadow-sm)',
+                        transition: 'var(--transition)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                      }}
+                    >
+                      💬 مراسلة الراكب
+                    </button>
+                    <button
                       onClick={(e) => handleViewResponses(demand, e)}
                       style={{
                         flex: 1,
+                        minWidth: '120px',
                         padding: 'var(--space-3)',
                         background: 'var(--surface-secondary)',
                         color: 'var(--text-primary)',
