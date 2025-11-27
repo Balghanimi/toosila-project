@@ -168,6 +168,9 @@ export const offersAPI = {
     const queryParams = new URLSearchParams(filters).toString();
     return apiRequest(`/offers?${queryParams}`, { method: 'GET' });
   },
+  getById: async (offerId) => {
+    return apiRequest(`/offers/${offerId}`, { method: 'GET' });
+  },
   create: async (offerData) => {
     return apiRequest('/offers', {
       method: 'POST',
@@ -189,6 +192,9 @@ export const demandsAPI = {
   getAll: async (filters = {}) => {
     const queryParams = new URLSearchParams(filters).toString();
     return apiRequest(`/demands?${queryParams}`, { method: 'GET' });
+  },
+  getById: async (demandId) => {
+    return apiRequest(`/demands/${demandId}`, { method: 'GET' });
   },
   create: async (demandData) => {
     return apiRequest('/demands', {

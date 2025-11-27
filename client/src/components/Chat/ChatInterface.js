@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { offersAPI, demandsAPI } from '../../services/api';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
+import RideDetailsModal from './RideDetailsModal';
 
 const ChatInterface = ({
   tripId,
@@ -21,14 +23,44 @@ const ChatInterface = ({
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showRideDetails, setShowRideDetails] = useState(false);
+  const [rideDetails, setRideDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // Handle click on header to navigate to the related offer/demand
-  const handleHeaderClick = () => {
-    if (rideType === 'offer' && tripId) {
-      navigate('/offers', { state: { highlightOfferId: tripId } });
-    } else if (rideType === 'demand' && tripId) {
-      navigate('/demands', { state: { highlightDemandId: tripId } });
+  // Handle click on header to show ride details modal
+  const handleHeaderClick = async () => {
+    if (!tripId) return;
+
+    setLoadingDetails(true);
+    try {
+      let response;
+      if (rideType === 'offer') {
+        response = await offersAPI.getById(tripId);
+      } else {
+        response = await demandsAPI.getById(tripId);
+      }
+
+      // Extract the data from the response
+      const data = response?.data || response?.offer || response?.demand || response;
+      setRideDetails(data);
+      setShowRideDetails(true);
+    } catch (err) {
+      console.error('Error fetching ride details:', err);
+      // Fallback to navigation if API fails
+      if (rideType === 'offer') {
+        navigate('/offers', { state: { highlightOfferId: tripId } });
+      } else {
+        navigate('/demands', { state: { highlightDemandId: tripId } });
+      }
+    } finally {
+      setLoadingDetails(false);
     }
+  };
+
+  // Handle booking from the details modal
+  const handleBookFromModal = (rideData) => {
+    // Navigate to offers page with booking intent
+    navigate('/offers', { state: { bookOfferId: rideData.id } });
   };
 
   // Load messages for this conversation
@@ -317,6 +349,60 @@ const ChatInterface = ({
           </div>
         </div>
       )}
+
+      {/* Loading Details Overlay */}
+      {loadingDetails && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(255, 255, 255, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3) var(--space-4)',
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-md)',
+              fontFamily: '"Cairo", sans-serif',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid var(--border-light)',
+                borderTop: '2px solid var(--primary)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            جاري تحميل التفاصيل...
+          </div>
+        </div>
+      )}
+
+      {/* Ride Details Modal */}
+      <RideDetailsModal
+        isOpen={showRideDetails}
+        onClose={() => setShowRideDetails(false)}
+        rideType={rideType}
+        rideData={rideDetails}
+        onBook={rideType === 'offer' ? handleBookFromModal : null}
+      />
     </div>
   );
 };
