@@ -1,0 +1,578 @@
+/**
+ * BookingModal Styles - Clean Professional Design
+ * تصميم نظيف واحترافي لنافذة الحجز
+ */
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease-out;
+}
+
+/* Modal Container */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  direction: rtl;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  transition: transform 0.2s ease-out;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.closeButton {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0;
+}
+
+/* Route */
+.route {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Top Info Row */
+.topInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #10b981;
+  direction: ltr;
+}
+
+.timeDate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.time,
+.date {
+  font-size: 13px;
+  color: #6b7280;
+  direction: ltr;
+}
+
+/* Driver Section */
+.driverSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.callButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #10b981;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.callButton:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.callButton:active {
+  transform: scale(0.95);
+}
+
+.driverInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.driverLabel {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.driverName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Info Cards */
+.infoCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cardIcon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cardLabel {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.cardValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  direction: ltr;
+}
+
+/* Seat Selector */
+.seatSelector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.seatLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.seatControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.seatButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 2px solid #10b981;
+  background: #ffffff;
+  color: #10b981;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.seatButton:hover:not(:disabled) {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.seatButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.seatButton:disabled {
+  border-color: #d1d5db;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.seatCount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  min-width: 50px;
+  text-align: center;
+  direction: ltr;
+}
+
+/* Total Section */
+.totalSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.totalLabel {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.totalAmount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #10b981;
+  direction: ltr;
+}
+
+.totalBreakdown {
+  font-size: 13px;
+  color: #6b7280;
+  direction: ltr;
+}
+
+/* Info Message */
+.infoMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #eff6ff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.infoIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.infoText {
+  font-size: 13px;
+  color: #1e40af;
+  line-height: 1.5;
+}
+
+/* Confirm Button */
+.confirmButton {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  margin-bottom: 12px;
+}
+
+.confirmButton:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.confirmButton:active {
+  transform: translateY(0);
+}
+
+/* Cancel Link */
+.cancelLink {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  cursor: pointer;
+  padding: 8px;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+.cancelLink:hover {
+  color: #374151;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .modal {
+    background: #1f2937;
+  }
+
+  .title {
+    color: #f3f4f6;
+  }
+
+  .route {
+    color: #f3f4f6;
+    border-bottom-color: #374151;
+  }
+
+  .driverSection {
+    background: #374151;
+  }
+
+  .driverName {
+    color: #f3f4f6;
+  }
+
+  .infoCard {
+    background: #374151;
+  }
+
+  .cardValue {
+    color: #f3f4f6;
+  }
+
+  .seatSelector {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .seatLabel {
+    color: #e5e7eb;
+  }
+
+  .seatCount {
+    color: #f3f4f6;
+  }
+
+  .totalSection {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  }
+
+  .totalLabel {
+    color: #d1fae5;
+  }
+
+  .infoMessage {
+    background: #1e3a5f;
+  }
+
+  .infoText {
+    color: #93c5fd;
+  }
+
+  .cancelLink {
+    color: #9ca3af;
+  }
+
+  .cancelLink:hover {
+    color: #e5e7eb;
+  }
+}
+
+/* Body dark-mode class support */
+body.dark-mode .modal {
+  background: #1f2937;
+}
+
+body.dark-mode .title {
+  color: #f3f4f6;
+}
+
+body.dark-mode .route {
+  color: #f3f4f6;
+  border-bottom-color: #374151;
+}
+
+body.dark-mode .driverSection {
+  background: #374151;
+}
+
+body.dark-mode .driverName {
+  color: #f3f4f6;
+}
+
+body.dark-mode .infoCard {
+  background: #374151;
+}
+
+body.dark-mode .cardValue {
+  color: #f3f4f6;
+}
+
+body.dark-mode .seatSelector {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+body.dark-mode .seatLabel {
+  color: #e5e7eb;
+}
+
+body.dark-mode .seatCount {
+  color: #f3f4f6;
+}
+
+body.dark-mode .totalSection {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+}
+
+body.dark-mode .totalLabel {
+  color: #d1fae5;
+}
+
+body.dark-mode .infoMessage {
+  background: #1e3a5f;
+}
+
+body.dark-mode .infoText {
+  color: #93c5fd;
+}
+
+body.dark-mode .cancelLink {
+  color: #9ca3af;
+}
+
+body.dark-mode .cancelLink:hover {
+  color: #e5e7eb;
+}
+
+/* Responsive - Small screens */
+@media (max-width: 400px) {
+  .modal {
+    padding: 20px 16px;
+  }
+
+  .infoCards {
+    gap: 8px;
+  }
+
+  .infoCard {
+    padding: 12px 8px;
+  }
+
+  .cardIcon {
+    font-size: 20px;
+  }
+
+  .cardLabel {
+    font-size: 11px;
+  }
+
+  .cardValue {
+    font-size: 14px;
+  }
+
+  .seatButton {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .seatCount {
+    font-size: 24px;
+    min-width: 40px;
+  }
+
+  .totalAmount {
+    font-size: 24px;
+  }
+
+  .confirmButton {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .modal,
+  .closeButton,
+  .callButton,
+  .seatButton,
+  .confirmButton,
+  .cancelLink {
+    transition: none;
+  }
+}
+
+/* Accessibility */
+.confirmButton:focus-visible,
+.cancelLink:focus-visible,
+.seatButton:focus-visible,
+.callButton:focus-visible,
+.closeButton:focus-visible {
+  outline: 3px solid #10b981;
+  outline-offset: 2px;
+}

@@ -1,13 +1,13 @@
 /**
- * BookingModal Component
- * نافذة تأكيد الحجز - تظهر في منتصف الشاشة
- * FIXED: Sticky footer + English numerals + ALWAYS centered in viewport
+ * BookingModal Component - Redesigned
+ * نافذة تأكيد الحجز - تصميم جديد ونظيف
  */
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { formatPrice, formatDate, formatTime, formatSeats } from '../utils/formatters';
+import { formatPrice, formatDate, formatTime } from '../utils/formatters';
+import styles from './BookingModal.module.css';
 
 const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
   const [show, setShow] = useState(false);
@@ -20,38 +20,10 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
     }
   }, [isOpen]);
 
-  // منع scroll عند فتح Modal + إضافة animation
+  // Prevent scroll when modal is open + animation
   useEffect(() => {
     if (isOpen) {
-      // Prevent body scroll while modal is open
       document.body.style.overflow = 'hidden';
-
-      // DO NOT use window.scrollTo() here!
-      // Modal with position:fixed will appear centered in the CURRENT viewport
-      // (wherever the user has scrolled to on the page)
-      // This is the correct behavior - user stays at their current scroll position
-
-      // DEBUG: Log modal positioning info
-      console.log('🔍 MODAL DEBUG v2.1:');
-      console.log('- Body overflow:', document.body.style.overflow);
-      console.log('- Window scrollY:', window.scrollY);
-      console.log('- Viewport height:', window.innerHeight);
-
-      // Check if modal overlay has correct styles after render
-      setTimeout(() => {
-        const overlay = document.querySelector('[data-modal-overlay="true"]');
-        if (overlay) {
-          const styles = window.getComputedStyle(overlay);
-          console.log('- Overlay position:', styles.position);
-          console.log('- Overlay display:', styles.display);
-          console.log('- Overlay top:', styles.top);
-          console.log('- Overlay zIndex:', styles.zIndex);
-        } else {
-          console.warn('⚠️ Modal overlay not found in DOM!');
-        }
-      }, 50);
-
-      // Trigger animation after a tiny delay
       setTimeout(() => setShow(true), 10);
     } else {
       document.body.style.overflow = 'unset';
@@ -63,7 +35,7 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
     };
   }, [isOpen]);
 
-  // إغلاق عند الضغط على ESC
+  // Close on ESC key
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
@@ -83,259 +55,130 @@ const BookingModal = ({ isOpen, onClose, offerDetails, onConfirm }) => {
     onClose();
   };
 
-  // Modal JSX
-  const modalContent = (
-    <div
-      data-modal-overlay="true"
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem',
-        overflow: 'auto',
-        opacity: show ? 1 : 0,
-        transition: 'opacity 0.2s ease-out',
-      }}
-    >
-      {/* Backdrop - الخلفية المعتمة */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
-        }}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+  const handleCallDriver = () => {
+    if (offerDetails.driverPhone) {
+      window.location.href = `tel:${offerDetails.driverPhone}`;
+    }
+  };
 
-      {/* Modal Content - المحتوى - GUARANTEED CENTERED */}
+  const totalPrice = offerDetails.price * seatCount;
+  const availableSeats = offerDetails.availableSeats || 4;
+
+  const modalContent = (
+    <div className={styles.overlay} style={{ opacity: show ? 1 : 0 }} onClick={onClose}>
+      {/* Modal Container */}
       <div
-        className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl transform transition-all z-10 flex flex-col"
-        style={{
-          position: 'relative',
-          maxWidth: '28rem',
-          width: '100%',
-          maxHeight: '85vh',
-          backgroundColor: 'white',
-          borderRadius: '1rem',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-          display: 'flex',
-          flexDirection: 'column',
-          margin: 'auto',
-          transform: show ? 'scale(1)' : 'scale(0.95)',
-          transition: 'transform 0.2s ease-out',
-        }}
+        className={styles.modal}
+        style={{ transform: show ? 'scale(1)' : 'scale(0.95)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header - Fixed */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-t-2xl p-5 text-white flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold" style={{ fontFamily: '"Cairo", sans-serif' }}>
-              تأكيد الحجز 🎫
-            </h3>
+        {/* Header */}
+        <div className={styles.header}>
+          <button onClick={onClose} className={styles.closeButton} aria-label="إغلاق">
+            ✕
+          </button>
+          <h2 className={styles.title}>تأكيد الحجز</h2>
+        </div>
+
+        {/* Route */}
+        <div className={styles.route}>
+          {offerDetails.fromCity} ← {offerDetails.toCity}
+        </div>
+
+        {/* Top Info Row */}
+        <div className={styles.topInfoRow}>
+          <div className={styles.price}>{formatPrice(offerDetails.price)} د.ع</div>
+          <div className={styles.timeDate}>
+            <span className={styles.time}>{formatTime(offerDetails.departureTime)} ⏰</span>
+            <span className={styles.date}>
+              {formatDate(offerDetails.departureDate || offerDetails.departureTime)} 📅
+            </span>
+          </div>
+        </div>
+
+        {/* Driver Section */}
+        <div className={styles.driverSection}>
+          {offerDetails.driverPhone && (
             <button
-              onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl leading-none transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-20"
-              aria-label="إغلاق"
+              onClick={handleCallDriver}
+              className={styles.callButton}
+              aria-label="اتصل بالسائق"
             >
-              ×
+              📞
+            </button>
+          )}
+          <div className={styles.driverInfo}>
+            <span className={styles.driverLabel}>السائق:</span>
+            <span className={styles.driverName}>{offerDetails.driverName || 'غير متوفر'}</span>
+          </div>
+        </div>
+
+        {/* Info Cards */}
+        <div className={styles.infoCards}>
+          <div className={styles.infoCard}>
+            <span className={styles.cardIcon}>💰</span>
+            <span className={styles.cardLabel}>سعر المقعد:</span>
+            <span className={styles.cardValue}>{formatPrice(offerDetails.price)} د.ع</span>
+          </div>
+          <div className={styles.infoCard}>
+            <span className={styles.cardIcon}>💺</span>
+            <span className={styles.cardLabel}>المقاعد المتاحة:</span>
+            <span className={styles.cardValue}>{availableSeats}</span>
+          </div>
+        </div>
+
+        {/* Seat Selector */}
+        <div className={styles.seatSelector}>
+          <span className={styles.seatLabel}>عدد المقاعد المطلوب</span>
+          <div className={styles.seatControls}>
+            <button
+              type="button"
+              onClick={() => setSeatCount((prev) => Math.max(1, prev - 1))}
+              disabled={seatCount <= 1}
+              className={styles.seatButton}
+              aria-label="تقليل"
+            >
+              −
+            </button>
+            <span className={styles.seatCount}>{seatCount}</span>
+            <button
+              type="button"
+              onClick={() => setSeatCount((prev) => Math.min(availableSeats, prev + 1))}
+              disabled={seatCount >= availableSeats}
+              className={styles.seatButton}
+              aria-label="زيادة"
+            >
+              +
             </button>
           </div>
         </div>
 
-        {/* Body - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {/* معلومات الرحلة - Compact */}
-          <div className="space-y-3">
-            {/* Route - Large and prominent */}
-            <div className="text-center pb-3 border-b-2">
-              <div
-                className="text-2xl font-bold text-gray-800"
-                style={{ fontFamily: '"Cairo", sans-serif' }}
-              >
-                {offerDetails.fromCity} ← {offerDetails.toCity}
-              </div>
-            </div>
-
-            {/* Price - Eye-catching */}
-            <div className="text-center py-3 bg-green-50 rounded-lg">
-              <div
-                className="text-sm text-gray-600 mb-1"
-                style={{ fontFamily: '"Cairo", sans-serif' }}
-              >
-                السعر
-              </div>
-              <div
-                className="text-3xl font-bold text-green-600"
-                style={{
-                  fontFamily: '"Cairo", sans-serif',
-                  direction: 'ltr',
-                  unicodeBidi: 'embed',
-                }}
-              >
-                {formatPrice(offerDetails.price)} د.ع
-              </div>
-            </div>
-
-            {/* Date and Time - Compact */}
-            <div className="flex gap-3">
-              <div className="flex-1 bg-gray-50 rounded-lg p-3 text-center">
-                <div className="text-xs text-gray-600 mb-1">📅</div>
-                <div
-                  className="font-semibold text-sm"
-                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-                >
-                  {formatDate(offerDetails.departureDate)}
-                </div>
-              </div>
-              <div className="flex-1 bg-gray-50 rounded-lg p-3 text-center">
-                <div className="text-xs text-gray-600 mb-1">⏰</div>
-                <div
-                  className="font-semibold text-sm"
-                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-                >
-                  {formatTime(offerDetails.departureTime)}
-                </div>
-              </div>
-            </div>
-
-            {/* Driver and Seats - Compact */}
-            <div className="flex gap-3">
-              <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                <div
-                  className="text-xs text-gray-600 mb-1"
-                  style={{ fontFamily: '"Cairo", sans-serif' }}
-                >
-                  السائق
-                </div>
-                <div
-                  className="font-semibold text-sm"
-                  style={{ fontFamily: '"Cairo", sans-serif' }}
-                >
-                  {offerDetails.driverName || 'غير متوفر'}
-                </div>
-              </div>
-              <div className="flex-1 bg-gray-50 rounded-lg p-3">
-                <div
-                  className="text-xs text-gray-600 mb-1"
-                  style={{ fontFamily: '"Cairo", sans-serif' }}
-                >
-                  المقاعد المتاحة 💺
-                </div>
-                <div
-                  className="font-semibold text-sm"
-                  style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-                >
-                  {formatSeats(offerDetails.availableSeats)}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Seat Selector */}
-          <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-            <div
-              className="text-center mb-3 font-semibold text-gray-700"
-              style={{ fontFamily: '"Cairo", sans-serif' }}
-            >
-              🪑 عدد المقاعد
-            </div>
-            <div className="flex justify-center items-center gap-4">
-              <button
-                type="button"
-                onClick={() => setSeatCount((prev) => Math.max(1, prev - 1))}
-                disabled={seatCount <= 1}
-                className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-2xl font-bold text-gray-700 transition-colors flex items-center justify-center"
-                aria-label="تقليل عدد المقاعد"
-              >
-                −
-              </button>
-              <span
-                className="text-3xl font-bold text-green-600 min-w-[50px] text-center"
-                style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-              >
-                {seatCount}
-              </span>
-              <button
-                type="button"
-                onClick={() =>
-                  setSeatCount((prev) => Math.min(offerDetails.availableSeats || 4, prev + 1))
-                }
-                disabled={seatCount >= (offerDetails.availableSeats || 4)}
-                className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-2xl font-bold text-white transition-colors flex items-center justify-center"
-                aria-label="زيادة عدد المقاعد"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Total Price */}
-          <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <span
-                className="text-gray-700 font-semibold"
-                style={{ fontFamily: '"Cairo", sans-serif' }}
-              >
-                💰 المجموع الكلي:
-              </span>
-              <span
-                className="text-2xl font-bold text-green-600"
-                style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-              >
-                {formatPrice(offerDetails.price * seatCount)} د.ع
-              </span>
-            </div>
-            <div
-              className="text-xs text-gray-600 mt-1 text-center"
-              style={{ fontFamily: '"Cairo", sans-serif', direction: 'ltr' }}
-            >
-              ({formatPrice(offerDetails.price)} × {seatCount})
-            </div>
-          </div>
-
-          {/* Info Notice - Compact */}
-          <div className="bg-blue-50 border-r-4 border-blue-500 p-3 rounded">
-            <p className="text-xs text-blue-800" style={{ fontFamily: '"Cairo", sans-serif' }}>
-              ℹ️ سيتم إرسال طلب الحجز للسائق للتأكيد النهائي.
-            </p>
-          </div>
+        {/* Total Section */}
+        <div className={styles.totalSection}>
+          <span className={styles.totalLabel}>المجموع الكلي:</span>
+          <span className={styles.totalAmount}>{formatPrice(totalPrice)} د.ع</span>
+          <span className={styles.totalBreakdown}>
+            ({seatCount} × {formatPrice(offerDetails.price)} د.ع)
+          </span>
         </div>
 
-        {/* Footer - ALWAYS VISIBLE (Sticky) */}
-        <div className="flex-shrink-0 p-4 bg-gray-50 border-t-2 border-gray-200 rounded-b-2xl flex gap-3 shadow-lg sticky bottom-0">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors text-base"
-            style={{ fontFamily: '"Cairo", sans-serif' }}
-          >
-            إلغاء
-          </button>
-          <button
-            onClick={handleConfirm}
-            className="flex-1 py-3 px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg font-semibold transition-all text-base shadow-lg transform hover:scale-105"
-            style={{ fontFamily: '"Cairo", sans-serif' }}
-          >
-            تأكيد الحجز ✅
-          </button>
+        {/* Info Message */}
+        <div className={styles.infoMessage}>
+          <span className={styles.infoIcon}>ℹ️</span>
+          <span className={styles.infoText}>سيتم إرسال طلب الحجز للسائق للتأكيد النهائي.</span>
         </div>
+
+        {/* Action Buttons */}
+        <button onClick={handleConfirm} className={styles.confirmButton}>
+          تأكيد الحجز
+        </button>
+        <button onClick={onClose} className={styles.cancelLink}>
+          إلغاء
+        </button>
       </div>
     </div>
   );
 
-  // Use React Portal to render modal at body level (guarantees proper z-index and positioning)
   return createPortal(modalContent, document.body);
 };
 
@@ -350,6 +193,7 @@ BookingModal.propTypes = {
     departureTime: PropTypes.string,
     price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     driverName: PropTypes.string,
+    driverPhone: PropTypes.string,
     availableSeats: PropTypes.number,
   }),
   onConfirm: PropTypes.func,
