@@ -605,7 +605,7 @@ export default function PostOfferModern() {
                     onChange={(e) => updateField('seats', e.target.value)}
                     style={{
                       width: '100%',
-                      padding: 'var(--space-3)',
+                      padding: '0 var(--space-3)',
                       border: `2px solid ${errors.seats ? '#f88' : 'var(--border-light)'}`,
                       borderRadius: 'var(--radius)',
                       fontSize: 'var(--text-base)',
@@ -614,6 +614,8 @@ export default function PostOfferModern() {
                       color: 'var(--text-primary)',
                       textAlign: 'center',
                       height: '48px',
+                      lineHeight: '48px',
+                      verticalAlign: 'middle',
                     }}
                   >
                     {[1, 2, 3, 4, 5, 6, 7].map((num) => (

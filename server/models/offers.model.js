@@ -96,28 +96,28 @@ class Offer {
     }
 
     // Determine ORDER BY clause
-    // Default: soonest departure first, then newest created as tiebreaker
-    let orderBy = 'o.departure_time ASC, o.created_at DESC';
+    // Default: newest created first (most recent posts at top)
+    let orderBy = 'o.created_at DESC, o.departure_time ASC';
     if (filters.sortBy) {
       switch(filters.sortBy) {
         case 'price_asc':
-          orderBy = 'o.price ASC, o.departure_time ASC';
+          orderBy = 'o.price ASC, o.created_at DESC';
           break;
         case 'price_desc':
-          orderBy = 'o.price DESC, o.departure_time ASC';
+          orderBy = 'o.price DESC, o.created_at DESC';
           break;
         case 'rating':
-          orderBy = 'u.rating_avg DESC NULLS LAST, o.departure_time ASC';
+          orderBy = 'u.rating_avg DESC NULLS LAST, o.created_at DESC';
           break;
         case 'seats':
-          orderBy = 'o.seats DESC, o.departure_time ASC';
+          orderBy = 'o.seats DESC, o.created_at DESC';
+          break;
+        case 'departure':
+          orderBy = 'o.departure_time ASC, o.created_at DESC';
           break;
         case 'newest':
-          orderBy = 'o.created_at DESC, o.departure_time ASC';
-          break;
-        case 'date':
         default:
-          orderBy = 'o.departure_time ASC, o.created_at DESC';
+          orderBy = 'o.created_at DESC, o.departure_time ASC';
       }
     }
 
@@ -137,8 +137,16 @@ class Offer {
       values
     );
 
+    // Count only offers with available seats (matching the HAVING clause)
     const countResult = await query(
-      `SELECT COUNT(*) FROM offers o ${whereClause}`,
+      `SELECT COUNT(*) FROM (
+        SELECT o.id
+        FROM offers o
+        LEFT JOIN bookings b ON o.id = b.offer_id
+        ${whereClause}
+        GROUP BY o.id
+        HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
+      ) as available_offers`,
       values.slice(0, -2)
     );
 
@@ -248,15 +256,22 @@ class Offer {
        AND (o.from_city ILIKE $1 OR o.to_city ILIKE $1)
        GROUP BY o.id, u.name, u.rating_avg, u.rating_count
        HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
-       ORDER BY o.departure_time ASC, o.created_at DESC
+       ORDER BY o.created_at DESC, o.departure_time ASC
        LIMIT $2 OFFSET $3`,
       [`%${searchTerm}%`, limit, offset]
     );
 
+    // Count only offers with available seats (matching the HAVING clause)
     const countResult = await query(
-      `SELECT COUNT(*) FROM offers 
-       WHERE is_active = true 
-       AND (from_city ILIKE $1 OR to_city ILIKE $1)`,
+      `SELECT COUNT(*) FROM (
+        SELECT o.id
+        FROM offers o
+        LEFT JOIN bookings b ON o.id = b.offer_id
+        WHERE o.is_active = true
+        AND (o.from_city ILIKE $1 OR o.to_city ILIKE $1)
+        GROUP BY o.id
+        HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
+      ) as available_offers`,
       [`%${searchTerm}%`]
     );
 
