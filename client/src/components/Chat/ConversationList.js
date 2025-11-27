@@ -224,7 +224,7 @@ const ConversationList = ({ onSelectConversation, selectedConversation, loading 
         }}
       >
         {filteredConversations
-          .filter((conv) => conv != null)
+          .filter((conv) => conv !== null && conv !== undefined)
           .map((conversation, index) => {
             // Handle field name variations from backend (snake_case vs camelCase)
             const tripId = conversation.tripId || conversation.ride_id;

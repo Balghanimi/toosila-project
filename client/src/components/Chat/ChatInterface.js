@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -17,8 +18,18 @@ const ChatInterface = ({
     useMessages();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Handle click on header to navigate to the related offer/demand
+  const handleHeaderClick = () => {
+    if (rideType === 'offer' && tripId) {
+      navigate('/offers', { state: { highlightOfferId: tripId } });
+    } else if (rideType === 'demand' && tripId) {
+      navigate('/demands', { state: { highlightDemandId: tripId } });
+    }
+  };
 
   // Load messages for this conversation
   useEffect(() => {
@@ -119,7 +130,26 @@ const ChatInterface = ({
           borderBottom: '1px solid var(--border-light)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+        <div
+          onClick={handleHeaderClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            cursor: 'pointer',
+            padding: 'var(--space-2)',
+            marginRight: 'calc(-1 * var(--space-2))',
+            borderRadius: 'var(--radius-lg)',
+            transition: 'var(--transition)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
+          title={rideType === 'offer' ? 'عرض تفاصيل العرض' : 'عرض تفاصيل الطلب'}
+        >
           {/* User Avatar */}
           <div
             style={{
@@ -146,9 +176,13 @@ const ChatInterface = ({
                 fontSize: 'var(--text-lg)',
                 fontWeight: '700',
                 fontFamily: '"Cairo", sans-serif',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
               }}
             >
               {otherUserName || 'مستخدم'}
+              <span style={{ fontSize: 'var(--text-sm)', opacity: 0.8 }}>🔗</span>
             </h3>
             {tripInfo && (
               <p
