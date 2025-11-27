@@ -700,3 +700,59 @@ input[type="number"]::-webkit-outer-spin-button {
     font-variant-numeric: lining-nums;
   }
 }
+
+/* ========================================
+   FORCE SIDEBAR/DRAWER FIX - CRITICAL
+   ======================================== */
+
+/* Force drawer content width */
+[class*='drawerContent'],
+[class*='drawer-content'],
+[class*='sidebar'],
+[class*='Sidebar'],
+nav[class*='drawer'] {
+  width: 280px !important;
+  min-width: 280px !important;
+  max-width: 320px !important;
+}
+
+/* Force drawer body width */
+[class*='drawerBody'],
+[class*='drawer-body'] {
+  width: 100% !important;
+  padding: 16px 20px !important;
+}
+
+/* Force menu items to show full text */
+[class*='drawerItem'],
+[class*='drawer-item'],
+[class*='menuItem'],
+[class*='menu-item'] {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: keep-all !important;
+}
+
+/* Force section headers to show full text */
+[class*='drawerSection'],
+[class*='drawer-section'] {
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+/* ========================================
+   FORCE DOWNLOAD BUTTON X SIZE FIX
+   ======================================== */
+
+/* Tiny close button on floating elements */
+button[class*='close'],
+button[class*='dismiss'],
+[class*='FloatingDownload'] button {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  font-size: 9px !important;
+  padding: 0 !important;
+}
