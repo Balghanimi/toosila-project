@@ -61,6 +61,10 @@ const RideDetailsModal = ({ isOpen, onClose, rideType, rideData, onBook }) => {
   const passengerName = rideData.passengerName || rideData.passenger_name || rideData.name;
   const notes = rideData.notes || rideData.description || '';
 
+  // User booking status (from API response)
+  const userHasBooking = rideData.userHasBooking || rideData.user_has_booking || false;
+  const userBookingStatus = rideData.userBookingStatus || rideData.user_booking_status || null;
+
   return (
     <div
       style={{
@@ -537,7 +541,7 @@ const RideDetailsModal = ({ isOpen, onClose, rideType, rideData, onBook }) => {
           >
             إغلاق
           </button>
-          {isOffer && onBook && (
+          {isOffer && onBook && !userHasBooking && (
             <button
               onClick={() => {
                 onClose();
@@ -568,6 +572,41 @@ const RideDetailsModal = ({ isOpen, onClose, rideType, rideData, onBook }) => {
             >
               احجز الآن
             </button>
+          )}
+          {isOffer && userHasBooking && (
+            <div
+              style={{
+                flex: 1,
+                padding: 'var(--space-3)',
+                background:
+                  userBookingStatus === 'confirmed'
+                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                    : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '600',
+                fontFamily: '"Cairo", sans-serif',
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              {userBookingStatus === 'confirmed' ? (
+                <>
+                  <span>✓</span>
+                  <span>تم تأكيد حجزك</span>
+                </>
+              ) : (
+                <>
+                  <span>⏳</span>
+                  <span>حجزك قيد الانتظار</span>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>

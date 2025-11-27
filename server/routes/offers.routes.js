@@ -15,7 +15,7 @@ const {
 } = require('../controllers/offers.controller');
 
 // Import middlewares
-const { authenticateToken, requireAdmin } = require('../middlewares/auth');
+const { authenticateToken, optionalAuth, requireAdmin } = require('../middlewares/auth');
 const { moderateLimiter, uploadLimiter } = require('../middlewares/rateLimiters');
 const {
   validateOfferCreation,
@@ -54,7 +54,7 @@ const { cacheList, cacheSearch, cacheStatic } = require('../middlewares/cache');
  *                 pagination:
  *                   $ref: '#/components/schemas/Pagination'
  */
-router.get('/', cacheList, validatePagination, getOffers);
+router.get('/', optionalAuth, cacheList, validatePagination, getOffers);
 
 /**
  * @swagger
@@ -167,7 +167,7 @@ router.get('/categories', cacheStatic, getCategories);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', cacheList, validateId, getOfferById);
+router.get('/:id', optionalAuth, cacheList, validateId, getOfferById);
 
 // Protected routes
 router.use(authenticateToken); // All routes below require authentication

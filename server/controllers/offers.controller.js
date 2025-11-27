@@ -54,16 +54,21 @@ const getOffers = asyncHandler(async (req, res) => {
   if (departureDate) filters.departureDate = departureDate;
   if (sortBy) filters.sortBy = sortBy;
 
-  const result = await Offer.findAll(parseInt(page), parseInt(limit), filters);
+  // req.user may be set by optionalAuth middleware
+  const currentUserId = req.user?.id || null;
+
+  const result = await Offer.findAll(parseInt(page), parseInt(limit), filters, currentUserId);
 
   res.json(result);
 });
 
-// Get offer by ID
+// Get offer by ID (with optional user booking status)
 const getOfferById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  // req.user may be set by optionalAuth middleware
+  const currentUserId = req.user?.id || null;
 
-  const offer = await Offer.findById(id);
+  const offer = await Offer.findById(id, currentUserId);
   if (!offer) {
     throw new AppError('العرض غير موجود', 404);
   }

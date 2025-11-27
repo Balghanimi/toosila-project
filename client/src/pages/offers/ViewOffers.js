@@ -327,6 +327,20 @@ const ViewOffers = React.memo(function ViewOffers() {
       console.error('❌ Error Message:', err.message);
       console.error('❌ Full Error:', err);
 
+      // Handle 409 Conflict (duplicate booking) specifically
+      if (err.response?.status === 409 || err.message?.includes('409')) {
+        showError('⚠️ لديك حجز مسبق على هذه الرحلة. يمكنك متابعة حالته من صفحة الحجوزات');
+        setShowBookingModal(false);
+        setBookingMessage('');
+        setSelectedOffer(null);
+
+        // Optionally navigate to bookings page
+        setTimeout(() => {
+          navigate('/bookings');
+        }, 2000);
+        return;
+      }
+
       const errorMessage =
         err.response?.data?.error ||
         err.response?.data?.message ||

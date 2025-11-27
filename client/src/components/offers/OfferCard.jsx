@@ -33,6 +33,10 @@ const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, 
   const isOwnOffer =
     currentUser && (currentUser.id === offer.driverId || currentUser.id === offer.driver_id);
 
+  // User booking status (from API response)
+  const userHasBooking = offer.userHasBooking || offer.user_has_booking || false;
+  const userBookingStatus = offer.userBookingStatus || offer.user_booking_status || null;
+
   return (
     <div className={styles.offerCard}>
       {/* Price - Most prominent - ENGLISH NUMERALS */}
@@ -102,10 +106,26 @@ const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, 
       {/* Action Buttons */}
       {currentUser && !currentUser.isDriver && (
         <div className={styles.actionButtons}>
-          <button type="button" onClick={handleBookClick} className={styles.bookButton}>
-            <span>احجز الآن</span>
-            <span className={styles.buttonIcon}>🎫</span>
-          </button>
+          {/* Show booking status badge if user has a booking */}
+          {userHasBooking ? (
+            <div
+              className={`${styles.bookingStatusBadge} ${
+                userBookingStatus === 'confirmed' ? styles.confirmed : styles.pending
+              }`}
+            >
+              <span className={styles.bookingStatusIcon}>
+                {userBookingStatus === 'confirmed' ? '✓' : '⏳'}
+              </span>
+              <span>
+                {userBookingStatus === 'confirmed' ? 'تم تأكيد حجزك' : 'حجزك قيد الانتظار'}
+              </span>
+            </div>
+          ) : (
+            <button type="button" onClick={handleBookClick} className={styles.bookButton}>
+              <span>احجز الآن</span>
+              <span className={styles.buttonIcon}>🎫</span>
+            </button>
+          )}
           {/* Message Driver Button - Only show if not own offer */}
           {!isOwnOffer && (
             <button type="button" onClick={handleMessageClick} className={styles.messageButton}>

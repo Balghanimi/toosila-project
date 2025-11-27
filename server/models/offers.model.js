@@ -17,6 +17,10 @@ class Offer {
     this.name = data.name;
     this.ratingAvg = data.rating_avg;
     this.ratingCount = data.rating_count;
+    // User booking status (if queried with currentUserId)
+    this.userHasBooking = data.user_has_booking || false;
+    this.userBookingStatus = data.user_booking_status || null;
+    this.userBookingId = data.user_booking_id || null;
   }
 
   // Create a new offer
@@ -31,23 +35,43 @@ class Offer {
     return new Offer(result.rows[0]);
   }
 
-  // Find offer by ID
-  static async findById(id) {
-    const result = await query(
-      `SELECT o.*, u.name, u.rating_avg, u.rating_count,
+  // Find offer by ID (optionally with user booking status)
+  static async findById(id, currentUserId = null) {
+    let sql;
+    let params;
+
+    if (currentUserId) {
+      // Include user's booking status if logged in
+      sql = `SELECT o.*, u.name, u.rating_avg, u.rating_count,
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0))::int as available_seats,
+              CASE WHEN ub.id IS NOT NULL THEN true ELSE false END as user_has_booking,
+              ub.status as user_booking_status,
+              ub.id as user_booking_id
+       FROM offers o
+       JOIN users u ON o.driver_id = u.id
+       LEFT JOIN bookings b ON o.id = b.offer_id
+       LEFT JOIN bookings ub ON o.id = ub.offer_id AND ub.passenger_id = $2 AND ub.status IN ('pending', 'confirmed')
+       WHERE o.id = $1
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count, ub.id, ub.status`;
+      params = [id, currentUserId];
+    } else {
+      // No user - just get offer details
+      sql = `SELECT o.*, u.name, u.rating_avg, u.rating_count,
               (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0))::int as available_seats
        FROM offers o
        JOIN users u ON o.driver_id = u.id
        LEFT JOIN bookings b ON o.id = b.offer_id
        WHERE o.id = $1
-       GROUP BY o.id, u.name, u.rating_avg, u.rating_count`,
-      [id]
-    );
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count`;
+      params = [id];
+    }
+
+    const result = await query(sql, params);
     return result.rows.length > 0 ? new Offer(result.rows[0]) : null;
   }
 
   // Get all offers with pagination and filters
-  static async findAll(page = 1, limit = 10, filters = {}) {
+  static async findAll(page = 1, limit = 10, filters = {}, currentUserId = null) {
     const offset = (page - 1) * limit;
     let whereClause = 'WHERE o.is_active = true';
     const values = [];
@@ -123,14 +147,29 @@ class Offer {
 
     values.push(limit, offset);
 
+    // Build the query with optional user booking status
+    let userBookingJoin = '';
+    let userBookingSelect = '';
+    let userBookingGroupBy = '';
+
+    if (currentUserId) {
+      // Add user booking status fields
+      userBookingSelect = `,
+              CASE WHEN ub.id IS NOT NULL THEN true ELSE false END as user_has_booking,
+              ub.status as user_booking_status,
+              ub.id as user_booking_id`;
+      userBookingJoin = ` LEFT JOIN bookings ub ON o.id = ub.offer_id AND ub.passenger_id = ${currentUserId} AND ub.status IN ('pending', 'confirmed')`;
+      userBookingGroupBy = ', ub.id, ub.status';
+    }
+
     const result = await query(
       `SELECT o.*, u.name, u.rating_avg, u.rating_count,
-              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0))::int as available_seats
+              (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0))::int as available_seats${userBookingSelect}
        FROM offers o
        JOIN users u ON o.driver_id = u.id
-       LEFT JOIN bookings b ON o.id = b.offer_id
+       LEFT JOIN bookings b ON o.id = b.offer_id${userBookingJoin}
        ${whereClause}
-       GROUP BY o.id, u.name, u.rating_avg, u.rating_count
+       GROUP BY o.id, u.name, u.rating_avg, u.rating_count${userBookingGroupBy}
        HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
        ORDER BY ${orderBy}
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
@@ -300,7 +339,11 @@ class Offer {
       updatedAt: this.updatedAt,
       name: this.name,
       ratingAvg: this.ratingAvg,
-      ratingCount: this.ratingCount
+      ratingCount: this.ratingCount,
+      // User booking status (only included when queried with currentUserId)
+      userHasBooking: this.userHasBooking,
+      userBookingStatus: this.userBookingStatus,
+      userBookingId: this.userBookingId
     };
   }
 }
