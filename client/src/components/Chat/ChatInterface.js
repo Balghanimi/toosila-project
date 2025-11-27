@@ -67,13 +67,30 @@ const ChatInterface = ({
     if (!tripInfo) return '';
 
     const { from, to, date, time } = tripInfo;
-    const formattedDate = new Date(date).toLocaleDateString('ar-IQ', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
 
-    return `${from} → ${to} • ${formattedDate} ${time}`;
+    // Build route string
+    const route = from && to ? `${from} → ${to}` : '';
+
+    // Safely format date
+    let formattedDate = '';
+    if (date) {
+      try {
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) {
+          formattedDate = parsedDate.toLocaleDateString('ar-IQ', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+          });
+        }
+      } catch {
+        formattedDate = '';
+      }
+    }
+
+    // Build the display string, only including parts that exist
+    const parts = [route, formattedDate, time].filter(Boolean);
+    return parts.join(' • ');
   };
 
   return (

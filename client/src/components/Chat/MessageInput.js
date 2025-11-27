@@ -121,16 +121,73 @@ const MessageInput = ({
       onSubmit={handleSubmit}
       style={{
         display: 'flex',
-        alignItems: 'flex-end',
+        flexDirection: 'column',
         gap: 'var(--space-2)',
-        padding: 'var(--space-3)',
-        background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-light)',
-        boxShadow: 'var(--shadow-sm)',
         direction: 'rtl',
       }}
     >
+      {/* Typing indicator - positioned above input */}
+      {isTyping && (
+        <div
+          style={{
+            background: 'var(--surface-secondary)',
+            padding: 'var(--space-2) var(--space-3)',
+            borderRadius: 'var(--radius-lg)',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-secondary)',
+            fontFamily: '"Cairo", sans-serif',
+            animation: 'fadeInUp 0.3s ease-out',
+            alignSelf: 'flex-start',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+            <span>يكتب</span>
+            <div style={{ display: 'flex', gap: '2px' }}>
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out',
+                }}
+              />
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out 0.2s',
+                }}
+              />
+              <div
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'bounce 1.4s infinite ease-in-out 0.4s',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Input row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 'var(--space-2)',
+          padding: 'var(--space-3)',
+          background: 'var(--surface-primary)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-light)',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
       {/* Message input */}
       <div
         style={{
@@ -285,59 +342,7 @@ const MessageInput = ({
           '📤'
         )}
       </button>
-
-      {/* Typing indicator */}
-      {isTyping && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '60px',
-            right: 'var(--space-3)',
-            background: 'var(--surface-primary)',
-            padding: 'var(--space-2) var(--space-3)',
-            borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--border-light)',
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-secondary)',
-            fontFamily: '"Cairo", sans-serif',
-            boxShadow: 'var(--shadow-sm)',
-            animation: 'fadeInUp 0.3s ease-out',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-            <span>يكتب</span>
-            <div style={{ display: 'flex', gap: '2px' }}>
-              <div
-                style={{
-                  width: '4px',
-                  height: '4px',
-                  background: 'var(--primary)',
-                  borderRadius: '50%',
-                  animation: 'bounce 1.4s infinite ease-in-out',
-                }}
-              />
-              <div
-                style={{
-                  width: '4px',
-                  height: '4px',
-                  background: 'var(--primary)',
-                  borderRadius: '50%',
-                  animation: 'bounce 1.4s infinite ease-in-out 0.2s',
-                }}
-              />
-              <div
-                style={{
-                  width: '4px',
-                  height: '4px',
-                  background: 'var(--primary)',
-                  borderRadius: '50%',
-                  animation: 'bounce 1.4s infinite ease-in-out 0.4s',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
 
       <style>{`
         @keyframes spin {
