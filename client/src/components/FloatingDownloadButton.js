@@ -148,43 +148,43 @@ const FloatingDownloadButton = () => {
           ⬇️
         </div>
 
-        {/* Close button - tiny, top-right corner */}
+        {/* Close button - tiny badge in top-right corner */}
         <button
           onClick={handleDismiss}
+          aria-label="إغلاق"
           style={{
             position: 'absolute',
-            top: '-6px',
-            right: '-6px',
+            top: '-5px',
+            right: '-5px',
             width: '18px',
             height: '18px',
+            minWidth: '18px',
+            maxWidth: '18px',
+            minHeight: '18px',
+            maxHeight: '18px',
             borderRadius: '50%',
-            background: isDarkMode ? '#374151' : '#ffffff',
-            color: isDarkMode ? '#d1d5db' : '#6b7280',
+            background: '#ffffff',
+            color: '#6b7280',
             border: '1.5px solid #d1d5db',
-            fontSize: '10px',
-            fontWeight: '600',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            lineHeight: '16px',
+            textAlign: 'center',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             padding: 0,
-            lineHeight: 1,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-            zIndex: 10000,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#ef4444';
-            e.currentTarget.style.color = 'white';
-            e.currentTarget.style.borderColor = '#ef4444';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = isDarkMode ? '#374151' : '#ffffff';
-            e.currentTarget.style.color = isDarkMode ? '#d1d5db' : '#6b7280';
-            e.currentTarget.style.borderColor = '#d1d5db';
+            margin: 0,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            zIndex: 10,
+            outline: 'none',
+            appearance: 'none',
+            WebkitAppearance: 'none',
           }}
         >
-          ✕
+          ×
         </button>
       </div>
 
