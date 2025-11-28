@@ -378,6 +378,8 @@ body.dark-mode .header {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  flex-basis: 280px !important;
 }
 
 @keyframes slideInRight {

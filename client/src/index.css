@@ -714,6 +714,14 @@ input[type='number']::-webkit-outer-spin-button {
   min-width: 280px !important;
   max-width: 320px !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  flex-basis: 280px !important;
+}
+
+/* Parent drawer container fix */
+[data-drawer='true'] {
+  display: flex !important;
+  justify-content: flex-start !important;
 }
 
 [data-drawer-body='true'],
@@ -733,6 +741,8 @@ nav[class*='drawer'] {
   min-width: 280px !important;
   max-width: 320px !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  flex-basis: 280px !important;
 }
 
 /* Force drawer body width */
@@ -774,6 +784,8 @@ nav[class*='drawer'] {
     min-width: 280px !important;
     max-width: 85vw !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    flex-basis: 280px !important;
   }
 
   [data-drawer-body='true'],

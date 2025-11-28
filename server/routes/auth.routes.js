@@ -108,6 +108,45 @@ router.post('/register', authLimiter, validateUserRegistration, register);
 
 /**
  * @swagger
+ * /auth/test-email-config:
+ *   get:
+ *     summary: Test email configuration (Development only)
+ *     description: Check if email service is properly configured
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Email configuration status
+ */
+router.get('/test-email-config', (req, res) => {
+  const config = {
+    hasHost: !!process.env.EMAIL_HOST,
+    hasUser: !!process.env.EMAIL_USER,
+    hasPass: !!process.env.EMAIL_PASS,
+    hasSendGrid: !!process.env.SENDGRID_API_KEY,
+    hasMailgun: !!process.env.MAILGUN_API_KEY,
+    frontendUrl: process.env.FRONTEND_URL || 'Not set',
+    emailFrom: process.env.EMAIL_FROM || 'Not set',
+    nodeEnv: process.env.NODE_ENV || 'Not set'
+  };
+
+  // Determine which email method is available
+  let emailMethod = 'None configured';
+  if (config.hasSendGrid) emailMethod = 'SendGrid';
+  else if (config.hasMailgun) emailMethod = 'Mailgun';
+  else if (config.hasHost && config.hasUser && config.hasPass) emailMethod = 'SMTP';
+
+  res.json({
+    success: true,
+    emailMethod,
+    config,
+    message: emailMethod === 'None configured'
+      ? 'No email service configured. Set EMAIL_HOST/USER/PASS or SENDGRID_API_KEY or MAILGUN_API_KEY'
+      : `Email service configured via ${emailMethod}`
+  });
+});
+
+/**
+ * @swagger
  * /auth/login:
  *   post:
  *     summary: User login
