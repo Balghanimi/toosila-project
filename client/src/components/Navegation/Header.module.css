@@ -362,11 +362,9 @@ body.dark-mode .header {
 
 .drawerContent {
   position: relative;
-  /* Fallback for older browsers */
-  width: 300px;
-  /* Modern browsers */
-  width: min(320px, 85vw);
-  width: clamp(280px, 85vw, 320px);
+  width: 280px !important;
+  min-width: 280px !important;
+  max-width: 320px !important;
   height: 100vh;
   height: 100dvh;
   background: var(--surface-primary);
@@ -379,6 +377,7 @@ body.dark-mode .header {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box !important;
 }
 
 @keyframes slideInRight {
@@ -548,10 +547,7 @@ body.dark-mode .header {
     font-size: var(--text-sm);
   }
 
-  .drawerContent {
-    width: 290px;
-    width: clamp(280px, 80vw, 300px);
-  }
+  /* drawerContent width is set in base style with !important */
 
   .drawerItem {
     font-size: 15px;
@@ -606,10 +602,7 @@ body.dark-mode .header {
     min-width: 65px;
   }
 
-  .drawerContent {
-    width: 280px;
-    width: clamp(270px, 85vw, 300px);
-  }
+  /* drawerContent width is set in base style with !important */
 
   .drawerBody {
     padding: 12px 16px;

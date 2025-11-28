@@ -166,11 +166,24 @@ const Header = () => {
           <nav
             className={styles.drawerContent}
             data-drawer-content="true"
-            style={{
-              width: '280px',
-              minWidth: '280px',
-              maxWidth: '320px',
-              boxSizing: 'border-box',
+            ref={(el) => {
+              if (el) {
+                el.style.cssText = `
+                  width: 280px !important;
+                  min-width: 280px !important;
+                  max-width: 320px !important;
+                  box-sizing: border-box !important;
+                  position: relative;
+                  height: 100dvh;
+                  background: var(--surface-primary);
+                  border-left: 1px solid var(--border-light);
+                  display: flex;
+                  flex-direction: column;
+                  margin-right: auto;
+                  overflow-y: auto;
+                  overflow-x: hidden;
+                `;
+              }
             }}
           >
             <div className={styles.drawerHeader}>
