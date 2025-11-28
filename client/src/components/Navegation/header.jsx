@@ -179,6 +179,7 @@ const Header = () => {
             display: 'flex',
             justifyContent: 'flex-start',
             width: '100%',
+            border: '5px solid red',
           }}
         >
           <div className={styles.drawerOverlay} onClick={toggleDrawer} />
@@ -192,6 +193,8 @@ const Header = () => {
               maxWidth: '320px',
               boxSizing: 'border-box',
               flexShrink: 0,
+              border: '5px solid blue',
+              backgroundColor: 'yellow',
             }}
           >
             <div className={styles.drawerHeader}>
