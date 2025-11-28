@@ -555,15 +555,15 @@ const BottomNav = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'var(--space-1)',
+                gap: '4px',
                 height: '100%',
                 border: 'none',
                 background: 'transparent',
                 color: isActive ? 'var(--primary)' : 'var(--text-muted)',
                 cursor: 'pointer',
                 transition: 'var(--transition)',
-                padding: 'var(--space-2) var(--space-1)',
-                fontSize: 'var(--text-xs)',
+                padding: '8px 4px',
+                fontSize: '11px',
                 fontWeight: '600',
                 fontFamily: '"Cairo", sans-serif',
                 direction: 'rtl',
@@ -571,6 +571,7 @@ const BottomNav = () => {
                 borderRadius: 'var(--radius)',
                 transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
                 animationDelay: `${index * 0.1}s`,
+                minWidth: 0,
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -672,17 +673,16 @@ const BottomNav = () => {
               {/* Label with enhanced typography */}
               <span
                 style={{
-                  fontSize: 'var(--text-xs)',
+                  fontSize: '11px',
                   fontWeight: isActive ? '700' : '600',
-                  lineHeight: '1',
+                  lineHeight: '1.2',
                   textAlign: 'center',
                   color: 'inherit',
                   whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  overflow: 'visible',
                   maxWidth: '100%',
                   transition: 'var(--transition)',
-                  transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                  transform: isActive ? 'scale(1.02)' : 'scale(1)',
                 }}
               >
                 {item.label}

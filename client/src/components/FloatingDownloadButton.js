@@ -148,21 +148,21 @@ const FloatingDownloadButton = () => {
           ⬇️
         </div>
 
-        {/* Close button - tiny */}
+        {/* Close button - tiny, top-right corner */}
         <button
           onClick={handleDismiss}
           style={{
             position: 'absolute',
-            top: '-4px',
-            right: '-4px',
-            width: '16px',
-            height: '16px',
+            top: '-6px',
+            right: '-6px',
+            width: '18px',
+            height: '18px',
             borderRadius: '50%',
-            background: isDarkMode ? '#1e293b' : 'white',
-            color: isDarkMode ? '#94a3b8' : '#6b7280',
-            border: '1px solid #d1d5db',
-            fontSize: '9px',
-            fontWeight: '400',
+            background: isDarkMode ? '#374151' : '#ffffff',
+            color: isDarkMode ? '#d1d5db' : '#6b7280',
+            border: '1.5px solid #d1d5db',
+            fontSize: '10px',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -170,7 +170,8 @@ const FloatingDownloadButton = () => {
             transition: 'all 0.2s ease',
             padding: 0,
             lineHeight: 1,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+            zIndex: 10000,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = '#ef4444';
@@ -178,8 +179,8 @@ const FloatingDownloadButton = () => {
             e.currentTarget.style.borderColor = '#ef4444';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = isDarkMode ? '#1e293b' : 'white';
-            e.currentTarget.style.color = isDarkMode ? '#94a3b8' : '#6b7280';
+            e.currentTarget.style.background = isDarkMode ? '#374151' : '#ffffff';
+            e.currentTarget.style.color = isDarkMode ? '#d1d5db' : '#6b7280';
             e.currentTarget.style.borderColor = '#d1d5db';
           }}
         >

@@ -42,6 +42,30 @@
       "name": "Admin",
       "item": [
         {
+          "name": "Check current database schema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/check-schema",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "check-schema"
+              ]
+            },
+            "description": "Inspect ID column types for demands, offers, bookings, and demand_responses tables"
+          },
+          "response": []
+        },
+        {
           "name": "Run database migration 016 (UUID to INTEGER)",
           "request": {
             "method": "POST",

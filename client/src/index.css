@@ -673,24 +673,25 @@ body.modal-open {
 }
 
 /* Target number displays specifically */
-input[type="number"],
-input[type="tel"],
-input[type="time"],
-input[type="date"],
+input[type='number'],
+input[type='tel'],
+input[type='time'],
+input[type='date'],
 .price,
 .stat-number,
 .rating,
 .seats,
-[data-numeric="true"] {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+[data-numeric='true'] {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
   font-variant-numeric: lining-nums !important;
   direction: ltr !important;
   unicode-bidi: embed !important;
 }
 
 /* Ensure number inputs show English numerals */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   opacity: 1;
 }
 
@@ -703,9 +704,26 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /* ========================================
    FORCE SIDEBAR/DRAWER FIX - CRITICAL
+   Using data attributes for reliable targeting
    ======================================== */
 
-/* Force drawer content width */
+/* Data attribute selectors - most reliable */
+[data-drawer-content='true'],
+[data-drawer-content] {
+  width: 280px !important;
+  min-width: 280px !important;
+  max-width: 320px !important;
+  box-sizing: border-box !important;
+}
+
+[data-drawer-body='true'],
+[data-drawer-body] {
+  width: 100% !important;
+  padding: 16px 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* Fallback class selectors */
 [class*='drawerContent'],
 [class*='drawer-content'],
 [class*='sidebar'],
@@ -714,6 +732,7 @@ nav[class*='drawer'] {
   width: 280px !important;
   min-width: 280px !important;
   max-width: 320px !important;
+  box-sizing: border-box !important;
 }
 
 /* Force drawer body width */
@@ -721,6 +740,7 @@ nav[class*='drawer'] {
 [class*='drawer-body'] {
   width: 100% !important;
   padding: 16px 20px !important;
+  box-sizing: border-box !important;
 }
 
 /* Force menu items to show full text */
@@ -742,17 +762,38 @@ nav[class*='drawer'] {
 }
 
 /* ========================================
+   MOBILE DRAWER OVERRIDE - ALL SCREEN SIZES
+   ======================================== */
+
+@media screen and (max-width: 768px) {
+  [data-drawer-content='true'],
+  [data-drawer-content],
+  [class*='drawerContent'],
+  nav[class*='drawer'] {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 85vw !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-drawer-body='true'],
+  [data-drawer-body],
+  [class*='drawerBody'] {
+    width: 100% !important;
+    padding: 16px 20px !important;
+    box-sizing: border-box !important;
+  }
+
+  [class*='drawerItem'],
+  [class*='drawerSection'] {
+    white-space: normal !important;
+    overflow: visible !important;
+    word-break: keep-all !important;
+  }
+}
+
+/* ========================================
    FORCE DOWNLOAD BUTTON X SIZE FIX
    ======================================== */
 
-/* Tiny close button on floating elements */
-button[class*='close'],
-button[class*='dismiss'],
-[class*='FloatingDownload'] button {
-  width: 16px !important;
-  height: 16px !important;
-  min-width: 16px !important;
-  min-height: 16px !important;
-  font-size: 9px !important;
-  padding: 0 !important;
-}
+/* Note: Don't override FloatingDownloadButton's own X button */

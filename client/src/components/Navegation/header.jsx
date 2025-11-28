@@ -161,11 +161,17 @@ const Header = () => {
 
       {/* Drawer with dynamic menu */}
       {drawerOpen && (
-        <div className={styles.drawer}>
+        <div className={styles.drawer} data-drawer="true">
           <div className={styles.drawerOverlay} onClick={toggleDrawer} />
           <nav
             className={styles.drawerContent}
-            style={{ width: 'clamp(280px, 85vw, 320px)', minWidth: '280px' }}
+            data-drawer-content="true"
+            style={{
+              width: '280px',
+              minWidth: '280px',
+              maxWidth: '320px',
+              boxSizing: 'border-box',
+            }}
           >
             <div className={styles.drawerHeader}>
               <h3>القائمة</h3>
@@ -177,7 +183,15 @@ const Header = () => {
                 ✕
               </button>
             </div>
-            <div className={styles.drawerBody} style={{ padding: '16px 20px', width: '100%' }}>
+            <div
+              className={styles.drawerBody}
+              data-drawer-body="true"
+              style={{
+                padding: '16px 20px',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
               {/* الصفحة الرئيسية */}
               <button
                 className={styles.drawerItem}
