@@ -538,12 +538,15 @@ body.dark-mode .header {
   /* Show hamburger menu on mobile */
   .hamburgerButton {
     display: flex !important;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 20px;
     flex-shrink: 0;
+    margin-left: 8px;
+    background: var(--surface-secondary);
+    border-radius: var(--radius);
   }
 
   .appName {
@@ -632,11 +635,12 @@ body.dark-mode .header {
   }
 
   .hamburgerButton {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 18px;
+    margin-left: 6px;
   }
 
   .languageChip {

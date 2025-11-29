@@ -14,9 +14,9 @@ const ThemeToggle = ({ style = {} }) => {
       onClick={toggleTheme}
       style={{
         position: 'relative',
-        width: '60px',
-        height: '30px',
-        borderRadius: '15px',
+        width: '36px',
+        height: '20px',
+        borderRadius: '10px',
         border: 'none',
         cursor: 'pointer',
         background: isDarkMode
@@ -24,8 +24,9 @@ const ThemeToggle = ({ style = {} }) => {
           : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
         transition: 'all 0.3s ease',
         boxShadow: isDarkMode
-          ? '0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1)'
-          : '0 2px 8px rgba(251, 191, 36, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.5)',
+          ? '0 1px 4px rgba(0, 0, 0, 0.3)'
+          : '0 1px 4px rgba(251, 191, 36, 0.3)',
+        flexShrink: 0,
         ...style,
       }}
       title={isDarkMode ? 'التبديل إلى الوضع الفاتح' : 'التبديل إلى الوضع المظلم'}
@@ -34,18 +35,18 @@ const ThemeToggle = ({ style = {} }) => {
       <div
         style={{
           position: 'absolute',
-          top: '3px',
-          right: isDarkMode ? '3px' : 'calc(100% - 27px)',
-          width: '24px',
-          height: '24px',
+          top: '2px',
+          right: isDarkMode ? '2px' : 'calc(100% - 18px)',
+          width: '16px',
+          height: '16px',
           borderRadius: '50%',
           background: isDarkMode ? '#1e293b' : '#ffffff',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '14px',
+          fontSize: '10px',
         }}
       >
         {isDarkMode ? '🌙' : '☀️'}
