@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
@@ -13,16 +13,6 @@ import logoHeader from '../../assets/logo-header.png';
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
-
-  // Force drawer width when open
-  useEffect(() => {
-    if (drawerOpen && drawerRef.current) {
-      drawerRef.current.style.setProperty('width', '280px', 'important');
-      drawerRef.current.style.setProperty('min-width', '280px', 'important');
-      drawerRef.current.style.setProperty('max-width', '320px', 'important');
-      drawerRef.current.style.setProperty('box-sizing', 'border-box', 'important');
-    }
-  }, [drawerOpen]);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, isAuthenticated, currentUser } = useAuth();
@@ -172,31 +162,9 @@ const Header = () => {
 
       {/* Drawer with dynamic menu */}
       {drawerOpen && (
-        <div
-          className={styles.drawer}
-          data-drawer="true"
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            width: '100%',
-            border: '5px solid red',
-          }}
-        >
+        <div className={styles.drawer} data-drawer="true">
           <div className={styles.drawerOverlay} onClick={toggleDrawer} />
-          <nav
-            ref={drawerRef}
-            className={styles.drawerContent}
-            data-drawer-content="true"
-            style={{
-              width: '280px',
-              minWidth: '280px',
-              maxWidth: '320px',
-              boxSizing: 'border-box',
-              flexShrink: 0,
-              border: '5px solid blue',
-              backgroundColor: 'yellow',
-            }}
-          >
+          <nav ref={drawerRef} className={styles.drawerContent} data-drawer-content="true">
             <div className={styles.drawerHeader}>
               <h3>القائمة</h3>
               <button

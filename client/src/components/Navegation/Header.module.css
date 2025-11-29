@@ -346,7 +346,8 @@ body.dark-mode .header {
   bottom: 0;
   z-index: 1100;
   display: flex;
-  direction: rtl;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .drawerOverlay {
@@ -358,10 +359,12 @@ body.dark-mode .header {
   background: var(--surface-overlay);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  z-index: 1;
 }
 
 .drawerContent {
   position: relative;
+  z-index: 2;
   width: 280px !important;
   min-width: 280px !important;
   max-width: 320px !important;
@@ -372,19 +375,18 @@ body.dark-mode .header {
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  margin-right: auto;
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInFromRight 0.3s ease-out;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box !important;
   flex-shrink: 0 !important;
-  flex-basis: 280px !important;
+  direction: rtl;
 }
 
-@keyframes slideInRight {
+@keyframes slideInFromRight {
   from {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
   to {
     transform: translateX(0);
