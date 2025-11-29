@@ -532,13 +532,12 @@ body.dark-mode .header {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 0 12px;
     height: 56px;
     direction: rtl;
-    position: relative; /* For absolute positioning of logo */
   }
 
   /* Hide center navigation on mobile */
@@ -546,13 +545,30 @@ body.dark-mode .header {
     display: none !important;
   }
 
-  /* LOGO - ABSOLUTE CENTER */
+  /* HAMBURGER - First column (RIGHT side in RTL) */
+  .hamburgerButton {
+    display: flex !important;
+    justify-self: start; /* Align to start of first column */
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+  }
+
+  .hamburgerButton:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+  }
+
+  /* LOGO - Second column (CENTER) */
   .logoSection {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 1;
+    justify-self: center;
   }
 
   .logoText {
@@ -568,42 +584,12 @@ body.dark-mode .header {
     width: 24px;
   }
 
-  /* HAMBURGER - RIGHT side */
-  .hamburgerButton {
-    display: flex !important;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 20px;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
-    flex-shrink: 0;
-    z-index: 2;
-  }
-
-  .hamburgerButton:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
-  }
-
-  /* ICONS CONTAINER - LEFT side */
-  .actionsSection {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    z-index: 2;
-  }
-
+  /* ICONS - Third column (LEFT side in RTL) */
   .actionButtons {
     display: flex !important;
     align-items: center;
-    gap: 4px; /* Smaller gap */
-    margin-right: auto; /* Push to LEFT in RTL */
+    justify-self: end; /* Align to end of third column */
+    gap: 4px;
   }
 
   /* ALL ICONS - SMALLER SIZE */
@@ -638,7 +624,10 @@ body.dark-mode .header {
     display: none !important;
   }
 
-  /* drawerContent width is set in base style with !important */
+  /* Hide actionsSection (no longer used) */
+  .actionsSection {
+    display: none !important;
+  }
 
   .drawerItem {
     font-size: 15px;
@@ -675,10 +664,6 @@ body.dark-mode .header {
     max-height: 24px;
   }
 
-  .actionsSection {
-    gap: 4px;
-  }
-
   .actionButtons {
     gap: 3px;
   }
@@ -705,8 +690,6 @@ body.dark-mode .header {
     min-width: 24px;
     font-size: 12px;
   }
-
-  /* drawerContent width is set in base style with !important */
 
   .drawerBody {
     padding: 12px 16px;

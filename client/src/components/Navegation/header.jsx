@@ -41,7 +41,17 @@ const Header = () => {
   return (
     <>
       <header className={styles.header}>
-        {/* Right Section: Logo + App Name */}
+        {/* Mobile Hamburger Menu - First in JSX (will be on RIGHT in RTL) */}
+        <button
+          className={styles.hamburgerButton}
+          onClick={toggleDrawer}
+          aria-label="القائمة"
+          aria-expanded={drawerOpen}
+        >
+          ☰
+        </button>
+
+        {/* Logo Section - Second in JSX (will be CENTERED) */}
         <div className={styles.logoSection}>
           <button
             className={styles.logoButton}
@@ -110,53 +120,41 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Left Section: User Actions */}
-        <div className={styles.actionsSection}>
-          <div className={styles.actionButtons}>
-            {/* Theme Toggle */}
-            <ThemeToggle />
+        {/* Icons Section - Third in JSX (will be on LEFT in RTL) */}
+        <div className={styles.actionButtons}>
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
-            <button
-              className={styles.languageChip}
-              onClick={toggleLanguage}
-              aria-label="تغيير اللغة"
-            >
-              {language === 'ar' ? 'ع' : 'EN'}
-            </button>
-
-            {/* Notification Bell - visible only for logged-in users */}
-            {isAuthenticated && <NotificationBell />}
-
-            <button className={styles.loginButton} onClick={handleAuthClick}>
-              {isAuthenticated ? user.name : t('login')}
-            </button>
-            {isAuthenticated && (
-              <div
-                className={styles.userAvatar}
-                onClick={handleAuthClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleAuthClick();
-                  }
-                }}
-                aria-label="الملف الشخصي"
-              >
-                {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Hamburger Menu */}
           <button
-            className={styles.hamburgerButton}
-            onClick={toggleDrawer}
-            aria-label="القائمة"
-            aria-expanded={drawerOpen}
+            className={styles.languageChip}
+            onClick={toggleLanguage}
+            aria-label="تغيير اللغة"
           >
-            ☰
+            {language === 'ar' ? 'ع' : 'EN'}
           </button>
+
+          {/* Notification Bell - visible only for logged-in users */}
+          {isAuthenticated && <NotificationBell />}
+
+          <button className={styles.loginButton} onClick={handleAuthClick}>
+            {isAuthenticated ? user.name : t('login')}
+          </button>
+          {isAuthenticated && (
+            <div
+              className={styles.userAvatar}
+              onClick={handleAuthClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleAuthClick();
+                }
+              }}
+              aria-label="الملف الشخصي"
+            >
+              {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
+            </div>
+          )}
         </div>
       </header>
 
