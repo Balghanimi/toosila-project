@@ -179,24 +179,20 @@ body.dark-mode .header {
 .hamburgerButton {
   appearance: none;
   border: none;
-  background: var(--surface-secondary);
+  background: transparent;
   padding: var(--space-2);
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 22px;
+  font-size: var(--text-xl);
   color: var(--text-primary);
   width: 44px;
   height: 44px;
-  min-width: 44px;
-  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
   position: relative;
-  flex-shrink: 0;
-  z-index: 10;
 }
 
 .hamburgerButton::before {
@@ -509,9 +505,9 @@ body.dark-mode .header {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header {
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-3);
     height: 56px;
-    gap: var(--space-1);
+    gap: var(--space-2);
   }
 
   /* Hide center navigation on mobile */
@@ -524,37 +520,23 @@ body.dark-mode .header {
     flex-shrink: 0;
   }
 
-  /* Actions section - all icons + hamburger */
+  /* Actions section - hamburger on left side */
   .actionsSection {
-    display: flex;
-    align-items: center;
+    flex-direction: row-reverse;
     gap: var(--space-1);
-    flex-shrink: 0;
   }
 
-  /* Show action buttons - compact sizing */
+  /* Hide action buttons on mobile, show only hamburger */
   .actionButtons {
-    display: flex !important;
-    align-items: center;
-    gap: 4px;
+    display: none;
   }
 
-  /* Show hamburger menu on mobile */
+  /* Show hamburger menu on mobile - ensure visibility */
   .hamburgerButton {
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 44px;
-    height: 44px;
     min-width: 44px;
     min-height: 44px;
-    font-size: 22px;
     flex-shrink: 0;
-    margin-left: 4px;
-    background: var(--primary);
-    color: white;
-    border-radius: var(--radius);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   }
 
   .appName {
@@ -567,37 +549,23 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 36px;
-    max-height: 36px;
+    height: 40px;
+    max-height: 40px;
   }
 
-  /* Compact language chip */
   .languageChip {
-    padding: 2px 6px;
-    font-size: 10px;
-    min-width: 24px;
-    height: 22px;
+    padding: var(--space-1) var(--space-2);
+    font-size: 11px;
+    min-width: 32px;
+    height: 24px;
   }
 
-  /* Compact login button - show user name */
   .loginButton {
-    display: flex !important;
-    font-size: 10px;
-    padding: 2px 8px;
-    height: 24px;
-    min-width: auto;
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: none !important;
   }
 
-  /* Compact user avatar */
   .userAvatar {
-    display: flex !important;
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
+    display: none;
   }
 
   /* drawerContent width is set in base style with !important */
@@ -610,8 +578,7 @@ body.dark-mode .header {
 /* Desktop: Hide hamburger, show navigation */
 @media (min-width: 769px) {
   .hamburgerButton {
-    display: none !important;
-    visibility: hidden !important;
+    display: none;
   }
 
   .centerNav {
@@ -621,8 +588,8 @@ body.dark-mode .header {
 
 @media (max-width: 480px) {
   .header {
-    padding: 0 4px;
-    gap: 2px;
+    padding: 0 var(--space-2);
+    gap: var(--space-1);
   }
 
   .appName {
@@ -635,12 +602,8 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 28px;
-    max-height: 28px;
-  }
-
-  .actionButtons {
-    gap: 2px;
+    height: 32px;
+    max-height: 32px;
   }
 
   .hamburgerButton {
@@ -648,28 +611,7 @@ body.dark-mode .header {
     height: 40px;
     min-width: 40px;
     min-height: 40px;
-    font-size: 20px;
-    margin-left: 4px;
-  }
-
-  .languageChip {
-    padding: 2px 4px;
-    font-size: 9px;
-    min-width: 20px;
-    height: 20px;
-  }
-
-  .loginButton {
-    font-size: 9px;
-    padding: 2px 6px;
-    height: 22px;
-    max-width: 60px;
-  }
-
-  .userAvatar {
-    width: 22px;
-    height: 22px;
-    font-size: 10px;
+    font-size: var(--text-lg);
   }
 
   /* drawerContent width is set in base style with !important */
