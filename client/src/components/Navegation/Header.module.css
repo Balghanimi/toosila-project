@@ -533,12 +533,12 @@ body.dark-mode .header {
 @media (max-width: 768px) {
   .header {
     display: flex;
-    flex-direction: row-reverse; /* RTL layout */
+    flex-direction: row; /* NOT row-reverse */
     justify-content: space-between;
     align-items: center;
     padding: 0 12px;
     height: 56px;
-    gap: 8px;
+    direction: ltr; /* Force LTR for correct order */
   }
 
   /* Hide center navigation on mobile */
@@ -546,34 +546,36 @@ body.dark-mode .header {
     display: none !important;
   }
 
-  /* Hamburger - RIGHT side in RTL (appears first due to row-reverse) */
+  /* LEFT side - Hamburger - MAKE IT VISIBLE */
   .hamburgerButton {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-    background: transparent;
-    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--primary); /* Green background for visibility */
+    color: white; /* White icon */
     border: none;
-    border-radius: 8px;
-    font-size: 24px;
+    border-radius: 10px;
+    font-size: 22px;
     flex-shrink: 0;
-    order: 1;
+    order: 1; /* First = LEFT */
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   }
 
   .hamburgerButton:hover {
-    background: var(--surface-secondary);
+    background: var(--primary-dark);
+    transform: scale(1.05);
   }
 
-  /* Logo - CENTER */
+  /* CENTER - Logo */
   .logoSection {
     flex: 1;
     display: flex;
     justify-content: center;
-    order: 2;
+    order: 2; /* Middle = CENTER */
   }
 
   .logoText {
@@ -589,40 +591,48 @@ body.dark-mode .header {
     width: 28px;
   }
 
-  /* Action buttons (icons) - LEFT side in RTL */
+  /* RIGHT side - Icons */
   .actionsSection {
     display: flex;
+    flex-direction: row-reverse; /* Icons in correct RTL order */
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
-    order: 3;
+    order: 3; /* Last = RIGHT */
   }
 
   .actionButtons {
     display: flex !important;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   }
 
   /* User avatar - green circle */
   .userAvatar {
     display: flex !important;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: var(--primary);
     border-radius: 50%;
     color: white;
-    font-size: 14px;
-    border: none;
+    font-size: 16px;
+    border: 2px solid white;
   }
 
-  /* Theme toggle - moon icon with dark background */
+  /* Theme toggle - better visibility */
   .themeToggle {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: #1e293b;
     border-radius: 50%;
-    color: white;
+    color: #fbbf24; /* Yellow moon */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Notification bell */
+  .notificationBell {
+    color: #fbbf24; /* Yellow bell */
   }
 
   /* Hide login button on mobile */
@@ -674,27 +684,29 @@ body.dark-mode .header {
   }
 
   .actionsSection {
-    gap: 3px;
+    gap: 4px;
   }
 
   .actionButtons {
-    gap: 3px;
+    gap: 4px;
   }
 
-  /* Hamburger - slightly smaller on tiny screens */
+  /* Hamburger - green and visible on tiny screens */
   .hamburgerButton {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     font-size: 20px;
+    background: var(--primary);
+    color: white;
   }
 
   /* Smaller icons on tiny screens */
   .userAvatar {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   /* drawerContent width is set in base style with !important */
