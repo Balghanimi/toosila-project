@@ -179,20 +179,24 @@ body.dark-mode .header {
 .hamburgerButton {
   appearance: none;
   border: none;
-  background: transparent;
+  background: var(--surface-secondary);
   padding: var(--space-2);
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: var(--text-xl);
+  font-size: 22px;
   color: var(--text-primary);
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
   position: relative;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .hamburgerButton::before {
@@ -538,15 +542,19 @@ body.dark-mode .header {
   /* Show hamburger menu on mobile */
   .hamburgerButton {
     display: flex !important;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-    font-size: 20px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 22px;
     flex-shrink: 0;
-    margin-left: 8px;
-    background: var(--surface-secondary);
+    margin-left: 4px;
+    background: var(--primary);
+    color: white;
     border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   }
 
   .appName {
@@ -602,7 +610,8 @@ body.dark-mode .header {
 /* Desktop: Hide hamburger, show navigation */
 @media (min-width: 769px) {
   .hamburgerButton {
-    display: none;
+    display: none !important;
+    visibility: hidden !important;
   }
 
   .centerNav {
@@ -635,12 +644,12 @@ body.dark-mode .header {
   }
 
   .hamburgerButton {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    font-size: 18px;
-    margin-left: 6px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 20px;
+    margin-left: 4px;
   }
 
   .languageChip {
