@@ -507,6 +507,7 @@ body.dark-mode .header {
   .header {
     padding: 0 var(--space-3);
     height: 56px;
+    gap: var(--space-2);
   }
 
   /* Hide center navigation on mobile */
@@ -514,9 +515,28 @@ body.dark-mode .header {
     display: none;
   }
 
-  /* Show hamburger menu on mobile */
+  /* Logo section - stays on right in RTL */
+  .logoSection {
+    flex-shrink: 0;
+  }
+
+  /* Actions section - hamburger on left side */
+  .actionsSection {
+    flex-direction: row-reverse;
+    gap: var(--space-1);
+  }
+
+  /* Hide action buttons on mobile, show only hamburger */
+  .actionButtons {
+    display: none;
+  }
+
+  /* Show hamburger menu on mobile - ensure visibility */
   .hamburgerButton {
-    display: flex;
+    display: flex !important;
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
   }
 
   .appName {
@@ -530,6 +550,7 @@ body.dark-mode .header {
 
   .logoText {
     height: 40px;
+    max-height: 40px;
   }
 
   .languageChip {
@@ -540,17 +561,11 @@ body.dark-mode .header {
   }
 
   .loginButton {
-    display: flex !important;
-    font-size: 12px;
-    padding: var(--space-1) var(--space-3);
-    height: 32px;
-    min-width: 70px;
+    display: none !important;
   }
 
   .userAvatar {
-    width: 28px;
-    height: 28px;
-    font-size: var(--text-sm);
+    display: none;
   }
 
   /* drawerContent width is set in base style with !important */
@@ -574,9 +589,6 @@ body.dark-mode .header {
 @media (max-width: 480px) {
   .header {
     padding: 0 var(--space-2);
-  }
-
-  .actionButtons {
     gap: var(--space-1);
   }
 
@@ -590,22 +602,16 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 36px;
+    height: 32px;
+    max-height: 32px;
   }
 
-  .languageChip {
-    padding: var(--space-1);
-    font-size: 10px;
-    min-width: 28px;
-    height: 22px;
-  }
-
-  .loginButton {
-    display: flex !important;
-    font-size: 11px;
-    padding: var(--space-1) var(--space-2);
-    height: 30px;
-    min-width: 65px;
+  .hamburgerButton {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: var(--text-lg);
   }
 
   /* drawerContent width is set in base style with !important */
