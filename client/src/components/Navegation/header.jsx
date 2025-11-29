@@ -125,11 +125,7 @@ const Header = () => {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          <button
-            className={styles.languageChip}
-            onClick={toggleLanguage}
-            aria-label="تغيير اللغة"
-          >
+          <button className={styles.languageChip} onClick={toggleLanguage} aria-label="تغيير اللغة">
             {language === 'ar' ? 'ع' : 'EN'}
           </button>
 
