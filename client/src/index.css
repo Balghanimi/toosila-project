@@ -125,8 +125,15 @@ body.dark-mode {
   box-sizing: border-box;
 }
 
+html {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  max-width: 100vw;
+  overflow-x: hidden;
   font-family:
     'Cairo',
     'Tajawal',
@@ -157,6 +164,13 @@ body {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Root container - prevent horizontal overflow */
+#root {
+  max-width: 100vw;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* RTL Support */
@@ -721,7 +735,7 @@ input[type='number']::-webkit-outer-spin-button {
 /* Parent drawer container fix */
 [data-drawer='true'] {
   display: flex !important;
-  justify-content: flex-start !important;
+  justify-content: flex-end !important;
 }
 
 [data-drawer-body='true'],
