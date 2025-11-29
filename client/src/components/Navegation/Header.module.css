@@ -505,9 +505,9 @@ body.dark-mode .header {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header {
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-2);
     height: 56px;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   /* Hide center navigation on mobile */
@@ -520,23 +520,34 @@ body.dark-mode .header {
     flex-shrink: 0;
   }
 
-  /* Actions section - hamburger on left side */
+  /* Actions section - icons + hamburger */
   .actionsSection {
-    flex-direction: row-reverse;
-    gap: var(--space-1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
-  /* Hide action buttons on mobile, show only hamburger */
+  /* Show compact action buttons on mobile */
   .actionButtons {
-    display: none;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
   }
 
-  /* Show hamburger menu on mobile - ensure visibility */
+  /* Show hamburger menu on mobile - prominent green button */
   .hamburgerButton {
     display: flex !important;
-    min-width: 44px;
-    min-height: 44px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     flex-shrink: 0;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius);
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   }
 
   .appName {
@@ -549,23 +560,36 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 40px;
-    max-height: 40px;
+    height: 36px;
+    max-height: 36px;
   }
 
+  /* Compact language chip */
   .languageChip {
-    padding: var(--space-1) var(--space-2);
-    font-size: 11px;
+    width: 32px;
+    height: 32px;
     min-width: 32px;
-    height: 24px;
+    padding: 0;
+    font-size: 11px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
   }
 
+  /* Hide full login button, show compact user badge */
   .loginButton {
     display: none !important;
   }
 
+  /* Compact user avatar for mobile */
   .userAvatar {
-    display: none;
+    display: flex !important;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    background: var(--primary);
+    color: white;
   }
 
   /* drawerContent width is set in base style with !important */
@@ -588,8 +612,8 @@ body.dark-mode .header {
 
 @media (max-width: 480px) {
   .header {
-    padding: 0 var(--space-2);
-    gap: var(--space-1);
+    padding: 0 6px;
+    gap: 4px;
   }
 
   .appName {
@@ -602,16 +626,39 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 32px;
-    max-height: 32px;
+    height: 28px;
+    max-height: 28px;
   }
 
+  .actionsSection {
+    gap: 4px;
+  }
+
+  .actionButtons {
+    gap: 4px;
+  }
+
+  /* Hamburger stays visible and prominent */
   .hamburgerButton {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-    font-size: var(--text-lg);
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 18px;
+  }
+
+  /* Smaller icons on tiny screens */
+  .languageChip {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    font-size: 10px;
+  }
+
+  .userAvatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
   /* drawerContent width is set in base style with !important */
