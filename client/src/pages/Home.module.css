@@ -264,7 +264,7 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--border-light);
   max-width: 800px;
-  margin: 0 auto 80px;
+  margin: 0 auto 32px;
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
@@ -504,6 +504,29 @@
   transform: translateY(-2px);
 }
 
+/* Date/Time Pickers - prevent clipping */
+.dateTimePicker,
+.timePicker,
+.datePicker {
+  margin: 0 8px;
+  padding: 12px;
+  width: calc(100% - 16px);
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 2px solid var(--border-light);
+  background: #ffffff;
+  color: #333333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dateTimePicker:focus,
+.timePicker:focus,
+.datePicker:focus {
+  border-color: var(--primary-500);
+  outline: none;
+}
+
 /* ===== Seats and Price ===== */
 .seatsPrice {
   display: grid;
@@ -569,6 +592,30 @@
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
+/* Seats dropdown specific */
+.seatsDropdown,
+.seatsSelect,
+select[name="seats"] {
+  color: #333333 !important;
+  background: #ffffff;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 12px;
+  width: 100%;
+}
+
+/* Price label - show full text */
+.priceLabel {
+  white-space: nowrap;
+  overflow: visible;
+}
+
+/* Booking form container */
+.bookingForm {
+  padding: 16px;
+  overflow: visible;
+}
+
 /* ===== Submit Button ===== */
 .submitButton {
   width: 100%;
@@ -619,9 +666,9 @@
 
 /* ===== Features Section ===== */
 .featuresSection {
-  padding: 80px 24px;
+  padding: 40px 16px;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 auto 16px;
   position: relative;
   z-index: 1;
 }
@@ -636,25 +683,26 @@
 
 .sectionSubtitle {
   text-align: center;
-  font-size: clamp(16px, 2.5vw, 20px);
+  font-size: clamp(14px, 2vw, 18px);
   color: var(--text-secondary);
-  margin-bottom: 56px;
+  margin-bottom: 24px;
   font-weight: 600;
 }
 
 .featuresGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px;
+  padding: 0 8px;
 }
 
 .featureCard {
   background: var(--surface-primary);
-  padding: 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -666,15 +714,15 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, var(--primary-500), var(--secondary-500));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .featureCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-300);
 }
 
@@ -683,32 +731,32 @@
 }
 
 .featureIcon {
-  font-size: 32px;
-  margin-bottom: 8px;
+  font-size: 28px;
+  margin-bottom: 6px;
   display: block;
-  animation: bounce 2s ease-in-out infinite;
 }
 
 .featureTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .featureDescription {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.4;
   font-weight: 500;
 }
 
 /* ===== How It Works ===== */
 .howItWorksSection {
-  padding: 80px 24px;
+  padding: 40px 16px;
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
   position: relative;
   z-index: 1;
+  margin-bottom: 16px;
 }
 
 .stepsGrid {
