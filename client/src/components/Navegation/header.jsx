@@ -139,22 +139,22 @@ const Header = () => {
           <button className={styles.loginButton} onClick={handleAuthClick}>
             {isAuthenticated ? user.name : t('login')}
           </button>
-          {isAuthenticated && (
-            <div
-              className={styles.userAvatar}
-              onClick={handleAuthClick}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleAuthClick();
-                }
-              }}
-              aria-label="الملف الشخصي"
-            >
-              {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
-            </div>
-          )}
+
+          {/* User Avatar - Always visible (shows login icon when not authenticated) */}
+          <div
+            className={styles.userAvatar}
+            onClick={handleAuthClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleAuthClick();
+              }
+            }}
+            aria-label={isAuthenticated ? 'الملف الشخصي' : 'تسجيل الدخول'}
+          >
+            {isAuthenticated ? (user.userType === 'driver' ? '🚗' : '🧑‍💼') : '👤'}
+          </div>
         </div>
       </header>
 
