@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { statsAPI } from '../services/api';
 import SkeletonLoader from '../components/UI/SkeletonLoader';
+import AuthModal from '../components/Auth/AuthModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [isAnimated, setIsAnimated] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     setIsAnimated(true);
@@ -94,12 +96,37 @@ const Dashboard = () => {
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
               fontFamily: '"Cairo", sans-serif',
-              margin: 0,
+              marginBottom: 'var(--space-4)',
             }}
           >
             يرجى تسجيل الدخول للوصول إلى لوحة التحكم
           </p>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            style={{
+              background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+              color: 'white',
+              border: 'none',
+              padding: 'var(--space-3) var(--space-6)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 'var(--text-base)',
+              fontWeight: '600',
+              fontFamily: '"Cairo", sans-serif',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+            }}
+          >
+            تسجيل الدخول / إنشاء حساب
+          </button>
         </div>
+
+        {showAuthModal && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            initialMode="login"
+          />
+        )}
       </div>
     );
   }
