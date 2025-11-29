@@ -505,9 +505,9 @@ body.dark-mode .header {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header {
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-2);
     height: 56px;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   /* Hide center navigation on mobile */
@@ -520,22 +520,29 @@ body.dark-mode .header {
     flex-shrink: 0;
   }
 
-  /* Actions section - hamburger on left side */
+  /* Actions section - all icons + hamburger */
   .actionsSection {
-    flex-direction: row-reverse;
+    display: flex;
+    align-items: center;
     gap: var(--space-1);
+    flex-shrink: 0;
   }
 
-  /* Hide action buttons on mobile, show only hamburger */
+  /* Show action buttons - compact sizing */
   .actionButtons {
-    display: none;
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
   }
 
-  /* Show hamburger menu on mobile - ensure visibility */
+  /* Show hamburger menu on mobile */
   .hamburgerButton {
     display: flex !important;
-    min-width: 44px;
-    min-height: 44px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 18px;
     flex-shrink: 0;
   }
 
@@ -549,23 +556,37 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 40px;
-    max-height: 40px;
+    height: 36px;
+    max-height: 36px;
   }
 
+  /* Compact language chip */
   .languageChip {
-    padding: var(--space-1) var(--space-2);
-    font-size: 11px;
-    min-width: 32px;
-    height: 24px;
+    padding: 2px 6px;
+    font-size: 10px;
+    min-width: 24px;
+    height: 22px;
   }
 
+  /* Compact login button - show user name */
   .loginButton {
-    display: none !important;
+    display: flex !important;
+    font-size: 10px;
+    padding: 2px 8px;
+    height: 24px;
+    min-width: auto;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
+  /* Compact user avatar */
   .userAvatar {
-    display: none;
+    display: flex !important;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
   }
 
   /* drawerContent width is set in base style with !important */
@@ -588,8 +609,8 @@ body.dark-mode .header {
 
 @media (max-width: 480px) {
   .header {
-    padding: 0 var(--space-2);
-    gap: var(--space-1);
+    padding: 0 4px;
+    gap: 2px;
   }
 
   .appName {
@@ -602,16 +623,40 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 32px;
-    max-height: 32px;
+    height: 28px;
+    max-height: 28px;
+  }
+
+  .actionButtons {
+    gap: 2px;
   }
 
   .hamburgerButton {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-    font-size: var(--text-lg);
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 16px;
+  }
+
+  .languageChip {
+    padding: 2px 4px;
+    font-size: 9px;
+    min-width: 20px;
+    height: 20px;
+  }
+
+  .loginButton {
+    font-size: 9px;
+    padding: 2px 6px;
+    height: 22px;
+    max-width: 60px;
+  }
+
+  .userAvatar {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
   }
 
   /* drawerContent width is set in base style with !important */
