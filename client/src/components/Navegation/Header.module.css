@@ -532,53 +532,52 @@ body.dark-mode .header {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header {
-    padding: 0 var(--space-3);
-    height: 56px;
-    gap: 0; /* Remove gap - use flex to push sections to edges */
+    display: flex;
+    flex-direction: row-reverse; /* RTL layout */
     justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    height: 56px;
+    gap: 8px;
   }
 
   /* Hide center navigation on mobile */
   .centerNav {
-    display: none;
-    flex: 0; /* Prevent taking space when hidden */
+    display: none !important;
   }
 
-  /* Logo section - stays on right in RTL */
-  .logoSection {
-    flex-shrink: 0;
-  }
-
-  /* Actions section - icons + hamburger, pushed to left edge in RTL */
-  .actionsSection {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    margin-left: auto; /* Push to left in RTL */
-  }
-
-  /* Show compact action buttons on mobile */
-  .actionButtons {
-    display: flex !important;
-    align-items: center;
-    gap: 6px;
-  }
-
-  /* Show hamburger menu on mobile - prominent green button */
+  /* Hamburger - RIGHT side in RTL (appears first due to row-reverse) */
   .hamburgerButton {
     display: flex !important;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    border-radius: 8px;
+    font-size: 24px;
     flex-shrink: 0;
-    background: var(--primary);
-    color: white;
-    border-radius: var(--radius);
-    font-size: 18px;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
-    margin-left: 8px; /* Prevent cut-off at left edge */
+    order: 1;
+  }
+
+  .hamburgerButton:hover {
+    background: var(--surface-secondary);
+  }
+
+  /* Logo - CENTER */
+  .logoSection {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    order: 2;
+  }
+
+  .logoText {
+    height: 32px;
   }
 
   .appName {
@@ -590,49 +589,50 @@ body.dark-mode .header {
     width: 28px;
   }
 
-  .logoText {
-    height: 36px;
-    max-height: 36px;
+  /* Action buttons (icons) - LEFT side in RTL */
+  .actionsSection {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    order: 3;
   }
 
-  /* Compact language chip - minimal style */
-  .languageChip {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    padding: 0;
-    font-size: 11px;
-    font-weight: 600;
+  .actionButtons {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* User avatar - green circle */
+  .userAvatar {
+    display: flex !important;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
     border-radius: 50%;
-    background: transparent;
-    border: 1.5px solid var(--text-secondary);
-    color: var(--text-secondary);
+    color: white;
+    font-size: 14px;
+    border: none;
   }
 
-  .languageChip:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+  /* Theme toggle - moon icon with dark background */
+  .themeToggle {
+    width: 32px;
+    height: 32px;
+    background: #1e293b;
+    border-radius: 50%;
+    color: white;
   }
 
-  /* Hide full login button, show compact user badge */
+  /* Hide login button on mobile */
   .loginButton {
     display: none !important;
   }
 
-  /* Compact user avatar for mobile - subtle style */
-  .userAvatar {
-    display: flex !important;
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-    background: var(--surface-secondary);
-    border: 1.5px solid var(--border-light);
-    color: var(--text-primary);
-  }
-
-  .userAvatar:hover {
-    border-color: var(--primary);
-    background: var(--primary-light);
+  /* Hide language chip on mobile to save space */
+  .languageChip {
+    display: none !important;
   }
 
   /* drawerContent width is set in base style with !important */
@@ -655,8 +655,8 @@ body.dark-mode .header {
 
 @media (max-width: 480px) {
   .header {
-    padding: 0 var(--space-2);
-    gap: 0;
+    padding: 0 8px;
+    gap: 4px;
   }
 
   .appName {
@@ -674,35 +674,27 @@ body.dark-mode .header {
   }
 
   .actionsSection {
-    gap: 4px;
+    gap: 3px;
   }
 
   .actionButtons {
-    gap: 4px;
+    gap: 3px;
   }
 
-  /* Hamburger stays visible and prominent */
+  /* Hamburger - slightly smaller on tiny screens */
   .hamburgerButton {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    font-size: 16px;
-    margin-left: 6px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 20px;
   }
 
   /* Smaller icons on tiny screens */
-  .languageChip {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    font-size: 9px;
-  }
-
   .userAvatar {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
   /* drawerContent width is set in base style with !important */
