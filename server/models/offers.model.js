@@ -145,22 +145,24 @@ class Offer {
       }
     }
 
-    values.push(limit, offset);
-
     // Build the query with optional user booking status
     let userBookingJoin = '';
     let userBookingSelect = '';
     let userBookingGroupBy = '';
 
     if (currentUserId) {
-      // Add user booking status fields
+      // Add user booking status fields with parameterized query
       userBookingSelect = `,
               CASE WHEN ub.id IS NOT NULL THEN true ELSE false END as user_has_booking,
               ub.status as user_booking_status,
               ub.id as user_booking_id`;
-      userBookingJoin = ` LEFT JOIN bookings ub ON o.id = ub.offer_id AND ub.passenger_id = ${currentUserId} AND ub.status IN ('pending', 'confirmed')`;
+      userBookingJoin = ` LEFT JOIN bookings ub ON o.id = ub.offer_id AND ub.passenger_id = $${paramCount} AND ub.status IN ('pending', 'confirmed')`;
+      values.push(currentUserId);
+      paramCount++;
       userBookingGroupBy = ', ub.id, ub.status';
     }
+
+    values.push(limit, offset);
 
     const result = await query(
       `SELECT o.*, u.name, u.rating_avg, u.rating_count,
