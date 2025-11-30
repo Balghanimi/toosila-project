@@ -145,6 +145,9 @@ class Offer {
       }
     }
 
+    // Save the filter values for the count query (before adding currentUserId)
+    const filterValues = [...values];
+
     // Build the query with optional user booking status
     let userBookingJoin = '';
     let userBookingSelect = '';
@@ -179,6 +182,7 @@ class Offer {
     );
 
     // Count only offers with available seats (matching the HAVING clause)
+    // Use filterValues which doesn't include currentUserId or limit/offset
     const countResult = await query(
       `SELECT COUNT(*) FROM (
         SELECT o.id
@@ -188,7 +192,7 @@ class Offer {
         GROUP BY o.id
         HAVING (o.seats - COALESCE(SUM(b.seats) FILTER (WHERE b.status IN ('pending', 'confirmed')), 0)) > 0
       ) as available_offers`,
-      values.slice(0, -2)
+      filterValues
     );
 
     return {
