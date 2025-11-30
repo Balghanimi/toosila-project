@@ -127,16 +127,19 @@ const getRideMessages = asyncHandler(async (req, res) => {
   let accessCheck;
 
   if (rideType === 'offer') {
-    // For offers: any authenticated user can view the conversation
-    // (they can message any offer except their own - checked in sendMessage)
-    // Just verify the offer exists and is active
+    // SECURITY: User must be the driver, have a booking, or have sent/received messages in this conversation
     accessCheck = await query(
-      `SELECT 1 FROM offers WHERE id = $1 AND is_active = true`,
-      [rideId]
+      `SELECT 1 FROM offers o
+       WHERE o.id = $1 AND o.is_active = true AND (
+         o.driver_id = $2 OR
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id = $2)
+       )`,
+      [rideId, req.user.id]
     );
 
     if (accessCheck.rows.length === 0) {
-      throw new AppError('Offer not found or inactive', 404);
+      throw new AppError('Access denied to this conversation', 403);
     }
   } else {
     // For demands: check if user is passenger or responded to this demand
