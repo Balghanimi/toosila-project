@@ -167,7 +167,7 @@ router.get('/debug-users', async (req, res) => {
 
   try {
     const result = await query(`
-      SELECT id, name, email, role, is_driver, is_active, created_at
+      SELECT id, name, email, role, is_driver, created_at
       FROM users
       ORDER BY created_at DESC
       LIMIT 20
