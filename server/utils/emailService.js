@@ -2,14 +2,15 @@
  * Email Service for Toosila
  * Handles sending emails for verification, password reset, notifications, etc.
  *
- * Supports multiple providers:
- * - SendGrid HTTP API (recommended for cloud platforms like Railway)
- * - Gmail SMTP
- * - Mailgun
- * - Any SMTP server
+ * Supports multiple providers (in priority order):
+ * 1. Resend HTTP API (recommended - simple, reliable)
+ * 2. SendGrid HTTP API (recommended for cloud platforms like Railway)
+ * 3. Gmail SMTP
+ * 4. Mailgun
+ * 5. Any SMTP server
  *
  * IMPORTANT: Railway and many cloud providers BLOCK SMTP ports (25, 587, 465).
- * Use SendGrid HTTP API instead by setting SENDGRID_API_KEY environment variable.
+ * Use Resend or SendGrid HTTP API instead.
  */
 
 const nodemailer = require('nodemailer');
@@ -18,6 +19,35 @@ const config = require('../config/env');
 // Email provider mode
 let emailProvider = 'none';
 let transporter = null;
+let resendClient = null;
+
+/**
+ * Send email using Resend HTTP API (simple, reliable)
+ * @param {object} mailOptions - Email options (from, to, subject, html)
+ * @returns {Promise<object>} - Send result
+ */
+const sendViaResend = async (mailOptions) => {
+  if (!resendClient) {
+    const { Resend } = require('resend');
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+
+  const result = await resendClient.emails.send({
+    from: mailOptions.from,
+    to: mailOptions.to,
+    subject: mailOptions.subject,
+    html: mailOptions.html,
+  });
+
+  if (result.error) {
+    throw new Error(result.error.message || 'Resend API error');
+  }
+
+  return {
+    messageId: result.data?.id || 'resend-' + Date.now(),
+    response: 'sent'
+  };
+};
 
 /**
  * Send email using SendGrid HTTP API (bypasses SMTP port blocking)
@@ -60,7 +90,9 @@ const sendViaNodemailer = async (mailOptions) => {
  * @returns {Promise<object>} - Send result
  */
 const sendEmail = async (mailOptions) => {
-  if (emailProvider === 'sendgrid-api') {
+  if (emailProvider === 'resend') {
+    return await sendViaResend(mailOptions);
+  } else if (emailProvider === 'sendgrid-api') {
     return await sendViaSendGridAPI(mailOptions);
   } else if (emailProvider === 'smtp' && transporter) {
     return await sendViaNodemailer(mailOptions);
@@ -70,14 +102,21 @@ const sendEmail = async (mailOptions) => {
 };
 
 const initializeTransporter = () => {
-  // Priority 1: SendGrid HTTP API (works on Railway and other cloud platforms)
+  // Priority 1: Resend HTTP API (simple, reliable, works everywhere)
+  if (process.env.RESEND_API_KEY) {
+    emailProvider = 'resend';
+    console.log('✅ Email service initialized with Resend HTTP API');
+    return;
+  }
+
+  // Priority 2: SendGrid HTTP API (works on Railway and other cloud platforms)
   if (process.env.SENDGRID_API_KEY) {
     emailProvider = 'sendgrid-api';
     console.log('✅ Email service initialized with SendGrid HTTP API');
     return;
   }
 
-  // Priority 2: SMTP (may be blocked on cloud platforms)
+  // Priority 3: SMTP (may be blocked on cloud platforms)
   if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
     // Mailgun SMTP configuration
     transporter = nodemailer.createTransport({
@@ -113,18 +152,20 @@ try {
   // Log email configuration on startup
   const emailConfig = {
     provider: emailProvider,
+    resend: process.env.RESEND_API_KEY ? 'SET (HTTP API)' : 'NOT SET',
     sendgrid: process.env.SENDGRID_API_KEY ? 'SET (HTTP API)' : 'NOT SET',
     mailgun: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT SET',
     smtp: config.EMAIL_USER ? `${config.EMAIL_HOST}:${config.EMAIL_PORT}` : 'NOT SET',
-    from: config.EMAIL_FROM || process.env.SENDGRID_FROM_EMAIL
+    from: config.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL
   };
 
   console.log('📧 Email Configuration:', JSON.stringify(emailConfig, null, 2));
 
   if (emailProvider === 'none') {
     console.warn('⚠️ EMAIL SERVICE NOT CONFIGURED - No email credentials found!');
-    console.warn('   RECOMMENDED: Set SENDGRID_API_KEY for Railway/cloud platforms');
-    console.warn('   Alternative: Set EMAIL_USER+EMAIL_PASS for SMTP (may be blocked)');
+    console.warn('   RECOMMENDED: Set RESEND_API_KEY (simple, reliable)');
+    console.warn('   Alternative: Set SENDGRID_API_KEY for Railway/cloud platforms');
+    console.warn('   Last resort: Set EMAIL_USER+EMAIL_PASS for SMTP (may be blocked)');
   } else if (emailProvider === 'smtp' && transporter) {
     // Verify SMTP connection (only for SMTP mode)
     console.log('🔄 Testing SMTP connection...');
@@ -376,7 +417,14 @@ const sendEmailChangeVerification = async (newEmail, name, verificationToken) =>
  * @returns {Promise<object>} - Configuration status
  */
 const testEmailConfiguration = async () => {
-  if (emailProvider === 'sendgrid-api') {
+  if (emailProvider === 'resend') {
+    // Resend HTTP API doesn't need connection verification
+    return {
+      success: true,
+      provider: 'resend',
+      message: 'Resend HTTP API configured'
+    };
+  } else if (emailProvider === 'sendgrid-api') {
     // SendGrid HTTP API doesn't need connection verification
     return {
       success: true,
@@ -408,6 +456,32 @@ const testEmailConfiguration = async () => {
 };
 
 /**
+ * Send test email via Resend
+ * @param {string} to - Recipient email
+ * @returns {Promise<object>} - Send result
+ */
+const sendTestEmailViaResend = async (to) => {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY not configured');
+  }
+
+  const mailOptions = {
+    from: config.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    to: to,
+    subject: 'اختبار البريد - Test Email from Toosila',
+    html: `
+      <h1>مرحباً! 🎉</h1>
+      <p>هذه رسالة اختبار من توصيلة.</p>
+      <p>This is a test email from Toosila.</p>
+      <p>Provider: Resend HTTP API</p>
+      <p>Time: ${new Date().toISOString()}</p>
+    `
+  };
+
+  return await sendViaResend(mailOptions);
+};
+
+/**
  * Get current email provider info
  * @returns {object} - Provider information
  */
@@ -421,5 +495,6 @@ module.exports = {
   sendPasswordResetEmail,
   sendEmailChangeVerification,
   testEmailConfiguration,
-  getEmailProviderInfo
+  getEmailProviderInfo,
+  sendTestEmailViaResend
 };

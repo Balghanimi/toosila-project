@@ -124,11 +124,12 @@ router.get('/test-email-config', async (req, res) => {
   const testResult = await testEmailConfiguration();
 
   const config = {
+    hasResend: !!process.env.RESEND_API_KEY,
     hasSendGrid: !!process.env.SENDGRID_API_KEY,
     hasMailgun: !!process.env.MAILGUN_API_KEY,
     hasSmtp: !!(process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS),
     frontendUrl: process.env.FRONTEND_URL || 'Not set',
-    emailFrom: process.env.EMAIL_FROM || process.env.SENDGRID_FROM_EMAIL || 'Not set',
+    emailFrom: process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'Not set',
     nodeEnv: process.env.NODE_ENV || 'Not set'
   };
 
@@ -139,11 +140,48 @@ router.get('/test-email-config', async (req, res) => {
     testResult,
     config,
     message: !providerInfo.configured
-      ? 'No email service configured. RECOMMENDED: Set SENDGRID_API_KEY (works on Railway). Alternative: EMAIL_HOST/USER/PASS (SMTP may be blocked on cloud platforms)'
+      ? 'No email service configured. RECOMMENDED: Set RESEND_API_KEY (simple). Alternative: SENDGRID_API_KEY. Last resort: EMAIL_HOST/USER/PASS (SMTP may be blocked)'
       : testResult.success
         ? `Email service ready via ${providerInfo.provider}`
         : `Email configured via ${providerInfo.provider} but test failed: ${testResult.error || testResult.message}`
   });
+});
+
+// Test Resend email provider
+router.get('/test-resend', async (req, res) => {
+  const { sendTestEmailViaResend, getEmailProviderInfo } = require('../utils/emailService');
+  const to = req.query.to;
+
+  if (!to) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing "to" query parameter. Usage: /test-resend?to=your@email.com'
+    });
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(400).json({
+      success: false,
+      error: 'RESEND_API_KEY not configured',
+      provider: getEmailProviderInfo()
+    });
+  }
+
+  try {
+    const result = await sendTestEmailViaResend(to);
+    res.json({
+      success: true,
+      message: `Test email sent to ${to}`,
+      messageId: result.messageId,
+      provider: 'resend'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      provider: 'resend'
+    });
+  }
 });
 
 // TEMPORARY: Detailed SMTP test to find real Gmail error
