@@ -152,6 +152,30 @@
           "response": []
         },
         {
+          "name": "Test email configuration (Development only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/test-email-config",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "test-email-config"
+              ]
+            },
+            "description": "Check if email service is properly configured"
+          },
+          "response": []
+        },
+        {
           "name": "User login",
           "request": {
             "method": "POST",

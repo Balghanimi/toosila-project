@@ -118,46 +118,31 @@ router.post('/register', authLimiter, validateUserRegistration, register);
  *         description: Email configuration status
  */
 router.get('/test-email-config', async (req, res) => {
-  const { testEmailConfiguration } = require('../utils/emailService');
+  const { testEmailConfiguration, getEmailProviderInfo } = require('../utils/emailService');
+
+  const providerInfo = getEmailProviderInfo();
+  const testResult = await testEmailConfiguration();
 
   const config = {
-    hasHost: !!process.env.EMAIL_HOST,
-    hasUser: !!process.env.EMAIL_USER,
-    hasPass: !!process.env.EMAIL_PASS,
     hasSendGrid: !!process.env.SENDGRID_API_KEY,
     hasMailgun: !!process.env.MAILGUN_API_KEY,
+    hasSmtp: !!(process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS),
     frontendUrl: process.env.FRONTEND_URL || 'Not set',
-    emailFrom: process.env.EMAIL_FROM || 'Not set',
-    emailHost: process.env.EMAIL_HOST || 'Not set',
-    emailPort: process.env.EMAIL_PORT || 'Not set',
+    emailFrom: process.env.EMAIL_FROM || process.env.SENDGRID_FROM_EMAIL || 'Not set',
     nodeEnv: process.env.NODE_ENV || 'Not set'
   };
 
-  // Determine which email method is available
-  let emailMethod = 'None configured';
-  if (config.hasSendGrid) emailMethod = 'SendGrid';
-  else if (config.hasMailgun) emailMethod = 'Mailgun';
-  else if (config.hasHost && config.hasUser && config.hasPass) emailMethod = 'SMTP';
-
-  // Test actual SMTP connection
-  let smtpTest = { success: false, error: 'Not tested' };
-  try {
-    const connected = await testEmailConfiguration();
-    smtpTest = { success: connected, error: connected ? null : 'Connection test returned false' };
-  } catch (err) {
-    smtpTest = { success: false, error: err.message };
-  }
-
   res.json({
-    success: smtpTest.success,
-    emailMethod,
-    smtpConnectionTest: smtpTest,
+    success: testResult.success,
+    provider: providerInfo.provider,
+    configured: providerInfo.configured,
+    testResult,
     config,
-    message: emailMethod === 'None configured'
-      ? 'No email service configured. Set EMAIL_HOST/USER/PASS or SENDGRID_API_KEY or MAILGUN_API_KEY'
-      : smtpTest.success
-        ? `Email service configured and verified via ${emailMethod}`
-        : `Email service configured via ${emailMethod} but connection failed: ${smtpTest.error}`
+    message: !providerInfo.configured
+      ? 'No email service configured. RECOMMENDED: Set SENDGRID_API_KEY (works on Railway). Alternative: EMAIL_HOST/USER/PASS (SMTP may be blocked on cloud platforms)'
+      : testResult.success
+        ? `Email service ready via ${providerInfo.provider}`
+        : `Email configured via ${providerInfo.provider} but test failed: ${testResult.error || testResult.message}`
   });
 });
 

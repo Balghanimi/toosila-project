@@ -3,33 +3,83 @@
  * Handles sending emails for verification, password reset, notifications, etc.
  *
  * Supports multiple providers:
+ * - SendGrid HTTP API (recommended for cloud platforms like Railway)
  * - Gmail SMTP
- * - SendGrid
  * - Mailgun
  * - Any SMTP server
+ *
+ * IMPORTANT: Railway and many cloud providers BLOCK SMTP ports (25, 587, 465).
+ * Use SendGrid HTTP API instead by setting SENDGRID_API_KEY environment variable.
  */
 
 const nodemailer = require('nodemailer');
 const config = require('../config/env');
 
-// Create email transporter based on configuration
-let transporter;
+// Email provider mode
+let emailProvider = 'none';
+let transporter = null;
+
+/**
+ * Send email using SendGrid HTTP API (bypasses SMTP port blocking)
+ * @param {object} mailOptions - Email options (from, to, subject, html)
+ * @returns {Promise<object>} - Send result
+ */
+const sendViaSendGridAPI = async (mailOptions) => {
+  const sgMail = require('@sendgrid/mail');
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+  const msg = {
+    to: mailOptions.to,
+    from: mailOptions.from,
+    subject: mailOptions.subject,
+    html: mailOptions.html,
+  };
+
+  const result = await sgMail.send(msg);
+  return {
+    messageId: result[0]?.headers?.['x-message-id'] || 'sendgrid-' + Date.now(),
+    response: result[0]?.statusCode
+  };
+};
+
+/**
+ * Send email using nodemailer transporter (SMTP)
+ * @param {object} mailOptions - Email options
+ * @returns {Promise<object>} - Send result
+ */
+const sendViaNodemailer = async (mailOptions) => {
+  if (!transporter) {
+    throw new Error('Email transporter not initialized');
+  }
+  return await transporter.sendMail(mailOptions);
+};
+
+/**
+ * Generic email send function that uses the best available method
+ * @param {object} mailOptions - Email options
+ * @returns {Promise<object>} - Send result
+ */
+const sendEmail = async (mailOptions) => {
+  if (emailProvider === 'sendgrid-api') {
+    return await sendViaSendGridAPI(mailOptions);
+  } else if (emailProvider === 'smtp' && transporter) {
+    return await sendViaNodemailer(mailOptions);
+  } else {
+    throw new Error('No email provider configured');
+  }
+};
 
 const initializeTransporter = () => {
-  // Check if we're using SendGrid API key
+  // Priority 1: SendGrid HTTP API (works on Railway and other cloud platforms)
   if (process.env.SENDGRID_API_KEY) {
-    // SendGrid configuration
-    transporter = nodemailer.createTransport({
-      host: 'smtp.sendgrid.net',
-      port: 587,
-      secure: false,
-      auth: {
-        user: 'apikey',
-        pass: process.env.SENDGRID_API_KEY
-      }
-    });
-  } else if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
-    // Mailgun configuration
+    emailProvider = 'sendgrid-api';
+    console.log('✅ Email service initialized with SendGrid HTTP API');
+    return;
+  }
+
+  // Priority 2: SMTP (may be blocked on cloud platforms)
+  if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
+    // Mailgun SMTP configuration
     transporter = nodemailer.createTransport({
       host: 'smtp.mailgun.org',
       port: 587,
@@ -39,58 +89,54 @@ const initializeTransporter = () => {
         pass: process.env.MAILGUN_API_KEY
       }
     });
-  } else {
+    emailProvider = 'smtp';
+  } else if (config.EMAIL_USER && config.EMAIL_PASS) {
     // Generic SMTP configuration (Gmail, etc.)
+    // WARNING: May not work on Railway due to port blocking
     transporter = nodemailer.createTransport({
       host: config.EMAIL_HOST,
       port: config.EMAIL_PORT,
-      secure: config.EMAIL_PORT === 465, // true for 465, false for other ports
+      secure: config.EMAIL_PORT === 465,
       auth: {
         user: config.EMAIL_USER,
         pass: config.EMAIL_PASS
       }
     });
+    emailProvider = 'smtp';
   }
 };
 
-// Initialize transporter
+// Initialize email service
 try {
   initializeTransporter();
 
-  // Log detailed email configuration on startup for debugging
+  // Log email configuration on startup
   const emailConfig = {
-    host: config.EMAIL_HOST,
-    port: config.EMAIL_PORT,
-    user: config.EMAIL_USER ? `${config.EMAIL_USER.substring(0, 3)}...` : 'NOT SET',
-    pass: config.EMAIL_PASS ? 'SET (hidden)' : 'NOT SET',
-    from: config.EMAIL_FROM,
-    sendgrid: process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET',
-    mailgun: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT SET'
+    provider: emailProvider,
+    sendgrid: process.env.SENDGRID_API_KEY ? 'SET (HTTP API)' : 'NOT SET',
+    mailgun: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT SET',
+    smtp: config.EMAIL_USER ? `${config.EMAIL_HOST}:${config.EMAIL_PORT}` : 'NOT SET',
+    from: config.EMAIL_FROM || process.env.SENDGRID_FROM_EMAIL
   };
 
   console.log('📧 Email Configuration:', JSON.stringify(emailConfig, null, 2));
 
-  const emailConfigured = !!(process.env.SENDGRID_API_KEY ||
-    process.env.MAILGUN_API_KEY ||
-    (config.EMAIL_USER && config.EMAIL_PASS));
-
-  if (emailConfigured) {
-    console.log('✅ Email service initialized with provider:',
-      process.env.SENDGRID_API_KEY ? 'SendGrid' :
-      process.env.MAILGUN_API_KEY ? 'Mailgun' :
-      `SMTP (${config.EMAIL_HOST})`
-    );
-
-    // Verify SMTP connection on startup
+  if (emailProvider === 'none') {
+    console.warn('⚠️ EMAIL SERVICE NOT CONFIGURED - No email credentials found!');
+    console.warn('   RECOMMENDED: Set SENDGRID_API_KEY for Railway/cloud platforms');
+    console.warn('   Alternative: Set EMAIL_USER+EMAIL_PASS for SMTP (may be blocked)');
+  } else if (emailProvider === 'smtp' && transporter) {
+    // Verify SMTP connection (only for SMTP mode)
+    console.log('🔄 Testing SMTP connection...');
     transporter.verify()
       .then(() => console.log('✅ SMTP connection verified successfully!'))
-      .catch(err => console.error('❌ SMTP connection verification failed:', err.message));
-  } else {
-    console.warn('⚠️ EMAIL SERVICE NOT CONFIGURED - No email credentials found!');
-    console.warn('   Set one of: SENDGRID_API_KEY, MAILGUN_API_KEY, or EMAIL_USER+EMAIL_PASS');
+      .catch(err => {
+        console.error('❌ SMTP connection failed:', err.message);
+        console.warn('   ⚠️ SMTP ports may be blocked. Consider using SendGrid HTTP API instead.');
+      });
   }
 } catch (error) {
-  console.error('❌ Failed to initialize email transporter:', error);
+  console.error('❌ Failed to initialize email service:', error);
 }
 
 /**
@@ -169,25 +215,20 @@ const sendVerificationEmail = async (email, name, verificationToken) => {
   try {
     console.log('📧 Sending verification email...', {
       to: email,
-      from: config.EMAIL_FROM,
-      host: config.EMAIL_HOST,
-      port: config.EMAIL_PORT,
-      user: config.EMAIL_USER ? `${config.EMAIL_USER.substring(0, 3)}...` : 'NOT SET',
-      hasCredentials: !!(config.EMAIL_USER && config.EMAIL_PASS),
+      from: config.EMAIL_FROM || process.env.SENDGRID_FROM_EMAIL,
+      provider: emailProvider,
       verificationUrl: verificationUrl
     });
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log('✅ Verification email sent:', info.messageId, 'to:', email);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('❌ Error sending verification email:', {
       to: email,
+      provider: emailProvider,
       message: error.message,
       code: error.code,
-      command: error.command,
-      responseCode: error.responseCode,
-      response: error.response,
-      stack: error.stack
+      response: error.response?.body || error.response
     });
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
@@ -267,11 +308,11 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log('Password reset email sent:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error('Error sending password reset email:', error.message);
     throw new Error('Failed to send password reset email');
   }
 };
@@ -322,32 +363,63 @@ const sendEmailChangeVerification = async (newEmail, name, verificationToken) =>
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending email change verification:', error);
+    console.error('Error sending email change verification:', error.message);
     throw new Error('Failed to send email change verification');
   }
 };
 
 /**
  * Test email configuration
- * @returns {Promise<boolean>} - Whether email is configured correctly
+ * @returns {Promise<object>} - Configuration status
  */
 const testEmailConfiguration = async () => {
-  try {
-    await transporter.verify();
-    console.log('✅ Email service is ready to send emails');
-    return true;
-  } catch (error) {
-    console.error('❌ Email service configuration error:', error.message);
-    return false;
+  if (emailProvider === 'sendgrid-api') {
+    // SendGrid HTTP API doesn't need connection verification
+    return {
+      success: true,
+      provider: 'sendgrid-api',
+      message: 'SendGrid HTTP API configured'
+    };
+  } else if (emailProvider === 'smtp' && transporter) {
+    try {
+      await transporter.verify();
+      return {
+        success: true,
+        provider: 'smtp',
+        message: 'SMTP connection verified'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        provider: 'smtp',
+        error: error.message
+      };
+    }
+  } else {
+    return {
+      success: false,
+      provider: 'none',
+      message: 'No email provider configured'
+    };
   }
 };
+
+/**
+ * Get current email provider info
+ * @returns {object} - Provider information
+ */
+const getEmailProviderInfo = () => ({
+  provider: emailProvider,
+  configured: emailProvider !== 'none'
+});
 
 module.exports = {
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendEmailChangeVerification,
-  testEmailConfiguration
+  testEmailConfiguration,
+  getEmailProviderInfo
 };
