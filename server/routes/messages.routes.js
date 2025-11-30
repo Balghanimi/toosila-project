@@ -30,23 +30,25 @@ const {
 // All routes require authentication
 router.use(authenticateToken);
 
+// Admin routes - MUST be defined BEFORE dynamic routes like /:rideType/:rideId
+router.get('/admin/stats', requireAdmin, getMessageStats);
+
 // Message management routes
 router.post('/', moderateLimiter, validateMessageCreation, sendMessage);
 router.get('/conversations', validatePagination, getConversationList);
 router.get('/recent', getRecentMessages);
 router.get('/unread-count', getUnreadCount);
 router.get('/stats', getUserMessageStats);
-router.get('/:rideType/:rideId', validatePagination, getRideMessages);
-router.get('/:id', validateId, getMessageById);
-router.put('/:id/read', validateId, markAsRead);
-router.put('/conversation/:rideType/:rideId/read', markConversationAsRead);
 
 // Deprecated routes (return 410 Gone)
 router.get('/inbox', getInbox);
 router.get('/sent', getSentMessages);
 router.get('/conversation/:userId', getConversation);
 
-// Admin routes
-router.get('/admin/stats', requireAdmin, getMessageStats);
+// Dynamic routes - MUST be defined AFTER static routes
+router.get('/:rideType/:rideId', validatePagination, getRideMessages);
+router.get('/:id', validateId, getMessageById);
+router.put('/:id/read', validateId, markAsRead);
+router.put('/conversation/:rideType/:rideId/read', markConversationAsRead);
 
 module.exports = router;
