@@ -57,7 +57,19 @@ const initializeTransporter = () => {
 try {
   initializeTransporter();
 
-  // Log email configuration status on startup
+  // Log detailed email configuration on startup for debugging
+  const emailConfig = {
+    host: config.EMAIL_HOST,
+    port: config.EMAIL_PORT,
+    user: config.EMAIL_USER ? `${config.EMAIL_USER.substring(0, 3)}...` : 'NOT SET',
+    pass: config.EMAIL_PASS ? 'SET (hidden)' : 'NOT SET',
+    from: config.EMAIL_FROM,
+    sendgrid: process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET',
+    mailgun: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT SET'
+  };
+
+  console.log('📧 Email Configuration:', JSON.stringify(emailConfig, null, 2));
+
   const emailConfigured = !!(process.env.SENDGRID_API_KEY ||
     process.env.MAILGUN_API_KEY ||
     (config.EMAIL_USER && config.EMAIL_PASS));
@@ -68,6 +80,11 @@ try {
       process.env.MAILGUN_API_KEY ? 'Mailgun' :
       `SMTP (${config.EMAIL_HOST})`
     );
+
+    // Verify SMTP connection on startup
+    transporter.verify()
+      .then(() => console.log('✅ SMTP connection verified successfully!'))
+      .catch(err => console.error('❌ SMTP connection verification failed:', err.message));
   } else {
     console.warn('⚠️ EMAIL SERVICE NOT CONFIGURED - No email credentials found!');
     console.warn('   Set one of: SENDGRID_API_KEY, MAILGUN_API_KEY, or EMAIL_USER+EMAIL_PASS');
@@ -154,17 +171,23 @@ const sendVerificationEmail = async (email, name, verificationToken) => {
       to: email,
       from: config.EMAIL_FROM,
       host: config.EMAIL_HOST,
-      hasCredentials: !!(config.EMAIL_USER && config.EMAIL_PASS)
+      port: config.EMAIL_PORT,
+      user: config.EMAIL_USER ? `${config.EMAIL_USER.substring(0, 3)}...` : 'NOT SET',
+      hasCredentials: !!(config.EMAIL_USER && config.EMAIL_PASS),
+      verificationUrl: verificationUrl
     });
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Verification email sent:', info.messageId);
+    console.log('✅ Verification email sent:', info.messageId, 'to:', email);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('❌ Error sending verification email:', {
+      to: email,
       message: error.message,
       code: error.code,
       command: error.command,
-      responseCode: error.responseCode
+      responseCode: error.responseCode,
+      response: error.response,
+      stack: error.stack
     });
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
