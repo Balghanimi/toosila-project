@@ -161,6 +161,42 @@ router.get('/test-email-config', async (req, res) => {
   });
 });
 
+// TEMPORARY: Admin endpoint to find message sender
+router.get('/find-message', async (req, res) => {
+  const { query } = require('../config/db');
+  const searchText = req.query.text;
+
+  if (!searchText) {
+    return res.status(400).json({ error: 'text parameter required' });
+  }
+
+  try {
+    const result = await query(`
+      SELECT
+        m.id,
+        m.content,
+        m.created_at,
+        m.sender_id,
+        m.ride_id,
+        m.ride_type,
+        u.name as sender_name,
+        u.email as sender_email
+      FROM messages m
+      JOIN users u ON m.sender_id = u.id
+      WHERE m.content ILIKE $1
+      ORDER BY m.created_at DESC
+      LIMIT 10
+    `, [`%${searchText}%`]);
+
+    res.json({
+      count: result.rows.length,
+      messages: result.rows
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /**
  * @swagger
  * /auth/login:
