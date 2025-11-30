@@ -117,7 +117,9 @@ router.post('/register', authLimiter, validateUserRegistration, register);
  *       200:
  *         description: Email configuration status
  */
-router.get('/test-email-config', (req, res) => {
+router.get('/test-email-config', async (req, res) => {
+  const { testEmailConfiguration } = require('../utils/emailService');
+
   const config = {
     hasHost: !!process.env.EMAIL_HOST,
     hasUser: !!process.env.EMAIL_USER,
@@ -126,6 +128,8 @@ router.get('/test-email-config', (req, res) => {
     hasMailgun: !!process.env.MAILGUN_API_KEY,
     frontendUrl: process.env.FRONTEND_URL || 'Not set',
     emailFrom: process.env.EMAIL_FROM || 'Not set',
+    emailHost: process.env.EMAIL_HOST || 'Not set',
+    emailPort: process.env.EMAIL_PORT || 'Not set',
     nodeEnv: process.env.NODE_ENV || 'Not set'
   };
 
@@ -135,13 +139,25 @@ router.get('/test-email-config', (req, res) => {
   else if (config.hasMailgun) emailMethod = 'Mailgun';
   else if (config.hasHost && config.hasUser && config.hasPass) emailMethod = 'SMTP';
 
+  // Test actual SMTP connection
+  let smtpTest = { success: false, error: 'Not tested' };
+  try {
+    const connected = await testEmailConfiguration();
+    smtpTest = { success: connected, error: connected ? null : 'Connection test returned false' };
+  } catch (err) {
+    smtpTest = { success: false, error: err.message };
+  }
+
   res.json({
-    success: true,
+    success: smtpTest.success,
     emailMethod,
+    smtpConnectionTest: smtpTest,
     config,
     message: emailMethod === 'None configured'
       ? 'No email service configured. Set EMAIL_HOST/USER/PASS or SENDGRID_API_KEY or MAILGUN_API_KEY'
-      : `Email service configured via ${emailMethod}`
+      : smtpTest.success
+        ? `Email service configured and verified via ${emailMethod}`
+        : `Email service configured via ${emailMethod} but connection failed: ${smtpTest.error}`
   });
 });
 
