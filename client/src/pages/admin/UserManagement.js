@@ -29,8 +29,9 @@ const UserManagement = () => {
       setError(null);
 
       const response = await adminAPI.getAllUsers(page, 20, filters);
-      setUsers(response.data.users || []);
-      setTotalPages(response.data.totalPages || 1);
+      // Backend returns { success, data: [...users...], pagination: { totalPages, ... } }
+      setUsers(response.data || []);
+      setTotalPages(response.pagination?.totalPages || 1);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err.message || 'فشل في تحميل المستخدمين');
