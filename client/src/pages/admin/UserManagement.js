@@ -182,7 +182,7 @@ const UserManagement = () => {
                     </td>
                     <td>{user.email}</td>
                     <td>
-                      {user.is_driver ? (
+                      {user.isDriver ? (
                         <Badge variant="primary">سائق</Badge>
                       ) : (
                         <Badge variant="neutral">راكب</Badge>
@@ -194,13 +194,13 @@ const UserManagement = () => {
                       {user.role === 'user' && <Badge variant="neutral">مستخدم</Badge>}
                     </td>
                     <td>
-                      {user.is_active ? (
+                      {user.isActive ? (
                         <span className="status-indicator status-active">نشط</span>
                       ) : (
                         <span className="status-indicator status-inactive">معطل</span>
                       )}
                     </td>
-                    <td>{new Date(user.created_at).toLocaleDateString('ar-IQ')}</td>
+                    <td>{new Date(user.createdAt).toLocaleDateString('ar-IQ')}</td>
                     <td>
                       <div className="action-buttons">
                         {user.role !== 'admin' && (

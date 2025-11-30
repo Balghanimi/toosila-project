@@ -7,6 +7,7 @@ class User {
     this.email = data.email;
     this.role = data.role || 'user'; // Role for access control: user, admin, moderator
     this.isDriver = data.is_driver;
+    this.isActive = data.is_active !== false; // Default to true if not set
     this.languagePreference = data.language_preference;
     this.ratingAvg = parseFloat(data.rating_avg) || 0.00;
     this.ratingCount = data.rating_count || 0;
