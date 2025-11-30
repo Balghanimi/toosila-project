@@ -166,27 +166,43 @@ router.get('/find-message', async (req, res) => {
   const { query } = require('../config/db');
   const searchText = req.query.text;
 
-  if (!searchText) {
-    return res.status(400).json({ error: 'text parameter required' });
-  }
-
   try {
-    const result = await query(`
-      SELECT
-        m.id,
-        m.content,
-        m.created_at,
-        m.sender_id,
-        m.ride_id,
-        m.ride_type,
-        u.name as sender_name,
-        u.email as sender_email
-      FROM messages m
-      JOIN users u ON m.sender_id = u.id
-      WHERE m.content ILIKE $1
-      ORDER BY m.created_at DESC
-      LIMIT 10
-    `, [`%${searchText}%`]);
+    let result;
+    if (searchText) {
+      result = await query(`
+        SELECT
+          m.id,
+          m.content,
+          m.created_at,
+          m.sender_id,
+          m.ride_id,
+          m.ride_type,
+          u.name as sender_name,
+          u.email as sender_email
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id
+        WHERE m.content ILIKE $1
+        ORDER BY m.created_at DESC
+        LIMIT 20
+      `, [`%${searchText}%`]);
+    } else {
+      // If no search text, return all recent messages
+      result = await query(`
+        SELECT
+          m.id,
+          m.content,
+          m.created_at,
+          m.sender_id,
+          m.ride_id,
+          m.ride_type,
+          u.name as sender_name,
+          u.email as sender_email
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id
+        ORDER BY m.created_at DESC
+        LIMIT 50
+      `);
+    }
 
     res.json({
       count: result.rows.length,
