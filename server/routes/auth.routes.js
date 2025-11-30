@@ -161,6 +161,27 @@ router.get('/test-email-config', async (req, res) => {
   });
 });
 
+// TEMPORARY: Debug endpoint to list users
+router.get('/debug-users', async (req, res) => {
+  const { query } = require('../config/db');
+
+  try {
+    const result = await query(`
+      SELECT id, name, email, role, is_driver, is_active, created_at
+      FROM users
+      ORDER BY created_at DESC
+      LIMIT 20
+    `);
+
+    res.json({
+      count: result.rows.length,
+      users: result.rows
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // TEMPORARY: Admin endpoint to find message sender
 router.get('/find-message', async (req, res) => {
   const { query } = require('../config/db');
