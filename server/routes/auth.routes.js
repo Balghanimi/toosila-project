@@ -161,6 +161,59 @@ router.get('/test-email-config', async (req, res) => {
   });
 });
 
+// TEMPORARY: Detailed SMTP test to find real Gmail error
+router.get('/test-smtp-debug', async (req, res) => {
+  const nodemailer = require('nodemailer');
+
+  const config = {
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS ? 'SET' : 'NOT SET',
+    from: process.env.EMAIL_FROM
+  };
+
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.port === 465,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  try {
+    // First verify connection
+    await transporter.verify();
+
+    // Then try to send a real email
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER, // Send to self
+      subject: 'Toosila SMTP Test - ' + new Date().toISOString(),
+      text: 'If you receive this, SMTP is working!',
+    });
+
+    res.json({
+      success: true,
+      config,
+      messageId: info.messageId,
+      response: info.response
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      config,
+      error: error.message,
+      code: error.code,
+      command: error.command,
+      responseCode: error.responseCode,
+      response: error.response
+    });
+  }
+});
+
 // TEMPORARY: Debug endpoint to list users
 router.get('/debug-users', async (req, res) => {
   const { query } = require('../config/db');
