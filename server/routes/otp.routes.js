@@ -7,6 +7,11 @@ const config = require('../config/env');
 
 const OTPIQ_API_KEY = process.env.OTPIQ_API_KEY;
 
+// Debug logging for API key
+console.log('=== OTP Routes Loaded ===');
+console.log('OTPIQ_API_KEY exists:', !!OTPIQ_API_KEY);
+console.log('OTPIQ_API_KEY length:', OTPIQ_API_KEY?.length || 0);
+
 /**
  * Generate a random 6-digit OTP code
  */
@@ -59,12 +64,19 @@ function formatIraqiPhone(phone) {
  *     tags: [OTP]
  */
 router.post('/send', async (req, res) => {
+  console.log('=== OTP Send Request ===');
+  console.log('Request body:', req.body);
+
   try {
     let { phone } = req.body;
+    console.log('Raw phone input:', phone);
 
     // Validate and format phone number
     phone = formatIraqiPhone(phone);
+    console.log('Formatted phone:', phone);
+
     if (!phone) {
+      console.log('Phone validation failed');
       return res.status(400).json({
         success: false,
         error: 'رقم الهاتف غير صحيح. يرجى إدخال رقم عراقي صحيح',
@@ -72,13 +84,16 @@ router.post('/send', async (req, res) => {
     }
 
     // Check rate limiting (max 5 OTPs per phone per hour)
+    console.log('Checking rate limiting...');
     const recentOTPs = await query(
       `SELECT COUNT(*) FROM otp_requests
        WHERE phone = $1 AND created_at > NOW() - INTERVAL '1 hour'`,
       [phone]
     );
+    console.log('Recent OTPs count:', recentOTPs.rows[0].count);
 
     if (parseInt(recentOTPs.rows[0].count) >= 5) {
+      console.log('Rate limit exceeded');
       return res.status(429).json({
         success: false,
         error: 'تم تجاوز الحد المسموح. حاول بعد ساعة.',
@@ -97,26 +112,39 @@ router.post('/send', async (req, res) => {
     // Generate OTP code locally
     const code = generateOTP();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    console.log('Generated OTP code:', code);
 
     // Invalidate previous OTPs for this phone
+    console.log('Invalidating previous OTPs...');
     await query(`UPDATE otp_requests SET verified = true WHERE phone = $1 AND verified = false`, [
       phone,
     ]);
 
     // Store OTP in database
+    console.log('Storing OTP in database...');
     await query(
       `INSERT INTO otp_requests (phone, code, channel, expires_at)
        VALUES ($1, $2, $3, $4)`,
       [phone, code, 'whatsapp', expiresAt]
     );
+    console.log('OTP stored successfully');
 
     // Send OTP via OTPIQ (WhatsApp first, then SMS fallback)
     const phoneWithoutPlus = phone.replace('+', '');
+    console.log('Phone for OTPIQ (without +):', phoneWithoutPlus);
     let channel = 'whatsapp';
 
     try {
       // Try WhatsApp first
-      await axios.post(
+      console.log('Sending OTP via OTPIQ WhatsApp...');
+      console.log('OTPIQ Request payload:', {
+        phoneNumber: phoneWithoutPlus,
+        smsType: 'verification',
+        verificationCode: code,
+        provider: 'whatsapp-sms',
+      });
+
+      const whatsappResponse = await axios.post(
         'https://api.otpiq.com/api/v1/sms/send',
         {
           phoneNumber: phoneWithoutPlus,
@@ -133,6 +161,7 @@ router.post('/send', async (req, res) => {
         }
       );
 
+      console.log('OTPIQ WhatsApp Response:', whatsappResponse.data);
       console.log(`OTP ${code} sent to ${phone} via WhatsApp`);
 
       res.json({
@@ -141,11 +170,17 @@ router.post('/send', async (req, res) => {
         channel: 'whatsapp',
       });
     } catch (whatsappError) {
-      console.error('OTPIQ WhatsApp Error:', whatsappError.response?.data || whatsappError.message);
+      console.error('=== OTPIQ WhatsApp Error ===');
+      console.error('Error Status:', whatsappError.response?.status);
+      console.error('Error Data:', JSON.stringify(whatsappError.response?.data, null, 2));
+      console.error('Error Message:', whatsappError.message);
+      console.error('Error Code:', whatsappError.code);
 
       // Try SMS fallback
+      console.log('WhatsApp failed, trying SMS fallback...');
       try {
-        await axios.post(
+        console.log('Sending OTP via OTPIQ SMS...');
+        const smsResponse = await axios.post(
           'https://api.otpiq.com/api/v1/sms/send',
           {
             phoneNumber: phoneWithoutPlus,
@@ -162,6 +197,8 @@ router.post('/send', async (req, res) => {
           }
         );
 
+        console.log('OTPIQ SMS Response:', smsResponse.data);
+
         // Update channel in database
         await query(
           `UPDATE otp_requests SET channel = 'sms'
@@ -177,7 +214,11 @@ router.post('/send', async (req, res) => {
           channel: 'sms',
         });
       } catch (smsError) {
-        console.error('OTPIQ SMS Error:', smsError.response?.data || smsError.message);
+        console.error('=== OTPIQ SMS Error ===');
+        console.error('Error Status:', smsError.response?.status);
+        console.error('Error Data:', JSON.stringify(smsError.response?.data, null, 2));
+        console.error('Error Message:', smsError.message);
+        console.error('Error Code:', smsError.code);
 
         // Delete the OTP record since we couldn't send it
         await query(`DELETE FROM otp_requests WHERE phone = $1 AND code = $2`, [phone, code]);
@@ -189,7 +230,10 @@ router.post('/send', async (req, res) => {
       }
     }
   } catch (error) {
-    console.error('OTP Send Error:', error);
+    console.error('=== OTP Send General Error ===');
+    console.error('Error Name:', error.name);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
     res.status(500).json({
       success: false,
       error: 'حدث خطأ في النظام. حاول مرة أخرى.',
