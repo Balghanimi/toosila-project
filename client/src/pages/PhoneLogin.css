@@ -97,6 +97,8 @@
 /* Phone Input */
 .phone-input-container {
   display: flex;
+  flex-direction: row;
+  direction: ltr; /* Force LTR for phone input layout */
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
@@ -117,10 +119,11 @@
   gap: 8px;
   padding: 16px;
   background: #f9fafb;
-  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
   font-weight: 600;
   color: #374151;
   flex-shrink: 0;
+  order: 0; /* Country code first (left side) */
 }
 
 .country-code .flag {
@@ -141,6 +144,7 @@
   text-align: left;
   letter-spacing: 1px;
   background: transparent;
+  order: 1; /* Input second (right side) */
 }
 
 .phone-input-container input:focus {
@@ -565,7 +569,7 @@
 
   .country-code {
     background: #374151;
-    border-color: #4b5563;
+    border-right-color: #4b5563;
     color: #f9fafb;
   }
 
@@ -688,7 +692,7 @@ body.dark-mode .phone-input-container {
 
 body.dark-mode .country-code {
   background: #374151;
-  border-color: #4b5563;
+  border-right-color: #4b5563;
   color: #f9fafb;
 }
 
