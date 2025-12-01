@@ -230,11 +230,11 @@ const Header = () => {
                   <button
                     className={styles.drawerItem}
                     onClick={() => {
-                      navigate('/demands');
+                      navigate('/offers');
                       toggleDrawer();
                     }}
                   >
-                    📋 طلباتي
+                    🚗 عرض العروض
                   </button>
                 </>
               )}

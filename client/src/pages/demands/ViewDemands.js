@@ -38,9 +38,20 @@ export default function ViewDemands() {
   // Determine if user is a driver
   const isDriver = currentUser?.isDriver || false;
 
+  // Redirect passengers to offers page - demands page is for drivers only
   useEffect(() => {
-    setIsAnimated(true);
-    fetchDemands();
+    if (currentUser && !isDriver) {
+      // Passenger trying to access demands page - redirect to offers
+      navigate('/offers', { replace: true });
+    }
+  }, [currentUser, isDriver, navigate]);
+
+  useEffect(() => {
+    // Only fetch if user is a driver
+    if (isDriver) {
+      setIsAnimated(true);
+      fetchDemands();
+    }
     // eslint-disable-next-line
   }, [currentUser, isDriver]);
 
@@ -69,23 +80,11 @@ export default function ViewDemands() {
       filterParams.limit = 20;
 
       const response = await demandsAPI.getAll(filterParams);
-      let fetchedDemands = response.demands || [];
-
-      // If user is a passenger, filter to show only their own demands
-      if (currentUser && !isDriver) {
-        fetchedDemands = fetchedDemands.filter((demand) => demand.passengerId === currentUser.id);
-      }
+      const fetchedDemands = response.demands || [];
 
       setDemands(fetchedDemands);
-
-      // Save pagination data (adjusted for filtered results if passenger)
-      if (currentUser && !isDriver) {
-        setTotal(fetchedDemands.length);
-        setTotalPages(1);
-      } else {
-        setTotal(response.total || 0);
-        setTotalPages(response.totalPages || 1);
-      }
+      setTotal(response.total || 0);
+      setTotalPages(response.totalPages || 1);
       setPage(1);
     } catch (err) {
       console.error('Error fetching demands:', err);
