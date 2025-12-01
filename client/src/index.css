@@ -823,3 +823,89 @@ nav[class*='drawer'] {
    ======================================== */
 
 /* Note: Don't override FloatingDownloadButton's own X button */
+
+/* ========================================
+   REACT-SELECT (SearchableCitySelect) FIXES
+   ======================================== */
+
+/* Ensure react-select portal renders on top of everything */
+.city-select__menu-portal {
+  z-index: 9999 !important;
+}
+
+/* Fix any inherited transparency - ensure white backgrounds */
+.city-select__control,
+.city-select__menu,
+.city-select__menu-list,
+.city-select__option {
+  background-color: #ffffff !important;
+}
+
+/* Selected option keeps its green background */
+.city-select__option--is-selected {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+/* Focused/hovered option gets light green */
+.city-select__option--is-focused:not(.city-select__option--is-selected) {
+  background-color: #d1fae5 !important;
+}
+
+/* Ensure text is visible */
+.city-select__single-value,
+.city-select__input-container,
+.city-select__input,
+.city-select__placeholder {
+  color: #1f2937 !important;
+}
+
+/* Make sure input is clickable and typeable */
+.city-select__input {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.city-select__value-container {
+  pointer-events: auto !important;
+}
+
+/* Placeholder should be lighter */
+.city-select__placeholder {
+  color: #9ca3af !important;
+}
+
+/* Dark mode support for react-select */
+body.dark-mode .city-select__control {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .city-select__menu,
+body.dark-mode .city-select__menu-list {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .city-select__option {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+body.dark-mode .city-select__option--is-selected {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .city-select__option--is-focused:not(.city-select__option--is-selected) {
+  background-color: #374151 !important;
+}
+
+body.dark-mode .city-select__single-value,
+body.dark-mode .city-select__input {
+  color: #f9fafb !important;
+}
+
+body.dark-mode .city-select__placeholder {
+  color: #9ca3af !important;
+}

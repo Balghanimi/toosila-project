@@ -59,84 +59,78 @@ const SearchableCitySelect = ({
     }
   };
 
-  // Custom styles to match existing app design
+  // Custom styles with EXPLICIT colors (no CSS variables that might not resolve)
   const customStyles = {
     control: (base, state) => ({
       ...base,
       minHeight: '48px',
-      border: state.isFocused
-        ? '2px solid var(--primary, #10b981)'
-        : '2px solid var(--border-light)',
-      borderRadius: 'var(--radius, 8px)',
+      border: state.isFocused ? '2px solid #10b981' : '2px solid #e5e7eb',
+      borderRadius: '8px',
       boxShadow: state.isFocused ? '0 0 0 3px rgba(16, 185, 129, 0.1)' : 'none',
-      backgroundColor: 'var(--surface-primary, #fff)',
+      backgroundColor: '#ffffff',
       fontFamily: '"Cairo", sans-serif',
-      fontSize: 'var(--text-base, 16px)',
+      fontSize: '16px',
       direction: 'rtl',
       textAlign: 'right',
-      cursor: 'pointer',
+      cursor: 'text',
       '&:hover': {
-        borderColor: 'var(--primary, #10b981)',
+        borderColor: '#10b981',
       },
     }),
     valueContainer: (base) => ({
       ...base,
-      padding: '0 var(--space-3, 12px)',
+      padding: '0 12px',
       justifyContent: 'flex-start',
     }),
     singleValue: (base) => ({
       ...base,
-      color: 'var(--text-primary, #1f2937)',
+      color: '#1f2937',
       fontFamily: '"Cairo", sans-serif',
       fontWeight: '500',
     }),
     placeholder: (base) => ({
       ...base,
-      color: 'var(--text-muted, #9ca3af)',
+      color: '#9ca3af',
       fontFamily: '"Cairo", sans-serif',
     }),
     input: (base) => ({
       ...base,
-      color: 'var(--text-primary, #1f2937)',
+      color: '#1f2937',
       fontFamily: '"Cairo", sans-serif',
       margin: 0,
       padding: 0,
+      opacity: 1,
     }),
     menu: (base) => ({
       ...base,
-      backgroundColor: 'var(--surface-primary, #fff)',
-      border: '2px solid var(--border-light)',
-      borderRadius: 'var(--radius, 8px)',
-      boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1))',
+      backgroundColor: '#ffffff',
+      border: '1px solid #e5e7eb',
+      borderRadius: '8px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
       zIndex: 9999,
       direction: 'rtl',
       marginTop: '4px',
     }),
     menuList: (base) => ({
       ...base,
-      padding: 'var(--space-1, 4px)',
+      padding: '4px',
       maxHeight: '250px',
+      backgroundColor: '#ffffff',
     }),
     option: (base, state) => ({
       ...base,
-      backgroundColor: state.isSelected
-        ? 'var(--primary, #10b981)'
-        : state.isFocused
-          ? 'var(--surface-secondary, #f3f4f6)'
-          : 'transparent',
-      color: state.isSelected ? '#fff' : 'var(--text-primary, #1f2937)',
+      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : '#ffffff',
+      color: state.isSelected ? '#ffffff' : '#1f2937',
       fontFamily: '"Cairo", sans-serif',
-      fontSize: 'var(--text-base, 16px)',
+      fontSize: '16px',
       fontWeight: state.isSelected ? '600' : '500',
-      padding: 'var(--space-3, 12px) var(--space-4, 16px)',
-      borderRadius: 'var(--radius-sm, 6px)',
+      padding: '12px 16px',
+      borderRadius: '6px',
       cursor: 'pointer',
       textAlign: 'right',
       direction: 'rtl',
       '&:active': {
-        backgroundColor: state.isSelected
-          ? 'var(--primary, #10b981)'
-          : 'var(--surface-secondary, #f3f4f6)',
+        backgroundColor: state.isSelected ? '#10b981' : '#d1fae5',
       },
     }),
     indicatorSeparator: () => ({
@@ -144,33 +138,40 @@ const SearchableCitySelect = ({
     }),
     dropdownIndicator: (base, state) => ({
       ...base,
-      color: 'var(--text-secondary, #6b7280)',
-      padding: 'var(--space-2, 8px)',
+      color: '#6b7280',
+      padding: '8px',
       transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0)',
       transition: 'transform 0.2s ease',
       '&:hover': {
-        color: 'var(--primary, #10b981)',
+        color: '#10b981',
       },
     }),
     clearIndicator: (base) => ({
       ...base,
-      color: 'var(--text-muted, #9ca3af)',
-      padding: 'var(--space-2, 8px)',
+      color: '#9ca3af',
+      padding: '8px',
+      cursor: 'pointer',
       '&:hover': {
-        color: 'var(--danger, #ef4444)',
+        color: '#ef4444',
       },
     }),
     noOptionsMessage: (base) => ({
       ...base,
-      color: 'var(--text-muted, #9ca3af)',
+      color: '#9ca3af',
       fontFamily: '"Cairo", sans-serif',
-      fontSize: 'var(--text-sm, 14px)',
-      padding: 'var(--space-4, 16px)',
+      fontSize: '14px',
+      padding: '16px',
+      backgroundColor: '#ffffff',
     }),
     loadingMessage: (base) => ({
       ...base,
-      color: 'var(--text-muted, #9ca3af)',
+      color: '#9ca3af',
       fontFamily: '"Cairo", sans-serif',
+      backgroundColor: '#ffffff',
+    }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999,
     }),
   };
 
@@ -189,11 +190,11 @@ const SearchableCitySelect = ({
           htmlFor={id}
           style={{
             display: 'block',
-            fontSize: 'var(--text-sm)',
+            fontSize: '14px',
             fontWeight: '600',
-            marginBottom: 'var(--space-2)',
+            marginBottom: '8px',
             fontFamily: '"Cairo", sans-serif',
-            color: 'var(--text-secondary)',
+            color: '#6b7280',
           }}
         >
           {label}
@@ -216,6 +217,7 @@ const SearchableCitySelect = ({
         classNamePrefix="city-select"
         menuPlacement="auto"
         menuPosition="fixed"
+        menuPortalTarget={document.body}
         menuShouldScrollIntoView={true}
       />
     </div>
