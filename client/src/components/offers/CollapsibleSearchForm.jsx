@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from './CollapsibleSearchForm.module.css';
+import SearchableCitySelect from '../UI/SearchableCitySelect';
 
 /**
  * Collapsible Search Form Component for Mobile-Optimized Offers Page
@@ -8,13 +9,13 @@ import styles from './CollapsibleSearchForm.module.css';
  * - Mobile-first design (48px+ touch targets)
  * - 16px+ font size (prevents iOS auto-zoom)
  * - Accessible and WCAG compliant
+ * - Searchable city dropdowns with Arabic support
  */
 const CollapsibleSearchForm = ({
   filters,
   onFiltersChange,
   onSearch,
   onClearFilters,
-  mainCities = [],
   allCities = [],
   // isDriver = false, // Reserved for future use
 }) => {
@@ -63,42 +64,28 @@ const CollapsibleSearchForm = ({
           <div className={styles.basicFilters}>
             {/* From City */}
             <div className={styles.formGroup}>
-              <label htmlFor="from-city" className={styles.label}>
-                من (المدن الرئيسية)
-              </label>
-              <select
-                id="from-city"
+              <SearchableCitySelect
                 value={filters.fromCity || ''}
-                onChange={(e) => handleFilterChange('fromCity', e.target.value)}
-                className={styles.select}
-              >
-                <option value="">جميع المدن الرئيسية</option>
-                {mainCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleFilterChange('fromCity', value)}
+                cities={allCities}
+                label="من"
+                placeholder="اختر مدينة المغادرة..."
+                allOptionLabel="جميع المدن"
+                id="from-city"
+              />
             </div>
 
             {/* To City */}
             <div className={styles.formGroup}>
-              <label htmlFor="to-city" className={styles.label}>
-                إلى (المدن الرئيسية)
-              </label>
-              <select
-                id="to-city"
+              <SearchableCitySelect
                 value={filters.toCity || ''}
-                onChange={(e) => handleFilterChange('toCity', e.target.value)}
-                className={styles.select}
-              >
-                <option value="">جميع المدن الرئيسية</option>
-                {mainCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => handleFilterChange('toCity', value)}
+                cities={allCities}
+                label="إلى"
+                placeholder="اختر مدينة الوصول..."
+                allOptionLabel="جميع المدن"
+                id="to-city"
+              />
             </div>
 
             {/* Departure Date */}
@@ -153,43 +140,29 @@ const CollapsibleSearchForm = ({
               </h4>
 
               <div className={styles.advancedGrid}>
-                {/* Full City Lists */}
+                {/* Full City Lists - Already using searchable selects in basic filters */}
                 <div className={styles.formGroup}>
-                  <label htmlFor="from-city-all" className={styles.label}>
-                    من (جميع المدن)
-                  </label>
-                  <select
-                    id="from-city-all"
+                  <SearchableCitySelect
                     value={filters.fromCity || ''}
-                    onChange={(e) => handleFilterChange('fromCity', e.target.value)}
-                    className={styles.select}
-                  >
-                    <option value="">جميع المدن</option>
-                    {allCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => handleFilterChange('fromCity', value)}
+                    cities={allCities}
+                    label="من (جميع المدن)"
+                    placeholder="اختر مدينة المغادرة..."
+                    allOptionLabel="جميع المدن"
+                    id="from-city-all"
+                  />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="to-city-all" className={styles.label}>
-                    إلى (جميع المدن)
-                  </label>
-                  <select
-                    id="to-city-all"
+                  <SearchableCitySelect
                     value={filters.toCity || ''}
-                    onChange={(e) => handleFilterChange('toCity', e.target.value)}
-                    className={styles.select}
-                  >
-                    <option value="">جميع المدن</option>
-                    {allCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => handleFilterChange('toCity', value)}
+                    cities={allCities}
+                    label="إلى (جميع المدن)"
+                    placeholder="اختر مدينة الوصول..."
+                    allOptionLabel="جميع المدن"
+                    id="to-city-all"
+                  />
                 </div>
 
                 {/* Price Range */}

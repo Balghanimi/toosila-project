@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import DemandResponseForm from '../../components/DemandResponseForm';
 import DemandResponsesList from '../../components/DemandResponsesList';
+import SearchableCitySelect from '../../components/UI/SearchableCitySelect';
 
 // Default fallback cities (defined outside component for stability)
 const DEFAULT_CITIES = [
@@ -298,11 +299,7 @@ export default function ViewDemands() {
       });
   };
 
-  // Use dynamic cities from database, fallback to defaults if empty
-  const MAIN_CITIES =
-    availableCities.length > 0 ? availableCities.slice(0, 5) : DEFAULT_CITIES.slice(0, 5);
-
-  // All cities (for advanced filters)
+  // All cities from database, fallback to defaults if empty
   const IRAQ_CITIES = availableCities.length > 0 ? availableCities : DEFAULT_CITIES;
 
   return (
@@ -381,105 +378,25 @@ export default function ViewDemands() {
               marginBottom: 'var(--space-4)',
             }}
           >
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
-                  marginBottom: 'var(--space-2)',
-                  fontFamily: '"Cairo", sans-serif',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                من (المدن الرئيسية)
-              </label>
-              <select
-                value={filters.fromCity}
-                onChange={(e) => setFilters({ ...filters, fromCity: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-3)',
-                  border: '2px solid var(--border-light)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-base)',
-                  fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)',
-                  textAlign: 'center',
-                  textAlignLast: 'center',
-                  direction: 'rtl',
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none',
-                  appearance: 'none',
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'left 10px center',
-                  backgroundSize: '20px',
-                  paddingLeft: '40px',
-                  paddingRight: '40px',
-                  position: 'relative',
-                  zIndex: 10,
-                }}
-              >
-                <option value="">جميع المدن الرئيسية</option>
-                {MAIN_CITIES.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchableCitySelect
+              value={filters.fromCity}
+              onChange={(value) => setFilters({ ...filters, fromCity: value })}
+              cities={IRAQ_CITIES}
+              label="من"
+              placeholder="اختر مدينة المغادرة..."
+              allOptionLabel="جميع المدن"
+              id="filter-from-city"
+            />
 
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: '600',
-                  marginBottom: 'var(--space-2)',
-                  fontFamily: '"Cairo", sans-serif',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                إلى (المدن الرئيسية)
-              </label>
-              <select
-                value={filters.toCity}
-                onChange={(e) => setFilters({ ...filters, toCity: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-3)',
-                  border: '2px solid var(--border-light)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-base)',
-                  fontFamily: '"Cairo", sans-serif',
-                  background: 'var(--surface-primary)',
-                  textAlign: 'center',
-                  textAlignLast: 'center',
-                  direction: 'rtl',
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none',
-                  appearance: 'none',
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'left 10px center',
-                  backgroundSize: '20px',
-                  paddingLeft: '40px',
-                  paddingRight: '40px',
-                  position: 'relative',
-                  zIndex: 10,
-                }}
-              >
-                <option value="">جميع المدن الرئيسية</option>
-                {MAIN_CITIES.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchableCitySelect
+              value={filters.toCity}
+              onChange={(value) => setFilters({ ...filters, toCity: value })}
+              cities={IRAQ_CITIES}
+              label="إلى"
+              placeholder="اختر مدينة الوصول..."
+              allOptionLabel="جميع المدن"
+              id="filter-to-city"
+            />
 
             <div>
               <label
@@ -603,81 +520,25 @@ export default function ViewDemands() {
                   border: '1px solid var(--border-light)',
                 }}
               >
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      marginBottom: 'var(--space-2)',
-                      fontFamily: '"Cairo", sans-serif',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    من (جميع المدن)
-                  </label>
-                  <select
-                    value={filters.fromCity}
-                    onChange={(e) => setFilters({ ...filters, fromCity: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--space-2)',
-                      border: '2px solid var(--border-light)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                      fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)',
-                      textAlign: 'center',
-                      textAlignLast: 'center',
-                      direction: 'rtl',
-                    }}
-                  >
-                    <option value="">جميع المدن</option>
-                    {IRAQ_CITIES.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableCitySelect
+                  value={filters.fromCity}
+                  onChange={(value) => setFilters({ ...filters, fromCity: value })}
+                  cities={IRAQ_CITIES}
+                  label="من (جميع المدن)"
+                  placeholder="اختر مدينة المغادرة..."
+                  allOptionLabel="جميع المدن"
+                  id="advanced-filter-from-city"
+                />
 
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: '600',
-                      marginBottom: 'var(--space-2)',
-                      fontFamily: '"Cairo", sans-serif',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    إلى (جميع المدن)
-                  </label>
-                  <select
-                    value={filters.toCity}
-                    onChange={(e) => setFilters({ ...filters, toCity: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: 'var(--space-2)',
-                      border: '2px solid var(--border-light)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                      fontFamily: '"Cairo", sans-serif',
-                      background: 'var(--surface-primary)',
-                      textAlign: 'center',
-                      textAlignLast: 'center',
-                      direction: 'rtl',
-                    }}
-                  >
-                    <option value="">جميع المدن</option>
-                    {IRAQ_CITIES.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableCitySelect
+                  value={filters.toCity}
+                  onChange={(value) => setFilters({ ...filters, toCity: value })}
+                  cities={IRAQ_CITIES}
+                  label="إلى (جميع المدن)"
+                  placeholder="اختر مدينة الوصول..."
+                  allOptionLabel="جميع المدن"
+                  id="advanced-filter-to-city"
+                />
               </div>
             </div>
           </div>

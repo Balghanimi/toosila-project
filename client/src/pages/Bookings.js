@@ -10,7 +10,20 @@ import { formatDate, formatTime, formatPrice, formatSeats } from '../utils/forma
 
 export default function Bookings() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.state?.tab || 'demands'); // 'demands', 'myOffers', 'sent', or 'received'
+  const { currentUser } = useAuth();
+  const { showSuccess, showError, showInfo, fetchPendingCount } = useNotifications();
+  const navigate = useNavigate();
+
+  // Determine if user is a driver
+  const isDriver = currentUser?.isDriver || false;
+
+  // Get default tab based on user type
+  const getDefaultTab = () => {
+    if (location.state?.tab) return location.state.tab;
+    return isDriver ? 'received' : 'demands';
+  };
+
+  const [activeTab, setActiveTab] = useState(getDefaultTab()); // 'demands', 'myOffers', 'sent', or 'received'
   const [bookings, setBookings] = useState([]);
   const [demands, setDemands] = useState([]);
   const [myOffers, setMyOffers] = useState([]); // Driver's own offers
@@ -35,12 +48,33 @@ export default function Bookings() {
     onConfirm: null,
     variant: 'danger',
   });
-  const { currentUser } = useAuth();
-  const { showSuccess, showError, fetchPendingCount } = useNotifications();
-  const navigate = useNavigate();
 
-  // Determine if user is a driver
-  const isDriver = currentUser?.isDriver || false;
+  // Tab configuration based on user type
+  // For Drivers: Active tabs first (received, myOffers), then disabled (sent, demands)
+  // For Passengers: Active tabs first (demands, sent), then disabled (myOffers, received)
+  const tabs = isDriver
+    ? [
+        { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: true },
+        { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: true },
+        { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: false },
+        { id: 'demands', label: 'طلباتي', icon: '👤', enabled: false },
+      ]
+    : [
+        { id: 'demands', label: 'طلباتي', icon: '👤', enabled: true },
+        { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: true },
+        { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: false },
+        { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: false },
+      ];
+
+  // Handle tab click
+  const handleTabClick = (tab) => {
+    if (!tab.enabled) {
+      const message = isDriver ? 'هذه الميزة متاحة للركاب' : 'هذه الميزة متاحة للسائقين';
+      showInfo(message);
+      return;
+    }
+    setActiveTab(tab.id);
+  };
 
   useEffect(() => {
     if (!currentUser) {
@@ -778,7 +812,7 @@ export default function Bookings() {
           aria-label="أنواع الحجوزات"
           style={{
             display: 'grid',
-            gridTemplateColumns: isDriver ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 'var(--space-2)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
@@ -786,163 +820,44 @@ export default function Bookings() {
             padding: 'var(--space-1)',
           }}
         >
-          {/* طلباتي - للركاب فقط */}
-          {!isDriver ? (
+          {tabs.map((tab) => (
             <button
-              onClick={() => setActiveTab('demands')}
+              key={tab.id}
+              onClick={() => handleTabClick(tab)}
               role="tab"
-              aria-selected={activeTab === 'demands'}
+              aria-selected={activeTab === tab.id}
               aria-controls="bookings-panel"
-              aria-label="طلباتي التي أنشأتها"
+              aria-label={tab.label}
+              aria-disabled={!tab.enabled}
               style={{
                 padding: 'var(--space-3)',
-                border: 'none',
+                border: !tab.enabled ? '2px dashed var(--border-light)' : 'none',
                 borderRadius: 'var(--radius-sm)',
-                background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
-                color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif',
-                boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
-              }}
-            >
-              🙋 طلباتي
-            </button>
-          ) : (
-            <button
-              disabled
-              role="tab"
-              aria-label="طلباتي - للركاب فقط"
-              title="هذا التبويب مخصص للركاب"
-              style={{
-                padding: 'var(--space-3)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-muted)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'not-allowed',
-                fontFamily: '"Cairo", sans-serif',
-                opacity: 0.5,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '2px',
-                }}
-              >
-                <span>🙋 طلباتي</span>
-                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>(للركاب)</span>
-              </div>
-            </button>
-          )}
-
-          {/* عروضي - للسائقين فقط */}
-          {isDriver ? (
-            <button
-              onClick={() => setActiveTab('myOffers')}
-              role="tab"
-              aria-selected={activeTab === 'myOffers'}
-              aria-controls="bookings-panel"
-              aria-label="عروضي التي أنشأتها"
-              style={{
-                padding: 'var(--space-3)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background:
-                  activeTab === 'myOffers'
-                    ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                background: !tab.enabled
+                  ? 'var(--surface-secondary)'
+                  : activeTab === tab.id
+                    ? tab.id === 'received'
+                      ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                      : tab.id === 'myOffers'
+                        ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                        : 'var(--surface-primary)'
                     : 'transparent',
-                color: activeTab === 'myOffers' ? 'white' : 'var(--text-secondary)',
+                color: !tab.enabled
+                  ? 'var(--text-muted)'
+                  : activeTab === tab.id
+                    ? tab.id === 'received' || tab.id === 'myOffers'
+                      ? 'white'
+                      : 'var(--text-primary)'
+                    : 'var(--text-secondary)',
                 fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
+                fontWeight: activeTab === tab.id ? '700' : '600',
+                cursor: tab.enabled ? 'pointer' : 'not-allowed',
                 fontFamily: '"Cairo", sans-serif',
-                boxShadow: activeTab === 'myOffers' ? 'var(--shadow-sm)' : 'none',
+                boxShadow: activeTab === tab.id && tab.enabled ? 'var(--shadow-sm)' : 'none',
+                opacity: tab.enabled ? 1 : 0.5,
                 transition: 'all 0.2s ease',
               }}
             >
-              🚗 عروضي
-            </button>
-          ) : null}
-
-          {/* حجوزاتي المرسلة */}
-          <button
-            onClick={() => setActiveTab('sent')}
-            role="tab"
-            aria-selected={activeTab === 'sent'}
-            aria-controls="bookings-panel"
-            aria-label={isDriver ? 'حجوزاتي على طلبات الركاب' : 'حجوزاتي على عروض السائقين'}
-            style={{
-              padding: 'var(--space-3)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              background: activeTab === 'sent' ? 'var(--surface-primary)' : 'transparent',
-              color: activeTab === 'sent' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'sent' ? 'var(--shadow-sm)' : 'none',
-            }}
-          >
-            📤 حجوزاتي
-          </button>
-
-          {/* الحجوزات الواردة - للسائقين */}
-          {isDriver ? (
-            <button
-              onClick={() => setActiveTab('received')}
-              role="tab"
-              aria-selected={activeTab === 'received'}
-              aria-controls="bookings-panel"
-              aria-label="الحجوزات الواردة على عروضي"
-              style={{
-                padding: 'var(--space-3)',
-                borderRadius: 'var(--radius-sm)',
-                background:
-                  activeTab === 'received'
-                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                    : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
-                color: activeTab === 'received' ? 'white' : '#065f46',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '700',
-                cursor: 'pointer',
-                fontFamily: '"Cairo", sans-serif',
-                boxShadow:
-                  activeTab === 'received'
-                    ? '0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2)'
-                    : 'none',
-                border: '2px solid #10b981',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              📥 الحجوزات الواردة
-            </button>
-          ) : (
-            <button
-              disabled
-              role="tab"
-              aria-label="الحجوزات الواردة - للسائقين فقط"
-              title="هذا التبويب مخصص للسائقين"
-              style={{
-                padding: 'var(--space-3)',
-                border: '2px dashed var(--border-light)',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--surface-secondary)',
-                color: 'var(--text-muted)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: '600',
-                cursor: 'not-allowed',
-                fontFamily: '"Cairo", sans-serif',
-                opacity: 0.5,
-              }}
-            >
               <div
                 style={{
                   display: 'flex',
@@ -951,11 +866,17 @@ export default function Bookings() {
                   gap: '2px',
                 }}
               >
-                <span>📥 الحجوزات الواردة</span>
-                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>(للسائقين)</span>
+                <span>
+                  {tab.icon} {tab.label} {!tab.enabled && '🔒'}
+                </span>
+                {!tab.enabled && (
+                  <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
+                    {tab.icon === '🚗' ? '(للسائقين)' : '(للركاب)'}
+                  </span>
+                )}
               </div>
             </button>
-          )}
+          ))}
         </div>
 
         {/* Error Message */}

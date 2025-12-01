@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { demandsAPI, offersAPI, citiesAPI } from '../services/api';
 import { formatLargeNumber, toEnglishNumber } from '../utils/formatters';
+import SearchableCitySelect from '../components/UI/SearchableCitySelect';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -15,10 +16,6 @@ const Home = () => {
   const [availableSeats, setAvailableSeats] = useState('1');
   const [pricePerSeat, setPricePerSeat] = useState('');
   const [isSwapping, setIsSwapping] = useState(false);
-  const [pickupSuggestions, setPickupSuggestions] = useState([]);
-  const [dropSuggestions, setDropSuggestions] = useState([]);
-  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
-  const [showDropSuggestions, setShowDropSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [availableCities, setAvailableCities] = useState([]);
@@ -87,15 +84,6 @@ const Home = () => {
     now.setHours(now.getHours() + 1);
     const timeString = now.toTimeString().slice(0, 5);
     setDepartureTime(timeString);
-
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('input')) {
-        setShowPickupSuggestions(false);
-        setShowDropSuggestions(false);
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -191,38 +179,6 @@ const Home = () => {
       setDropLocation(pickupLocation);
       setIsSwapping(false);
     }, 200);
-  };
-
-  const handlePickupChange = (value) => {
-    setPickupLocation(value);
-    if (value.trim()) {
-      const filtered = availableCities.filter((city) => city.includes(value.trim()));
-      setPickupSuggestions(filtered);
-      setShowPickupSuggestions(filtered.length > 0);
-    } else {
-      setShowPickupSuggestions(false);
-    }
-  };
-
-  const handleDropChange = (value) => {
-    setDropLocation(value);
-    if (value.trim()) {
-      const filtered = availableCities.filter((city) => city.includes(value.trim()));
-      setDropSuggestions(filtered);
-      setShowDropSuggestions(filtered.length > 0);
-    } else {
-      setShowDropSuggestions(false);
-    }
-  };
-
-  const selectPickupCity = (city) => {
-    setPickupLocation(city);
-    setShowPickupSuggestions(false);
-  };
-
-  const selectDropCity = (city) => {
-    setDropLocation(city);
-    setShowDropSuggestions(false);
   };
 
   const saveNewCityIfNeeded = async (cityName) => {
@@ -349,57 +305,14 @@ const Home = () => {
           <div className={styles.locationRow}>
             <div className={`${styles.locationMarker} ${styles.locationMarkerFrom}`} />
             <div className={styles.locationInputWrapper}>
-              <input
-                type="text"
-                placeholder={t('pickupLocation')}
+              <SearchableCitySelect
                 value={pickupLocation}
-                onChange={(e) => handlePickupChange(e.target.value)}
-                onFocus={() => {
-                  if (pickupLocation.trim()) {
-                    const filtered = availableCities.filter((city) =>
-                      city.includes(pickupLocation.trim())
-                    );
-                    if (filtered.length > 0) {
-                      setPickupSuggestions(filtered);
-                      setShowPickupSuggestions(true);
-                    }
-                  }
-                }}
-                className={styles.locationInput}
-                aria-label="نقطة الانطلاق"
-                aria-describedby={showPickupSuggestions ? 'pickup-suggestions' : undefined}
-                aria-autocomplete="list"
-                aria-expanded={showPickupSuggestions}
-                aria-controls="pickup-suggestions"
-                role="combobox"
+                onChange={setPickupLocation}
+                cities={availableCities}
+                placeholder={t('pickupLocation')}
+                showAllOption={false}
+                id="pickup-city"
               />
-              {showPickupSuggestions && pickupSuggestions.length > 0 && (
-                <div
-                  className={styles.suggestions}
-                  id="pickup-suggestions"
-                  role="listbox"
-                  aria-label="مقترحات نقطة الانطلاق"
-                >
-                  {pickupSuggestions.map((city, index) => (
-                    <div
-                      key={index}
-                      onClick={() => selectPickupCity(city)}
-                      className={styles.suggestionItem}
-                      role="option"
-                      aria-selected={pickupLocation === city}
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          selectPickupCity(city);
-                        }
-                      }}
-                    >
-                      {city}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
@@ -421,57 +334,14 @@ const Home = () => {
           <div className={styles.locationRow}>
             <div className={`${styles.locationMarker} ${styles.locationMarkerTo}`} />
             <div className={styles.locationInputWrapper}>
-              <input
-                type="text"
-                placeholder={t('dropLocation')}
+              <SearchableCitySelect
                 value={dropLocation}
-                onChange={(e) => handleDropChange(e.target.value)}
-                onFocus={() => {
-                  if (dropLocation.trim()) {
-                    const filtered = availableCities.filter((city) =>
-                      city.includes(dropLocation.trim())
-                    );
-                    if (filtered.length > 0) {
-                      setDropSuggestions(filtered);
-                      setShowDropSuggestions(true);
-                    }
-                  }
-                }}
-                className={styles.locationInput}
-                aria-label="نقطة الوصول"
-                aria-describedby={showDropSuggestions ? 'drop-suggestions' : undefined}
-                aria-autocomplete="list"
-                aria-expanded={showDropSuggestions}
-                aria-controls="drop-suggestions"
-                role="combobox"
+                onChange={setDropLocation}
+                cities={availableCities}
+                placeholder={t('dropLocation')}
+                showAllOption={false}
+                id="drop-city"
               />
-              {showDropSuggestions && dropSuggestions.length > 0 && (
-                <div
-                  className={styles.suggestions}
-                  id="drop-suggestions"
-                  role="listbox"
-                  aria-label="مقترحات نقطة الوصول"
-                >
-                  {dropSuggestions.map((city, index) => (
-                    <div
-                      key={index}
-                      onClick={() => selectDropCity(city)}
-                      className={styles.suggestionItem}
-                      role="option"
-                      aria-selected={dropLocation === city}
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          selectDropCity(city);
-                        }
-                      }}
-                    >
-                      {city}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>

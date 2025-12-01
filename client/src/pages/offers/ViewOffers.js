@@ -404,16 +404,7 @@ const ViewOffers = React.memo(function ViewOffers() {
     }
   };
 
-  // Use dynamic cities from database, fallback to defaults if empty
-  const MAIN_CITIES = React.useMemo(() => {
-    if (availableCities.length > 0) {
-      // Return first 5 cities as main cities
-      return availableCities.slice(0, 5);
-    }
-    return DEFAULT_CITIES.slice(0, 5);
-  }, [availableCities]);
-
-  // All cities (for advanced filters)
+  // All cities from database, fallback to defaults if empty
   const IRAQ_CITIES = React.useMemo(() => {
     if (availableCities.length > 0) {
       return availableCities;
@@ -528,13 +519,12 @@ const ViewOffers = React.memo(function ViewOffers() {
           </p>
         </div>
 
-        {/* Filters - NEW COLLAPSIBLE SEARCH FORM */}
+        {/* Filters - Collapsible Search Form with Searchable City Dropdowns */}
         <CollapsibleSearchForm
           filters={filters}
           onFiltersChange={setFilters}
           onSearch={handleFilter}
           onClearFilters={handleClearFilters}
-          mainCities={MAIN_CITIES}
           allCities={IRAQ_CITIES}
           isDriver={isDriver}
         />
