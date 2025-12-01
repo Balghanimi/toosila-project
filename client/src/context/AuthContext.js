@@ -25,8 +25,8 @@ export function AuthProvider({ children }) {
 
         if (token && savedUser) {
           const userData = JSON.parse(savedUser);
-          // Validate user data structure
-          if (userData.id && userData.email && userData.name) {
+          // Validate user data structure - support both email and phone-based users
+          if (userData.id && userData.name && (userData.email || userData.phone)) {
             // Load cached user first for immediate UI rendering
             setUser(userData);
 
@@ -172,13 +172,28 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Login function - API-based
-  const login = async (credentials) => {
+  // Login function - supports both email/password and direct token/user (for OTP flow)
+  const login = async (credentialsOrToken, userDataOrNull = null) => {
     setError('');
     setLoading(true);
 
     try {
-      const { email, password } = credentials;
+      // Check if this is a direct login with token and user (from OTP verification)
+      if (typeof credentialsOrToken === 'string' && userDataOrNull) {
+        // Direct login with token and user object
+        const token = credentialsOrToken;
+        const userData = userDataOrNull;
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        setUser(userData);
+
+        setLoading(false);
+        return { success: true, user: userData };
+      }
+
+      // Traditional email/password login
+      const { email, password } = credentialsOrToken;
 
       if (!email || !password) {
         throw new Error('البريد الإلكتروني وكلمة المرور مطلوبان');

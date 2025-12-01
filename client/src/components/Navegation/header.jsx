@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotifications } from '../../context/NotificationContext';
 import NotificationBell from '../notifications/NotificationBell';
-import AuthModal from '../Auth/AuthModal';
 import UserMenu from '../Auth/UserMenu';
 import ThemeToggle from '../ThemeToggle';
 import logoHeader from '../../assets/logo-header.png';
@@ -13,7 +12,6 @@ import logoHeader from '../../assets/logo-header.png';
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, isAuthenticated, currentUser } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
@@ -29,7 +27,8 @@ const Header = () => {
     if (isAuthenticated) {
       setShowUserMenu(true);
     } else {
-      setShowAuthModal(true);
+      // Navigate to phone login page instead of showing modal
+      navigate('/login');
     }
   };
 
@@ -341,7 +340,24 @@ const Header = () => {
 
               {/* إذا لم يكن مسجل دخول */}
               {!currentUser && (
-                <p className={styles.placeholder}>يرجى تسجيل الدخول لرؤية القائمة الكاملة</p>
+                <>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => {
+                      navigate('/login');
+                      toggleDrawer();
+                    }}
+                    style={{
+                      background: 'var(--primary)',
+                      color: 'white',
+                      fontWeight: '600',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    📱 تسجيل الدخول
+                  </button>
+                  <p className={styles.placeholder}>يرجى تسجيل الدخول لرؤية القائمة الكاملة</p>
+                </>
               )}
 
               {/* قسم الاتصال بنا */}
@@ -409,15 +425,6 @@ const Header = () => {
             </div>
           </nav>
         </div>
-      )}
-
-      {/* Authentication Modal */}
-      {showAuthModal && (
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          initialMode="login"
-        />
       )}
 
       {/* User Menu */}
