@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { offersAPI, demandsAPI, bookingsAPI } from '../../services/api';
+import { offersAPI, demandsAPI, bookingsAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm';
@@ -35,6 +35,10 @@ const ViewOffers = React.memo(function ViewOffers() {
     sortBy: 'date', // date, price, rating
   });
 
+  // Dynamic cities from database
+  const [availableCities, setAvailableCities] = useState([]);
+  const [citiesLoading, setCitiesLoading] = useState(true);
+
   const { currentUser, user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const navigate = useNavigate();
@@ -42,6 +46,45 @@ const ViewOffers = React.memo(function ViewOffers() {
 
   // Determine if user is a driver
   const isDriver = user?.isDriver || currentUser?.isDriver || false;
+
+  // Fetch cities from database with caching
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        setCitiesLoading(true);
+        // Check cache first
+        const cached = localStorage.getItem('cached_cities');
+        const cacheTime = localStorage.getItem('cached_cities_time');
+        const now = Date.now();
+        const CACHE_TTL = 60 * 60 * 1000; // 1 hour cache (refresh when user creates new offer/demand)
+
+        if (cached && cacheTime && now - parseInt(cacheTime) < CACHE_TTL) {
+          setAvailableCities(JSON.parse(cached));
+          setCitiesLoading(false);
+          return;
+        }
+
+        // Fetch fresh data from API
+        const response = await citiesAPI.getAll();
+        const cities = response.cities || [];
+        setAvailableCities(cities);
+
+        // Cache for next time
+        localStorage.setItem('cached_cities', JSON.stringify(cities));
+        localStorage.setItem('cached_cities_time', now.toString());
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        // Use cached data if available
+        const cached = localStorage.getItem('cached_cities');
+        if (cached) {
+          setAvailableCities(JSON.parse(cached));
+        }
+      } finally {
+        setCitiesLoading(false);
+      }
+    };
+    fetchCities();
+  }, []);
 
   useEffect(() => {
     // Redirect drivers to demands page
@@ -351,26 +394,25 @@ const ViewOffers = React.memo(function ViewOffers() {
     }
   };
 
-  // PERFORMANCE FIX: Memoized constant arrays to prevent recreation on every render
-  const MAIN_CITIES = React.useMemo(() => ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'], []);
+  // Default fallback cities (used if API fails or while loading)
+  const DEFAULT_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل', 'كربلاء', 'ذي قار', 'ديالى', 'الأنبار', 'واسط', 'ميسان'];
 
-  // All Iraqi cities (for advanced filters)
-  const IRAQ_CITIES = React.useMemo(
-    () => [
-      'بغداد',
-      'البصرة',
-      'النجف',
-      'أربيل',
-      'الموصل',
-      'كربلاء',
-      'ذي قار',
-      'ديالى',
-      'الأنبار',
-      'واسط',
-      'ميسان',
-    ],
-    []
-  );
+  // Use dynamic cities from database, fallback to defaults if empty
+  const MAIN_CITIES = React.useMemo(() => {
+    if (availableCities.length > 0) {
+      // Return first 5 cities as main cities
+      return availableCities.slice(0, 5);
+    }
+    return DEFAULT_CITIES.slice(0, 5);
+  }, [availableCities]);
+
+  // All cities (for advanced filters)
+  const IRAQ_CITIES = React.useMemo(() => {
+    if (availableCities.length > 0) {
+      return availableCities;
+    }
+    return DEFAULT_CITIES;
+  }, [availableCities]);
 
   // Sorting is handled server-side (created_at DESC by default)
 

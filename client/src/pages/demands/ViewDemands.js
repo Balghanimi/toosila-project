@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { demandsAPI, demandResponsesAPI } from '../../services/api';
+import { demandsAPI, demandResponsesAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import DemandResponseForm from '../../components/DemandResponseForm';
 import DemandResponsesList from '../../components/DemandResponsesList';
@@ -24,6 +24,9 @@ export default function ViewDemands() {
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
+  // Dynamic cities from database
+  const [availableCities, setAvailableCities] = useState([]);
+
   // States for demand response functionality
   const [selectedDemand, setSelectedDemand] = useState(null);
   const [showResponseForm, setShowResponseForm] = useState(false);
@@ -45,6 +48,41 @@ export default function ViewDemands() {
       navigate('/offers', { replace: true });
     }
   }, [currentUser, isDriver, navigate]);
+
+  // Fetch cities from database with caching
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        // Check cache first
+        const cached = localStorage.getItem('cached_cities');
+        const cacheTime = localStorage.getItem('cached_cities_time');
+        const now = Date.now();
+        const CACHE_TTL = 60 * 60 * 1000; // 1 hour cache
+
+        if (cached && cacheTime && now - parseInt(cacheTime) < CACHE_TTL) {
+          setAvailableCities(JSON.parse(cached));
+          return;
+        }
+
+        // Fetch fresh data from API
+        const response = await citiesAPI.getAll();
+        const cities = response.cities || [];
+        setAvailableCities(cities);
+
+        // Cache for next time
+        localStorage.setItem('cached_cities', JSON.stringify(cities));
+        localStorage.setItem('cached_cities_time', now.toString());
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        // Use cached data if available
+        const cached = localStorage.getItem('cached_cities');
+        if (cached) {
+          setAvailableCities(JSON.parse(cached));
+        }
+      }
+    };
+    fetchCities();
+  }, []);
 
   useEffect(() => {
     // Only fetch if user is a driver
@@ -234,22 +272,14 @@ export default function ViewDemands() {
   };
 
   // Main cities (most popular routes)
-  const MAIN_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل'];
+  // Default fallback cities (used if API fails or while loading)
+  const DEFAULT_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل', 'كربلاء', 'ذي قار', 'ديالى', 'الأنبار', 'واسط', 'ميسان'];
 
-  // All Iraqi cities (for advanced filters)
-  const IRAQ_CITIES = [
-    'بغداد',
-    'البصرة',
-    'النجف',
-    'أربيل',
-    'الموصل',
-    'كربلاء',
-    'ذي قار',
-    'ديالى',
-    'الأنبار',
-    'واسط',
-    'ميسان',
-  ];
+  // Use dynamic cities from database, fallback to defaults if empty
+  const MAIN_CITIES = availableCities.length > 0 ? availableCities.slice(0, 5) : DEFAULT_CITIES.slice(0, 5);
+
+  // All cities (for advanced filters)
+  const IRAQ_CITIES = availableCities.length > 0 ? availableCities : DEFAULT_CITIES;
 
   return (
     <div
