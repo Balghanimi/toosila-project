@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { demandsAPI, offersAPI, citiesAPI } from '../services/api';
 import { formatLargeNumber, toEnglishNumber } from '../utils/formatters';
 import SearchableCitySelect from '../components/UI/SearchableCitySelect';
@@ -23,6 +24,7 @@ const Home = () => {
   const location = useLocation();
   const { t } = useLanguage();
   const { currentUser } = useAuth();
+  const { showSuccess, showError } = useNotifications();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -135,9 +137,16 @@ const Home = () => {
         };
 
         await offersAPI.create(offerData);
-        navigate('/offers', { state: { success: true } });
+        showSuccess('تم نشر العرض بنجاح! ✅');
+        clearForm();
+        setIsSubmitting(false);
+        // Optional: navigate to offers page after short delay
+        setTimeout(() => {
+          navigate('/bookings', { state: { tab: 'myOffers' } });
+        }, 1500);
       } catch (err) {
         console.error('Error creating offer:', err);
+        showError('حدث خطأ أثناء نشر العرض. حاول مرة أخرى.');
         setSubmitError(err.message || 'حدث خطأ أثناء نشر العرض. حاول مرة أخرى.');
         setIsSubmitting(false);
       }
@@ -163,9 +172,16 @@ const Home = () => {
         };
 
         await demandsAPI.create(demandData);
-        navigate('/bookings', { state: { tab: 'demands' } });
+        showSuccess('تم نشر الطلب بنجاح! ✅');
+        clearForm();
+        setIsSubmitting(false);
+        // Navigate to bookings page after short delay
+        setTimeout(() => {
+          navigate('/bookings', { state: { tab: 'demands' } });
+        }, 1500);
       } catch (err) {
         console.error('Error creating demand:', err);
+        showError('حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
         setSubmitError(err.message || 'حدث خطأ أثناء نشر الطلب. حاول مرة أخرى.');
         setIsSubmitting(false);
       }
@@ -199,11 +215,51 @@ const Home = () => {
     }
   };
 
-  const getCurrentDate = () => {
-    const today = new Date();
-    const day = today.getDate();
-    const month = today.toLocaleDateString('ar-EG', { month: 'long' });
-    return `${toEnglishNumber(day)} ${month}`;
+  // Clear form after successful submission
+  const clearForm = () => {
+    setPickupLocation('');
+    setDropLocation('');
+    setSelectedDate('today');
+    setAvailableSeats('1');
+    setPricePerSeat('');
+    // Reset departure time to one hour from now
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    setDepartureTime(now.toTimeString().slice(0, 5));
+  };
+
+  // Format the selected date in Arabic
+  const getFormattedDate = () => {
+    let dateObj;
+    if (selectedDate === 'today') {
+      dateObj = new Date();
+    } else if (selectedDate === 'tomorrow') {
+      dateObj = new Date();
+      dateObj.setDate(dateObj.getDate() + 1);
+    } else {
+      dateObj = new Date(selectedDate);
+    }
+
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+
+    return dateObj.toLocaleDateString('ar-IQ', options);
+  };
+
+  // Format time in Arabic (12-hour with صباحاً/مساءً)
+  const getFormattedTime = () => {
+    if (!departureTime) return '';
+
+    const [hours, minutes] = departureTime.split(':');
+    const hour = parseInt(hours);
+    const period = hour >= 12 ? 'مساءً' : 'صباحاً';
+    const hour12 = hour % 12 || 12;
+
+    return `${toEnglishNumber(hour12)}:${toEnglishNumber(minutes)} ${period}`;
   };
 
   return (
@@ -349,11 +405,8 @@ const Home = () => {
         {/* Date Time Section */}
         <div className={styles.dateTimeSection}>
           <div className={styles.dateTimeHeader}>
-            <div
-              className={styles.dateTimeLabel}
-              style={{ direction: 'ltr', unicodeBidi: 'embed' }}
-            >
-              📅 {getCurrentDate()}، {toEnglishNumber(departureTime)}
+            <div className={styles.dateTimeLabel}>
+              📅 {getFormattedDate()} - 🕐 {getFormattedTime()}
             </div>
             <button
               onClick={() => {
