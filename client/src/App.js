@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Navegation/header';
 import BottomNav from './components/BottomNav';
 import FloatingDownloadButton from './components/FloatingDownloadButton';
@@ -99,7 +99,8 @@ export default function App() {
                                     <Route path="/bookings" element={<Bookings />} />
                                     <Route path="/settings" element={<Settings />} />
                                     {/* مسارات العروض */}
-                                    <Route path="/post-offer" element={<PostOfferModern />} />
+                                    {/* Redirect /post-offer to homepage - form is on homepage */}
+                                    <Route path="/post-offer" element={<Navigate to="/" replace />} />
                                     <Route path="/offers" element={<ViewOffers />} />
                                     {/* مسارات الطلبات */}
                                     <Route path="/demands" element={<ViewDemands />} />

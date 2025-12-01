@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { demandsAPI, citiesAPI } from '../services/api';
+import { demandsAPI, offersAPI, citiesAPI } from '../services/api';
 import { formatLargeNumber, toEnglishNumber } from '../utils/formatters';
 import styles from './Home.module.css';
 
@@ -128,15 +128,31 @@ const Home = () => {
         navigate('/offers', { state: searchParams });
       }
     } else if (mode === 'offer') {
-      const offerData = {
-        fromCity: pickupLocation,
-        toCity: dropLocation,
-        departureDate: calculatedDate,
-        departureTime: departureTime,
-        seats: availableSeats,
-        price: pricePerSeat,
-      };
-      navigate('/post-offer', { state: offerData });
+      setIsSubmitting(true);
+      setSubmitError('');
+
+      try {
+        await saveNewCityIfNeeded(pickupLocation);
+        await saveNewCityIfNeeded(dropLocation);
+
+        // Combine date and time into ISO format
+        const departureDateTime = new Date(`${calculatedDate}T${departureTime}:00`);
+
+        const offerData = {
+          fromCity: pickupLocation.trim(),
+          toCity: dropLocation.trim(),
+          departureTime: departureDateTime.toISOString(),
+          seats: parseInt(availableSeats),
+          price: parseFloat(pricePerSeat),
+        };
+
+        await offersAPI.create(offerData);
+        navigate('/offers', { state: { success: true } });
+      } catch (err) {
+        console.error('Error creating offer:', err);
+        setSubmitError(err.message || 'حدث خطأ أثناء نشر العرض. حاول مرة أخرى.');
+        setIsSubmitting(false);
+      }
     } else if (mode === 'demand') {
       setIsSubmitting(true);
       setSubmitError('');

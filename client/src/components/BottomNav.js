@@ -199,7 +199,7 @@ const BottomNav = () => {
       key: 'carpool',
       label: t('home'),
       icon: Icons.carpool,
-      paths: ['/', '/offers', '/post-offer'],
+      paths: ['/', '/offers'],
     },
     {
       key: 'mytrips',

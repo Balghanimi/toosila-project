@@ -532,7 +532,7 @@ const Dashboard = () => {
             {/* للسائقين: نشر رحلة جديدة (ثانوي) */}
             {currentUser?.isDriver && (
               <button
-                onClick={() => navigate('/post-offer')}
+                onClick={() => navigate('/', { state: { mode: 'offer' } })}
                 style={{
                   padding: 'var(--space-4)',
                   background: 'var(--surface-secondary)',

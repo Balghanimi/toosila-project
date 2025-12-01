@@ -617,7 +617,7 @@ const ViewOffers = React.memo(function ViewOffers() {
             </p>
             {currentUser && currentUser.isDriver && (
               <button
-                onClick={() => navigate('/post-offer')}
+                onClick={() => navigate('/', { state: { mode: 'offer' } })}
                 style={{
                   padding: 'var(--space-3) var(--space-6)',
                   background: 'var(--primary)',

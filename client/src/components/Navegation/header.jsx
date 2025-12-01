@@ -196,7 +196,7 @@ const Header = () => {
                   <button
                     className={styles.drawerItem}
                     onClick={() => {
-                      navigate('/post-offer');
+                      navigate('/', { state: { mode: 'offer' } });
                       toggleDrawer();
                     }}
                   >

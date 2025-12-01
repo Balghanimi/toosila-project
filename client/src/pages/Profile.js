@@ -113,14 +113,14 @@ const Profile = () => {
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div
-            onClick={() => navigate(currentUser.isDriver ? '/post-offer' : '/')}
+            onClick={() => navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined })}
             role="button"
             tabIndex={0}
             aria-label={currentUser.isDriver ? 'انقر لنشر رحلة جديدة' : 'انقر للبحث عن رحلة'}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                navigate(currentUser.isDriver ? '/post-offer' : '/');
+                navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined });
               }
             }}
             style={{
@@ -338,7 +338,7 @@ const Profile = () => {
           {/* Quick Action Button - Driver */}
           {currentUser.isDriver ? (
             <button
-              onClick={() => navigate('/post-offer')}
+              onClick={() => navigate('/', { state: { mode: 'offer' } })}
               style={{
                 width: '100%',
                 padding: 'var(--space-5)',
