@@ -6,7 +6,13 @@ const { query } = require('../config/db');
 const config = require('../config/env');
 
 const OTPIQ_API_KEY = process.env.OTPIQ_API_KEY;
-const OTPIQ_BASE_URL = 'https://api.otpiq.com/api/v1';
+
+/**
+ * Generate a random 6-digit OTP code
+ */
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 /**
  * Helper function to format Iraqi phone numbers
@@ -21,8 +27,7 @@ function formatIraqiPhone(phone) {
 
   // Handle different formats
   if (cleaned.startsWith('+964')) {
-    // Already in correct format, just clean it
-    cleaned = cleaned;
+    // Already in correct format
   } else if (cleaned.startsWith('964')) {
     cleaned = '+' + cleaned;
   } else if (cleaned.startsWith('07')) {
@@ -50,30 +55,8 @@ function formatIraqiPhone(phone) {
  * /otp/send:
  *   post:
  *     summary: Send OTP to phone number
- *     description: Sends a 6-digit OTP code via WhatsApp (primary) or SMS (fallback)
+ *     description: Generates a 6-digit OTP code and sends it via WhatsApp (primary) or SMS (fallback)
  *     tags: [OTP]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *             properties:
- *               phone:
- *                 type: string
- *                 description: Iraqi phone number (07X XXXX XXXX format)
- *                 example: "07812345678"
- *     responses:
- *       200:
- *         description: OTP sent successfully
- *       400:
- *         description: Invalid phone number
- *       429:
- *         description: Rate limit exceeded
- *       500:
- *         description: Failed to send OTP
  */
 router.post('/send', async (req, res) => {
   try {
@@ -88,14 +71,14 @@ router.post('/send', async (req, res) => {
       });
     }
 
-    // Check rate limiting (max 3 OTPs per phone per hour)
+    // Check rate limiting (max 5 OTPs per phone per hour)
     const recentOTPs = await query(
       `SELECT COUNT(*) FROM otp_requests
        WHERE phone = $1 AND created_at > NOW() - INTERVAL '1 hour'`,
       [phone]
     );
 
-    if (parseInt(recentOTPs.rows[0].count) >= 3) {
+    if (parseInt(recentOTPs.rows[0].count) >= 5) {
       return res.status(429).json({
         success: false,
         error: 'تم تجاوز الحد المسموح. حاول بعد ساعة.',
@@ -111,38 +94,64 @@ router.post('/send', async (req, res) => {
       });
     }
 
+    // Generate OTP code locally
+    const code = generateOTP();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    // Invalidate previous OTPs for this phone
+    await query(`UPDATE otp_requests SET verified = true WHERE phone = $1 AND verified = false`, [
+      phone,
+    ]);
+
+    // Store OTP in database
+    await query(
+      `INSERT INTO otp_requests (phone, code, channel, expires_at)
+       VALUES ($1, $2, $3, $4)`,
+      [phone, code, 'whatsapp', expiresAt]
+    );
+
     // Send OTP via OTPIQ (WhatsApp first, then SMS fallback)
+    const phoneWithoutPlus = phone.replace('+', '');
     let channel = 'whatsapp';
-    let response;
 
     try {
-      response = await axios.post(
-        `${OTPIQ_BASE_URL}/send`,
+      // Try WhatsApp first
+      await axios.post(
+        'https://api.otpiq.com/api/v1/sms/send',
         {
-          phone: phone,
-          channel: 'whatsapp',
-          projectId: 'toosila',
+          phoneNumber: phoneWithoutPlus,
+          smsType: 'verification',
+          verificationCode: code,
+          provider: 'whatsapp-sms',
         },
         {
           headers: {
             Authorization: `Bearer ${OTPIQ_API_KEY}`,
             'Content-Type': 'application/json',
           },
-          timeout: 30000, // 30 second timeout
+          timeout: 30000,
         }
       );
-    } catch (whatsappError) {
-      console.log('WhatsApp OTP failed, trying SMS:', whatsappError.message);
 
-      // Fallback to SMS if WhatsApp fails
-      channel = 'sms';
+      console.log(`OTP ${code} sent to ${phone} via WhatsApp`);
+
+      res.json({
+        success: true,
+        message: 'تم إرسال رمز التحقق عبر واتساب',
+        channel: 'whatsapp',
+      });
+    } catch (whatsappError) {
+      console.error('OTPIQ WhatsApp Error:', whatsappError.response?.data || whatsappError.message);
+
+      // Try SMS fallback
       try {
-        response = await axios.post(
-          `${OTPIQ_BASE_URL}/send`,
+        await axios.post(
+          'https://api.otpiq.com/api/v1/sms/send',
           {
-            phone: phone,
-            channel: 'sms',
-            projectId: 'toosila',
+            phoneNumber: phoneWithoutPlus,
+            smsType: 'verification',
+            verificationCode: code,
+            provider: 'sms',
           },
           {
             headers: {
@@ -152,38 +161,38 @@ router.post('/send', async (req, res) => {
             timeout: 30000,
           }
         );
+
+        // Update channel in database
+        await query(
+          `UPDATE otp_requests SET channel = 'sms'
+           WHERE phone = $1 AND code = $2`,
+          [phone, code]
+        );
+
+        console.log(`OTP ${code} sent to ${phone} via SMS`);
+
+        res.json({
+          success: true,
+          message: 'تم إرسال رمز التحقق عبر SMS',
+          channel: 'sms',
+        });
       } catch (smsError) {
-        console.error('SMS OTP also failed:', smsError.message);
-        throw smsError;
+        console.error('OTPIQ SMS Error:', smsError.response?.data || smsError.message);
+
+        // Delete the OTP record since we couldn't send it
+        await query(`DELETE FROM otp_requests WHERE phone = $1 AND code = $2`, [phone, code]);
+
+        res.status(500).json({
+          success: false,
+          error: 'فشل في إرسال رمز التحقق. حاول مرة أخرى.',
+        });
       }
     }
-
-    // Store OTP request in database for tracking
-    await query(
-      `INSERT INTO otp_requests (phone, channel, expires_at)
-       VALUES ($1, $2, NOW() + INTERVAL '10 minutes')`,
-      [phone, channel]
-    );
-
-    res.json({
-      success: true,
-      message: channel === 'whatsapp' ? 'تم إرسال الرمز عبر واتساب' : 'تم إرسال الرمز عبر SMS',
-      channel: channel,
-    });
   } catch (error) {
-    console.error('OTP Send Error:', error.response?.data || error.message);
-
-    // Handle specific OTPIQ errors
-    if (error.response?.status === 401) {
-      return res.status(500).json({
-        success: false,
-        error: 'خطأ في إعدادات الخدمة',
-      });
-    }
-
+    console.error('OTP Send Error:', error);
     res.status(500).json({
       success: false,
-      error: 'فشل في إرسال رمز التحقق. حاول مرة أخرى.',
+      error: 'حدث خطأ في النظام. حاول مرة أخرى.',
     });
   }
 });
@@ -193,31 +202,8 @@ router.post('/send', async (req, res) => {
  * /otp/verify:
  *   post:
  *     summary: Verify OTP code
- *     description: Verifies the 6-digit OTP code and returns user data or indicates new user
+ *     description: Verifies the 6-digit OTP code locally (in our database)
  *     tags: [OTP]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *               - code
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "07812345678"
- *               code:
- *                 type: string
- *                 example: "123456"
- *     responses:
- *       200:
- *         description: OTP verified successfully
- *       400:
- *         description: Invalid or expired OTP
- *       500:
- *         description: Verification failed
  */
 router.post('/verify', async (req, res) => {
   try {
@@ -239,61 +225,35 @@ router.post('/verify', async (req, res) => {
       });
     }
 
-    // Check if OTPIQ API key is configured
-    if (!OTPIQ_API_KEY) {
-      return res.status(500).json({
-        success: false,
-        error: 'خدمة التحقق غير متوفرة حالياً',
-      });
-    }
-
-    // Verify with OTPIQ
-    let verifyResponse;
-    try {
-      verifyResponse = await axios.post(
-        `${OTPIQ_BASE_URL}/verify`,
-        {
-          phone: phone,
-          code: code,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${OTPIQ_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          timeout: 30000,
-        }
-      );
-    } catch (verifyError) {
-      console.error('OTPIQ verify error:', verifyError.response?.data || verifyError.message);
-
-      if (verifyError.response?.status === 400) {
-        return res.status(400).json({
-          success: false,
-          error: 'رمز التحقق غير صحيح أو منتهي الصلاحية',
-        });
-      }
-
-      throw verifyError;
-    }
-
-    // Check if verification was successful
-    if (!verifyResponse.data.success && !verifyResponse.data.verified) {
-      return res.status(400).json({
-        success: false,
-        error: 'رمز التحقق غير صحيح',
-      });
-    }
-
-    // Mark OTP as verified in our database
-    await query(
-      `UPDATE otp_requests
-       SET verified = true
-       WHERE phone = $1 AND verified = false
+    // Verify code in our database (NOT via OTPIQ)
+    const result = await query(
+      `SELECT * FROM otp_requests
+       WHERE phone = $1
+       AND code = $2
+       AND verified = false
+       AND expires_at > NOW()
        ORDER BY created_at DESC
        LIMIT 1`,
-      [phone]
+      [phone, code]
     );
+
+    if (result.rows.length === 0) {
+      // Increment attempts counter for rate limiting
+      await query(
+        `UPDATE otp_requests
+         SET attempts = attempts + 1
+         WHERE phone = $1 AND verified = false`,
+        [phone]
+      );
+
+      return res.status(400).json({
+        success: false,
+        error: 'رمز التحقق غير صحيح أو منتهي الصلاحية',
+      });
+    }
+
+    // Mark OTP as verified
+    await query(`UPDATE otp_requests SET verified = true WHERE id = $1`, [result.rows[0].id]);
 
     // Check if user exists
     const userResult = await query('SELECT * FROM users WHERE phone = $1', [phone]);
@@ -336,11 +296,10 @@ router.post('/verify', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('OTP Verify Error:', error.response?.data || error.message);
-
+    console.error('OTP Verify Error:', error);
     res.status(500).json({
       success: false,
-      error: 'فشل في التحقق. حاول مرة أخرى.',
+      error: 'حدث خطأ في التحقق. حاول مرة أخرى.',
     });
   }
 });
@@ -352,32 +311,6 @@ router.post('/verify', async (req, res) => {
  *     summary: Complete registration for new users
  *     description: Creates a new user account after phone verification
  *     tags: [OTP]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *               - name
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "07812345678"
- *               name:
- *                 type: string
- *                 example: "أحمد محمد"
- *               is_driver:
- *                 type: boolean
- *                 example: false
- *     responses:
- *       200:
- *         description: Registration completed successfully
- *       400:
- *         description: Invalid data or phone already registered
- *       500:
- *         description: Registration failed
  */
 router.post('/complete-registration', async (req, res) => {
   try {
@@ -395,7 +328,6 @@ router.post('/complete-registration', async (req, res) => {
     const verifiedOTP = await query(
       `SELECT * FROM otp_requests
        WHERE phone = $1 AND verified = true
-       AND created_at > NOW() - INTERVAL '10 minutes'
        ORDER BY created_at DESC
        LIMIT 1`,
       [phone]
@@ -457,40 +389,6 @@ router.post('/complete-registration', async (req, res) => {
       error: 'فشل في إكمال التسجيل. حاول مرة أخرى.',
     });
   }
-});
-
-/**
- * @swagger
- * /otp/resend:
- *   post:
- *     summary: Resend OTP code
- *     description: Resends OTP code to the same phone number
- *     tags: [OTP]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "07812345678"
- *     responses:
- *       200:
- *         description: OTP resent successfully
- *       429:
- *         description: Rate limit exceeded
- */
-router.post('/resend', async (req, res) => {
-  // This is essentially the same as /send, but can have different rate limiting if needed
-  // For now, just forward to /send logic
-  return router.handle(req, res, () => {
-    req.url = '/send';
-    router.handle(req, res);
-  });
 });
 
 module.exports = router;
