@@ -954,31 +954,6 @@ export default function ViewDemands() {
                     >
                       💬 مراسلة الراكب
                     </button>
-                    <button
-                      onClick={(e) => handleViewResponses(demand, e)}
-                      style={{
-                        flex: 1,
-                        minWidth: '120px',
-                        padding: 'var(--space-3)',
-                        background: 'var(--surface-secondary)',
-                        color: 'var(--text-primary)',
-                        border: '2px solid var(--border-light)',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        fontFamily: '"Cairo", sans-serif',
-                        transition: 'var(--transition)',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-light)';
-                      }}
-                    >
-                      📋 عرض العروض
-                    </button>
                   </div>
                 )}
 
