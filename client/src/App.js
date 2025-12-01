@@ -30,7 +30,6 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 // Offers
-const PostOfferModern = lazy(() => import('./pages/offers/PostOfferModern'));
 const ViewOffers = lazy(() => import('./pages/offers/ViewOffers'));
 
 // Demands
@@ -100,7 +99,10 @@ export default function App() {
                                     <Route path="/settings" element={<Settings />} />
                                     {/* مسارات العروض */}
                                     {/* Redirect /post-offer to homepage - form is on homepage */}
-                                    <Route path="/post-offer" element={<Navigate to="/" replace />} />
+                                    <Route
+                                      path="/post-offer"
+                                      element={<Navigate to="/" replace />}
+                                    />
                                     <Route path="/offers" element={<ViewOffers />} />
                                     {/* مسارات الطلبات */}
                                     <Route path="/demands" element={<ViewDemands />} />

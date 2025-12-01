@@ -113,7 +113,9 @@ const Profile = () => {
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div
-            onClick={() => navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined })}
+            onClick={() =>
+              navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined })
+            }
             role="button"
             tabIndex={0}
             aria-label={currentUser.isDriver ? 'انقر لنشر رحلة جديدة' : 'انقر للبحث عن رحلة'}
