@@ -490,4 +490,47 @@ export const adminAPI = {
   },
 };
 
+// OTP Phone Verification API
+export const otpAPI = {
+  // Send OTP to phone number
+  send: async (phone) => {
+    const response = await apiRequest('/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+    return response;
+  },
+
+  // Verify OTP code
+  verify: async (phone, code) => {
+    const response = await apiRequest('/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code }),
+    });
+    return response;
+  },
+
+  // Complete registration for new users
+  completeRegistration: async (phone, name, isDriver) => {
+    const response = await apiRequest('/otp/complete-registration', {
+      method: 'POST',
+      body: JSON.stringify({
+        phone,
+        name,
+        is_driver: isDriver,
+      }),
+    });
+    return response;
+  },
+
+  // Resend OTP
+  resend: async (phone) => {
+    const response = await apiRequest('/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+    return response;
+  },
+};
+
 export default apiRequest;

@@ -62,6 +62,9 @@ const EmailVerificationReminder = lazy(() => import('./pages/EmailVerificationRe
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
+// Phone Login
+const PhoneLogin = lazy(() => import('./pages/PhoneLogin'));
+
 // Admin Pages
 const AdminRoute = lazy(() => import('./components/Admin/AdminRoute'));
 const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'));
@@ -155,6 +158,9 @@ export default function App() {
                                       path="/reset-password/:token"
                                       element={<ResetPassword />}
                                     />
+                                    {/* Phone Login/Register */}
+                                    <Route path="/login" element={<PhoneLogin />} />
+                                    <Route path="/register" element={<PhoneLogin />} />
 
                                     {/* Admin Test Page - temporarily disabled */}
                                     {/* <Route path="/admin-test" element={<AdminTest />} /> */}

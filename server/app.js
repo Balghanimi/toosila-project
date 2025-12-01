@@ -37,6 +37,7 @@ const emailVerificationRoutes = require('./routes/emailVerification.routes');
 const passwordResetRoutes = require('./routes/passwordReset.routes');
 const healthRoutes = require('./routes/health.routes');
 const adminRoutes = require('./routes/admin.routes');
+const otpRoutes = require('./routes/otp.routes');
 
 const app = express();
 
@@ -171,6 +172,7 @@ app.use('/api/verification', noCache, verificationRoutes);
 app.use('/api/email-verification', noCache, emailVerificationRoutes);
 app.use('/api/password-reset', noCache, passwordResetRoutes);
 app.use('/api/admin', noCache, adminRoutes); // Admin routes for migrations
+app.use('/api/otp', noCache, otpRoutes); // OTP phone verification routes
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {
