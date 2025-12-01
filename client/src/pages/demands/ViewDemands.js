@@ -273,10 +273,23 @@ export default function ViewDemands() {
 
   // Main cities (most popular routes)
   // Default fallback cities (used if API fails or while loading)
-  const DEFAULT_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل', 'كربلاء', 'ذي قار', 'ديالى', 'الأنبار', 'واسط', 'ميسان'];
+  const DEFAULT_CITIES = [
+    'بغداد',
+    'البصرة',
+    'النجف',
+    'أربيل',
+    'الموصل',
+    'كربلاء',
+    'ذي قار',
+    'ديالى',
+    'الأنبار',
+    'واسط',
+    'ميسان',
+  ];
 
   // Use dynamic cities from database, fallback to defaults if empty
-  const MAIN_CITIES = availableCities.length > 0 ? availableCities.slice(0, 5) : DEFAULT_CITIES.slice(0, 5);
+  const MAIN_CITIES =
+    availableCities.length > 0 ? availableCities.slice(0, 5) : DEFAULT_CITIES.slice(0, 5);
 
   // All cities (for advanced filters)
   const IRAQ_CITIES = availableCities.length > 0 ? availableCities : DEFAULT_CITIES;

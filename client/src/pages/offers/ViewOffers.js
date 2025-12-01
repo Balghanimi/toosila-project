@@ -37,7 +37,6 @@ const ViewOffers = React.memo(function ViewOffers() {
 
   // Dynamic cities from database
   const [availableCities, setAvailableCities] = useState([]);
-  const [citiesLoading, setCitiesLoading] = useState(true);
 
   const { currentUser, user } = useAuth();
   const { showSuccess, showError } = useNotifications();
@@ -51,7 +50,6 @@ const ViewOffers = React.memo(function ViewOffers() {
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        setCitiesLoading(true);
         // Check cache first
         const cached = localStorage.getItem('cached_cities');
         const cacheTime = localStorage.getItem('cached_cities_time');
@@ -60,7 +58,6 @@ const ViewOffers = React.memo(function ViewOffers() {
 
         if (cached && cacheTime && now - parseInt(cacheTime) < CACHE_TTL) {
           setAvailableCities(JSON.parse(cached));
-          setCitiesLoading(false);
           return;
         }
 
@@ -79,8 +76,6 @@ const ViewOffers = React.memo(function ViewOffers() {
         if (cached) {
           setAvailableCities(JSON.parse(cached));
         }
-      } finally {
-        setCitiesLoading(false);
       }
     };
     fetchCities();
@@ -395,7 +390,19 @@ const ViewOffers = React.memo(function ViewOffers() {
   };
 
   // Default fallback cities (used if API fails or while loading)
-  const DEFAULT_CITIES = ['بغداد', 'البصرة', 'النجف', 'أربيل', 'الموصل', 'كربلاء', 'ذي قار', 'ديالى', 'الأنبار', 'واسط', 'ميسان'];
+  const DEFAULT_CITIES = [
+    'بغداد',
+    'البصرة',
+    'النجف',
+    'أربيل',
+    'الموصل',
+    'كربلاء',
+    'ذي قار',
+    'ديالى',
+    'الأنبار',
+    'واسط',
+    'ميسان',
+  ];
 
   // Use dynamic cities from database, fallback to defaults if empty
   const MAIN_CITIES = React.useMemo(() => {
