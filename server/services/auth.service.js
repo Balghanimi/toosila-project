@@ -42,27 +42,30 @@ class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(password, BCRYPT.SALT_ROUNDS);
 
-    // Generate verification token
-    const { token, hashedToken, expiry } = this.generateVerificationToken();
+    // TEMPORARY: Email verification disabled for graduation demo
+    // TODO: Re-enable email verification for production
+    // const { token, hashedToken, expiry } = this.generateVerificationToken();
 
-    // Create user with verification token
+    // Create user with email already verified (for demo)
     const user = await User.create({
       name,
       email,
       passwordHash,
       isDriver,
       languagePreference,
-      verificationToken: hashedToken,
-      verificationTokenExpires: expiry,
-      emailVerified: false,
+      verificationToken: null,
+      verificationTokenExpires: null,
+      emailVerified: true, // Auto-verify for demo
     });
 
-    // Send verification email (don't fail registration if email fails)
-    await this.sendVerificationEmailSafe(email, name, token);
+    // TEMPORARY: Skip verification email for demo
+    // TODO: Re-enable for production
+    // await this.sendVerificationEmailSafe(email, name, token);
+    console.log('📧 Email verification skipped for demo - user auto-verified:', email);
 
     return {
       user: user.toJSON(),
-      requiresVerification: true,
+      requiresVerification: false, // No verification needed for demo
     };
   }
 
