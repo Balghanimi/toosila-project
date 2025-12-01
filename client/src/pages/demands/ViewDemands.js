@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { demandsAPI, demandResponsesAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import DemandResponseForm from '../../components/DemandResponseForm';
 import DemandResponsesList from '../../components/DemandResponsesList';
 
@@ -50,6 +51,7 @@ export default function ViewDemands() {
   const [responsesLoading, setResponsesLoading] = useState(false);
 
   const { currentUser } = useAuth();
+  const { showSuccess } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -122,6 +124,16 @@ export default function ViewDemands() {
     }
     // eslint-disable-next-line
   }, [location.state, demands]);
+
+  // Handle success message after posting offer (driver redirected from /offers)
+  useEffect(() => {
+    if (location.state?.success) {
+      showSuccess('🎉 تم نشر العرض بنجاح! يمكنك الآن تصفح طلبات الركاب.');
+      // Clear the state to prevent showing message on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line
+  }, [location.state?.success]);
 
   const fetchDemands = async (filterParams = {}) => {
     setLoading(true);

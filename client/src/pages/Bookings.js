@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { bookingsAPI, demandsAPI, demandResponsesAPI } from '../services/api';
+import { bookingsAPI, demandsAPI, demandResponsesAPI, offersAPI } from '../services/api';
 import DemandResponsesList from '../components/DemandResponsesList';
 import ConfirmDialog from '../components/UI/ConfirmDialog';
 import SkeletonLoader from '../components/UI/SkeletonLoader';
@@ -10,9 +10,10 @@ import { formatDate, formatTime, formatPrice, formatSeats } from '../utils/forma
 
 export default function Bookings() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.state?.tab || 'demands'); // 'demands', 'sent', or 'received'
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'demands'); // 'demands', 'myOffers', 'sent', or 'received'
   const [bookings, setBookings] = useState([]);
   const [demands, setDemands] = useState([]);
+  const [myOffers, setMyOffers] = useState([]); // Driver's own offers
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [highlightedBooking, setHighlightedBooking] = useState(
@@ -37,6 +38,9 @@ export default function Bookings() {
   const { currentUser } = useAuth();
   const { showSuccess, showError, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
+
+  // Determine if user is a driver
+  const isDriver = currentUser?.isDriver || false;
 
   useEffect(() => {
     if (!currentUser) {
@@ -181,6 +185,12 @@ export default function Bookings() {
         }
 
         setDemands(demandsWithResponses);
+      } else if (activeTab === 'myOffers') {
+        // جلب عروضي (للسائقين فقط)
+        const response = await offersAPI.getAll({ driverId: currentUser?.id });
+        const driverOffers = response.offers || [];
+        console.log('📦 Fetched my offers:', driverOffers);
+        setMyOffers(driverOffers);
       } else {
         const response =
           activeTab === 'received'
@@ -768,7 +778,7 @@ export default function Bookings() {
           aria-label="أنواع الحجوزات"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: isDriver ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
             gap: 'var(--space-2)',
             marginBottom: 'var(--space-6)',
             background: 'var(--surface-secondary)',
@@ -776,33 +786,98 @@ export default function Bookings() {
             padding: 'var(--space-1)',
           }}
         >
-          <button
-            onClick={() => setActiveTab('demands')}
-            role="tab"
-            aria-selected={activeTab === 'demands'}
-            aria-controls="bookings-panel"
-            aria-label="طلباتي التي أنشأتها"
-            style={{
-              padding: 'var(--space-3)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
-              color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Cairo", sans-serif',
-              boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
-            }}
-          >
-            🙋 طلباتي
-          </button>
+          {/* طلباتي - للركاب فقط */}
+          {!isDriver ? (
+            <button
+              onClick={() => setActiveTab('demands')}
+              role="tab"
+              aria-selected={activeTab === 'demands'}
+              aria-controls="bookings-panel"
+              aria-label="طلباتي التي أنشأتها"
+              style={{
+                padding: 'var(--space-3)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                background: activeTab === 'demands' ? 'var(--surface-primary)' : 'transparent',
+                color: activeTab === 'demands' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: activeTab === 'demands' ? 'var(--shadow-sm)' : 'none',
+              }}
+            >
+              🙋 طلباتي
+            </button>
+          ) : (
+            <button
+              disabled
+              role="tab"
+              aria-label="طلباتي - للركاب فقط"
+              title="هذا التبويب مخصص للركاب"
+              style={{
+                padding: 'var(--space-3)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-muted)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'not-allowed',
+                fontFamily: '"Cairo", sans-serif',
+                opacity: 0.5,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span>🙋 طلباتي</span>
+                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>(للركاب)</span>
+              </div>
+            </button>
+          )}
+
+          {/* عروضي - للسائقين فقط */}
+          {isDriver ? (
+            <button
+              onClick={() => setActiveTab('myOffers')}
+              role="tab"
+              aria-selected={activeTab === 'myOffers'}
+              aria-controls="bookings-panel"
+              aria-label="عروضي التي أنشأتها"
+              style={{
+                padding: 'var(--space-3)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                background:
+                  activeTab === 'myOffers'
+                    ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                    : 'transparent',
+                color: activeTab === 'myOffers' ? 'white' : 'var(--text-secondary)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow: activeTab === 'myOffers' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              🚗 عروضي
+            </button>
+          ) : null}
+
+          {/* حجوزاتي المرسلة */}
           <button
             onClick={() => setActiveTab('sent')}
             role="tab"
             aria-selected={activeTab === 'sent'}
             aria-controls="bookings-panel"
-            aria-label="حجوزاتي على عروض الآخرين"
+            aria-label={isDriver ? 'حجوزاتي على طلبات الركاب' : 'حجوزاتي على عروض السائقين'}
             style={{
               padding: 'var(--space-3)',
               border: 'none',
@@ -818,53 +893,69 @@ export default function Bookings() {
           >
             📤 حجوزاتي
           </button>
-          <button
-            onClick={() => setActiveTab('received')}
-            role="tab"
-            aria-selected={activeTab === 'received'}
-            aria-controls="bookings-panel"
-            aria-label="الحجوزات الواردة على عروضي - للسائقين"
-            style={{
-              padding: 'var(--space-3)',
-              borderRadius: 'var(--radius-sm)',
-              background:
-                activeTab === 'received'
-                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
-              color: activeTab === 'received' ? 'white' : '#065f46',
-              fontSize: 'var(--text-sm)',
-              fontWeight: '700',
-              cursor: 'pointer',
-              fontFamily: '"Cairo", sans-serif',
-              boxShadow:
-                activeTab === 'received'
-                  ? '0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2)'
-                  : 'none',
-              border: '2px solid #10b981',
-              position: 'relative',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            <div
+
+          {/* الحجوزات الواردة - للسائقين */}
+          {isDriver ? (
+            <button
+              onClick={() => setActiveTab('received')}
+              role="tab"
+              aria-selected={activeTab === 'received'}
+              aria-controls="bookings-panel"
+              aria-label="الحجوزات الواردة على عروضي"
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '2px',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-sm)',
+                background:
+                  activeTab === 'received'
+                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                    : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+                color: activeTab === 'received' ? 'white' : '#065f46',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontFamily: '"Cairo", sans-serif',
+                boxShadow:
+                  activeTab === 'received'
+                    ? '0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2)'
+                    : 'none',
+                border: '2px solid #10b981',
+                transition: 'all 0.3s ease',
               }}
             >
-              <div>🚗 الحجوزات الواردة</div>
+              📥 الحجوزات الواردة
+            </button>
+          ) : (
+            <button
+              disabled
+              role="tab"
+              aria-label="الحجوزات الواردة - للسائقين فقط"
+              title="هذا التبويب مخصص للسائقين"
+              style={{
+                padding: 'var(--space-3)',
+                border: '2px dashed var(--border-light)',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--surface-secondary)',
+                color: 'var(--text-muted)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '600',
+                cursor: 'not-allowed',
+                fontFamily: '"Cairo", sans-serif',
+                opacity: 0.5,
+              }}
+            >
               <div
                 style={{
-                  fontSize: '10px',
-                  fontWeight: '500',
-                  opacity: 0.9,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
                 }}
               >
-                (للسائقين)
+                <span>📥 الحجوزات الواردة</span>
+                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>(للسائقين)</span>
               </div>
-            </div>
-          </button>
+            </button>
+          )}
         </div>
 
         {/* Error Message */}
@@ -1144,6 +1235,180 @@ export default function Bookings() {
                         لا توجد ردود على هذا الطلب بعد
                       </div>
                     )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        ) : activeTab === 'myOffers' ? (
+          // عرض عروضي (للسائقين)
+          myOffers.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: 'var(--space-8)',
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                borderRadius: 'var(--radius-xl)',
+                boxShadow: 'var(--shadow-md)',
+                border: '2px solid #3b82f6',
+              }}
+            >
+              <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🚗</div>
+              <p
+                style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: '700',
+                  color: '#1e40af',
+                  marginBottom: 'var(--space-2)',
+                  fontFamily: '"Cairo", sans-serif',
+                }}
+              >
+                لم تقم بنشر أي عروض بعد
+              </p>
+              <div
+                style={{
+                  marginTop: 'var(--space-4)',
+                  padding: 'var(--space-4)',
+                  background: 'white',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid #3b82f6',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    color: '#1e40af',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  💡 يمكنك نشر عرض رحلة جديد من الصفحة الرئيسية
+                </p>
+                <button
+                  onClick={() => navigate('/', { state: { mode: 'offer' } })}
+                  style={{
+                    marginTop: 'var(--space-3)',
+                    padding: 'var(--space-3) var(--space-6)',
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontFamily: '"Cairo", sans-serif',
+                  }}
+                >
+                  🚗 نشر عرض رحلة
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {myOffers.map((offer) => (
+                <div
+                  key={offer.id}
+                  style={{
+                    background: 'var(--surface-primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-4)',
+                    marginBottom: 'var(--space-4)',
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--border-light)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: 'var(--space-3)',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: 'var(--text-xl)',
+                        fontWeight: '700',
+                        color: 'var(--text-primary)',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      🚗 {offer.fromCity} ← {offer.toCity}
+                    </h3>
+                    <div
+                      style={{
+                        padding: 'var(--space-1) var(--space-3)',
+                        background:
+                          offer.status === 'active'
+                            ? '#22c55e'
+                            : offer.status === 'completed'
+                              ? '#3b82f6'
+                              : '#6b7280',
+                        color: 'white',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: '700',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      {offer.status === 'active'
+                        ? 'نشط'
+                        : offer.status === 'completed'
+                          ? 'مكتمل'
+                          : 'غير نشط'}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gap: 'var(--space-2)',
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--text-secondary)',
+                      fontFamily: '"Cairo", sans-serif',
+                      marginBottom: 'var(--space-3)',
+                    }}
+                  >
+                    <div>📅 {formatDate(offer.departureTime)}</div>
+                    <div>🕐 {formatTime(offer.departureTime)}</div>
+                    <div>💺 {formatSeats(offer.seats)} مقعد متاح</div>
+                    <div>💰 {formatPrice(offer.price)} د.ع / مقعد</div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                    <button
+                      onClick={() => navigate(`/offers/${offer.id}`)}
+                      style={{
+                        flex: 1,
+                        padding: 'var(--space-3)',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      👁️ عرض التفاصيل
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('received')}
+                      style={{
+                        flex: 1,
+                        padding: 'var(--space-3)',
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                      }}
+                    >
+                      📥 الحجوزات الواردة
+                    </button>
                   </div>
                 </div>
               ))}
