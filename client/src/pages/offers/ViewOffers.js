@@ -7,6 +7,21 @@ import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm
 import OfferCard from '../../components/offers/OfferCard';
 import BookingModal from '../../components/BookingModal.jsx';
 
+// Default fallback cities (defined outside component for stability)
+const DEFAULT_CITIES = [
+  'بغداد',
+  'البصرة',
+  'النجف',
+  'أربيل',
+  'الموصل',
+  'كربلاء',
+  'ذي قار',
+  'ديالى',
+  'الأنبار',
+  'واسط',
+  'ميسان',
+];
+
 // PERFORMANCE FIX: Added React.memo to prevent unnecessary re-renders
 const ViewOffers = React.memo(function ViewOffers() {
   const [offers, setOffers] = useState([]);
@@ -388,21 +403,6 @@ const ViewOffers = React.memo(function ViewOffers() {
       showError(errorMessage);
     }
   };
-
-  // Default fallback cities (used if API fails or while loading)
-  const DEFAULT_CITIES = [
-    'بغداد',
-    'البصرة',
-    'النجف',
-    'أربيل',
-    'الموصل',
-    'كربلاء',
-    'ذي قار',
-    'ديالى',
-    'الأنبار',
-    'واسط',
-    'ميسان',
-  ];
 
   // Use dynamic cities from database, fallback to defaults if empty
   const MAIN_CITIES = React.useMemo(() => {
