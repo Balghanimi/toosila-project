@@ -687,9 +687,17 @@ export default function Bookings() {
             {/* Message Button - Always Visible */}
             <button
               onClick={() => {
-                const recipientId = isReceived ? booking.user?.id : booking.offer?.driver?.id;
+                // Navigate to messages with ride context for proper conversation opening
                 const recipientName = isReceived ? booking.user?.name : booking.offer?.driver?.name;
-                navigate(`/messages`, { state: { recipientId, recipientName } });
+                navigate(`/messages`, {
+                  state: {
+                    rideType: 'offer',
+                    rideId: booking.offer?.id || booking.offerId,
+                    driverName: recipientName || (isReceived ? 'الراكب' : 'السائق'),
+                    fromCity: booking.offer?.fromCity,
+                    toCity: booking.offer?.toCity,
+                  },
+                });
               }}
               aria-label={`مراسلة ${isReceived ? booking.user?.name || 'الراكب' : booking.offer?.driver?.name || 'السائق'}`}
               style={{
