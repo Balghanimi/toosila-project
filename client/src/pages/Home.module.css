@@ -9,7 +9,7 @@
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e8f4f0 100%);
   position: relative;
   overflow-x: hidden;
-  padding-bottom: 80px; /* Space for bottom nav */
+  padding-bottom: 70px; /* Space for bottom nav - reduced */
 }
 
 /* Animated Background Blobs */
@@ -753,11 +753,11 @@ select[name="seats"] {
 
 /* ===== How It Works ===== */
 .howItWorksSection {
-  padding: 40px 16px;
+  padding: 32px 16px;
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
   position: relative;
   z-index: 1;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .stepsGrid {
@@ -805,14 +805,14 @@ select[name="seats"] {
 /* ===== Trust Banner ===== */
 .trustBanner {
   background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
-  padding: 32px 24px;
-  border-radius: 24px;
+  padding: 24px 20px;
+  border-radius: 20px;
   max-width: 1200px;
-  margin: 0 auto 16px;
+  margin: 0 16px 0;
   box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3);
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
