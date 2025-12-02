@@ -13,6 +13,7 @@
     "db:migrate:009": "node scripts/run-migration-009-messages-read-status.js",
     "db:migrate:012": "node scripts/run-migration-012-bookings.js",
     "db:migrate:013": "node scripts/run-migration-013-demands.js",
+    "db:migrate:017": "node scripts/run-migration-017-phone-verification.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
