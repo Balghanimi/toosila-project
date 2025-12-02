@@ -1024,3 +1024,299 @@ select[name="seats"] {
     transform: rotate(360deg);
   }
 }
+
+/* ===== DARK MODE - Professional & Eye-Comfortable ===== */
+
+/* Background and Container */
+:global(body.dark-mode) .homeContainer {
+  background: #18181b;
+  color: #e4e4e7;
+}
+
+/* Background Blobs - Muted for dark mode */
+:global(body.dark-mode) .backgroundBlob1,
+:global(body.dark-mode) .backgroundBlob2,
+:global(body.dark-mode) .backgroundBlob3 {
+  opacity: 0.15;
+  filter: blur(100px);
+}
+
+/* Hero Section */
+:global(body.dark-mode) .heroSection {
+  background: transparent;
+}
+
+:global(body.dark-mode) .heroTitle {
+  color: #e4e4e7;
+  text-shadow: none;
+}
+
+:global(body.dark-mode) .heroSubtitle {
+  color: #a1a1aa;
+}
+
+/* Main Card - Elevated with subtle border */
+:global(body.dark-mode) .mainCard {
+  background: #1f1f23;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Mode Buttons */
+:global(body.dark-mode) .modeButton {
+  background: #27272a;
+  color: #a1a1aa;
+  border: 1px solid #3f3f46;
+}
+
+:global(body.dark-mode) .modeButton:hover {
+  background: #3f3f46;
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .modeButton.demand,
+:global(body.dark-mode) .modeButton.offer,
+:global(body.dark-mode) .modeButton.find {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+:global(body.dark-mode) .modeButton.demand:hover,
+:global(body.dark-mode) .modeButton.offer:hover,
+:global(body.dark-mode) .modeButton.find:hover {
+  background: #16a34a;
+}
+
+/* Location Inputs */
+:global(body.dark-mode) .locationContainer {
+  background: transparent;
+}
+
+:global(body.dark-mode) .locationInputWrapper input,
+:global(body.dark-mode) .locationInput {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .locationInputWrapper input:focus,
+:global(body.dark-mode) .locationInput:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+  background: #2a2a2e;
+}
+
+:global(body.dark-mode) .locationInput::placeholder,
+:global(body.dark-mode) .locationInputWrapper input::placeholder {
+  color: #52525b;
+}
+
+/* Location Markers */
+:global(body.dark-mode) .locationMarkerFrom {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+}
+
+:global(body.dark-mode) .locationMarkerTo {
+  background: #f87171;
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.3);
+}
+
+/* Swap Button */
+:global(body.dark-mode) .swapButton {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #22c55e;
+}
+
+:global(body.dark-mode) .swapButton:hover {
+  background: #3f3f46;
+  border-color: #22c55e;
+}
+
+/* Date/Time Section */
+:global(body.dark-mode) .dateTimeSection {
+  background: transparent;
+}
+
+:global(body.dark-mode) .dateTimeLabel {
+  color: #a1a1aa;
+}
+
+:global(body.dark-mode) .dateTimeValue {
+  color: #22c55e;
+}
+
+:global(body.dark-mode) .editButton {
+  background: #27272a;
+  color: #a1a1aa;
+  border: 1px solid #3f3f46;
+}
+
+:global(body.dark-mode) .editButton:hover {
+  background: #3f3f46;
+  color: #e4e4e7;
+}
+
+/* Date Buttons */
+:global(body.dark-mode) .dateButton {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #a1a1aa;
+}
+
+:global(body.dark-mode) .dateButton:hover {
+  background: #3f3f46;
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .dateButton.active {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+/* Seats and Price Inputs */
+:global(body.dark-mode) .seatsPrice {
+  background: transparent;
+}
+
+:global(body.dark-mode) .inputLabel {
+  color: #a1a1aa;
+}
+
+:global(body.dark-mode) .select,
+:global(body.dark-mode) .input {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .select:focus,
+:global(body.dark-mode) .input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+/* Submit Button */
+:global(body.dark-mode) .submitButton {
+  background: #22c55e;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+:global(body.dark-mode) .submitButton:hover {
+  background: #16a34a;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+:global(body.dark-mode) .submitButton:disabled {
+  background: #27272a;
+  color: #52525b;
+  box-shadow: none;
+}
+
+/* Trust Indicators */
+:global(body.dark-mode) .trustIndicators {
+  color: #a1a1aa;
+}
+
+:global(body.dark-mode) .trustItem {
+  color: #a1a1aa;
+}
+
+:global(body.dark-mode) .trustIcon {
+  color: #22c55e;
+}
+
+/* Stats Bar */
+:global(body.dark-mode) .statsBar {
+  background: #1f1f23;
+  border: 1px solid #27272a;
+}
+
+:global(body.dark-mode) .statItem {
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .statNumber {
+  color: #22c55e;
+}
+
+:global(body.dark-mode) .statLabel {
+  color: #71717a;
+}
+
+/* Features Section */
+:global(body.dark-mode) .featuresSection {
+  background: transparent;
+}
+
+:global(body.dark-mode) .sectionTitle {
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .sectionSubtitle {
+  color: #a1a1aa;
+}
+
+/* Feature Cards */
+:global(body.dark-mode) .featureCard {
+  background: #1f1f23;
+  border: 1px solid #27272a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(body.dark-mode) .featureCard:hover {
+  border-color: #3f3f46;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+:global(body.dark-mode) .featureTitle {
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .featureDescription {
+  color: #a1a1aa;
+}
+
+/* Step Cards */
+:global(body.dark-mode) .stepCard {
+  background: #1f1f23;
+  border: 1px solid #27272a;
+}
+
+:global(body.dark-mode) .stepNumber {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+:global(body.dark-mode) .stepTitle {
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .stepDescription {
+  color: #a1a1aa;
+}
+
+/* Trust Banner */
+:global(body.dark-mode) .trustBanner {
+  background: linear-gradient(135deg, #1f1f23 0%, #27272a 100%);
+  border: 1px solid #3f3f46;
+}
+
+:global(body.dark-mode) .trustBannerTitle {
+  color: #e4e4e7;
+}
+
+:global(body.dark-mode) .trustBannerText {
+  color: #a1a1aa;
+}
+
+/* Error Message */
+:global(body.dark-mode) .errorMessage {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}

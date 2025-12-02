@@ -88,36 +88,42 @@ body.light-mode {
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode */
+/* Dark Mode - Professional & Eye-Comfortable */
 body.dark-mode {
-  /* Text Colors */
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-muted: #9ca3af; /* Adequate contrast for dark mode */
-  --text-placeholder: #9ca3af; /* Dedicated placeholder color for dark mode */
-  --text-light: #6b7280;
-  --text-white: #ffffff;
+  /* Text Colors - Softer whites for reduced eye strain */
+  --text-primary: #e4e4e7; /* Zinc-200: softer than pure white */
+  --text-secondary: #a1a1aa; /* Zinc-400: comfortable secondary text */
+  --text-muted: #71717a; /* Zinc-500: subtle muted text */
+  --text-placeholder: #71717a;
+  --text-light: #52525b;
+  --text-white: #fafafa;
 
-  /* Surface Colors */
-  --surface-primary: #0f172a;
-  --surface-secondary: #1e293b;
-  --surface-tertiary: #334155;
-  --surface-overlay: rgba(0, 0, 0, 0.7);
+  /* Surface Colors - Warmer, softer dark tones */
+  --surface-primary: #18181b; /* Zinc-900: true black alternative */
+  --surface-secondary: #1f1f23; /* Custom: slightly elevated */
+  --surface-tertiary: #27272a; /* Zinc-800: cards and elevated surfaces */
+  --surface-elevated: #2a2a2e; /* Custom: modals and dropdowns */
+  --surface-overlay: rgba(0, 0, 0, 0.75);
 
-  /* Border Colors */
-  --border-light: #334155;
-  --border-medium: #475569;
-  --border-dark: #64748b;
+  /* Border Colors - Subtle and refined */
+  --border-light: #27272a; /* Zinc-800 */
+  --border-medium: #3f3f46; /* Zinc-700 */
+  --border-dark: #52525b; /* Zinc-600 */
 
-  /* Shadows - More prominent in dark mode */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 30px rgba(0, 0, 0, 0.6);
+  /* Shadows - Subtle glow effect for depth */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 0 2px rgba(255, 255, 255, 0.02);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 0 3px rgba(255, 255, 255, 0.02);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
 
-  /* Adjust primary colors for better contrast */
-  --primary-light: #22c55e;
+  /* Primary colors - Muted green for dark mode */
+  --primary: #22c55e; /* Slightly muted */
+  --primary-light: #4ade80;
   --primary-hover: #16a34a;
+  --primary-dark: #15803d;
+
+  /* Focus ring - softer */
+  --focus-ring: 0 0 0 3px rgba(34, 197, 94, 0.25);
 }
 
 /* Base Styles */
@@ -875,37 +881,59 @@ nav[class*='drawer'] {
   color: #9ca3af !important;
 }
 
-/* Dark mode support for react-select */
+/* Dark mode support for react-select - Eye-comfortable colors */
 body.dark-mode .city-select__control {
-  background-color: #1f2937 !important;
-  border-color: #374151 !important;
+  background-color: #27272a !important;
+  border-color: #3f3f46 !important;
+}
+
+body.dark-mode .city-select__control:hover {
+  border-color: #52525b !important;
+}
+
+body.dark-mode .city-select__control--is-focused {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
 }
 
 body.dark-mode .city-select__menu,
 body.dark-mode .city-select__menu-list {
-  background-color: #1f2937 !important;
-  border-color: #374151 !important;
+  background-color: #1f1f23 !important;
+  border: 1px solid #3f3f46 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 body.dark-mode .city-select__option {
-  background-color: #1f2937 !important;
-  color: #f9fafb !important;
+  background-color: #1f1f23 !important;
+  color: #e4e4e7 !important;
 }
 
 body.dark-mode .city-select__option--is-selected {
-  background-color: #10b981 !important;
+  background-color: #22c55e !important;
   color: #ffffff !important;
 }
 
 body.dark-mode .city-select__option--is-focused:not(.city-select__option--is-selected) {
-  background-color: #374151 !important;
+  background-color: #27272a !important;
 }
 
 body.dark-mode .city-select__single-value,
 body.dark-mode .city-select__input {
-  color: #f9fafb !important;
+  color: #e4e4e7 !important;
 }
 
 body.dark-mode .city-select__placeholder {
-  color: #9ca3af !important;
+  color: #52525b !important;
+}
+
+body.dark-mode .city-select__indicator {
+  color: #71717a !important;
+}
+
+body.dark-mode .city-select__indicator:hover {
+  color: #a1a1aa !important;
+}
+
+body.dark-mode .city-select__indicator-separator {
+  background-color: #3f3f46 !important;
 }

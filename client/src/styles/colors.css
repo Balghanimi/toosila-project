@@ -204,33 +204,43 @@
   --z-notification: 1080;
 }
 
-/* ===== Dark Mode Colors ===== */
+/* ===== Dark Mode Colors - Professional & Eye-Comfortable ===== */
 body.dark-mode {
-  /* Surface Colors */
-  --surface-primary: #0f172a;
-  --surface-secondary: #1e293b;
-  --surface-tertiary: #334155;
-  --surface-elevated: #1e293b;
-  --surface-overlay: rgba(15, 23, 42, 0.95);
+  /* Surface Colors - Warmer zinc tones instead of cold slate */
+  --surface-primary: #18181b; /* Zinc-900: softer than slate */
+  --surface-secondary: #1f1f23; /* Custom warm dark */
+  --surface-tertiary: #27272a; /* Zinc-800 */
+  --surface-elevated: #2a2a2e; /* Cards and modals */
+  --surface-overlay: rgba(0, 0, 0, 0.8);
 
-  /* Text Colors */
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-muted: #94a3b8; /* Adjusted for dark mode contrast */
-  --text-placeholder: #94a3b8; /* Dedicated placeholder color for dark mode */
-  --text-inverse: #0f172a;
+  /* Text Colors - Reduced brightness for eye comfort */
+  --text-primary: #e4e4e7; /* Zinc-200: not pure white */
+  --text-secondary: #a1a1aa; /* Zinc-400 */
+  --text-tertiary: #71717a; /* Zinc-500 */
+  --text-muted: #71717a;
+  --text-placeholder: #52525b; /* Zinc-600 */
+  --text-inverse: #18181b;
 
-  /* Border Colors */
-  --border-light: #334155;
-  --border-medium: #475569;
-  --border-dark: #64748b;
+  /* Border Colors - Subtle and refined */
+  --border-light: #27272a; /* Zinc-800 */
+  --border-medium: #3f3f46; /* Zinc-700 */
+  --border-dark: #52525b; /* Zinc-600 */
 
-  /* Shadows in dark mode */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  /* Shadows - Subtle with slight ambient glow */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.02);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 0 2px rgba(255, 255, 255, 0.02);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 0 3px rgba(255, 255, 255, 0.02);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+
+  /* Primary colors - Softer green accents */
+  --primary-500: #22c55e;
+  --primary-600: #16a34a;
+  --primary: #22c55e;
+  --primary-light: #4ade80;
+  --primary-dark: #15803d;
+
+  /* Gradients - Muted for dark mode */
+  --gradient-primary: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
