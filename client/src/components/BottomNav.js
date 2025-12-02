@@ -83,6 +83,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { unreadMessages } = useNotifications();
+  // eslint-disable-next-line no-unused-vars
   const { currentUser } = useAuth();
   const currentPath = location.pathname;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
