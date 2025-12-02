@@ -22,6 +22,7 @@ const Home = () => {
   const [availableCities, setAvailableCities] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+  // eslint-disable-next-line no-unused-vars
   const { t } = useLanguage();
   const { currentUser } = useAuth();
   const { showSuccess, showError } = useNotifications();
@@ -274,7 +275,10 @@ const Home = () => {
         className={styles.heroSection}
         style={{ minHeight: 'auto', paddingTop: '20px', paddingBottom: '16px' }}
       >
-        <h1 className={styles.heroTitle} style={{ fontSize: '2rem', marginBottom: '8px', marginTop: '0' }}>
+        <h1
+          className={styles.heroTitle}
+          style={{ fontSize: '2rem', marginBottom: '8px', marginTop: '0' }}
+        >
           توصيلة
         </h1>
         <p className={styles.heroSubtitle} style={{ fontSize: '0.95rem', marginBottom: '0' }}>
