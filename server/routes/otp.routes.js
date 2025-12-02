@@ -59,8 +59,8 @@ function formatIraqiPhone(phone) {
  * @swagger
  * /otp/send:
  *   post:
- *     summary: Send OTP to phone number
- *     description: Generates a 6-digit OTP code and sends it via WhatsApp (primary) or SMS (fallback)
+ *     summary: Send OTP to phone number (only for NEW users)
+ *     description: Checks if user exists. If exists, returns user info for direct login. If not, sends OTP for registration.
  *     tags: [OTP]
  */
 router.post('/send', async (req, res) => {
@@ -82,6 +82,32 @@ router.post('/send', async (req, res) => {
         error: 'رقم الهاتف غير صحيح. يرجى إدخال رقم عراقي صحيح',
       });
     }
+
+    // ============================================
+    // CHECK IF USER EXISTS (skip OTP for existing users)
+    // ============================================
+    console.log('Checking if user exists...');
+    const existingUser = await query('SELECT * FROM users WHERE phone = $1', [phone]);
+
+    if (existingUser.rows.length > 0) {
+      // User exists - return info for direct login (NO OTP needed)
+      const user = existingUser.rows[0];
+      console.log('User exists, skipping OTP:', user.id);
+
+      return res.json({
+        success: true,
+        userExists: true,
+        message: 'مستخدم موجود، جاري تسجيل الدخول...',
+        user: {
+          id: user.id,
+          name: user.name,
+          phone: phone,
+        },
+      });
+    }
+
+    console.log('New user, proceeding with OTP...');
+    // ============================================
 
     // Check rate limiting (max 5 OTPs per phone per hour)
     console.log('Checking rate limiting...');
@@ -431,6 +457,71 @@ router.post('/complete-registration', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'فشل في إكمال التسجيل. حاول مرة أخرى.',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /otp/login-existing:
+ *   post:
+ *     summary: Direct login for existing users (no OTP required)
+ *     description: Logs in an existing user directly without OTP verification
+ *     tags: [OTP]
+ */
+router.post('/login-existing', async (req, res) => {
+  console.log('=== Login Existing User Request ===');
+  console.log('Request body:', req.body);
+
+  try {
+    let { phone } = req.body;
+
+    // Validate and format phone number
+    phone = formatIraqiPhone(phone);
+
+    if (!phone) {
+      return res.status(400).json({
+        success: false,
+        error: 'رقم الهاتف غير صحيح',
+      });
+    }
+
+    // Find the user
+    const userResult = await query('SELECT * FROM users WHERE phone = $1', [phone]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'المستخدم غير موجود',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id, phone: phone }, config.JWT_SECRET, {
+      expiresIn: '30d',
+    });
+
+    console.log('User logged in successfully:', user.id);
+
+    res.json({
+      success: true,
+      token: token,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: phone,
+        email: user.email,
+        isDriver: user.is_driver,
+        phoneVerified: user.phone_verified,
+      },
+    });
+  } catch (error) {
+    console.error('Login Existing User Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'حدث خطأ في تسجيل الدخول. حاول مرة أخرى.',
     });
   }
 });

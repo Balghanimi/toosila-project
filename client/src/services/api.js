@@ -531,6 +531,15 @@ export const otpAPI = {
     });
     return response;
   },
+
+  // Login existing user (no OTP required)
+  loginExisting: async (phone) => {
+    const response = await apiRequest('/otp/login-existing', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+    return response;
+  },
 };
 
 export default apiRequest;

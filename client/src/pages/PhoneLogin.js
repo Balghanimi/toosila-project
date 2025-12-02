@@ -64,7 +64,7 @@ const PhoneLogin = () => {
     }, 1000);
   };
 
-  // Send OTP
+  // Send OTP (or direct login for existing users)
   const handleSendOTP = async () => {
     const cleanedPhone = phone.replace(/\D/g, '');
     if (!cleanedPhone || cleanedPhone.length < 10) {
@@ -77,6 +77,18 @@ const PhoneLogin = () => {
 
     try {
       const response = await otpAPI.send(cleanedPhone);
+
+      // Check if user already exists (no OTP needed)
+      if (response.userExists) {
+        // Direct login for existing user
+        console.log('Existing user detected, logging in directly...');
+        const loginResponse = await otpAPI.loginExisting(cleanedPhone);
+        login(loginResponse.token, loginResponse.user);
+        navigate('/');
+        return;
+      }
+
+      // New user - proceed with OTP verification
       setChannel(response.channel);
       setStep(2);
       startCountdown();
