@@ -1,8 +1,9 @@
 import React from 'react';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 /**
  * SearchableCitySelect - A reusable searchable dropdown for city selection
+ * Supports adding new cities/areas that don't exist in the list
  *
  * @param {Object} props
  * @param {string} props.value - Currently selected city value
@@ -15,6 +16,7 @@ import Select from 'react-select';
  * @param {string} props.label - Optional label text
  * @param {boolean} props.disabled - Whether the select is disabled
  * @param {string} props.id - Optional id for accessibility
+ * @param {boolean} props.allowCreate - Whether to allow creating new options (default: true)
  */
 const SearchableCitySelect = ({
   value,
@@ -27,6 +29,7 @@ const SearchableCitySelect = ({
   label,
   disabled = false,
   id,
+  allowCreate = true,
 }) => {
   // Convert cities array to react-select options format
   const options = React.useMemo(() => {
@@ -42,12 +45,18 @@ const SearchableCitySelect = ({
     return cityOptions;
   }, [cities, showAllOption, allOptionLabel]);
 
-  // Find the currently selected option
+  // Find the currently selected option (or create one for custom values)
   const selectedOption = React.useMemo(() => {
     if (!value) {
       return showAllOption ? options[0] : null;
     }
-    return options.find((opt) => opt.value === value) || null;
+    // Check if value exists in options
+    const existingOption = options.find((opt) => opt.value === value);
+    if (existingOption) {
+      return existingOption;
+    }
+    // If not found, create a custom option (for user-entered values)
+    return { value: value, label: value };
   }, [value, options, showAllOption]);
 
   // Handle selection change
@@ -118,22 +127,30 @@ const SearchableCitySelect = ({
       maxHeight: '250px',
       backgroundColor: '#ffffff',
     }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isSelected ? '#16a34a' : state.isFocused ? '#dcfce7' : '#ffffff',
-      color: state.isSelected ? '#ffffff' : '#374151',
-      fontFamily: '"Cairo", sans-serif',
-      fontSize: '16px',
-      fontWeight: state.isSelected ? '600' : '500',
-      padding: '12px 16px',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      textAlign: 'right',
-      direction: 'rtl',
-      '&:active': {
-        backgroundColor: state.isSelected ? '#16a34a' : '#dcfce7',
-      },
-    }),
+    option: (base, state) => {
+      // Check if this is the "create new" option
+      const isCreateOption = state.data.__isNew__;
+      return {
+        ...base,
+        backgroundColor: isCreateOption
+          ? state.isFocused ? '#dcfce7' : '#f0fdf4'
+          : state.isSelected ? '#16a34a' : state.isFocused ? '#dcfce7' : '#ffffff',
+        color: isCreateOption ? '#16a34a' : state.isSelected ? '#ffffff' : '#374151',
+        fontFamily: '"Cairo", sans-serif',
+        fontSize: '16px',
+        fontWeight: isCreateOption ? '700' : state.isSelected ? '600' : '500',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        textAlign: 'right',
+        direction: 'rtl',
+        borderBottom: isCreateOption ? '2px solid #dcfce7' : 'none',
+        marginBottom: isCreateOption ? '4px' : '0',
+        '&:active': {
+          backgroundColor: state.isSelected ? '#16a34a' : '#dcfce7',
+        },
+      };
+    },
     indicatorSeparator: () => ({
       display: 'none',
     }),
@@ -158,11 +175,12 @@ const SearchableCitySelect = ({
     }),
     noOptionsMessage: (base) => ({
       ...base,
-      color: '#9ca3af',
+      color: '#16a34a',
       fontFamily: '"Cairo", sans-serif',
       fontSize: '14px',
       padding: '16px',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#f0fdf4',
+      borderRadius: '8px',
     }),
     loadingMessage: (base) => ({
       ...base,
@@ -201,7 +219,7 @@ const SearchableCitySelect = ({
           {label}
         </label>
       )}
-      <Select
+      <CreatableSelect
         inputId={id}
         value={selectedOption}
         onChange={handleChange}
@@ -212,14 +230,17 @@ const SearchableCitySelect = ({
         isDisabled={disabled}
         isRtl={true}
         placeholder={placeholder}
-        noOptionsMessage={() => 'لا توجد نتائج'}
+        noOptionsMessage={() => '✨ اكتب اسم المدينة أو المنطقة لإضافتها'}
         loadingMessage={() => 'جاري البحث...'}
+        formatCreateLabel={(inputValue) => `➕ إضافة "${inputValue}"`}
         filterOption={filterOption}
         classNamePrefix="city-select"
         menuPlacement="auto"
         menuPosition="fixed"
         menuPortalTarget={document.body}
         menuShouldScrollIntoView={true}
+        allowCreateWhileLoading={true}
+        createOptionPosition="first"
       />
     </div>
   );
