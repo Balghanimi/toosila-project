@@ -9,7 +9,7 @@ import SearchableCitySelect from '../components/UI/SearchableCitySelect';
 import styles from './Home.module.css';
 
 const Home = () => {
-  const [mode, setMode] = useState('find');
+  const [mode, setMode] = useState('offer');
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropLocation, setDropLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState('today');
@@ -309,26 +309,22 @@ const Home = () => {
           aria-label="خيارات البحث والنشر"
           style={{ marginBottom: '1.5rem' }}
         >
-          {!currentUser?.isDriver && (
-            <button
-              onClick={() => setMode('demand')}
-              className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
-              aria-label="طلب رحلة جديدة"
-              aria-pressed={mode === 'demand'}
-            >
-              💺 طلب رحلة
-            </button>
-          )}
-          {currentUser?.isDriver && (
-            <button
-              onClick={() => setMode('offer')}
-              className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
-              aria-label="نشر عرض رحلة جديد"
-              aria-pressed={mode === 'offer'}
-            >
-              🚗 نشر عرض
-            </button>
-          )}
+          <button
+            onClick={() => setMode('offer')}
+            className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
+            aria-label="نشر عرض رحلة جديد"
+            aria-pressed={mode === 'offer'}
+          >
+            🚗 نشر رحلة
+          </button>
+          <button
+            onClick={() => setMode('demand')}
+            className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
+            aria-label="طلب رحلة جديدة"
+            aria-pressed={mode === 'demand'}
+          >
+            💺 طلب رحلة
+          </button>
           <button
             onClick={() => {
               console.log('🔍 ابحث عن رحلة button clicked - navigating to offers');
@@ -342,19 +338,6 @@ const Home = () => {
             aria-label="البحث عن رحلة متاحة"
           >
             🔍 ابحث عن رحلة
-          </button>
-          <button
-            onClick={() => {
-              if (currentUser && currentUser.isDriver) {
-                navigate('/demands');
-              } else {
-                navigate('/offers');
-              }
-            }}
-            className={`${styles.modeButton} ${styles.browse}`}
-            aria-label={currentUser?.isDriver ? 'تصفح طلبات الركاب' : 'تصفح عروض السائقين'}
-          >
-            📋 تصفح الرحلات
           </button>
         </div>
         {/* Location Container */}
