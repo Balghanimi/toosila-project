@@ -213,6 +213,8 @@ router.post('/send', async (req, res) => {
       console.error('Error Data:', JSON.stringify(whatsappError.response?.data, null, 2));
       console.error('Error Message:', whatsappError.message);
       console.error('Error Code:', whatsappError.code);
+      const whatsappErrorDetail = whatsappError.response?.data?.message || whatsappError.response?.data?.error || whatsappError.message;
+      console.error('WhatsApp error detail:', whatsappErrorDetail);
 
       // Try SMS fallback
       console.log('WhatsApp failed, trying SMS fallback...');
@@ -261,9 +263,26 @@ router.post('/send', async (req, res) => {
         // Delete the OTP record since we couldn't send it
         await query(`DELETE FROM otp_requests WHERE phone = $1 AND code = $2`, [phone, code]);
 
+        // Get detailed error message from OTPIQ
+        const otpiqErrorMsg = smsError.response?.data?.message || smsError.response?.data?.error || smsError.message;
+        const statusCode = smsError.response?.status;
+
+        let userErrorMsg = 'فشل في إرسال رمز التحقق. حاول مرة أخرى.';
+        if (statusCode === 401) {
+          userErrorMsg = 'خطأ في إعدادات خدمة التحقق. يرجى التواصل مع الدعم.';
+        } else if (statusCode === 400) {
+          userErrorMsg = 'رقم الهاتف غير صالح. تأكد من إدخال رقم عراقي صحيح.';
+        } else if (statusCode === 402 || otpiqErrorMsg?.toLowerCase().includes('balance')) {
+          userErrorMsg = 'خدمة التحقق غير متوفرة مؤقتاً. يرجى المحاولة لاحقاً.';
+        }
+
+        console.error('Final error message to user:', userErrorMsg);
+        console.error('OTPIQ error details:', otpiqErrorMsg);
+
         res.status(500).json({
           success: false,
-          error: 'فشل في إرسال رمز التحقق. حاول مرة أخرى.',
+          error: userErrorMsg,
+          debug: process.env.NODE_ENV === 'development' ? otpiqErrorMsg : undefined,
         });
       }
     }
