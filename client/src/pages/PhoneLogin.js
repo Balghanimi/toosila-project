@@ -79,11 +79,10 @@ const PhoneLogin = () => {
       const response = await otpAPI.send(cleanedPhone);
 
       // Check if user already exists (no OTP needed)
-      if (response.userExists) {
-        // Direct login for existing user
-        console.log('Existing user detected, logging in directly...');
-        const loginResponse = await otpAPI.loginExisting(cleanedPhone);
-        login(loginResponse.token, loginResponse.user);
+      if (response.userExists && response.token) {
+        // Direct login for existing user - token already provided!
+        console.log('Existing user detected, logging in directly (no OTP sent)');
+        login(response.token, response.user);
         navigate('/');
         return;
       }

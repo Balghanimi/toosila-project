@@ -90,18 +90,30 @@ router.post('/send', async (req, res) => {
     const existingUser = await query('SELECT * FROM users WHERE phone = $1', [phone]);
 
     if (existingUser.rows.length > 0) {
-      // User exists - return info for direct login (NO OTP needed)
+      // User exists - LOGIN DIRECTLY (NO OTP needed = NO COST!)
       const user = existingUser.rows[0];
-      console.log('User exists, skipping OTP:', user.id);
+      console.log('User exists, logging in directly (NO OTP sent):', user.id);
+
+      // Generate JWT token directly
+      const token = jwt.sign(
+        { id: user.id, phone: phone },
+        config.JWT_SECRET,
+        { expiresIn: '30d' }
+      );
 
       return res.json({
         success: true,
         userExists: true,
-        message: 'مستخدم موجود، جاري تسجيل الدخول...',
+        message: 'تم تسجيل الدخول بنجاح',
+        token: token,
         user: {
           id: user.id,
           name: user.name,
           phone: phone,
+          email: user.email,
+          isDriver: user.is_driver,
+          role: user.role,
+          phoneVerified: user.phone_verified,
         },
       });
     }
