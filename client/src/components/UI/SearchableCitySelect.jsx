@@ -29,7 +29,7 @@ const SearchableCitySelect = ({
   label,
   disabled = false,
   id,
-  allowCreate = true,
+  // allowCreate is always true - CreatableSelect enables this by default
 }) => {
   // Convert cities array to react-select options format
   const options = React.useMemo(() => {
@@ -130,15 +130,40 @@ const SearchableCitySelect = ({
     option: (base, state) => {
       // Check if this is the "create new" option
       const isCreateOption = state.data.__isNew__;
+
+      // Calculate background color based on state
+      let bgColor = '#ffffff';
+      if (isCreateOption) {
+        bgColor = state.isFocused ? '#dcfce7' : '#f0fdf4';
+      } else if (state.isSelected) {
+        bgColor = '#16a34a';
+      } else if (state.isFocused) {
+        bgColor = '#dcfce7';
+      }
+
+      // Calculate text color
+      let textColor = '#374151';
+      if (isCreateOption) {
+        textColor = '#16a34a';
+      } else if (state.isSelected) {
+        textColor = '#ffffff';
+      }
+
+      // Calculate font weight
+      let fontWeight = '500';
+      if (isCreateOption) {
+        fontWeight = '700';
+      } else if (state.isSelected) {
+        fontWeight = '600';
+      }
+
       return {
         ...base,
-        backgroundColor: isCreateOption
-          ? state.isFocused ? '#dcfce7' : '#f0fdf4'
-          : state.isSelected ? '#16a34a' : state.isFocused ? '#dcfce7' : '#ffffff',
-        color: isCreateOption ? '#16a34a' : state.isSelected ? '#ffffff' : '#374151',
+        backgroundColor: bgColor,
+        color: textColor,
         fontFamily: '"Cairo", sans-serif',
         fontSize: '16px',
-        fontWeight: isCreateOption ? '700' : state.isSelected ? '600' : '500',
+        fontWeight: fontWeight,
         padding: '12px 16px',
         borderRadius: '8px',
         cursor: 'pointer',
