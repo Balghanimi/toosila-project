@@ -145,7 +145,7 @@ router.post('/send', async (req, res) => {
       });
 
       const whatsappResponse = await axios.post(
-        'https://api.otpiq.com/api/sms/send',
+        'https://api.otpiq.com/api/sms',
         {
           phoneNumber: phoneWithoutPlus,
           smsType: 'verification',
@@ -181,7 +181,7 @@ router.post('/send', async (req, res) => {
       try {
         console.log('Sending OTP via OTPIQ SMS...');
         const smsResponse = await axios.post(
-          'https://api.otpiq.com/api/sms/send',
+          'https://api.otpiq.com/api/sms',
           {
             phoneNumber: phoneWithoutPlus,
             smsType: 'verification',
