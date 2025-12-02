@@ -106,9 +106,15 @@ const BottomNav = () => {
 
     setIsTogglingRole(true);
     try {
-      await toggleUserType();
+      // Get the new role BEFORE calling toggleUserType (since current is about to flip)
       const newRole = currentUser.isDriver ? 'راكب' : 'سائق';
-      alert(`تم التبديل إلى وضع ${newRole} بنجاح! ✅`);
+      const result = await toggleUserType();
+
+      if (result.success) {
+        alert(`تم التبديل إلى وضع ${newRole} بنجاح! ✅`);
+      } else {
+        alert('حدث خطأ أثناء تبديل الدور');
+      }
     } catch (error) {
       console.error('Error toggling role:', error);
       alert('حدث خطأ أثناء تبديل الدور');
