@@ -9,7 +9,9 @@ import SearchableCitySelect from '../components/UI/SearchableCitySelect';
 import styles from './Home.module.css';
 
 const Home = () => {
-  const [mode, setMode] = useState('offer');
+  const { currentUser } = useAuth();
+  // Default mode: drivers see 'offer', passengers see 'demand'
+  const [mode, setMode] = useState(currentUser?.isDriver ? 'offer' : 'demand');
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropLocation, setDropLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState('today');
@@ -24,7 +26,6 @@ const Home = () => {
   const location = useLocation();
   // eslint-disable-next-line no-unused-vars
   const { t } = useLanguage();
-  const { currentUser } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -33,6 +34,11 @@ const Home = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Update mode when user type changes (e.g., role switch)
+  useEffect(() => {
+    setMode(currentUser?.isDriver ? 'offer' : 'demand');
+  }, [currentUser?.isDriver]);
 
   useEffect(() => {
     if (submitError && (pickupLocation || dropLocation || selectedDate)) {
@@ -309,22 +315,29 @@ const Home = () => {
           aria-label="خيارات البحث والنشر"
           style={{ marginBottom: '1.5rem' }}
         >
-          <button
-            onClick={() => setMode('offer')}
-            className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
-            aria-label="نشر عرض رحلة جديد"
-            aria-pressed={mode === 'offer'}
-          >
-            🚗 نشر رحلة
-          </button>
-          <button
-            onClick={() => setMode('demand')}
-            className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
-            aria-label="طلب رحلة جديدة"
-            aria-pressed={mode === 'demand'}
-          >
-            💺 طلب رحلة
-          </button>
+          {/* Show "نشر رحلة" only for drivers */}
+          {currentUser?.isDriver && (
+            <button
+              onClick={() => setMode('offer')}
+              className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
+              aria-label="نشر عرض رحلة جديد"
+              aria-pressed={mode === 'offer'}
+            >
+              🚗 نشر رحلة
+            </button>
+          )}
+          {/* Show "طلب رحلة" only for passengers */}
+          {!currentUser?.isDriver && (
+            <button
+              onClick={() => setMode('demand')}
+              className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
+              aria-label="طلب رحلة جديدة"
+              aria-pressed={mode === 'demand'}
+            >
+              💺 طلب رحلة
+            </button>
+          )}
+          {/* Search button visible to all */}
           <button
             onClick={() => {
               console.log('🔍 ابحث عن رحلة button clicked - navigating to offers');

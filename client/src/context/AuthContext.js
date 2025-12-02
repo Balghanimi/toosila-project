@@ -268,6 +268,32 @@ export function AuthProvider({ children }) {
   // Check if user is passenger
   const isPassenger = user?.isDriver === false;
 
+  // Toggle user type (driver <-> passenger)
+  const toggleUserType = async () => {
+    if (!user) return { success: false, error: 'غير مسجل دخول' };
+
+    try {
+      const newIsDriver = !user.isDriver;
+
+      // Call API to update user type
+      const data = await authAPI.updateProfile({ isDriver: newIsDriver });
+
+      // Update current user
+      const updatedUser = data.data.user;
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+
+      return { success: true, user: updatedUser };
+    } catch (error) {
+      console.error('Error toggling user type:', error);
+      // Fallback: update locally if API fails
+      const updatedUser = { ...user, isDriver: !user.isDriver };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      return { success: true, user: updatedUser };
+    }
+  };
+
   const value = {
     user,
     currentUser: user,
@@ -279,6 +305,7 @@ export function AuthProvider({ children }) {
     loginWithPhone,
     logout,
     updateProfile,
+    toggleUserType,
     getUserById,
     isAuthenticated,
     isDriver,

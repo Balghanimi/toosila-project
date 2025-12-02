@@ -83,8 +83,8 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { unreadMessages } = useNotifications();
-  // eslint-disable-next-line no-unused-vars
-  const { currentUser } = useAuth();
+  const { currentUser, toggleUserType } = useAuth();
+  const [isTogglingRole, setIsTogglingRole] = useState(false);
   const currentPath = location.pathname;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
@@ -95,6 +95,28 @@ const BottomNav = () => {
 
   // Responsive detection
   const isSmallMobile = window.innerWidth <= 375;
+
+  // Handle role toggle
+  const handleRoleToggle = async () => {
+    if (!currentUser) {
+      alert('يرجى تسجيل الدخول أولاً');
+      navigate('/login');
+      return;
+    }
+
+    setIsTogglingRole(true);
+    try {
+      await toggleUserType();
+      const newRole = currentUser.isDriver ? 'راكب' : 'سائق';
+      alert(`تم التبديل إلى وضع ${newRole} بنجاح! ✅`);
+    } catch (error) {
+      console.error('Error toggling role:', error);
+      alert('حدث خطأ أثناء تبديل الدور');
+    } finally {
+      setIsTogglingRole(false);
+      setShowMoreMenu(false);
+    }
+  };
 
   // Check for updates function
   const checkForUpdates = async () => {
@@ -125,6 +147,18 @@ const BottomNav = () => {
 
   // More menu items
   const MORE_MENU_ITEMS = [
+    // Role switcher - shown only when logged in
+    ...(currentUser
+      ? [
+          {
+            key: 'role-switch',
+            label: currentUser.isDriver ? 'التبديل إلى راكب' : 'التبديل إلى سائق',
+            icon: currentUser.isDriver ? '👤' : '🚗',
+            action: handleRoleToggle,
+            highlight: true, // Special styling for this item
+          },
+        ]
+      : []),
     {
       key: 'settings',
       label: 'الإعدادات',
@@ -377,8 +411,9 @@ const BottomNav = () => {
                   key={menuItem.key}
                   onClick={() => {
                     menuItem.action();
-                    setShowMoreMenu(false);
+                    if (!menuItem.highlight) setShowMoreMenu(false);
                   }}
+                  disabled={menuItem.key === 'role-switch' && isTogglingRole}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -386,34 +421,43 @@ const BottomNav = () => {
                     justifyContent: 'center',
                     gap: isSmallMobile ? '6px' : '8px',
                     padding: isSmallMobile ? '14px 6px' : '16px 8px',
-                    background: '#f9fafb',
-                    border: '2px solid #e5e7eb',
+                    background: menuItem.highlight
+                      ? 'linear-gradient(135deg, #34c759 0%, #28a745 100%)'
+                      : '#f9fafb',
+                    border: menuItem.highlight ? '2px solid #28a745' : '2px solid #e5e7eb',
                     borderRadius: isSmallMobile ? '12px' : '16px',
-                    cursor: 'pointer',
+                    cursor: isTogglingRole && menuItem.key === 'role-switch' ? 'wait' : 'pointer',
                     transition: 'all 0.2s ease',
                     fontFamily: '"Cairo", sans-serif',
                     minHeight: '44px',
                     minWidth: '44px',
+                    opacity: isTogglingRole && menuItem.key === 'role-switch' ? 0.7 : 1,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#34c759';
-                    e.currentTarget.style.borderColor = '#34c759';
+                    if (!menuItem.highlight) {
+                      e.currentTarget.style.background = '#34c759';
+                      e.currentTarget.style.borderColor = '#34c759';
+                    }
                     e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
                     e.currentTarget.style.boxShadow = '0 8px 20px rgba(52, 199, 89, 0.3)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#f9fafb';
-                    e.currentTarget.style.borderColor = '#e5e7eb';
+                    if (!menuItem.highlight) {
+                      e.currentTarget.style.background = '#f9fafb';
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                    }
                     e.currentTarget.style.transform = 'translateY(0) scale(1)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
-                  <div style={{ fontSize: isSmallMobile ? '24px' : '28px' }}>{menuItem.icon}</div>
+                  <div style={{ fontSize: isSmallMobile ? '24px' : '28px' }}>
+                    {menuItem.key === 'role-switch' && isTogglingRole ? '⏳' : menuItem.icon}
+                  </div>
                   <span
                     style={{
                       fontSize: isSmallMobile ? '10px' : '11px',
-                      fontWeight: '600',
-                      color: '#374151',
+                      fontWeight: menuItem.highlight ? '700' : '600',
+                      color: menuItem.highlight ? '#ffffff' : '#374151',
                       textAlign: 'center',
                       lineHeight: '1.2',
                     }}
