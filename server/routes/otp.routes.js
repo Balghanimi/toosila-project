@@ -12,6 +12,17 @@ console.log('=== OTP Routes Loaded ===');
 console.log('OTPIQ_API_KEY exists:', !!OTPIQ_API_KEY);
 console.log('OTPIQ_API_KEY length:', OTPIQ_API_KEY?.length || 0);
 
+// Diagnostic endpoint to check OTPIQ configuration
+// eslint-disable-next-line no-unused-vars
+router.get('/debug-config', (req, res) => {
+  res.json({
+    otpiqKeyExists: !!OTPIQ_API_KEY,
+    otpiqKeyLength: OTPIQ_API_KEY?.length || 0,
+    otpiqKeyPrefix: OTPIQ_API_KEY?.substring(0, 10) + '...',
+    nodeEnv: process.env.NODE_ENV,
+  });
+});
+
 /**
  * Generate a random 6-digit OTP code
  */
