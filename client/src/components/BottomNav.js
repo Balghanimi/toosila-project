@@ -529,16 +529,13 @@ const BottomNav = () => {
           zIndex: 1000,
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
-          height: '72px',
-          padding: 'var(--space-2) 0',
-          background:
-            'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
+          height: '68px',
+          padding: '12px 0',
+          background: 'rgba(255, 255, 255, 0.98)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '2px solid transparent',
-          borderImage:
-            'linear-gradient(90deg, rgba(52, 199, 89, 0.3) 0%, rgba(52, 199, 89, 0.1) 50%, rgba(52, 199, 89, 0.3) 100%) 1',
-          boxShadow: '0 -8px 32px rgba(52, 199, 89, 0.08), 0 -2px 8px rgba(0, 0, 0, 0.05)',
+          borderTop: '1px solid #e5e7eb',
+          boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.05)',
           direction: 'rtl',
           fontFamily: '"Cairo", sans-serif',
         }}
@@ -556,21 +553,21 @@ const BottomNav = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
+                gap: '2px',
                 height: '100%',
                 border: 'none',
                 background: 'transparent',
-                color: isActive ? 'var(--primary)' : 'var(--text-muted)',
+                color: isActive ? '#16a34a' : '#9ca3af',
                 cursor: 'pointer',
-                transition: 'var(--transition)',
-                padding: '8px 4px',
+                transition: 'all 0.2s ease',
+                padding: '4px',
                 fontSize: '11px',
-                fontWeight: '600',
+                fontWeight: isActive ? '600' : '500',
                 fontFamily: '"Cairo", sans-serif',
                 direction: 'rtl',
                 outline: 'none',
-                borderRadius: 'var(--radius)',
-                transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                borderRadius: '8px',
+                transform: 'translateY(0)',
                 animationDelay: `${index * 0.1}s`,
                 minWidth: 0,
               }}
@@ -607,38 +604,35 @@ const BottomNav = () => {
               aria-current={isActive ? 'page' : undefined}
               aria-label={item.label}
             >
-              {/* Active indicator with animation */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-2px',
-                  left: '25%',
-                  right: '25%',
-                  height: '3px',
-                  background: isActive
-                    ? 'linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                    : 'transparent',
-                  borderRadius: '0 0 var(--radius) var(--radius)',
-                  transition: 'var(--transition)',
-                  transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
-                  transformOrigin: 'center',
-                  boxShadow: isActive ? '0 2px 8px rgba(52, 199, 89, 0.3)' : 'none',
-                }}
-              />
+              {/* Active indicator - dot below icon */}
+              {isActive && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '2px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '4px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    background: '#16a34a',
+                  }}
+                />
+              )}
 
-              {/* Icon with enhanced styling */}
+              {/* Icon */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
+                  width: '24px',
+                  height: '24px',
                   color: 'inherit',
                   borderRadius: '50%',
-                  background: isActive ? 'rgba(52, 199, 89, 0.1)' : 'transparent',
-                  transition: 'var(--transition)',
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                  background: 'transparent',
+                  transition: 'all 0.2s ease',
+                  transform: 'scale(1)',
                   position: 'relative',
                 }}
               >
@@ -671,19 +665,19 @@ const BottomNav = () => {
                 )}
               </div>
 
-              {/* Label with enhanced typography */}
+              {/* Label */}
               <span
                 style={{
-                  fontSize: '11px',
-                  fontWeight: isActive ? '700' : '600',
+                  fontSize: '10px',
+                  fontWeight: isActive ? '600' : '500',
                   lineHeight: '1.2',
                   textAlign: 'center',
-                  color: 'inherit',
+                  color: isActive ? '#16a34a' : '#6b7280',
                   whiteSpace: 'nowrap',
                   overflow: 'visible',
                   maxWidth: '100%',
-                  transition: 'var(--transition)',
-                  transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'all 0.2s ease',
+                  transform: 'scale(1)',
                 }}
               >
                 {item.label}

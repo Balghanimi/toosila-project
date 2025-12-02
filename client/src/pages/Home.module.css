@@ -159,75 +159,70 @@
 /* ===== Mode Buttons ===== */
 .modeButtons {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 56px;
+  margin-bottom: 24px;
   animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
 }
 
 .modeButton {
-  padding: 16px 32px;
-  border: 3px solid transparent;
-  border-radius: 16px;
-  background: var(--surface-primary);
-  color: var(--text-primary);
-  font-size: 17px;
-  font-weight: 700;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  min-width: 180px;
+  min-width: auto;
 }
 
 .modeButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s ease;
+  display: none;
 }
 
 .modeButton:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background: #e5e7eb;
+  transform: none;
+  box-shadow: none;
 }
 
 .modeButton:hover::before {
-  left: 100%;
+  display: none;
 }
 
-.modeButton.demand {
-  border-color: var(--primary-500);
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-  color: white;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
-}
-
-.modeButton.offer {
-  border-color: var(--secondary-500);
-  background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
-  color: white;
-  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
-}
-
+/* Active states - all use the same green color */
+.modeButton.demand,
+.modeButton.offer,
 .modeButton.find {
-  border-color: var(--accent-purple-500);
-  background: linear-gradient(135deg, var(--accent-purple-500) 0%, var(--accent-purple-600) 100%);
+  background: #16a34a;
   color: white;
-  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35);
+  font-weight: 600;
+  border: none;
+  box-shadow: none;
 }
 
+.modeButton.demand:hover,
+.modeButton.offer:hover,
+.modeButton.find:hover {
+  background: #15803d;
+}
+
+/* Browse button - always inactive style unless clicked */
 .modeButton.browse {
-  border-color: var(--accent-orange-500);
-  background: linear-gradient(135deg, var(--accent-orange-500) 0%, var(--accent-orange-600) 100%);
-  color: white;
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
+  background: #f3f4f6;
+  color: #6b7280;
+  font-weight: 500;
+  border: none;
+  box-shadow: none;
+}
+
+.modeButton.browse:hover {
+  background: #e5e7eb;
 }
 
 /* ===== Trust Indicators ===== */
@@ -258,11 +253,11 @@
 
 /* ===== Main Card ===== */
 .mainCard {
-  background: var(--surface-primary);
-  border-radius: 32px;
+  background: white;
+  border-radius: 16px;
   padding: 48px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
   max-width: 800px;
   margin: 0 auto 32px;
   position: relative;
@@ -272,64 +267,57 @@
 }
 
 .mainCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-500),
-    var(--secondary-500),
-    var(--accent-purple-500)
-  );
-  border-radius: 32px 32px 0 0;
+  display: none; /* Remove the top gradient bar */
 }
 
 /* ===== Location Inputs ===== */
 .locationContainer {
   position: relative;
-  background: var(--surface-secondary);
-  borderradius: 20px;
-  border: 2px solid var(--border-light);
-  margin-bottom: 32px;
+  background: transparent;
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 24px;
   overflow: visible;
   transition: all 0.3s ease;
 }
 
 .locationContainer:hover {
-  border-color: var(--primary-300);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .locationRow {
   display: flex;
   align-items: center;
-  padding: 20px 24px;
+  padding: 0;
   position: relative;
+  margin-bottom: 16px;
+}
+
+.locationRow:last-child {
+  margin-bottom: 0;
 }
 
 .locationRow:first-child {
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: none;
 }
 
 .locationMarker {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-left: 16px;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  margin-left: 12px;
+  box-shadow: none;
 }
 
 .locationMarkerFrom {
-  background: var(--primary-500);
+  background: #16a34a;
 }
 
 .locationMarkerTo {
-  background: var(--text-muted);
-  border-radius: 4px;
+  background: #ef4444;
+  border-radius: 50%;
 }
 
 .locationInputWrapper {
@@ -337,53 +325,67 @@
   position: relative;
 }
 
+/* Style the SearchableCitySelect inputs */
+.locationInputWrapper input,
 .locationInput {
   width: 100%;
-  border: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   outline: none;
-  font-size: 17px;
-  color: var(--text-primary);
-  background: transparent;
-  font-weight: 600;
+  font-size: 16px;
+  color: #374151;
+  background: #f9fafb;
+  font-weight: 500;
   font-family: 'Cairo', sans-serif;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
 }
 
-.locationInput::placeholder {
-  color: var(--text-placeholder, var(--text-muted));
-  font-weight: 500;
-  opacity: 1; /* Ensure full opacity for proper contrast */
+.locationInputWrapper input:focus,
+.locationInput:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+  background: white;
+}
+
+.locationInput::placeholder,
+.locationInputWrapper input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+  opacity: 1;
 }
 
 /* ===== Swap Button ===== */
 .swapButton {
   position: absolute;
-  left: 24px;
+  right: -20px;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--primary-500);
-  color: white;
-  border: 4px solid var(--surface-secondary);
+  background: white;
+  color: #16a34a;
+  border: 2px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .swapButton:hover {
-  transform: translateY(-50%) scale(1.15) rotate(180deg);
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+  border-color: #16a34a;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .swapButton:active {
-  transform: translateY(-50%) scale(1) rotate(180deg);
+  transform: translateY(-50%) scale(1);
 }
 
 /* ===== Suggestions Dropdown ===== */
@@ -423,85 +425,89 @@
 
 /* ===== Date Time Section ===== */
 .dateTimeSection {
-  background: var(--surface-secondary);
-  border-radius: 16px;
-  padding: 16px;
-  margin: 0 8px 24px;
-  border: 1px solid var(--border-light);
+  background: transparent;
+  border-radius: 12px;
+  padding: 0;
+  margin: 0 0 24px;
+  border: none;
   overflow: visible;
   box-sizing: border-box;
 }
 
 .dateTimeHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
 }
 
 .dateTimeLabel {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  text-align: center;
 }
 
 .dateTimeValue {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--primary-600);
+  font-size: 16px;
+  font-weight: 600;
+  color: #16a34a;
 }
 
 .editButton {
-  padding: 10px 20px;
-  background: var(--primary-500);
-  color: white;
+  padding: 8px 16px;
+  background: #f3f4f6;
+  color: #374151;
   border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  margin-right: 12px;
 }
 
 .editButton:hover {
-  background: var(--primary-600);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  background: #e5e7eb;
+  transform: none;
+  box-shadow: none;
 }
 
 .dateButtons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .dateButton {
   flex: 1;
-  padding: 16px 24px;
-  border: 2px solid var(--border-light);
-  border-radius: 14px;
-  background: var(--surface-primary);
-  color: var(--text-secondary);
-  font-size: 16px;
-  font-weight: 700;
+  padding: 10px 20px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .dateButton:hover {
-  border-color: var(--primary-500);
-  color: var(--primary-600);
-  transform: translateY(-2px);
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: none;
 }
 
 .dateButton.active {
-  background: var(--primary-500);
+  background: #16a34a;
   color: white;
-  border-color: var(--primary-500);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-  transform: translateY(-2px);
+  border-color: #16a34a;
+  box-shadow: none;
+  transform: none;
+  font-weight: 600;
 }
 
 /* Date/Time Pickers - prevent clipping */
@@ -619,49 +625,44 @@ select[name="seats"] {
 /* ===== Submit Button ===== */
 .submitButton {
   width: 100%;
-  padding: 20px 40px;
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  padding: 16px 32px;
+  background: #16a34a;
   color: white;
   border: none;
-  border-radius: 16px;
-  font-size: 19px;
-  font-weight: 800;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
   position: relative;
   overflow: hidden;
 }
 
 .submitButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
+  display: none;
 }
 
 .submitButton:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(16, 185, 129, 0.5);
+  background: #15803d;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
 }
 
 .submitButton:hover::before {
-  left: 100%;
+  display: none;
 }
 
 .submitButton:active {
-  transform: translateY(-2px);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
 }
 
 .submitButton:disabled {
-  opacity: 0.65; /* Improved for better visibility */
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  filter: grayscale(0.3); /* Subtle indication of disabled state */
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
 }
 
 /* ===== Features Section ===== */
@@ -931,22 +932,27 @@ select[name="seats"] {
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
   .heroSection {
-    padding: 60px 20px 40px;
+    padding: 16px 16px 12px;
   }
 
   .mainCard {
-    padding: 32px 24px;
-    border-radius: 24px;
+    padding: 20px 16px;
+    border-radius: 16px;
+    margin: 0 12px 16px;
   }
 
   .modeButtons {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
   }
 
   .modeButton {
-    width: 100%;
+    flex: 0 1 auto;
     min-width: unset;
+    padding: 10px 16px;
+    font-size: 13px;
   }
 
   .statsBar {
@@ -974,14 +980,26 @@ select[name="seats"] {
   }
 
   .swapButton {
-    left: 50%;
-    top: auto;
-    bottom: -24px;
-    transform: translateX(-50%);
+    right: -16px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .swapButton:hover {
-    transform: translateX(-50%) scale(1.15) rotate(90deg);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .locationRow {
+    margin-bottom: 12px;
+  }
+
+  .dateButtons {
+    gap: 6px;
+  }
+
+  .dateButton {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }
 

@@ -59,22 +59,23 @@ const SearchableCitySelect = ({
     }
   };
 
-  // Custom styles with EXPLICIT colors (no CSS variables that might not resolve)
+  // Custom styles with EXPLICIT colors
   const customStyles = {
     control: (base, state) => ({
       ...base,
       minHeight: '48px',
-      border: state.isFocused ? '2px solid #10b981' : '2px solid #e5e7eb',
-      borderRadius: '8px',
-      boxShadow: state.isFocused ? '0 0 0 3px rgba(16, 185, 129, 0.1)' : 'none',
-      backgroundColor: '#ffffff',
+      border: state.isFocused ? '1px solid #16a34a' : '1px solid #e5e7eb',
+      borderRadius: '12px',
+      boxShadow: state.isFocused ? '0 0 0 3px rgba(22, 163, 74, 0.1)' : 'none',
+      backgroundColor: state.isFocused ? '#ffffff' : '#f9fafb',
       fontFamily: '"Cairo", sans-serif',
       fontSize: '16px',
       direction: 'rtl',
       textAlign: 'right',
       cursor: 'text',
+      transition: 'all 0.2s ease',
       '&:hover': {
-        borderColor: '#10b981',
+        borderColor: '#16a34a',
       },
     }),
     valueContainer: (base) => ({
@@ -119,18 +120,18 @@ const SearchableCitySelect = ({
     }),
     option: (base, state) => ({
       ...base,
-      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : '#ffffff',
-      color: state.isSelected ? '#ffffff' : '#1f2937',
+      backgroundColor: state.isSelected ? '#16a34a' : state.isFocused ? '#dcfce7' : '#ffffff',
+      color: state.isSelected ? '#ffffff' : '#374151',
       fontFamily: '"Cairo", sans-serif',
       fontSize: '16px',
       fontWeight: state.isSelected ? '600' : '500',
       padding: '12px 16px',
-      borderRadius: '6px',
+      borderRadius: '8px',
       cursor: 'pointer',
       textAlign: 'right',
       direction: 'rtl',
       '&:active': {
-        backgroundColor: state.isSelected ? '#10b981' : '#d1fae5',
+        backgroundColor: state.isSelected ? '#16a34a' : '#dcfce7',
       },
     }),
     indicatorSeparator: () => ({
@@ -138,12 +139,12 @@ const SearchableCitySelect = ({
     }),
     dropdownIndicator: (base, state) => ({
       ...base,
-      color: '#6b7280',
+      color: '#9ca3af',
       padding: '8px',
       transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0)',
       transition: 'transform 0.2s ease',
       '&:hover': {
-        color: '#10b981',
+        color: '#16a34a',
       },
     }),
     clearIndicator: (base) => ({

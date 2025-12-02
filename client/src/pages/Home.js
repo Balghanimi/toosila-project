@@ -269,15 +269,15 @@ const Home = () => {
       <div className={styles.backgroundBlob2} />
       <div className={styles.backgroundBlob3} />
 
-      {/* COMPACT HERO - 15% of viewport */}
+      {/* COMPACT HERO - Reduced whitespace */}
       <section
         className={styles.heroSection}
-        style={{ minHeight: '15vh', paddingTop: '2rem', paddingBottom: '1rem' }}
+        style={{ minHeight: 'auto', paddingTop: '20px', paddingBottom: '16px' }}
       >
-        <h1 className={styles.heroTitle} style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+        <h1 className={styles.heroTitle} style={{ fontSize: '2rem', marginBottom: '8px', marginTop: '0' }}>
           توصيلة
         </h1>
-        <p className={styles.heroSubtitle} style={{ fontSize: '1rem', marginBottom: '0' }}>
+        <p className={styles.heroSubtitle} style={{ fontSize: '0.95rem', marginBottom: '0' }}>
           رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
         </p>
       </section>
@@ -289,15 +289,13 @@ const Home = () => {
         </div>
       )}
 
-      {/* MAIN SEARCH FORM - PRIMARY FOCUS - 60% of above fold */}
+      {/* MAIN SEARCH FORM - Clean card design */}
       <div
         className={styles.mainCard}
         style={{
-          border: '3px solid #10b981',
-          boxShadow: '0 20px 50px rgba(16, 185, 129, 0.3)',
-          transform: 'scale(1.02)',
-          maxWidth: '700px',
-          margin: '0 auto 2rem',
+          maxWidth: '500px',
+          margin: '0 auto 1.5rem',
+          padding: '24px',
         }}
       >
         {/* Mode Buttons - Inside Form */}
@@ -365,7 +363,7 @@ const Home = () => {
                 value={pickupLocation}
                 onChange={setPickupLocation}
                 cities={availableCities}
-                placeholder={t('pickupLocation')}
+                placeholder="اختر مدينة الانطلاق..."
                 showAllOption={false}
                 id="pickup-city"
               />
@@ -394,7 +392,7 @@ const Home = () => {
                 value={dropLocation}
                 onChange={setDropLocation}
                 cities={availableCities}
-                placeholder={t('dropLocation')}
+                placeholder="اختر مدينة الوصول..."
                 showAllOption={false}
                 id="drop-city"
               />
