@@ -263,7 +263,7 @@ const BottomNav = () => {
 
     // Navigate to the primary path for each section
     const navigationMap = {
-      carpool: currentUser && currentUser.isDriver ? '/demands' : '/offers',
+      carpool: '/',
       mytrips: '/bookings',
       messages: '/messages',
       profile: '/profile',
