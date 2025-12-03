@@ -20,7 +20,6 @@ const CollapsibleSearchForm = ({
   // isDriver = false, // Reserved for future use
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -119,102 +118,6 @@ const CollapsibleSearchForm = ({
               </select>
             </div>
           </div>
-
-          {/* Advanced Filters Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={styles.advancedToggle}
-            aria-expanded={showAdvancedFilters}
-          >
-            <span>{showAdvancedFilters ? '🔼' : '🔽'}</span>
-            <span>{showAdvancedFilters ? 'إخفاء الفلاتر المتقدمة' : 'فلاتر متقدمة'}</span>
-          </button>
-
-          {/* Advanced Filters */}
-          {showAdvancedFilters && (
-            <div className={styles.advancedFilters}>
-              <h4 className={styles.advancedTitle}>
-                <span>🎛️</span>
-                <span>خيارات البحث المتقدم</span>
-              </h4>
-
-              <div className={styles.advancedGrid}>
-                {/* Full City Lists - Already using searchable selects in basic filters */}
-                <div className={styles.formGroup}>
-                  <SearchableCitySelect
-                    value={filters.fromCity || ''}
-                    onChange={(value) => handleFilterChange('fromCity', value)}
-                    cities={allCities}
-                    label="من (جميع المدن)"
-                    placeholder="اختر مدينة المغادرة..."
-                    allOptionLabel="جميع المدن"
-                    id="from-city-all"
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <SearchableCitySelect
-                    value={filters.toCity || ''}
-                    onChange={(value) => handleFilterChange('toCity', value)}
-                    cities={allCities}
-                    label="إلى (جميع المدن)"
-                    placeholder="اختر مدينة الوصول..."
-                    allOptionLabel="جميع المدن"
-                    id="to-city-all"
-                  />
-                </div>
-
-                {/* Price Range */}
-                <div className={styles.formGroup}>
-                  <label htmlFor="min-price" className={styles.label}>
-                    السعر الأدنى
-                  </label>
-                  <input
-                    type="number"
-                    id="min-price"
-                    placeholder="0"
-                    value={filters.minPrice || ''}
-                    onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                    className={styles.input}
-                    min="0"
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="max-price" className={styles.label}>
-                    السعر الأقصى
-                  </label>
-                  <input
-                    type="number"
-                    id="max-price"
-                    placeholder="1000000"
-                    value={filters.maxPrice || ''}
-                    onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                    className={styles.input}
-                    min="0"
-                  />
-                </div>
-
-                {/* Minimum Seats */}
-                <div className={styles.formGroup}>
-                  <label htmlFor="min-seats" className={styles.label}>
-                    عدد المقاعد الأدنى
-                  </label>
-                  <input
-                    type="number"
-                    id="min-seats"
-                    placeholder="1"
-                    value={filters.minSeats || ''}
-                    onChange={(e) => handleFilterChange('minSeats', e.target.value)}
-                    className={styles.input}
-                    min="1"
-                    max="10"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Action Buttons */}
           <div className={styles.actionButtons}>
