@@ -37,15 +37,7 @@ const DESTINATION_SUGGESTIONS = [
   'شركة نفط الجنوب',
 ];
 
-const TIME_OPTIONS = [
-  '6:00 AM',
-  '6:30 AM',
-  '7:00 AM',
-  '7:30 AM',
-  '8:00 AM',
-  '8:30 AM',
-  '9:00 AM',
-];
+const TIME_OPTIONS = ['6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM'];
 
 /**
  * LinesComingSoon - Attractive coming soon page with interest registration
@@ -169,9 +161,7 @@ const LinesComingSoon = () => {
   const handleDestFocus = () => {
     setFilteredDests(
       destination.length > 0
-        ? DESTINATION_SUGGESTIONS.filter((s) =>
-            s.toLowerCase().includes(destination.toLowerCase())
-          )
+        ? DESTINATION_SUGGESTIONS.filter((s) => s.toLowerCase().includes(destination.toLowerCase()))
         : DESTINATION_SUGGESTIONS
     );
     setShowDestSuggestions(true);
@@ -401,7 +391,9 @@ const LinesComingSoon = () => {
           <div className={styles.successMessage}>
             <div className={styles.successIcon}>✅</div>
             <h3>تم التسجيل بنجاح!</h3>
-            <p>سنبلغك فور توفر خط من {area} إلى {destination}</p>
+            <p>
+              سنبلغك فور توفر خط من {area} إلى {destination}
+            </p>
           </div>
         )}
       </div>

@@ -14,16 +14,7 @@ import styles from './LinesHome.module.css';
 const LinesHome = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const {
-    lines,
-    loading,
-    error,
-    pagination,
-    filters,
-    fetchLines,
-    updateFilters,
-    loadMore,
-  } = useLines();
+  const { lines, loading, error, pagination, fetchLines, updateFilters, loadMore } = useLines();
 
   const [cities, setCities] = useState([]);
   const [fromCity, setFromCity] = useState('');
@@ -101,10 +92,7 @@ const LinesHome = () => {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
-            <button
-              className={styles.switchButton}
-              onClick={handleSwitchToTrips}
-            >
+            <button className={styles.switchButton} onClick={handleSwitchToTrips}>
               🚗 التبديل للرحلات
             </button>
           </div>
@@ -114,10 +102,7 @@ const LinesHome = () => {
           </div>
           <div className={styles.headerRight}>
             {isDriver && (
-              <button
-                className={styles.createButton}
-                onClick={() => navigate('/lines/create')}
-              >
+              <button className={styles.createButton} onClick={() => navigate('/lines/create')}>
                 + إنشاء خط
               </button>
             )}
@@ -179,19 +164,12 @@ const LinesHome = () => {
       </div>
 
       {/* Quick Filters */}
-      <LineFilters
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-      />
+      <LineFilters activeFilter={activeFilter} onFilterChange={handleFilterChange} />
 
       {/* Lines List */}
       <div className={styles.linesSection}>
         {/* Error */}
-        {error && (
-          <div className={styles.errorBox}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.errorBox}>{error}</div>}
 
         {/* Loading */}
         {loading && lines.length === 0 && (
@@ -208,10 +186,7 @@ const LinesHome = () => {
             <h3>لا توجد خطوط متاحة</h3>
             <p>لم نعثر على خطوط تطابق بحثك</p>
             {isDriver && (
-              <button
-                className={styles.createLineButton}
-                onClick={() => navigate('/lines/create')}
-              >
+              <button className={styles.createLineButton} onClick={() => navigate('/lines/create')}>
                 + أنشئ خطك الأول
               </button>
             )}
@@ -234,11 +209,7 @@ const LinesHome = () => {
         {/* Load More */}
         {lines.length > 0 && pagination.page < pagination.totalPages && (
           <div className={styles.loadMoreContainer}>
-            <button
-              className={styles.loadMoreButton}
-              onClick={loadMore}
-              disabled={loading}
-            >
+            <button className={styles.loadMoreButton} onClick={loadMore} disabled={loading}>
               {loading ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
             </button>
           </div>

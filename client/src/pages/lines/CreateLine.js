@@ -286,11 +286,7 @@ const CreateLine = () => {
                 onChange={handleStopChange}
                 className={styles.stopTimeInput}
               />
-              <button
-                type="button"
-                className={styles.addStopButton}
-                onClick={handleAddStop}
-              >
+              <button type="button" className={styles.addStopButton} onClick={handleAddStop}>
                 + إضافة
               </button>
             </div>
@@ -391,11 +387,7 @@ const CreateLine = () => {
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className={styles.submitButton}
-          disabled={submitting || loading}
-        >
+        <button type="submit" className={styles.submitButton} disabled={submitting || loading}>
           {submitting ? 'جاري الإنشاء...' : 'إنشاء الخط'}
         </button>
       </form>

@@ -18,7 +18,7 @@ const PhoneAuth = ({ onClose, mode = 'login' }) => {
     birthYear: '',
   });
 
-  const { login, register, setError: setAuthError } = useAuth();
+  const { login, register } = useAuth();
   const otpRefs = useRef([]);
 
   useEffect(() => {

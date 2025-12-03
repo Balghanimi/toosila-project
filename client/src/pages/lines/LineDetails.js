@@ -138,13 +138,9 @@ const LineDetails = () => {
         {/* Line Info */}
         <div className={styles.section}>
           <div className={styles.badgesRow}>
-            <span className={`${styles.badge} ${typeBadge.className}`}>
-              {typeBadge.text}
-            </span>
+            <span className={`${styles.badge} ${typeBadge.className}`}>{typeBadge.text}</span>
             {currentLine.is_ladies_only && (
-              <span className={`${styles.badge} ${styles.badgeLadies}`}>
-                👩 نسائي
-              </span>
+              <span className={`${styles.badge} ${styles.badgeLadies}`}>👩 نسائي</span>
             )}
             <span className={`${styles.badge} ${styles.badgeStatus}`}>
               {currentLine.status === 'active' ? '🟢 نشط' : '🔴 متوقف'}
@@ -195,13 +191,17 @@ const LineDetails = () => {
               <div className={styles.scheduleItem}>
                 <span className={styles.scheduleIcon}>🌅</span>
                 <span className={styles.scheduleLabel}>وقت الذهاب</span>
-                <span className={styles.scheduleValue}>{formatTime(currentLine.departure_time)}</span>
+                <span className={styles.scheduleValue}>
+                  {formatTime(currentLine.departure_time)}
+                </span>
               </div>
               {currentLine.return_time && (
                 <div className={styles.scheduleItem}>
                   <span className={styles.scheduleIcon}>🌆</span>
                   <span className={styles.scheduleLabel}>وقت الرجوع</span>
-                  <span className={styles.scheduleValue}>{formatTime(currentLine.return_time)}</span>
+                  <span className={styles.scheduleValue}>
+                    {formatTime(currentLine.return_time)}
+                  </span>
                 </div>
               )}
             </div>
@@ -315,11 +315,7 @@ const LineDetails = () => {
         </div>
 
         {/* Error Message */}
-        {subscribeError && (
-          <div className={styles.errorMessage}>
-            {subscribeError}
-          </div>
-        )}
+        {subscribeError && <div className={styles.errorMessage}>{subscribeError}</div>}
 
         {/* Subscribe Button */}
         {!isOwner && (
@@ -342,10 +338,7 @@ const LineDetails = () => {
         {isOwner && (
           <div className={styles.ownerActions}>
             <p className={styles.ownerNote}>أنت مالك هذا الخط</p>
-            <button
-              className={styles.editButton}
-              onClick={() => navigate(`/lines/${lineId}/edit`)}
-            >
+            <button className={styles.editButton} onClick={() => navigate(`/lines/${lineId}/edit`)}>
               ✏️ تعديل الخط
             </button>
           </div>

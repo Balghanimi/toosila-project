@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRatings } from '../context/RatingContext';
 
-const RatingDisplay = ({ userId, userType, showCount = true, size = 'medium' }) => {
+const RatingDisplay = ({ userId, showCount = true, size = 'medium' }) => {
   const { getUserAverageRating, getUserRatingCount } = useRatings();
 
   const rating = getUserAverageRating(userId);

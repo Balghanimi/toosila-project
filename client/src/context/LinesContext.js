@@ -44,30 +44,33 @@ export function LinesProvider({ children }) {
   /**
    * Fetch all lines with filters
    */
-  const fetchLines = useCallback(async (customFilters = {}) => {
-    setLoading(true);
-    setError('');
+  const fetchLines = useCallback(
+    async (customFilters = {}) => {
+      setLoading(true);
+      setError('');
 
-    try {
-      const mergedFilters = { ...filters, ...customFilters };
-      const response = await linesAPI.getAll(mergedFilters);
+      try {
+        const mergedFilters = { ...filters, ...customFilters };
+        const response = await linesAPI.getAll(mergedFilters);
 
-      setLines(response.lines || []);
-      setPagination({
-        page: response.page || 1,
-        totalPages: response.totalPages || 1,
-        total: response.total || 0,
-      });
+        setLines(response.lines || []);
+        setPagination({
+          page: response.page || 1,
+          totalPages: response.totalPages || 1,
+          total: response.total || 0,
+        });
 
-      return response;
-    } catch (err) {
-      console.error('Error fetching lines:', err);
-      setError('حدث خطأ أثناء جلب الخطوط');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+        return response;
+      } catch (err) {
+        console.error('Error fetching lines:', err);
+        setError('حدث خطأ أثناء جلب الخطوط');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
   /**
    * Fetch single line by ID
@@ -132,65 +135,74 @@ export function LinesProvider({ children }) {
   /**
    * Create new line (for drivers)
    */
-  const createLine = useCallback(async (lineData) => {
-    setLoading(true);
-    setError('');
+  const createLine = useCallback(
+    async (lineData) => {
+      setLoading(true);
+      setError('');
 
-    try {
-      const response = await linesAPI.create(lineData);
-      // Refresh my lines
-      await fetchMyLines();
-      return response;
-    } catch (err) {
-      console.error('Error creating line:', err);
-      setError(err.message || 'حدث خطأ أثناء إنشاء الخط');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchMyLines]);
+      try {
+        const response = await linesAPI.create(lineData);
+        // Refresh my lines
+        await fetchMyLines();
+        return response;
+      } catch (err) {
+        console.error('Error creating line:', err);
+        setError(err.message || 'حدث خطأ أثناء إنشاء الخط');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchMyLines]
+  );
 
   /**
    * Subscribe to a line
    */
-  const subscribeLine = useCallback(async (lineId, subscriptionData) => {
-    setLoading(true);
-    setError('');
+  const subscribeLine = useCallback(
+    async (lineId, subscriptionData) => {
+      setLoading(true);
+      setError('');
 
-    try {
-      const response = await linesAPI.subscribe(lineId, subscriptionData);
-      // Refresh subscriptions
-      await fetchMySubscriptions();
-      return response;
-    } catch (err) {
-      console.error('Error subscribing:', err);
-      setError(err.message || 'حدث خطأ أثناء الاشتراك');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchMySubscriptions]);
+      try {
+        const response = await linesAPI.subscribe(lineId, subscriptionData);
+        // Refresh subscriptions
+        await fetchMySubscriptions();
+        return response;
+      } catch (err) {
+        console.error('Error subscribing:', err);
+        setError(err.message || 'حدث خطأ أثناء الاشتراك');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchMySubscriptions]
+  );
 
   /**
    * Unsubscribe from a line
    */
-  const unsubscribeLine = useCallback(async (lineId) => {
-    setLoading(true);
-    setError('');
+  const unsubscribeLine = useCallback(
+    async (lineId) => {
+      setLoading(true);
+      setError('');
 
-    try {
-      const response = await linesAPI.unsubscribe(lineId);
-      // Refresh subscriptions
-      await fetchMySubscriptions();
-      return response;
-    } catch (err) {
-      console.error('Error unsubscribing:', err);
-      setError(err.message || 'حدث خطأ أثناء إلغاء الاشتراك');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchMySubscriptions]);
+      try {
+        const response = await linesAPI.unsubscribe(lineId);
+        // Refresh subscriptions
+        await fetchMySubscriptions();
+        return response;
+      } catch (err) {
+        console.error('Error unsubscribing:', err);
+        setError(err.message || 'حدث خطأ أثناء إلغاء الاشتراك');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchMySubscriptions]
+  );
 
   /**
    * Update filters

@@ -77,7 +77,7 @@ export default function UserProfile({ isOpen, onClose }) {
   const handleToggleRole = async () => {
     setIsSwitchingRole(true);
     const newRole = user.userType === 'driver' ? 'passenger' : 'driver';
-    const result = await updateProfile({ isDriver: newRole === 'driver' });
+    await updateProfile({ isDriver: newRole === 'driver' });
     setIsSwitchingRole(false);
     // Profile will auto-update through context
   };

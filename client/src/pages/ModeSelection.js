@@ -41,15 +41,10 @@ const ModeSelection = () => {
         {/* Mode Cards */}
         <div className={styles.cardsContainer}>
           {/* Trips Card */}
-          <button
-            className={styles.modeCard}
-            onClick={() => handleSelectMode('trips')}
-          >
+          <button className={styles.modeCard} onClick={() => handleSelectMode('trips')}>
             <div className={styles.cardIcon}>🚗</div>
             <h2 className={styles.cardTitle}>رحلات</h2>
-            <p className={styles.cardDescription}>
-              رحلات فردية من مدينة إلى أخرى
-            </p>
+            <p className={styles.cardDescription}>رحلات فردية من مدينة إلى أخرى</p>
             <ul className={styles.cardFeatures}>
               <li>حجز رحلة واحدة</li>
               <li>اختيار التاريخ والوقت</li>
@@ -59,15 +54,10 @@ const ModeSelection = () => {
           </button>
 
           {/* Lines Card */}
-          <button
-            className={styles.modeCard}
-            onClick={() => handleSelectMode('lines')}
-          >
+          <button className={styles.modeCard} onClick={() => handleSelectMode('lines')}>
             <div className={styles.cardIcon}>🚌</div>
             <h2 className={styles.cardTitle}>خطوط</h2>
-            <p className={styles.cardDescription}>
-              اشتراك يومي للطلاب والموظفين
-            </p>
+            <p className={styles.cardDescription}>اشتراك يومي للطلاب والموظفين</p>
             <ul className={styles.cardFeatures}>
               <li>اشتراك شهري/أسبوعي</li>
               <li>مواعيد ثابتة يومياً</li>
@@ -83,9 +73,7 @@ const ModeSelection = () => {
         </button>
 
         {/* Info Note */}
-        <p className={styles.infoNote}>
-          يمكنك التبديل بين الوضعين في أي وقت من القائمة
-        </p>
+        <p className={styles.infoNote}>يمكنك التبديل بين الوضعين في أي وقت من القائمة</p>
       </div>
     </div>
   );

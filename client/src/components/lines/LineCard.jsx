@@ -16,7 +16,6 @@ const LineCard = ({ line, onSubscribe }) => {
     working_days,
     monthly_price,
     available_seats,
-    total_seats,
     driver_name,
     driver_rating,
     total_subscribers,
@@ -69,13 +68,9 @@ const LineCard = ({ line, onSubscribe }) => {
     <div className={styles.card}>
       {/* Badges Row */}
       <div className={styles.badgesRow}>
-        <span className={`${styles.badge} ${typeBadge.className}`}>
-          {typeBadge.text}
-        </span>
+        <span className={`${styles.badge} ${typeBadge.className}`}>{typeBadge.text}</span>
         {is_ladies_only && (
-          <span className={`${styles.badge} ${styles.badgeLadies}`}>
-            👩 نسائي فقط
-          </span>
+          <span className={`${styles.badge} ${styles.badgeLadies}`}>👩 نسائي فقط</span>
         )}
       </div>
 
@@ -123,9 +118,7 @@ const LineCard = ({ line, onSubscribe }) => {
         <div className={styles.driverDetails}>
           <span className={styles.driverName}>{driver_name || 'السائق'}</span>
           {driver_rating > 0 && (
-            <span className={styles.driverRating}>
-              ⭐ {Number(driver_rating).toFixed(1)}
-            </span>
+            <span className={styles.driverRating}>⭐ {Number(driver_rating).toFixed(1)}</span>
           )}
         </div>
         <div className={styles.subscribers}>

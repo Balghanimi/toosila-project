@@ -17,7 +17,7 @@ const MySubscriptions = () => {
     if (user) {
       fetchMySubscriptions();
     }
-  }, [user]);
+  }, [user, fetchMySubscriptions]);
 
   // Format time to 12-hour format
   const formatTime = (time) => {
