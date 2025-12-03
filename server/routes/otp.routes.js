@@ -107,7 +107,7 @@ router.post('/send', async (req, res) => {
 
       // Generate JWT token directly
       const token = jwt.sign(
-        { id: user.id, phone: phone },
+        { id: user.id, phone: phone, role: user.role || 'user' },
         config.JWT_SECRET,
         { expiresIn: '30d' }
       );
@@ -375,9 +375,11 @@ router.post('/verify', async (req, res) => {
       const user = userResult.rows[0];
 
       // Generate JWT token
-      const token = jwt.sign({ id: user.id, phone: phone }, config.JWT_SECRET, {
-        expiresIn: '30d',
-      });
+      const token = jwt.sign(
+        { id: user.id, phone: phone, role: user.role || 'user' },
+        config.JWT_SECRET,
+        { expiresIn: '30d' }
+      );
 
       // Update phone_verified status
       await query(
@@ -396,6 +398,7 @@ router.post('/verify', async (req, res) => {
           phone: phone,
           email: user.email,
           isDriver: user.is_driver,
+          role: user.role || 'user',
           phoneVerified: true,
         },
       });
@@ -471,8 +474,12 @@ router.post('/complete-registration', async (req, res) => {
 
     const user = result.rows[0];
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id, phone: phone }, config.JWT_SECRET, { expiresIn: '30d' });
+    // Generate JWT token (new user gets 'user' role by default)
+    const token = jwt.sign(
+      { id: user.id, phone: phone, role: user.role || 'user' },
+      config.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
 
     res.json({
       success: true,
@@ -482,6 +489,7 @@ router.post('/complete-registration', async (req, res) => {
         name: user.name,
         phone: user.phone,
         isDriver: user.is_driver,
+        role: user.role || 'user',
         phoneVerified: true,
       },
     });
@@ -541,9 +549,11 @@ router.post('/login-existing', async (req, res) => {
     const user = userResult.rows[0];
 
     // Generate JWT token
-    const token = jwt.sign({ id: user.id, phone: phone }, config.JWT_SECRET, {
-      expiresIn: '30d',
-    });
+    const token = jwt.sign(
+      { id: user.id, phone: phone, role: user.role || 'user' },
+      config.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
 
     console.log('User logged in successfully:', user.id);
 
@@ -556,6 +566,7 @@ router.post('/login-existing', async (req, res) => {
         phone: phone,
         email: user.email,
         isDriver: user.is_driver,
+        role: user.role || 'user',
         phoneVerified: user.phone_verified,
       },
     });
