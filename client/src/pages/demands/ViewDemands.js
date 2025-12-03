@@ -41,6 +41,10 @@ export default function ViewDemands() {
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
+  // Advanced filter options
+  const [sortBy, setSortBy] = useState('newest');
+  const [ladiesOnly, setLadiesOnly] = useState(false);
+
   // Dynamic cities from database
   const [availableCities, setAvailableCities] = useState([]);
 
@@ -302,6 +306,35 @@ export default function ViewDemands() {
   // All cities from database, fallback to defaults if empty
   const IRAQ_CITIES = availableCities.length > 0 ? availableCities : DEFAULT_CITIES;
 
+  // Apply sorting and filtering to demands
+  const getFilteredAndSortedDemands = () => {
+    let result = [...demands];
+
+    // Filter by ladies only (if demand has isLadiesOnly field)
+    if (ladiesOnly) {
+      result = result.filter((d) => d.isLadiesOnly === true);
+    }
+
+    // Sort based on selected option
+    switch (sortBy) {
+      case 'newest':
+        result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case 'cheapest':
+        result.sort((a, b) => (a.budgetMax || 0) - (b.budgetMax || 0));
+        break;
+      case 'soonest':
+        result.sort((a, b) => new Date(a.earliestTime) - new Date(b.earliestTime));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  };
+
+  const displayedDemands = getFilteredAndSortedDemands();
+
   return (
     <div
       style={{
@@ -508,37 +541,98 @@ export default function ViewDemands() {
                 <span>خيارات البحث المتقدم</span>
               </h4>
 
-              {/* Full City Lists */}
+              {/* Sort Options */}
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '600',
+                    marginBottom: 'var(--space-2)',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  ترتيب حسب
+                </label>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: 'var(--space-2)',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {[
+                    { value: 'newest', label: 'الأحدث', icon: '🕐' },
+                    { value: 'cheapest', label: 'الأرخص', icon: '💰' },
+                    { value: 'soonest', label: 'الأقرب موعداً', icon: '📅' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSortBy(option.value)}
+                      style={{
+                        padding: 'var(--space-2) var(--space-4)',
+                        background:
+                          sortBy === option.value
+                            ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                            : 'var(--surface-primary)',
+                        color: sortBy === option.value ? 'white' : 'var(--text-primary)',
+                        border: sortBy === option.value ? 'none' : '2px solid var(--border-light)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: '"Cairo", sans-serif',
+                        transition: 'all 0.2s ease',
+                        boxShadow: sortBy === option.value ? 'var(--shadow-sm)' : 'none',
+                      }}
+                    >
+                      {option.icon} {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ladies Only Filter */}
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 'var(--space-3)',
                   padding: 'var(--space-3)',
                   background: 'var(--surface-primary)',
                   borderRadius: 'var(--radius)',
                   border: '1px solid var(--border-light)',
+                  cursor: 'pointer',
                 }}
+                onClick={() => setLadiesOnly(!ladiesOnly)}
               >
-                <SearchableCitySelect
-                  value={filters.fromCity}
-                  onChange={(value) => setFilters({ ...filters, fromCity: value })}
-                  cities={IRAQ_CITIES}
-                  label="من (جميع المدن)"
-                  placeholder="اختر مدينة المغادرة..."
-                  allOptionLabel="جميع المدن"
-                  id="advanced-filter-from-city"
+                <input
+                  type="checkbox"
+                  checked={ladiesOnly}
+                  onChange={(e) => setLadiesOnly(e.target.checked)}
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    accentColor: 'var(--primary)',
+                    cursor: 'pointer',
+                  }}
                 />
-
-                <SearchableCitySelect
-                  value={filters.toCity}
-                  onChange={(value) => setFilters({ ...filters, toCity: value })}
-                  cities={IRAQ_CITIES}
-                  label="إلى (جميع المدن)"
-                  placeholder="اختر مدينة الوصول..."
-                  allOptionLabel="جميع المدن"
-                  id="advanced-filter-to-city"
-                />
+                <label
+                  style={{
+                    fontSize: 'var(--text-base)',
+                    fontWeight: '600',
+                    fontFamily: '"Cairo", sans-serif',
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <span>👩</span>
+                  <span>للنساء فقط</span>
+                </label>
               </div>
             </div>
           </div>
@@ -622,7 +716,7 @@ export default function ViewDemands() {
           </div>
         )}
 
-        {!loading && demands.length === 0 && (
+        {!loading && displayedDemands.length === 0 && (
           <div
             style={{
               textAlign: 'center',
@@ -676,9 +770,9 @@ export default function ViewDemands() {
           </div>
         )}
 
-        {!loading && demands.length > 0 && (
+        {!loading && displayedDemands.length > 0 && (
           <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
-            {demands.map((demand) => (
+            {displayedDemands.map((demand) => (
               <div
                 key={demand.id}
                 onClick={() => handleDemandClick(demand)}
@@ -867,7 +961,7 @@ export default function ViewDemands() {
         )}
 
         {/* Pagination Info and Load More Button */}
-        {!loading && demands.length > 0 && (
+        {!loading && displayedDemands.length > 0 && (
           <div
             style={{
               display: 'flex',
@@ -891,7 +985,7 @@ export default function ViewDemands() {
                 margin: 0,
               }}
             >
-              عرض {demands.length} من {total} نتيجة
+              عرض {displayedDemands.length} من {total} نتيجة
             </p>
 
             {page < totalPages && (
