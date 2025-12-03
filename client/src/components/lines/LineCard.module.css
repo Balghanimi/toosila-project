@@ -1,0 +1,357 @@
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  border: 2px solid transparent;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(22, 163, 74, 0.15);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+/* Badges */
+.badgesRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badgeStudents {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badgeEmployees {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badgeGeneral {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.badgeLadies {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+/* Line Name */
+.lineName {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+/* Route */
+.route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f0fdf4;
+  border-radius: 12px;
+}
+
+.routeCity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.routeIcon {
+  font-size: 1rem;
+}
+
+.routeArrow {
+  color: #16a34a;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Times */
+.timesRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.timeItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 10px;
+  flex: 1;
+}
+
+.timeIcon {
+  font-size: 1rem;
+}
+
+.timeLabel {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.timeValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-right: auto;
+}
+
+/* Working Days */
+.workingDays {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.daysIcon {
+  font-size: 1rem;
+}
+
+/* Driver Info */
+.driverInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.driverAvatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.driverDetails {
+  flex: 1;
+}
+
+.driverName {
+  display: block;
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.driverRating {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.subscribers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.subscribersIcon {
+  font-size: 1rem;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.priceSection {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.priceValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.priceCurrency {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.priceLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.seatsSection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seatsIcon {
+  font-size: 1.25rem;
+}
+
+.seatsAvailable {
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.seatsFull {
+  font-weight: 700;
+  color: #dc2626;
+}
+
+/* Subscribe Button */
+.subscribeButton {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+}
+
+.subscribeButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+}
+
+.buttonDisabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.buttonDisabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dark Mode */
+:global(body.dark-mode) .card {
+  background: #1e293b;
+}
+
+:global(body.dark-mode) .card:hover {
+  border-color: rgba(74, 222, 128, 0.3);
+  box-shadow: 0 8px 30px rgba(74, 222, 128, 0.1);
+}
+
+:global(body.dark-mode) .lineName {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .route {
+  background: rgba(22, 163, 74, 0.1);
+}
+
+:global(body.dark-mode) .routeCity {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .routeArrow {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .timeItem {
+  background: #334155;
+}
+
+:global(body.dark-mode) .timeValue {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .workingDays {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .driverInfo {
+  background: #334155;
+}
+
+:global(body.dark-mode) .driverName {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .driverRating,
+:global(body.dark-mode) .subscribers {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .footer {
+  border-top-color: #334155;
+}
+
+:global(body.dark-mode) .priceValue,
+:global(body.dark-mode) .priceCurrency {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .priceLabel {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .seatsAvailable {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .badgeStudents {
+  background: rgba(29, 78, 216, 0.2);
+  color: #60a5fa;
+}
+
+:global(body.dark-mode) .badgeEmployees {
+  background: rgba(180, 83, 9, 0.2);
+  color: #fbbf24;
+}
+
+:global(body.dark-mode) .badgeGeneral {
+  background: rgba(75, 85, 99, 0.3);
+  color: #9ca3af;
+}
+
+:global(body.dark-mode) .badgeLadies {
+  background: rgba(190, 24, 93, 0.2);
+  color: #f472b6;
+}

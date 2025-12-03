@@ -1829,6 +1829,107 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "OTP",
+      "item": [
+        {
+          "name": "Send OTP to phone number (only for NEW users)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/send",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "send"
+              ]
+            },
+            "description": "Checks if user exists. If exists, returns user info for direct login. If not, sends OTP for registration."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "Verifies the 6-digit OTP code locally (in our database)"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete registration for new users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/complete-registration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "complete-registration"
+              ]
+            },
+            "description": "Creates a new user account after phone verification"
+          },
+          "response": []
+        },
+        {
+          "name": "Direct login for existing users (no OTP required)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/login-existing",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "login-existing"
+              ]
+            },
+            "description": "Logs in an existing user directly without OTP verification"
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

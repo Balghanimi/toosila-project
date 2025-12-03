@@ -542,4 +542,86 @@ export const otpAPI = {
   },
 };
 
+// Lines API (خطوط الاشتراك اليومي)
+export const linesAPI = {
+  // Get all lines with filters
+  getAll: async (filters = {}) => {
+    const queryParams = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== '' && value !== null) {
+        queryParams.append(key, value);
+      }
+    });
+    return apiRequest(`/lines?${queryParams.toString()}`, { method: 'GET' });
+  },
+
+  // Get line by ID
+  getById: async (lineId) => {
+    return apiRequest(`/lines/${lineId}`, { method: 'GET' });
+  },
+
+  // Create new line (for drivers)
+  create: async (lineData) => {
+    return apiRequest('/lines', {
+      method: 'POST',
+      body: JSON.stringify(lineData),
+    });
+  },
+
+  // Update line
+  update: async (lineId, lineData) => {
+    return apiRequest(`/lines/${lineId}`, {
+      method: 'PUT',
+      body: JSON.stringify(lineData),
+    });
+  },
+
+  // Delete line
+  delete: async (lineId) => {
+    return apiRequest(`/lines/${lineId}`, { method: 'DELETE' });
+  },
+
+  // Get driver's own lines
+  getMyLines: async () => {
+    return apiRequest('/lines/my-lines', { method: 'GET' });
+  },
+
+  // Subscribe to a line
+  subscribe: async (lineId, subscriptionData) => {
+    return apiRequest(`/lines/${lineId}/subscribe`, {
+      method: 'POST',
+      body: JSON.stringify(subscriptionData),
+    });
+  },
+
+  // Unsubscribe from a line
+  unsubscribe: async (lineId) => {
+    return apiRequest(`/lines/${lineId}/unsubscribe`, { method: 'DELETE' });
+  },
+
+  // Get user's subscriptions
+  getMySubscriptions: async (status = null) => {
+    const queryParams = status ? `?status=${status}` : '';
+    return apiRequest(`/subscriptions/my-subscriptions${queryParams}`, { method: 'GET' });
+  },
+
+  // Get line subscribers (for drivers)
+  getSubscribers: async (lineId) => {
+    return apiRequest(`/lines/${lineId}/subscribers`, { method: 'GET' });
+  },
+
+  // Add stop to line
+  addStop: async (lineId, stopData) => {
+    return apiRequest(`/lines/${lineId}/stops`, {
+      method: 'POST',
+      body: JSON.stringify(stopData),
+    });
+  },
+
+  // Remove stop from line
+  removeStop: async (lineId, stopId) => {
+    return apiRequest(`/lines/${lineId}/stops/${stopId}`, { method: 'DELETE' });
+  },
+};
+
 export default apiRequest;

@@ -1,0 +1,634 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  padding-bottom: 120px;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+.headerTitle {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.headerSpacer {
+  width: 80px;
+}
+
+/* Content */
+.content {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Sections */
+.section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+/* Badges */
+.badgesRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badgeStudents {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badgeEmployees {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badgeGeneral {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.badgeLadies {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.badgeStatus {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.lineName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* Route Card */
+.routeCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f0fdf4;
+  border-radius: 12px;
+}
+
+.routePoint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.routeIcon {
+  font-size: 1.25rem;
+}
+
+.routeCity {
+  font-weight: 700;
+  color: #166534;
+  font-size: 1.1rem;
+}
+
+.routeLine {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #16a34a 0%, #86efac 50%, #16a34a 100%);
+  position: relative;
+}
+
+.routeLine::after {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #16a34a;
+  font-size: 1.25rem;
+  background: #f0fdf4;
+  padding: 0 8px;
+}
+
+/* Stops List */
+.stopsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stopItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.stopNumber {
+  width: 28px;
+  height: 28px;
+  background: #16a34a;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stopName {
+  flex: 1;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stopTime {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Schedule */
+.scheduleCard {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.scheduleRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.scheduleItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+}
+
+.scheduleIcon {
+  font-size: 1.5rem;
+}
+
+.scheduleLabel {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.scheduleValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.workingDays {
+  text-align: center;
+}
+
+.daysLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.daysGrid {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dayBadge {
+  padding: 6px 12px;
+  background: #e5e7eb;
+  color: #6b7280;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.dayActive {
+  background: #16a34a;
+  color: white;
+}
+
+/* Driver Card */
+.driverCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.driverAvatar {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+
+.driverInfo {
+  flex: 1;
+}
+
+.driverName {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.driverRating {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.driverStats {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Pricing Grid */
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pricingCard {
+  position: relative;
+  padding: 16px 12px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+  text-align: center;
+}
+
+.pricingCard:hover {
+  border-color: #16a34a;
+}
+
+.pricingSelected {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.pricingBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16a34a;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pricingPeriod {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.pricingPrice {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.pricingCurrency {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+@media (max-width: 400px) {
+  .pricingGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricingCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .pricingPeriod {
+    margin: 0;
+  }
+
+  .pricingPrice {
+    font-size: 1.25rem;
+  }
+}
+
+/* Stop Select */
+.stopSelect {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Cairo', sans-serif;
+  background: white;
+  cursor: pointer;
+}
+
+.stopSelect:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+/* Availability */
+.availabilityCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.availabilityInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.availabilityIcon {
+  font-size: 1.5rem;
+}
+
+.availabilityText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Error */
+.errorMessage {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Subscribe Section */
+.subscribeSection {
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 16px 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.totalPrice {
+  display: flex;
+  flex-direction: column;
+}
+
+.totalPrice span:first-child {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.totalAmount {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.subscribeButton {
+  flex: 1;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+.subscribeButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Owner Actions */
+.ownerActions {
+  text-align: center;
+  padding: 20px;
+}
+
+.ownerNote {
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.editButton {
+  padding: 12px 32px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Loading & Error */
+.loadingBox,
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  text-align: center;
+  padding: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #16a34a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorBox span {
+  font-size: 3rem;
+}
+
+.errorBox p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.errorBox button {
+  padding: 12px 24px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Dark Mode */
+:global(body.dark-mode) .container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+:global(body.dark-mode) .header {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+}
+
+:global(body.dark-mode) .section,
+:global(body.dark-mode) .availabilityCard {
+  background: #1e293b;
+}
+
+:global(body.dark-mode) .sectionTitle,
+:global(body.dark-mode) .lineName {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .routeCard {
+  background: rgba(22, 163, 74, 0.15);
+}
+
+:global(body.dark-mode) .routeCity {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .stopItem,
+:global(body.dark-mode) .scheduleCard,
+:global(body.dark-mode) .driverCard {
+  background: #334155;
+}
+
+:global(body.dark-mode) .stopName,
+:global(body.dark-mode) .scheduleValue,
+:global(body.dark-mode) .driverName,
+:global(body.dark-mode) .availabilityText,
+:global(body.dark-mode) .pricingPrice {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .scheduleItem {
+  background: #475569;
+}
+
+:global(body.dark-mode) .pricingCard {
+  background: #334155;
+  border-color: #475569;
+}
+
+:global(body.dark-mode) .pricingSelected {
+  background: rgba(22, 163, 74, 0.2);
+  border-color: #4ade80;
+}
+
+:global(body.dark-mode) .stopSelect {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .subscribeSection {
+  background: #1e293b;
+}
+
+:global(body.dark-mode) .totalAmount {
+  color: #4ade80;
+}

@@ -1,0 +1,256 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+/* Background Decorations */
+.bgCircle1 {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(22, 163, 74, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bgCircle2 {
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(22, 163, 74, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.header {
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #166534;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: #15803d;
+  font-weight: 500;
+}
+
+/* Mode Cards Container */
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 640px) {
+  .cardsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Mode Card */
+.modeCard {
+  background: white;
+  border: 3px solid transparent;
+  border-radius: 24px;
+  padding: 32px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.modeCard:hover {
+  transform: translateY(-8px);
+  border-color: #16a34a;
+  box-shadow: 0 12px 40px rgba(22, 163, 74, 0.2);
+}
+
+.modeCard:active {
+  transform: translateY(-4px);
+}
+
+.cardIcon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.cardDescription {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.cardFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  text-align: right;
+}
+
+.cardFeatures li {
+  padding: 8px 0;
+  color: #374151;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardFeatures li::before {
+  content: '✓';
+  color: #16a34a;
+  font-weight: 700;
+}
+
+/* Card Badge */
+.cardBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badgeNew {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Skip Button */
+.skipButton {
+  background: transparent;
+  border: 2px solid #d1d5db;
+  color: #6b7280;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: 16px;
+}
+
+.skipButton:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.05);
+}
+
+/* Info Note */
+.infoNote {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+/* Dark Mode Support */
+:global(body.dark-mode) .container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+:global(body.dark-mode) .bgCircle1,
+:global(body.dark-mode) .bgCircle2 {
+  background: radial-gradient(circle, rgba(22, 163, 74, 0.1) 0%, transparent 70%);
+}
+
+:global(body.dark-mode) .title {
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .subtitle {
+  color: #86efac;
+}
+
+:global(body.dark-mode) .modeCard {
+  background: #1e293b;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+:global(body.dark-mode) .modeCard:hover {
+  box-shadow: 0 12px 40px rgba(22, 163, 74, 0.3);
+}
+
+:global(body.dark-mode) .cardTitle {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .cardDescription {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .cardFeatures li {
+  color: #cbd5e1;
+}
+
+:global(body.dark-mode) .skipButton {
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .skipButton:hover {
+  border-color: #4ade80;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+:global(body.dark-mode) .infoNote {
+  color: #64748b;
+}

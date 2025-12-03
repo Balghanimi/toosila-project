@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { showLinesInNav, canAccessLines } from '../config/featureFlags';
 
 // Simple outline SVG icons
 const Icons = {
@@ -163,6 +164,28 @@ const BottomNav = () => {
             action: handleRoleToggle,
             highlight: true, // Special styling for this item
           },
+        ]
+      : []),
+    // Lines feature - show to everyone (goes to coming soon for non-admins)
+    ...(showLinesInNav()
+      ? [
+          {
+            key: 'lines',
+            label: 'الخطوط',
+            icon: '🚌',
+            action: () => navigate('/lines'),
+          },
+          // My Subscriptions - shown only when logged in and has full lines access
+          ...(currentUser && canAccessLines(currentUser)
+            ? [
+                {
+                  key: 'subscriptions',
+                  label: 'اشتراكاتي',
+                  icon: '📋',
+                  action: () => navigate('/subscriptions'),
+                },
+              ]
+            : []),
         ]
       : []),
     {

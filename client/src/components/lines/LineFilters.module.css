@@ -1,0 +1,94 @@
+.container {
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filtersRow {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filtersRow::-webkit-scrollbar {
+  display: none;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filterButton:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.filterButton.active {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+.filterIcon {
+  font-size: 1rem;
+}
+
+.filterLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Dark Mode */
+:global(body.dark-mode) .container {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+:global(body.dark-mode) .filterButton {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+:global(body.dark-mode) .filterButton:hover {
+  background: #475569;
+  border-color: #64748b;
+}
+
+:global(body.dark-mode) .filterButton.active {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border-color: #4ade80;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .container {
+    padding: 12px 16px;
+  }
+
+  .filterButton {
+    padding: 8px 16px;
+  }
+
+  .filterLabel {
+    font-size: 0.85rem;
+  }
+}

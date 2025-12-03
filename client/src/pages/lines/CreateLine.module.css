@@ -1,0 +1,534 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  padding-bottom: 100px;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+.headerTitle {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.headerSpacer {
+  width: 80px;
+}
+
+/* Form */
+.form {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Sections */
+.section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+/* Input */
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Cairo', sans-serif;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+/* Select */
+.select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Cairo', sans-serif;
+  background: white;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+/* Textarea */
+.textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Cairo', sans-serif;
+  background: white;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+/* Type Buttons */
+.typeButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.typeButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.typeButton:hover {
+  border-color: #16a34a;
+}
+
+.typeButton span:first-child {
+  font-size: 1.5rem;
+}
+
+.typeActive {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: #16a34a;
+}
+
+.checkboxText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Route Inputs */
+.routeInputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.routeInput {
+  flex: 1;
+  position: relative;
+}
+
+.routeInput .input {
+  padding-right: 40px;
+}
+
+.routeIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+}
+
+.routeArrow {
+  color: #16a34a;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Stops */
+.stopsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stopItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.stopNumber {
+  width: 28px;
+  height: 28px;
+  background: #16a34a;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stopName {
+  flex: 1;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stopTime {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.removeStopButton {
+  width: 28px;
+  height: 28px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.addStopRow {
+  display: flex;
+  gap: 8px;
+}
+
+.stopInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Cairo', sans-serif;
+}
+
+.stopInput:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+.stopTimeInput {
+  width: 100px;
+  padding: 10px 8px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Cairo', sans-serif;
+}
+
+.stopTimeInput:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+.addStopButton {
+  padding: 10px 16px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+}
+
+/* Times */
+.timesRow {
+  display: flex;
+  gap: 16px;
+}
+
+.timeInput {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeInput label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeIcon {
+  font-size: 1.25rem;
+}
+
+/* Days Grid */
+.daysGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayButton {
+  padding: 10px 16px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cairo', sans-serif;
+}
+
+.dayButton:hover {
+  border-color: #16a34a;
+}
+
+.dayActive {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+/* Price Input */
+.priceInput {
+  position: relative;
+}
+
+.priceInput .input {
+  padding-left: 50px;
+}
+
+.priceCurrency {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* Error Message */
+.errorMessage {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Submit Button */
+.submitButton {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+}
+
+.submitButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Auth Required */
+.authRequired {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  text-align: center;
+  padding: 20px;
+}
+
+.authRequired span {
+  font-size: 3rem;
+}
+
+.authRequired p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.authRequired button {
+  padding: 12px 32px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Dark Mode */
+:global(body.dark-mode) .container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+:global(body.dark-mode) .header {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+}
+
+:global(body.dark-mode) .section {
+  background: #1e293b;
+}
+
+:global(body.dark-mode) .label {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .input,
+:global(body.dark-mode) .select,
+:global(body.dark-mode) .textarea {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .input::placeholder,
+:global(body.dark-mode) .textarea::placeholder {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .typeButton {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .typeActive {
+  background: rgba(22, 163, 74, 0.2);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+:global(body.dark-mode) .checkboxText {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .stopItem {
+  background: #334155;
+}
+
+:global(body.dark-mode) .stopName {
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .stopInput,
+:global(body.dark-mode) .stopTimeInput {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+:global(body.dark-mode) .dayButton {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .dayActive {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+:global(body.dark-mode) .timeInput label {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .priceCurrency {
+  color: #94a3b8;
+}
+
+:global(body.dark-mode) .authRequired p {
+  color: #94a3b8;
+}

@@ -4,6 +4,7 @@ import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { showLinesInNav, canAccessLines } from '../../config/featureFlags';
 import NotificationBell from '../notifications/NotificationBell';
 import UserMenu from '../Auth/UserMenu';
 import ThemeToggle from '../ThemeToggle';
@@ -235,6 +236,45 @@ const Header = () => {
                   >
                     🚗 عرض العروض
                   </button>
+                </>
+              )}
+
+              {/* قسم الخطوط - Show to everyone if enabled in nav */}
+              {showLinesInNav() && (
+                <>
+                  <div className={styles.drawerSection}>خطوط الاشتراك</div>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => {
+                      navigate('/lines');
+                      toggleDrawer();
+                    }}
+                  >
+                    🚌 {canAccessLines(currentUser) ? 'تصفح الخطوط' : 'الخطوط (قريباً)'}
+                  </button>
+                  {/* Only show create/subscriptions for users with full access */}
+                  {canAccessLines(currentUser) && currentUser?.isDriver && (
+                    <button
+                      className={styles.drawerItem}
+                      onClick={() => {
+                        navigate('/lines/create');
+                        toggleDrawer();
+                      }}
+                    >
+                      ➕ إنشاء خط جديد
+                    </button>
+                  )}
+                  {canAccessLines(currentUser) && currentUser && (
+                    <button
+                      className={styles.drawerItem}
+                      onClick={() => {
+                        navigate('/subscriptions');
+                        toggleDrawer();
+                      }}
+                    >
+                      📋 اشتراكاتي
+                    </button>
+                  )}
                 </>
               )}
 

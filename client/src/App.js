@@ -16,6 +16,7 @@ import { NotificationsProvider } from './context/NotificationsContext';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ConnectionProvider } from './context/ConnectionContext';
+import { LinesProvider } from './context/LinesContext';
 import ConnectionOverlay from './components/ConnectionOverlay';
 import './App.css';
 import './styles/enhancements.css';
@@ -65,6 +66,15 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 // Phone Login
 const PhoneLogin = lazy(() => import('./pages/PhoneLogin'));
 
+// Lines Feature
+const ModeSelection = lazy(() => import('./pages/ModeSelection'));
+const LinesHome = lazy(() => import('./pages/lines/LinesHome'));
+const LineDetails = lazy(() => import('./pages/lines/LineDetails'));
+const CreateLine = lazy(() => import('./pages/lines/CreateLine'));
+const MySubscriptions = lazy(() => import('./pages/lines/MySubscriptions'));
+const LinesComingSoon = lazy(() => import('./pages/lines/LinesComingSoon'));
+const LinesRoute = lazy(() => import('./components/LinesRoute'));
+
 // Admin Pages
 const AdminRoute = lazy(() => import('./components/Admin/AdminRoute'));
 const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'));
@@ -89,7 +99,8 @@ export default function App() {
                       <OffersProvider>
                         <DemandsProvider>
                           <RatingProvider>
-                            <div>
+                            <LinesProvider>
+                              <div>
                               <Header title="توصيلة" />
                               <main className="appContent">
                                 <Suspense fallback={<LoadingSpinner />}>
@@ -162,6 +173,44 @@ export default function App() {
                                     <Route path="/login" element={<PhoneLogin />} />
                                     <Route path="/register" element={<PhoneLogin />} />
 
+                                    {/* Lines Coming Soon Page (with interest registration) */}
+                                    <Route path="/lines-coming-soon" element={<LinesComingSoon />} />
+
+                                    {/* Lines Feature (خطوط الاشتراك اليومي) - Admin Only */}
+                                    <Route path="/mode-select" element={<ModeSelection />} />
+                                    <Route
+                                      path="/lines"
+                                      element={
+                                        <LinesRoute>
+                                          <LinesHome />
+                                        </LinesRoute>
+                                      }
+                                    />
+                                    <Route
+                                      path="/lines/create"
+                                      element={
+                                        <LinesRoute>
+                                          <CreateLine />
+                                        </LinesRoute>
+                                      }
+                                    />
+                                    <Route
+                                      path="/lines/:lineId"
+                                      element={
+                                        <LinesRoute>
+                                          <LineDetails />
+                                        </LinesRoute>
+                                      }
+                                    />
+                                    <Route
+                                      path="/subscriptions"
+                                      element={
+                                        <LinesRoute>
+                                          <MySubscriptions />
+                                        </LinesRoute>
+                                      }
+                                    />
+
                                     {/* Admin Test Page - temporarily disabled */}
                                     {/* <Route path="/admin-test" element={<AdminTest />} /> */}
 
@@ -187,7 +236,8 @@ export default function App() {
                               </main>
                               <BottomNav />
                               <FloatingDownloadButton />
-                            </div>
+                              </div>
+                            </LinesProvider>
                           </RatingProvider>
                         </DemandsProvider>
                       </OffersProvider>

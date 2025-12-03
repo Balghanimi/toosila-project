@@ -38,6 +38,8 @@ const passwordResetRoutes = require('./routes/passwordReset.routes');
 const healthRoutes = require('./routes/health.routes');
 const adminRoutes = require('./routes/admin.routes');
 const otpRoutes = require('./routes/otp.routes');
+const linesRoutes = require('./routes/lines.routes');
+const subscriptionsRoutes = require('./routes/subscriptions.routes');
 
 const app = express();
 
@@ -154,6 +156,15 @@ app.use(
   })
 );
 
+// Root-level health check (for client connectivity monitoring)
+app.get('/health', (req, res) => {
+  res.json({
+    ok: true,
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
+
 // Health check routes (comprehensive monitoring)
 app.use('/api/health', healthRoutes);
 
@@ -173,6 +184,8 @@ app.use('/api/email-verification', noCache, emailVerificationRoutes);
 app.use('/api/password-reset', noCache, passwordResetRoutes);
 app.use('/api/admin', noCache, adminRoutes); // Admin routes for migrations
 app.use('/api/otp', noCache, otpRoutes); // OTP phone verification routes
+app.use('/api/lines', shortCache, etag, linesRoutes); // Lines feature routes
+app.use('/api/subscriptions', noCache, subscriptionsRoutes); // Subscriptions routes
 
 // Serve static files from React build (production only)
 if (config.NODE_ENV === 'production') {
