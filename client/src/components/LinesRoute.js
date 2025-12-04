@@ -10,6 +10,11 @@ import { canAccessLines } from '../config/featureFlags';
 const LinesRoute = ({ children }) => {
   const { currentUser } = useAuth();
 
+  // Debug: Log access check (remove in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[LinesRoute] User:', currentUser?.name, 'Role:', currentUser?.role, 'Can Access:', canAccessLines(currentUser));
+  }
+
   if (!canAccessLines(currentUser)) {
     return <Navigate to="/lines-coming-soon" replace />;
   }
