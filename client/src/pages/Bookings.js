@@ -10,7 +10,7 @@ import { formatDate, formatTime, formatPrice, formatSeats } from '../utils/forma
 
 export default function Bookings() {
   const location = useLocation();
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const { showSuccess, showError, showInfo, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
 
@@ -78,29 +78,22 @@ export default function Bookings() {
 
   useEffect(() => {
     // Wait for auth to finish loading before checking user
-    // Don't redirect while auth is still initializing
-    if (currentUser === null) {
-      // Check if there's a token - if yes, wait for auth to load
-      const token = localStorage.getItem('token');
-      if (token) {
-        // Auth is loading, don't redirect yet
-        return;
-      }
-      // No token, user is definitely not logged in
+    if (authLoading) {
+      console.log('[Bookings] Auth still loading, waiting...');
+      return;
+    }
+
+    // Auth finished loading, check if user is logged in
+    if (!currentUser) {
+      console.log('[Bookings] No user logged in, redirecting to home');
       navigate('/');
       return;
     }
 
-    console.log('\n' + '='.repeat(60));
-    console.log('🔍 BOOKING DEBUG MODE ENABLED');
-    console.log('='.repeat(60));
-    console.log(`📍 Active Tab: ${activeTab}`);
-    console.log(`👤 Current User: ${currentUser?.name} (${currentUser?.id?.slice(0, 8)})`);
-    console.log('='.repeat(60) + '\n');
-
+    console.log('[Bookings] User loaded:', currentUser?.name, 'Tab:', activeTab);
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, activeTab, navigate]);
+  }, [currentUser, authLoading, activeTab, navigate]);
 
   // Clear highlighted booking after 3 seconds
   useEffect(() => {
