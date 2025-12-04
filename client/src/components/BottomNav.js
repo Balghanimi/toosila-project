@@ -263,7 +263,7 @@ const BottomNav = () => {
       key: 'carpool',
       label: t('home'),
       icon: Icons.carpool,
-      paths: ['/', '/offers'],
+      paths: ['/home', '/offers'],
     },
     {
       key: 'mytrips',
@@ -309,7 +309,7 @@ const BottomNav = () => {
   const getActiveKey = () => {
     const activeItem = NAV_ITEMS.find((item) =>
       item.paths.some((path) => {
-        if (path === '/') return currentPath === '/';
+        if (path === '/home') return currentPath === '/home';
         return currentPath.startsWith(path);
       })
     );
@@ -327,7 +327,7 @@ const BottomNav = () => {
 
     // Navigate to the primary path for each section
     const navigationMap = {
-      carpool: '/',
+      carpool: '/home',
       mytrips: '/bookings',
       messages: '/messages',
       profile: '/profile',
