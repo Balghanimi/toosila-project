@@ -12,7 +12,9 @@ const LinesRoute = ({ children }) => {
 
   // Debug: Always log for debugging blank page issue
   console.log('[LinesRoute] Debug:', {
-    currentUser: currentUser ? { name: currentUser.name, role: currentUser.role, id: currentUser.id } : null,
+    currentUser: currentUser
+      ? { name: currentUser.name, role: currentUser.role, id: currentUser.id }
+      : null,
     loading,
     canAccess: canAccessLines(currentUser),
     hasChildren: !!children,

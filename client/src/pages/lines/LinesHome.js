@@ -18,7 +18,12 @@ const LinesHome = () => {
   const { currentUser } = useAuth();
   const { lines, loading, error, pagination, fetchLines, updateFilters, loadMore } = useLines();
 
-  console.log('[LinesHome] State:', { currentUser: currentUser?.name, linesCount: lines?.length, loading, error });
+  console.log('[LinesHome] State:', {
+    currentUser: currentUser?.name,
+    linesCount: lines?.length,
+    loading,
+    error,
+  });
 
   const [cities, setCities] = useState([]);
   const [fromCity, setFromCity] = useState('');

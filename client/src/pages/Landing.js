@@ -25,10 +25,7 @@ const Landing = () => {
               {currentUser.name?.charAt(0) || '👤'}
             </button>
           ) : (
-            <button
-              className={styles.loginBtn}
-              onClick={() => navigate('/login')}
-            >
+            <button className={styles.loginBtn} onClick={() => navigate('/login')}>
               دخول
             </button>
           )}
@@ -63,10 +60,7 @@ const Landing = () => {
             <span className={styles.tag}>💬 محادثة</span>
             <span className={styles.tag}>⭐ تقييمات</span>
           </div>
-          <button
-            className={styles.ctaGreen}
-            onClick={() => navigate('/home')}
-          >
+          <button className={styles.ctaGreen} onClick={() => navigate('/home')}>
             ابحث عن رحلة ←
           </button>
         </div>
@@ -82,10 +76,7 @@ const Landing = () => {
             <span className={styles.tag}>💼 موظفين</span>
             <span className={styles.tag}>👩 للنساء</span>
           </div>
-          <button
-            className={styles.ctaOrange}
-            onClick={() => navigate('/lines-coming-soon')}
-          >
+          <button className={styles.ctaOrange} onClick={() => navigate('/lines-coming-soon')}>
             🔔 أبلغني عند التوفر
           </button>
         </div>
