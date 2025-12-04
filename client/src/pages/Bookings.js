@@ -85,8 +85,8 @@ export default function Bookings() {
 
     // Auth finished loading, check if user is logged in
     if (!currentUser) {
-      console.log('[Bookings] No user logged in, redirecting to home');
-      navigate('/');
+      console.log('[Bookings] No user logged in, redirecting to login');
+      navigate('/login');
       return;
     }
 
@@ -1207,7 +1207,7 @@ export default function Bookings() {
                   💡 يمكنك نشر عرض رحلة جديد من الصفحة الرئيسية
                 </p>
                 <button
-                  onClick={() => navigate('/', { state: { mode: 'offer' } })}
+                  onClick={() => navigate('/home', { state: { mode: 'offer' } })}
                   style={{
                     marginTop: 'var(--space-3)',
                     padding: 'var(--space-3) var(--space-6)',

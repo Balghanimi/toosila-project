@@ -83,7 +83,7 @@ const PhoneLogin = () => {
         // Direct login for existing user - token already provided!
         console.log('Existing user detected, logging in directly (no OTP sent)');
         login(response.token, response.user);
-        navigate('/');
+        navigate('/home');
         return;
       }
 
@@ -174,7 +174,7 @@ const PhoneLogin = () => {
       } else {
         // Existing user - login
         login(response.token, response.user);
-        navigate('/');
+        navigate('/home');
       }
     } catch (err) {
       setError(err.message || 'رمز التحقق غير صحيح');
@@ -200,7 +200,7 @@ const PhoneLogin = () => {
       const cleanedPhone = phone.replace(/\D/g, '');
       const response = await otpAPI.completeRegistration(cleanedPhone, name.trim(), isDriver);
       login(response.token, response.user);
-      navigate('/');
+      navigate('/home');
     } catch (err) {
       setError(err.message || 'فشل في إكمال التسجيل');
     } finally {

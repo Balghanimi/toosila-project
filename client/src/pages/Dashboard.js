@@ -532,7 +532,7 @@ const Dashboard = () => {
             {/* للسائقين: نشر رحلة جديدة (ثانوي) */}
             {currentUser?.isDriver && (
               <button
-                onClick={() => navigate('/', { state: { mode: 'offer' } })}
+                onClick={() => navigate('/home', { state: { mode: 'offer' } })}
                 style={{
                   padding: 'var(--space-4)',
                   background: 'var(--surface-secondary)',
@@ -568,7 +568,7 @@ const Dashboard = () => {
             {/* للركاب: نشر طلب رحلة (ثانوي) */}
             {!currentUser?.isDriver && (
               <button
-                onClick={() => navigate('/', { state: { mode: 'demand' } })}
+                onClick={() => navigate('/home', { state: { mode: 'demand' } })}
                 style={{
                   padding: 'var(--space-4)',
                   background: 'var(--surface-secondary)',

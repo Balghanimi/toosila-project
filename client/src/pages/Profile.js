@@ -114,7 +114,7 @@ const Profile = () => {
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div
             onClick={() =>
-              navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined })
+              navigate('/home', { state: currentUser.isDriver ? { mode: 'offer' } : undefined })
             }
             role="button"
             tabIndex={0}
@@ -122,7 +122,7 @@ const Profile = () => {
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                navigate('/', { state: currentUser.isDriver ? { mode: 'offer' } : undefined });
+                navigate('/home', { state: currentUser.isDriver ? { mode: 'offer' } : undefined });
               }
             }}
             style={{
@@ -340,7 +340,7 @@ const Profile = () => {
           {/* Quick Action Button - Driver */}
           {currentUser.isDriver ? (
             <button
-              onClick={() => navigate('/', { state: { mode: 'offer' } })}
+              onClick={() => navigate('/home', { state: { mode: 'offer' } })}
               style={{
                 width: '100%',
                 padding: 'var(--space-5)',
@@ -376,7 +376,7 @@ const Profile = () => {
             /* Quick Actions for Passenger */
             <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/home')}
                 style={{
                   width: '100%',
                   padding: 'var(--space-5)',
@@ -409,7 +409,7 @@ const Profile = () => {
               </button>
 
               <button
-                onClick={() => navigate('/', { state: { mode: 'demand' } })}
+                onClick={() => navigate('/home', { state: { mode: 'demand' } })}
                 style={{
                   width: '100%',
                   padding: 'var(--space-5)',

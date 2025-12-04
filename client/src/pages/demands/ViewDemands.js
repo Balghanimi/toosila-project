@@ -751,7 +751,7 @@ export default function ViewDemands() {
             </p>
             {currentUser && !currentUser.isDriver && (
               <button
-                onClick={() => navigate('/', { state: { mode: 'demand' } })}
+                onClick={() => navigate('/home', { state: { mode: 'demand' } })}
                 style={{
                   padding: 'var(--space-3) var(--space-6)',
                   background: 'var(--primary)',

@@ -206,7 +206,7 @@ const ViewOffers = React.memo(function ViewOffers() {
 
   const handleClearFilters = () => {
     // العودة للصفحة الرئيسية عند مسح الفلتر
-    navigate('/');
+    navigate('/home');
   };
 
   // PERFORMANCE FIX: Memoized expensive date/time formatting functions
@@ -607,7 +607,7 @@ const ViewOffers = React.memo(function ViewOffers() {
             </p>
             {currentUser && currentUser.isDriver && (
               <button
-                onClick={() => navigate('/', { state: { mode: 'offer' } })}
+                onClick={() => navigate('/home', { state: { mode: 'offer' } })}
                 style={{
                   padding: 'var(--space-3) var(--space-6)',
                   background: 'var(--primary)',
