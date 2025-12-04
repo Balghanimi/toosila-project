@@ -7,6 +7,26 @@
   padding-bottom: 100px;
 }
 
+/* Back Button */
+.backButton {
+  background: white;
+  border: 2px solid #10B981;
+  color: #10B981;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover {
+  background: #10B981;
+  color: white;
+}
+
 /* Hero Section */
 .hero {
   text-align: center;

@@ -228,6 +228,15 @@ const LinesComingSoon = () => {
 
   return (
     <div className={styles.container}>
+      {/* Back Button */}
+      <button
+        className={styles.backButton}
+        onClick={() => navigate('/')}
+        aria-label="الرجوع للرئيسية"
+      >
+        ← رجوع للرئيسية
+      </button>
+
       {/* Hero Section */}
       <div className={styles.hero}>
         <div className={styles.heroIcon}>🚌</div>

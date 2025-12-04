@@ -341,7 +341,10 @@ const BottomNav = () => {
 
   // Hide bottom nav on certain screens
   const shouldHideBottomNav = () => {
-    const hiddenPaths = ['/login', '/register', '/auth', '/onboarding'];
+    // Exact match for landing page
+    if (currentPath === '/') return true;
+    // Prefix match for other hidden paths
+    const hiddenPaths = ['/login', '/register', '/auth', '/onboarding', '/lines-coming-soon'];
     return hiddenPaths.some((path) => currentPath.startsWith(path));
   };
 

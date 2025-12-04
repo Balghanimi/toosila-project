@@ -1,0 +1,337 @@
+/* Landing Page Styles */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+  padding-bottom: 40px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.loginBtn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+}
+
+.profileBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.langToggle {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+}
+
+/* Logo Section */
+.logoSection {
+  text-align: center;
+  padding: 30px 20px 20px;
+}
+
+.logoIcon {
+  font-size: 60px;
+  margin-bottom: 8px;
+}
+
+.logoText {
+  font-size: 42px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.slogan {
+  font-size: 16px;
+  color: #64748b;
+  margin: 8px 0 0;
+  font-weight: 400;
+}
+
+/* Services Section */
+.servicesSection {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Service Cards */
+.serviceCard {
+  background: white;
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.serviceCard:first-of-type {
+  border-color: #10B981;
+}
+
+.cardComingSoon {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+}
+
+/* Badges */
+.badgeActive {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badgeComingSoon {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Card Icon */
+.cardIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.iconGreen {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+}
+
+.iconOrange {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+/* Card Content */
+.cardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px;
+}
+
+.cardSubtitle {
+  font-size: 14px;
+  color: #10B981;
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.cardDescription {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tag {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* CTA Buttons */
+.ctaGreen {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaGreen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.ctaOrange {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaOrange:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 20px;
+}
+
+.footerBrand {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footerLinks button {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  padding: 4px 8px;
+}
+
+.footerLinks button:hover {
+  color: #10B981;
+}
+
+.footerLinks span {
+  color: #cbd5e1;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .logoText,
+  .sectionTitle,
+  .cardTitle {
+    color: #f1f5f9;
+  }
+
+  .slogan,
+  .cardDescription,
+  .footerBrand {
+    color: #94a3b8;
+  }
+
+  .serviceCard {
+    background: #1e293b;
+  }
+
+  .cardComingSoon {
+    background: linear-gradient(180deg, #292524 0%, #1e293b 100%);
+  }
+
+  .langToggle,
+  .tag {
+    background: #334155;
+    color: #94a3b8;
+  }
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .logoText {
+    font-size: 36px;
+  }
+
+  .slogan {
+    font-size: 14px;
+  }
+
+  .servicesSection {
+    padding: 16px;
+  }
+
+  .serviceCard {
+    padding: 20px 16px;
+  }
+}

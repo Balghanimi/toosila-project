@@ -24,6 +24,7 @@ import './styles/enhancements.css';
 import './styles/professional-ui.css';
 
 // Lazy load all pages for code splitting
+const Landing = lazy(() => import('./pages/Landing'));
 const Home = lazy(() => import('./pages/Home'));
 const Messages = lazy(() => import('./pages/Messages'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -105,7 +106,8 @@ export default function App() {
                                 <main className="appContent">
                                   <Suspense fallback={<LoadingSpinner />}>
                                     <Routes>
-                                      <Route path="/" element={<Home />} />
+                                      <Route path="/" element={<Landing />} />
+                                      <Route path="/home" element={<Home />} />
                                       <Route path="/dashboard" element={<Dashboard />} />
                                       <Route path="/messages" element={<Messages />} />
                                       <Route path="/profile" element={<Profile />} />
