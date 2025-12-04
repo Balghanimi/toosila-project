@@ -85,15 +85,15 @@ export default function Bookings() {
 
     // Auth finished loading, check if user is logged in
     if (!currentUser) {
-      console.log('[Bookings] No user logged in, redirecting to login');
-      navigate('/login');
+      console.log('[Bookings] No user logged in');
+      setLoading(false);
       return;
     }
 
     console.log('[Bookings] User loaded:', currentUser?.name, 'Tab:', activeTab);
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, authLoading, activeTab, navigate]);
+  }, [currentUser, authLoading, activeTab]);
 
   // Clear highlighted booking after 3 seconds
   useEffect(() => {
@@ -776,6 +776,102 @@ export default function Bookings() {
       </div>
     );
   };
+
+  // Show loading while auth is checking
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid #e2e8f0',
+              borderTop: '4px solid #10B981',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 16px',
+            }}
+          />
+          <p style={{ color: '#64748b', fontFamily: '"Cairo", sans-serif' }}>جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not logged in
+  if (!currentUser) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          padding: '20px',
+        }}
+      >
+        <div
+          style={{
+            textAlign: 'center',
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            maxWidth: '400px',
+          }}
+        >
+          <div style={{ fontSize: '60px', marginBottom: '20px' }}>🔐</div>
+          <h2
+            style={{
+              fontSize: '24px',
+              fontWeight: '700',
+              color: '#1e293b',
+              marginBottom: '12px',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
+            يجب تسجيل الدخول
+          </h2>
+          <p
+            style={{
+              color: '#64748b',
+              marginBottom: '24px',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
+            لعرض رحلاتك وحجوزاتك، يرجى تسجيل الدخول أولاً
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              width: '100%',
+              padding: '14px 24px',
+              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+          >
+            تسجيل الدخول
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
