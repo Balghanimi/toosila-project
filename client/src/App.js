@@ -117,7 +117,7 @@ export default function App() {
                                       {/* Redirect /post-offer to homepage - form is on homepage */}
                                       <Route
                                         path="/post-offer"
-                                        element={<Navigate to="/" replace />}
+                                        element={<Navigate to="/home" replace />}
                                       />
                                       <Route path="/offers" element={<ViewOffers />} />
                                       {/* مسارات الطلبات */}
