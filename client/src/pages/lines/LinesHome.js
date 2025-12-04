@@ -12,9 +12,13 @@ import styles from './LinesHome.module.css';
  * LinesHome - Main page for browsing and searching lines
  */
 const LinesHome = () => {
+  console.log('[LinesHome] Component rendering');
+
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const { lines, loading, error, pagination, fetchLines, updateFilters, loadMore } = useLines();
+
+  console.log('[LinesHome] State:', { currentUser: currentUser?.name, linesCount: lines?.length, loading, error });
 
   const [cities, setCities] = useState([]);
   const [fromCity, setFromCity] = useState('');

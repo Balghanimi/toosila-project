@@ -18,6 +18,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ConnectionProvider } from './context/ConnectionContext';
 import { LinesProvider } from './context/LinesContext';
 import ConnectionOverlay from './components/ConnectionOverlay';
+import LinesRoute from './components/LinesRoute';
 import './App.css';
 import './styles/enhancements.css';
 import './styles/professional-ui.css';
@@ -73,7 +74,6 @@ const LineDetails = lazy(() => import('./pages/lines/LineDetails'));
 const CreateLine = lazy(() => import('./pages/lines/CreateLine'));
 const MySubscriptions = lazy(() => import('./pages/lines/MySubscriptions'));
 const LinesComingSoon = lazy(() => import('./pages/lines/LinesComingSoon'));
-const LinesRoute = lazy(() => import('./components/LinesRoute'));
 
 // Admin Pages
 const AdminRoute = lazy(() => import('./components/Admin/AdminRoute'));

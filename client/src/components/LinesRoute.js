@@ -8,17 +8,28 @@ import { canAccessLines } from '../config/featureFlags';
  * Redirects to Lines Coming Soon page if user doesn't have access
  */
 const LinesRoute = ({ children }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
 
-  // Debug: Log access check (remove in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[LinesRoute] User:', currentUser?.name, 'Role:', currentUser?.role, 'Can Access:', canAccessLines(currentUser));
+  // Debug: Always log for debugging blank page issue
+  console.log('[LinesRoute] Debug:', {
+    currentUser: currentUser ? { name: currentUser.name, role: currentUser.role, id: currentUser.id } : null,
+    loading,
+    canAccess: canAccessLines(currentUser),
+    hasChildren: !!children,
+  });
+
+  // Wait for auth to load before making access decision
+  if (loading) {
+    console.log('[LinesRoute] Auth loading, showing spinner...');
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
   }
 
   if (!canAccessLines(currentUser)) {
+    console.log('[LinesRoute] Access denied, redirecting to coming-soon');
     return <Navigate to="/lines-coming-soon" replace />;
   }
 
+  console.log('[LinesRoute] Access granted, rendering children');
   return children;
 };
 

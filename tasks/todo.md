@@ -1,4 +1,163 @@
-# Toosila Project - Current Tasks & Progress
+# COMPLETED: Fix Lines Page Navigation
+
+**Date:** December 4, 2025
+**Files Modified:** client/src/App.js, client/src/components/LinesRoute.js
+
+---
+
+## Problem
+
+The Lines page (/lines) was showing BLANK for admin users, and the feature was not discoverable.
+
+## Root Cause Analysis
+
+1. **LinesRoute was lazy loaded** (line 76 of App.js):
+   ```javascript
+   const LinesRoute = lazy(() => import('./components/LinesRoute'));
+   ```
+
+   This caused issues because:
+   - LinesRoute is a route guard/wrapper, not a page component
+   - Double lazy loading (LinesRoute + LinesHome) caused timing issues
+   - The component could render null before auth state was ready
+
+2. **Navigation was in "More" menu** - Working as designed, but easy to miss
+
+## Solution
+
+Changed `LinesRoute` from lazy loaded to regular import:
+
+**Before (App.js):**
+```javascript
+const LinesRoute = lazy(() => import('./components/LinesRoute'));
+```
+
+**After (App.js):**
+```javascript
+import LinesRoute from './components/LinesRoute';
+```
+
+Also added loading state check to LinesRoute.js to wait for auth context.
+
+## Files Changed
+
+1. **client/src/App.js**
+   - Added: `import LinesRoute from './components/LinesRoute';` (line 21)
+   - Removed: `const LinesRoute = lazy(() => import('./components/LinesRoute'));`
+
+2. **client/src/components/LinesRoute.js** (earlier change)
+   - Added `loading` state from AuthContext
+   - Shows loading indicator while auth is initializing
+   - Prevents premature redirect before user role is known
+
+## How to Test
+
+1. Login as admin user (run: `node server/scripts/set-admin.js <email>`)
+2. Open app and click "المزيد" (More menu)
+3. Click "الخطوط" (Lines)
+4. Admin should see LinesHome page (not blank, not Coming Soon)
+5. Regular users should see LinesComingSoon page
+
+## Navigation Flow
+
+| User Type | Click "الخطوط" | Result |
+|-----------|----------------|--------|
+| Admin     | /lines         | LinesHome.js |
+| Driver    | /lines         | LinesComingSoon.js |
+| Passenger | /lines         | LinesComingSoon.js |
+
+---
+
+# COMPLETED: Redesign Advanced Search Filters
+
+**Date:** December 3-4, 2025
+**File:** client/src/pages/demands/ViewDemands.js
+**Commit:** 690f2df
+
+---
+
+## Problem Analysis
+
+The "خيارات البحث المتقدم" section had DUPLICATE fields:
+- Lines 381-399: Quick search has "من" and "إلى" city selects
+- Lines 523-541: Advanced filters had SAME "من" and "إلى" city selects (DUPLICATE!)
+
+This was confusing and useless - users saw the same fields twice.
+
+---
+
+## Todo List
+
+- [x] 1. Add state for new filters (sortBy, ladiesOnly)
+- [x] 2. Remove duplicate city selects from advanced filters (lines 511-542)
+- [x] 3. Replace with sort buttons and ladies-only checkbox
+- [x] 4. Apply sorting/filtering to displayed results
+- [x] 5. Commit and push changes
+
+---
+
+## Changes Made
+
+### 1. Added State (lines 44-46)
+```javascript
+const [sortBy, setSortBy] = useState('newest');
+const [ladiesOnly, setLadiesOnly] = useState(false);
+```
+
+### 2. Replaced Advanced Filters Content (lines 515-607)
+- Removed duplicate SearchableCitySelect components
+- Added sort buttons: 🕐 الأحدث, 💰 الأرخص, 📅 الأقرب موعداً
+- Added ladies-only checkbox: 👩 للنساء فقط
+
+### 3. Added Filtering/Sorting Logic (lines 309-336)
+```javascript
+const getFilteredAndSortedDemands = () => {
+  let result = [...demands];
+  if (ladiesOnly) {
+    result = result.filter((d) => d.isLadiesOnly === true);
+  }
+  switch (sortBy) {
+    case 'newest': result.sort(...); break;
+    case 'cheapest': result.sort(...); break;
+    case 'soonest': result.sort(...); break;
+  }
+  return result;
+};
+const displayedDemands = getFilteredAndSortedDemands();
+```
+
+### 4. Updated Render Logic
+- Changed all `demands.length` to `displayedDemands.length`
+- Changed `demands.map()` to `displayedDemands.map()`
+
+---
+
+## Review
+
+**Status:** COMPLETE
+
+**What was done:**
+- Removed useless duplicate city fields from advanced filters
+- Added useful sort options (newest, cheapest, soonest departure)
+- Added ladies-only filter checkbox
+- Client-side sorting and filtering applied to results
+
+**Files changed:** 1 file, 120 insertions, 26 deletions
+
+---
+---
+
+# COMPLETED: Railway Build Fix
+
+**Completed:** December 3, 2025
+**Commit:** cb968a8
+
+Changed `rootDirectory` from `"/"` to `"."` in railway.json and railway.toml.
+
+---
+---
+
+# Previous Project Status (Archive)
 
 **Last Updated**: October 3, 2025 - Session 2 Complete
 **Project**: توصيلة (Toosila) - Iraq Ride-Sharing Platform

@@ -77,7 +77,16 @@ export default function Bookings() {
   };
 
   useEffect(() => {
-    if (!currentUser) {
+    // Wait for auth to finish loading before checking user
+    // Don't redirect while auth is still initializing
+    if (currentUser === null) {
+      // Check if there's a token - if yes, wait for auth to load
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Auth is loading, don't redirect yet
+        return;
+      }
+      // No token, user is definitely not logged in
       navigate('/');
       return;
     }
