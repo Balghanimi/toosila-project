@@ -54,8 +54,8 @@ body {
 /* ===== Content Area ===== */
 .appContent {
   padding: var(--space-4);
-  padding-bottom: calc(var(--space-4) + 56px + env(safe-area-inset-bottom));
-  min-height: 100vh;
+  padding-bottom: calc(var(--space-4) + 68px + env(safe-area-inset-bottom));
+  min-height: auto;
   max-width: 1400px;
   margin: 0 auto;
 }
