@@ -108,10 +108,21 @@ app.use(
   })
 );
 
-// CORS configuration
+// CORS configuration - Dynamic origin matching for multiple allowed origins
 app.use(
   cors({
-    origin: config.corsOrigin, // ← ✅ متوافق مع architecture.md,
+    origin: function(origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowed list
+      if (config.corsOrigins.indexOf(origin) !== -1) {
+        callback(null, origin); // Return only the matching origin
+      } else {
+        logger.warn(`CORS blocked request from origin: ${origin}`);
+        callback(null, false);
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

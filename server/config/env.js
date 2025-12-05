@@ -22,9 +22,12 @@ const config = {
   // Frontend configuration
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3001',
-  corsOrigin: process.env.NODE_ENV === 'production'
-    ? (process.env.CORS_ORIGIN || 'https://toosila-frontend-production.up.railway.app')
-    : (process.env.CORS_ORIGIN || 'http://localhost:3000'),
+  // Parse CORS_ORIGIN as array for dynamic origin matching
+  corsOrigins: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+    : (process.env.NODE_ENV === 'production'
+        ? ['https://toosila-frontend-production.up.railway.app']
+        : ['http://localhost:3000']),
   
   // Email configuration
   EMAIL_HOST: process.env.EMAIL_HOST || 'smtp.gmail.com',
