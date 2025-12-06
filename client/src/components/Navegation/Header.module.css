@@ -341,29 +341,40 @@ body.dark-mode .header {
   transform: translateY(0);
 }
 
-/* User Avatar */
+/* User Avatar - Modern Green Theme */
 .userAvatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
-  background: var(--primary);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: var(--text-base);
-  transition: all 0.2s ease;
-  border: 2px solid var(--border-light);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   outline: none;
+  color: white;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
 }
 
 .userAvatar:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-sm);
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.userAvatar:active {
+  transform: scale(0.95);
 }
 
 .userAvatar:focus-visible {
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--focus-ring), 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
+.userAvatar svg {
+  color: white;
 }
 
 /* Drawer Styles */
@@ -572,7 +583,7 @@ body.dark-mode .header {
   }
 
   .logoText {
-    height: 28px;
+    height: 40px;
   }
 
   .appName {
@@ -580,8 +591,8 @@ body.dark-mode .header {
   }
 
   .logo {
-    height: 24px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
   }
 
   /* ICONS - Third column (LEFT side in RTL) */
@@ -655,13 +666,13 @@ body.dark-mode .header {
   }
 
   .logo {
-    height: 20px;
-    width: 20px;
+    height: 28px;
+    width: 28px;
   }
 
   .logoText {
-    height: 24px;
-    max-height: 24px;
+    height: 36px;
+    max-height: 36px;
   }
 
   .actionButtons {

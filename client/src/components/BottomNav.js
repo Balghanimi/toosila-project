@@ -325,6 +325,11 @@ const BottomNav = () => {
       return;
     }
 
+    // Close more menu if open before navigating
+    if (showMoreMenu) {
+      setShowMoreMenu(false);
+    }
+
     // Navigate to the primary path for each section
     const navigationMap = {
       carpool: '/home',
