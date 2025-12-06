@@ -949,3 +949,30 @@ body.dark-mode .city-select__option--create {
 body.dark-mode .city-select__option--create:hover {
   background-color: #27372a !important;
 }
+
+/* ========================================
+   NATIVE APP FEEL - DISABLE TEXT SELECTION
+   Makes the app feel more like a mobile app
+   ======================================== */
+
+/* Disable text selection on all elements */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection in input fields, textareas, and contenteditable */
+input,
+textarea,
+[contenteditable='true'],
+[contenteditable=''] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
