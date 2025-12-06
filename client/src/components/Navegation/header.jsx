@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
@@ -32,6 +32,19 @@ const Header = () => {
       return newState;
     });
   };
+
+  // Close drawer and reset overflow on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+    document.body.style.overflow = '';
+  }, [location.pathname]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const handleAuthClick = () => {
     if (isAuthenticated) {
