@@ -66,7 +66,7 @@ const UserMenu = ({ onClose }) => {
               height: '80px',
               borderRadius: '50%',
               background:
-                user?.userType === 'driver'
+                user?.isDriver
                   ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
                   : 'linear-gradient(135deg, var(--secondary) 0%, #4338ca 100%)',
               display: 'flex',
@@ -77,7 +77,7 @@ const UserMenu = ({ onClose }) => {
               boxShadow: 'var(--shadow-lg)',
             }}
           >
-            {user?.userType === 'driver' ? '🚗' : '🧑‍💼'}
+            {user?.isDriver ? '🚗' : '🧑‍💼'}
           </div>
 
           <h3
@@ -100,7 +100,8 @@ const UserMenu = ({ onClose }) => {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            {user?.userType === 'driver' ? 'سائق' : 'راكب'} • {user?.city}
+            {user?.role === 'admin' ? 'مدير' : user?.isDriver ? 'سائق' : 'راكب'}
+            {user?.city ? ` • ${user?.city}` : ''}
           </p>
         </div>
 

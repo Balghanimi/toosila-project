@@ -138,7 +138,7 @@ export default function UserProfile({ isOpen, onClose }) {
               height: '80px',
               borderRadius: '50%',
               background:
-                user.userType === 'driver'
+                user.isDriver
                   ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                   : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
               display: 'flex',
@@ -150,7 +150,7 @@ export default function UserProfile({ isOpen, onClose }) {
               transition: 'all 0.3s ease',
             }}
           >
-            {user.userType === 'driver' ? '🚗' : '🧑‍💼'}
+            {user.isDriver ? '🚗' : '🧑‍💼'}
           </div>
           <h2
             style={{
@@ -196,11 +196,11 @@ export default function UserProfile({ isOpen, onClose }) {
               e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
             }}
           >
-            <span style={{ fontSize: '18px' }}>{user.userType === 'driver' ? '🧑‍💼' : '🚗'}</span>
+            <span style={{ fontSize: '18px' }}>{user.isDriver ? '🧑‍💼' : '🚗'}</span>
             <span>
               {isSwitchingRole
                 ? 'جاري التبديل...'
-                : user.userType === 'driver'
+                : user.isDriver
                   ? 'التبديل إلى راكب'
                   : 'التبديل إلى سائق'}
             </span>
@@ -211,7 +211,7 @@ export default function UserProfile({ isOpen, onClose }) {
           <div
             style={{
               display: 'inline-block',
-              background: user.userType === 'driver' ? '#10b981' : '#3b82f6',
+              background: user.role === 'admin' ? '#dc2626' : user.isDriver ? '#10b981' : '#3b82f6',
               color: 'white',
               padding: '4px 12px',
               borderRadius: '12px',
@@ -219,7 +219,7 @@ export default function UserProfile({ isOpen, onClose }) {
               fontWeight: '600',
             }}
           >
-            {user.userType === 'driver' ? '🚗 سائق' : '🧑‍💼 راكب'}
+            {user.role === 'admin' ? '⚡ مدير' : user.isDriver ? '🚗 سائق' : '🧑‍💼 راكب'}
           </div>
 
           {/* Email Verification Status */}
