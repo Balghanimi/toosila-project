@@ -15,12 +15,13 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, config.JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ 
+      // Use 401 for token-related errors to trigger re-authentication
+      return res.status(401).json({
         error: 'Invalid or expired token',
         message: 'Please login again'
       });
     }
-    
+
     req.user = user;
     next();
   });
@@ -39,12 +40,13 @@ const authenticateRefreshToken = (req, res, next) => {
 
   jwt.verify(refreshToken, config.JWT_REFRESH_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ 
+      // Use 401 for token-related errors to trigger re-authentication
+      return res.status(401).json({
         error: 'Invalid or expired refresh token',
         message: 'Please login again'
       });
     }
-    
+
     req.user = user;
     next();
   });
