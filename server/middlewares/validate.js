@@ -56,6 +56,10 @@ const validateUserUpdate = [
     .optional()
     .isIn(['ar', 'en'])
     .withMessage('Language must be either ar or en'),
+  body('isDriver')
+    .optional()
+    .isBoolean()
+    .withMessage('isDriver must be a boolean value'),
   handleValidationErrors,
 ];
 
