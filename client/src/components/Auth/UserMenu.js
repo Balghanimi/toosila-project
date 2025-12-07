@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+// Updated: Fixed role display sync with AuthContext
 const UserMenu = ({ onClose }) => {
   const [isAnimated, setIsAnimated] = useState(false);
   const { currentUser, logout, isDriver } = useAuth();
