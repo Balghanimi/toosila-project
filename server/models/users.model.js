@@ -136,6 +136,18 @@ class User {
       paramCount++;
     }
 
+    if (filters.role) {
+      whereClause += ` AND role = $${paramCount}`;
+      values.push(filters.role);
+      paramCount++;
+    }
+
+    if (filters.isActive !== undefined) {
+      whereClause += ` AND is_active = $${paramCount}`;
+      values.push(filters.isActive);
+      paramCount++;
+    }
+
     values.push(limit, offset);
 
     const result = await query(

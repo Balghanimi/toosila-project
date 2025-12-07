@@ -140,11 +140,18 @@ const getUserStats = catchAsync(async (req, res) => {
  * @returns {Promise<void>}
  */
 const getAllUsers = catchAsync(async (req, res) => {
-  const { page = 1, limit = 10, isDriver, languagePreference } = req.query;
+  const { page = 1, limit = 10, isDriver, languagePreference, role, isActive } = req.query;
   const filters = {};
 
-  if (isDriver !== undefined) filters.isDriver = isDriver === 'true';
+  // Only apply filter if value is explicitly 'true' or 'false', not empty string
+  if (isDriver === 'true' || isDriver === 'false') {
+    filters.isDriver = isDriver === 'true';
+  }
   if (languagePreference) filters.languagePreference = languagePreference;
+  if (role) filters.role = role;
+  if (isActive === 'true' || isActive === 'false') {
+    filters.isActive = isActive === 'true';
+  }
 
   const result = await User.findAll(page, limit, filters);
 
