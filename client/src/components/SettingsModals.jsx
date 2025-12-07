@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { authAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 // Modal Wrapper Component
 export function Modal({ title, children, onClose }) {
@@ -410,10 +411,9 @@ export function UserTypeModal({ onClose, onSuccess }) {
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { currentUser, setCurrentUser } = useAuth();
 
-  // Get current user from localStorage
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const currentIsDriver = currentUser.isDriver || false;
+  const currentIsDriver = currentUser?.isDriver || false;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -435,19 +435,18 @@ export function UserTypeModal({ onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      await authAPI.updateProfile({ isDriver: newIsDriver });
+      const response = await authAPI.updateProfile({ isDriver: newIsDriver });
 
-      // Update localStorage
-      const updatedUser = { ...currentUser, isDriver: newIsDriver };
+      // Update React context state (this also updates localStorage via AuthContext)
+      const updatedUser = response.data?.user || { ...currentUser, isDriver: newIsDriver };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
 
       const userType = newIsDriver ? 'سائق 🚗' : 'راكب 👤';
       onSuccess(`تم تحديث نوع الحساب إلى ${userType} بنجاح ✅`);
 
-      setTimeout(() => {
-        onClose();
-        window.location.reload();
-      }, 1500);
+      // No page reload needed - React context handles state update
+      setTimeout(onClose, 1500);
     } catch (err) {
       setError(err.message || 'فشل تحديث نوع الحساب');
     } finally {
