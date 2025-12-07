@@ -11,6 +11,12 @@ const UserMenu = ({ onClose }) => {
     setIsAnimated(true);
   }, []);
 
+  // Debug log
+  useEffect(() => {
+    console.log('👤 UserMenu - currentUser:', currentUser);
+    console.log('🚗 UserMenu - isDriver:', isDriver);
+  }, [currentUser, isDriver]);
+
   const handleLogout = () => {
     logout();
     onClose();

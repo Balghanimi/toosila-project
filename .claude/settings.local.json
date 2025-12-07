@@ -38,7 +38,10 @@
       "Bash(curl:*)",
       "Bash(timeout 60 railway logs:*)",
       "Bash(timeout 30 railway logs:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git -C \"c:/Users/a2z/toosila-project\" log --oneline -10)",
+      "Bash(git -C:*)",
+      "Bash(timeout 30 railway run:*)"
     ],
     "deny": [],
     "ask": []

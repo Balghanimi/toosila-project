@@ -239,10 +239,13 @@ export function AuthProvider({ children }) {
       }
 
       // Call API
+      console.log('🔄 Updating profile with:', updates);
       const data = await authAPI.updateProfile(updates);
 
       // Update current user
       const updatedUser = data.data.user;
+      console.log('✅ Profile updated, new user data:', updatedUser);
+      console.log('📊 isDriver value:', updatedUser.isDriver);
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
 
