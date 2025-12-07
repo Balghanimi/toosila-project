@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const UserMenu = ({ onClose }) => {
   const [isAnimated, setIsAnimated] = useState(false);
-  const { user, logout } = useAuth();
+  const { currentUser, logout, isDriver } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,10 +65,9 @@ const UserMenu = ({ onClose }) => {
               width: '80px',
               height: '80px',
               borderRadius: '50%',
-              background:
-                user?.isDriver
-                  ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                  : 'linear-gradient(135deg, var(--secondary) 0%, #4338ca 100%)',
+              background: isDriver
+                ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                : 'linear-gradient(135deg, var(--secondary) 0%, #4338ca 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -77,7 +76,7 @@ const UserMenu = ({ onClose }) => {
               boxShadow: 'var(--shadow-lg)',
             }}
           >
-            {user?.isDriver ? '🚗' : '🧑‍💼'}
+            {isDriver ? '🚗' : '🧑‍💼'}
           </div>
 
           <h3
@@ -89,7 +88,7 @@ const UserMenu = ({ onClose }) => {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            {user?.name}
+            {currentUser?.name}
           </h3>
 
           <p
@@ -100,8 +99,8 @@ const UserMenu = ({ onClose }) => {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            {user?.role === 'admin' ? 'مدير' : user?.isDriver ? 'سائق' : 'راكب'}
-            {user?.city ? ` • ${user?.city}` : ''}
+            {currentUser?.role === 'admin' ? 'مدير' : isDriver ? 'سائق' : 'راكب'}
+            {currentUser?.city ? ` • ${currentUser?.city}` : ''}
           </p>
         </div>
 
@@ -114,7 +113,7 @@ const UserMenu = ({ onClose }) => {
           }}
         >
           {/* Admin Panel Link - Only for admins */}
-          {user?.role === 'admin' && (
+          {currentUser?.role === 'admin' && (
             <button
               onClick={() => {
                 navigate('/admin');
