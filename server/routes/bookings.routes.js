@@ -313,7 +313,7 @@ router.get('/admin/stats', requireAdmin, getBookingStats);
 router.post('/:id/accept', validateId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
-    const driverId = req.user.userId;
+    const driverId = req.user.id;
     const pool = req.app.get('db');
 
     // Start transaction to prevent race conditions
@@ -436,7 +436,7 @@ router.post('/:id/accept', validateId, async (req, res, next) => {
 router.post('/:id/reject', validateId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
-    const driverId = req.user.userId;
+    const driverId = req.user.id;
     const pool = req.app.get('db');
 
     // التحقق من أن الحجز موجود وللسائق الحالي
