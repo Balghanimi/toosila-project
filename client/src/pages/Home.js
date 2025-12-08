@@ -308,7 +308,6 @@ const Home = () => {
           padding: '24px',
         }}
       >
-
         {/* Mode Buttons - Inside Form */}
         <div
           className={styles.modeButtons}
@@ -352,8 +351,6 @@ const Home = () => {
           >
             🔍 ابحث عن رحلة
           </button>
-
-
         </div>
         {/* Location Container */}
         <div className={styles.locationContainer}>
@@ -724,7 +721,7 @@ const Home = () => {
         </div>
         {!isMobile && <span style={{ fontSize: '32px', opacity: 0.8 }}>←</span>}
       </div>
-    </div >
+    </div>
   );
 };
 

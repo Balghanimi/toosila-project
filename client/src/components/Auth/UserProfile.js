@@ -137,10 +137,9 @@ export default function UserProfile({ isOpen, onClose }) {
               width: '80px',
               height: '80px',
               borderRadius: '50%',
-              background:
-                user.isDriver
-                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              background: user.isDriver
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

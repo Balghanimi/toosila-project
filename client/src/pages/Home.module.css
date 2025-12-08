@@ -601,7 +601,7 @@
 /* Seats dropdown specific */
 .seatsDropdown,
 .seatsSelect,
-select[name="seats"] {
+select[name='seats'] {
   color: #333333 !important;
   background: #ffffff;
   padding: 12px 16px;
@@ -1059,7 +1059,9 @@ select[name="seats"] {
 :global(body.dark-mode) .mainCard {
   background: #1f1f23;
   border: 1px solid #27272a;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* Mode Buttons */

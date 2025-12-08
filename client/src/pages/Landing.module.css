@@ -27,7 +27,7 @@
 }
 
 .loginBtn {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   padding: 8px 20px;
@@ -42,7 +42,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   font-size: 18px;
@@ -115,7 +115,7 @@
 }
 
 .serviceCard:first-of-type {
-  border-color: #10B981;
+  border-color: #10b981;
 }
 
 .cardComingSoon {
@@ -127,7 +127,7 @@
   position: absolute;
   top: -12px;
   right: 20px;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   padding: 6px 14px;
   border-radius: 20px;
@@ -177,7 +177,7 @@
 
 .cardSubtitle {
   font-size: 14px;
-  color: #10B981;
+  color: #10b981;
   margin: 0 0 12px;
   font-weight: 600;
 }
@@ -210,7 +210,7 @@
 .ctaGreen {
   width: 100%;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   border-radius: 14px;
@@ -218,7 +218,9 @@
   font-weight: 700;
   cursor: pointer;
   font-family: 'Cairo', sans-serif;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .ctaGreen:hover {
@@ -237,7 +239,9 @@
   font-weight: 700;
   cursor: pointer;
   font-family: 'Cairo', sans-serif;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .ctaOrange:hover {
@@ -277,7 +281,7 @@
 }
 
 .footerLinks button:hover {
-  color: #10B981;
+  color: #10b981;
 }
 
 .footerLinks span {

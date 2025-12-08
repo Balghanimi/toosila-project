@@ -370,7 +370,9 @@ body.dark-mode .header {
 }
 
 .userAvatar:focus-visible {
-  box-shadow: var(--focus-ring), 0 4px 12px rgba(22, 163, 74, 0.4);
+  box-shadow:
+    var(--focus-ring),
+    0 4px 12px rgba(22, 163, 74, 0.4);
 }
 
 .userAvatar svg {
