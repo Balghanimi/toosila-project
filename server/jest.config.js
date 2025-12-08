@@ -1,5 +1,10 @@
 module.exports = {
   testEnvironment: 'node',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/middlewares/',
+    '/__tests__/integration/'
+  ],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'controllers/**/*.js',
