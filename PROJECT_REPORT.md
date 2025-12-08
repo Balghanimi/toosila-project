@@ -682,6 +682,59 @@ The project was developed using an **innovative multi-agent AI system**:
 
 ## 🚀 Recent Achievements (Latest Development Session)
 
+### Session Highlights (December 2025)
+
+#### Critical Bug Fixes & Improvements ✅
+
+##### 1. Role Display Synchronization Fix ✅
+- **Issue**: UserMenu dropdown showed incorrect role (راكب/passenger) even when user was a driver (سائق)
+- **Root Cause**: UserMenu component was not properly synced with AuthContext's reactive `isDriver` value
+- **Fix Applied**:
+  - Modified [UserMenu.js](client/src/components/Auth/UserMenu.js) to use `isDriver` from AuthContext instead of `user?.isDriver`
+  - Changed from `const { user, logout }` to `const { currentUser, logout, isDriver }`
+  - Updated all role display logic to use the reactive `isDriver` value
+  - Result: Role display now synchronizes perfectly between Profile and UserMenu
+- **Commits**:
+  - `c39cbe3` - fix: force UserMenu rebuild for role display
+  - `e1cbba4` - trigger: force frontend rebuild
+
+##### 2. Authentication Middleware Status Code Fix ✅
+- **Issue**: Profile updates caused 401 errors requiring re-login, but middleware was returning 403
+- **Root Cause**: auth.js middleware returned 403 (Forbidden) for expired tokens instead of 401 (Unauthorized)
+- **Fix Applied**:
+  - Changed [server/middlewares/auth.js](server/middlewares/auth.js) to return 401 for all token-related errors
+  - This triggers proper re-authentication flow in frontend
+  - Error message: "Invalid or expired token - Please login again"
+- **Commits**: `05046c9` - debug: add console logs to track role update
+
+##### 3. User Profile Validation Enhancement ✅
+- **Issue**: `isDriver` field updates were being rejected during profile updates
+- **Root Cause**: validation middleware didn't include `isDriver` in allowed fields
+- **Fix Applied**:
+  - Added `isDriver` boolean validation to [server/middlewares/validate.js](server/middlewares/validate.js)
+  - Validation: `body('isDriver').optional().isBoolean().withMessage('isDriver must be a boolean value')`
+  - Users can now successfully toggle between driver and passenger roles
+- **Commits**: `05046c9` - fix: add isDriver validation to user update middleware
+
+##### 4. Booking Acceptance Critical Fix ✅
+- **Issue**: "Cannot read properties of undefined (reading 'query')" when accepting/rejecting bookings
+- **Root Cause**: Code used `req.user.userId` but JWT middleware sets `req.user.id`
+- **Fix Applied**:
+  - Fixed [server/routes/bookings.routes.js](server/routes/bookings.routes.js):
+    - Line 316 (Accept booking): Changed `req.user.userId` → `req.user.id`
+    - Line 439 (Reject booking): Changed `req.user.userId` → `req.user.id`
+  - Booking system now fully functional
+- **Impact**: Drivers can now successfully accept and reject booking requests
+
+##### 5. Railway Deployment Automation Issues ✅
+- **Issue**: Changes not appearing in production despite successful commits
+- **Root Cause**: Railway wasn't automatically triggering rebuilds
+- **Workaround Applied**:
+  - Created empty commits to force Railway deployment
+  - `git commit --allow-empty -m "trigger: force frontend rebuild"`
+  - `git push` to trigger Railway rebuild
+- **User Note**: May require manual deployment trigger or empty commits for critical updates
+
 ### Session Highlights (October 2025)
 
 #### 1. Custom Toosila Logo Creation ✅

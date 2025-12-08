@@ -308,12 +308,13 @@ const Home = () => {
           padding: '24px',
         }}
       >
+
         {/* Mode Buttons - Inside Form */}
         <div
           className={styles.modeButtons}
           role="group"
           aria-label="خيارات البحث والنشر"
-          style={{ marginBottom: '1.5rem' }}
+          style={{ marginBottom: '1.5rem', flexWrap: 'wrap' }}
         >
           {/* Show "نشر رحلة" only for drivers */}
           {currentUser?.isDriver && (
@@ -340,7 +341,6 @@ const Home = () => {
           {/* Search button visible to all */}
           <button
             onClick={() => {
-              console.log('🔍 ابحث عن رحلة button clicked - navigating to offers');
               if (currentUser && currentUser.isDriver) {
                 navigate('/demands');
               } else {
@@ -352,6 +352,8 @@ const Home = () => {
           >
             🔍 ابحث عن رحلة
           </button>
+
+
         </div>
         {/* Location Container */}
         <div className={styles.locationContainer}>
@@ -722,7 +724,7 @@ const Home = () => {
         </div>
         {!isMobile && <span style={{ fontSize: '32px', opacity: 0.8 }}>←</span>}
       </div>
-    </div>
+    </div >
   );
 };
 

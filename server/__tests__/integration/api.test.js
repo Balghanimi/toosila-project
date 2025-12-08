@@ -31,7 +31,7 @@ describe.skip('API Integration Tests', () => {
       it('should register a new user', async () => {
         const userData = {
           name: 'Test User',
-          email: 'newuser@test.com',
+          email: `test-${Date.now()}@example.com`,
           password: 'Password123!',
           languagePreference: 'ar'
         };
