@@ -160,6 +160,12 @@ const validateId = [
   handleValidationErrors,
 ];
 
+// Integer ID validation (for bookings, offers, etc.)
+const validateIntId = [
+  param('id').isInt({ min: 1 }).withMessage('Invalid ID format / معرّف غير صالح'),
+  handleValidationErrors,
+];
+
 // Query validation
 const validatePagination = [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -182,5 +188,6 @@ module.exports = {
   validateMessageCreation,
   validateRatingCreation,
   validateId,
+  validateIntId,
   validatePagination,
 };

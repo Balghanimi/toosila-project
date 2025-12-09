@@ -41,7 +41,12 @@
       "Bash(npm install:*)",
       "Bash(git -C \"c:/Users/a2z/toosila-project\" log --oneline -10)",
       "Bash(git -C:*)",
-      "Bash(timeout 30 railway run:*)"
+      "Bash(timeout 30 railway run:*)",
+      "Bash(npm run test:setup:*)",
+      "Bash(npm test:*)",
+      "Bash(ls:*)",
+      "Bash(psql:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

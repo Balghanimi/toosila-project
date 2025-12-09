@@ -13,8 +13,8 @@ if (process.env.DATABASE_URL) {
 
   // Check if SSL should be disabled (for local postgres without SSL)
   const sslMode = process.env.DATABASE_URL.includes('sslmode=disable') ||
-                  process.env.DATABASE_URL.includes('localhost') ||
-                  process.env.DATABASE_URL.includes('127.0.0.1');
+    process.env.DATABASE_URL.includes('localhost') ||
+    process.env.DATABASE_URL.includes('127.0.0.1');
 
   poolConfig = {
     connectionString: process.env.DATABASE_URL,
@@ -54,6 +54,7 @@ if (process.env.DATABASE_URL) {
 }
 
 const pool = new Pool(poolConfig);
+console.log('DEBUG: config/db.js initialized pool:', !!pool, 'isPool:', pool instanceof Pool);
 
 // Test database connection
 pool.on('connect', () => {
@@ -89,6 +90,9 @@ pool.on('remove', () => {
 // Helper function to execute queries with performance logging
 const query = async (text, params) => {
   const start = Date.now();
+  if (!pool) {
+    console.error('CRITICAL: pool is undefined inside query()!');
+  }
   try {
     const res = await pool.query(text, params);
     const duration = Date.now() - start;

@@ -6,6 +6,7 @@
 const Booking = require('../models/bookings.model');
 const Offer = require('../models/offers.model');
 const { query } = require('../config/db');
+console.log('DEBUG: booking.service.js imported query:', typeof query, query);
 const { NotFoundError, ValidationError, ForbiddenError } = require('../utils/errors');
 const { BOOKING_STATUS } = require('../constants');
 

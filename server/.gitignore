@@ -40,3 +40,9 @@ Thumbs.db
 
 # Uploads (if any)
 uploads/
+
+# Test output files
+*_test*.txt
+*_debug*.txt
+*_output*.txt
+*_result*.txt

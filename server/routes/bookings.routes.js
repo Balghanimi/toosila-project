@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { pool } = require('../config/db');
 
 // Import controllers
 const {
@@ -21,6 +22,7 @@ const { moderateLimiter } = require('../middlewares/rateLimiters');
 const {
   validateBookingCreation,
   validateId,
+  validateIntId,
   validatePagination
 } = require('../middlewares/validate');
 
@@ -310,11 +312,10 @@ router.get('/admin/stats', requireAdmin, getBookingStats);
  *       200:
  *         description: Booking accepted successfully
  */
-router.post('/:id/accept', validateId, async (req, res, next) => {
+router.post('/:id/accept', validateIntId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
     const driverId = req.user.id;
-    const pool = req.app.get('db');
 
     // Start transaction to prevent race conditions
     await pool.query('BEGIN');
@@ -323,7 +324,7 @@ router.post('/:id/accept', validateId, async (req, res, next) => {
       // التحقق من أن الحجز موجود وللسائق الحالي
       const bookingResult = await pool.query(
         `SELECT b.*, o.id as offer_id, o.seats as offer_seats, o.driver_id,
-                o.from_city, o.to_city, o.departure_date, o.price
+                o.from_city, o.to_city, o.departure_time, o.price
          FROM bookings b
          JOIN offers o ON b.offer_id = o.id
          WHERE b.id = $1
@@ -390,7 +391,7 @@ router.post('/:id/accept', validateId, async (req, res, next) => {
             bookingId: bookingId,
             booking_id: bookingId,
             route: `${booking.from_city} → ${booking.to_city}`,
-            date: booking.departure_date,
+            date: booking.departure_time,
             price: booking.price,
           }),
         ]
@@ -433,15 +434,14 @@ router.post('/:id/accept', validateId, async (req, res, next) => {
  *       200:
  *         description: Booking rejected successfully
  */
-router.post('/:id/reject', validateId, async (req, res, next) => {
+router.post('/:id/reject', validateIntId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
     const driverId = req.user.id;
-    const pool = req.app.get('db');
 
     // التحقق من أن الحجز موجود وللسائق الحالي
     const bookingResult = await pool.query(
-      `SELECT b.*, o.driver_id, o.from_city, o.to_city, o.departure_date, o.price
+      `SELECT b.*, o.driver_id, o.from_city, o.to_city, o.departure_time, o.price
        FROM bookings b
        JOIN offers o ON b.offer_id = o.id
        WHERE b.id = $1`,

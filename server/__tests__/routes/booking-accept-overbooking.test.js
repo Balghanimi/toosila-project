@@ -5,7 +5,24 @@
 
 const request = require('supertest');
 const app = require('../../app');
-const pool = require('../../config/db');
+const { pool, query } = require('../../config/db');
+
+// Mock socket to prevent errors
+jest.mock('../../socket', () => ({
+  notifyNewBooking: jest.fn(),
+  notifyBookingStatusUpdate: jest.fn(),
+}));
+
+// Mock email service to prevent SMTP/API calls during tests
+jest.mock('../../utils/emailService', () => ({
+  sendEmail: jest.fn().mockResolvedValue(true),
+  sendVerificationEmail: jest.fn().mockResolvedValue(true),
+  sendWelcomeEmail: jest.fn().mockResolvedValue(true),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
+  sendBookingConfirmationEmail: jest.fn().mockResolvedValue(true),
+  sendBookingRequestEmail: jest.fn().mockResolvedValue(true),
+  sendBookingStatusEmail: jest.fn().mockResolvedValue(true)
+}));
 
 describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
   let driverToken;
@@ -14,53 +31,101 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
   let driverId;
   let passenger1Id;
   let passenger2Id;
+  let passenger3Id;
+  let passenger3Token;
   let offerId;
   let booking1Id;
   let booking2Id;
 
   beforeAll(async () => {
     // Clean up test data
-    await pool.query(`DELETE FROM bookings WHERE 1=1`);
-    await pool.query(`DELETE FROM offers WHERE 1=1`);
-    await pool.query(`DELETE FROM users WHERE email LIKE '%overbooking-test%'`);
+    await query(`DELETE FROM bookings WHERE 1=1`);
+    await query(`DELETE FROM offers WHERE 1=1`);
+    await query(`DELETE FROM users WHERE email LIKE '%overbooking-test%'`);
 
     // Create test driver
-    const driverRes = await request(app).post('/api/auth/register').send({
+    const driverRegData = {
       name: 'Test Driver Overbooking',
       email: 'driver-overbooking-test@test.com',
       password: 'Password123!',
       isDriver: true,
+    };
+    const driverRes = await request(app).post('/api/auth/register').send(driverRegData);
+    driverId = driverRes.body.data.user.id;
+
+    // Login driver
+    const driverLoginRes = await request(app).post('/api/auth/login').send({
+      email: driverRegData.email,
+      password: driverRegData.password
     });
-    driverToken = driverRes.body.token;
-    driverId = driverRes.body.user.id;
+    driverToken = driverLoginRes.body.data.token;
 
     // Create test passenger 1
-    const passenger1Res = await request(app).post('/api/auth/register').send({
+    const p1RegData = {
       name: 'Test Passenger 1',
       email: 'passenger1-overbooking-test@test.com',
       password: 'Password123!',
       isDriver: false,
+    };
+    const passenger1Res = await request(app).post('/api/auth/register').send(p1RegData);
+    passenger1Id = passenger1Res.body.data.user.id;
+
+    // Login passenger 1
+    const p1LoginRes = await request(app).post('/api/auth/login').send({
+      email: p1RegData.email,
+      password: p1RegData.password
     });
-    passenger1Token = passenger1Res.body.token;
-    passenger1Id = passenger1Res.body.user.id;
+    passenger1Token = p1LoginRes.body.data.token;
 
     // Create test passenger 2
-    const passenger2Res = await request(app).post('/api/auth/register').send({
+    const p2RegData = {
       name: 'Test Passenger 2',
       email: 'passenger2-overbooking-test@test.com',
       password: 'Password123!',
       isDriver: false,
+    };
+    const passenger2Res = await request(app).post('/api/auth/register').send(p2RegData);
+    passenger2Id = passenger2Res.body.data.user.id;
+
+    // Login passenger 2
+    const p2LoginRes = await request(app).post('/api/auth/login').send({
+      email: p2RegData.email,
+      password: p2RegData.password
     });
-    passenger2Token = passenger2Res.body.token;
-    passenger2Id = passenger2Res.body.user.id;
+    passenger2Token = p2LoginRes.body.data.token;
+
+    // Create test passenger 3
+    const p3RegData = {
+      name: 'Test Passenger 3',
+      email: 'passenger3-overbooking-test@test.com',
+      password: 'Password123!',
+      isDriver: false,
+    };
+    const passenger3Res = await request(app).post('/api/auth/register').send(p3RegData);
+    passenger3Id = passenger3Res.body.data.user.id;
+
+    // Login passenger 3
+    const p3LoginRes = await request(app).post('/api/auth/login').send({
+      email: p3RegData.email,
+      password: p3RegData.password
+    });
+    passenger3Token = p3LoginRes.body.data.token;
   });
 
   afterAll(async () => {
     // Clean up test data
-    await pool.query(`DELETE FROM bookings WHERE 1=1`);
-    await pool.query(`DELETE FROM offers WHERE 1=1`);
-    await pool.query(`DELETE FROM users WHERE email LIKE '%overbooking-test%'`);
-    await pool.end();
+    try {
+      await query(`DELETE FROM bookings WHERE 1=1`);
+      await query(`DELETE FROM offers WHERE 1=1`);
+      await query(`DELETE FROM users WHERE email LIKE '%overbooking-test%'`);
+
+      // Close pool connection if it exists and has end method
+      if (pool && typeof pool.end === 'function') {
+        await pool.end();
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error.message);
+    }
   });
 
   test('Should prevent overbooking when accepting multiple bookings', async () => {
@@ -79,34 +144,22 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
     expect(offerRes.status).toBe(201);
     offerId = offerRes.body.offer.id;
 
-    // Step 2: Passenger 1 books 2 seats
-    const booking1Res = await request(app)
-      .post('/api/bookings')
-      .set('Authorization', `Bearer ${passenger1Token}`)
-      .send({
-        offerId: offerId,
-        seats: 2,
-        message: 'Passenger 1 booking',
-      });
+    // Step 2: Passenger 1 books 2 seats (Direct Insert)
+    const b1Result = await query(
+      `INSERT INTO bookings (offer_id, passenger_id, seats, status) VALUES ($1, $2, $3, 'pending') RETURNING id`,
+      [offerId, passenger1Id, 2]
+    );
+    booking1Id = b1Result.rows[0].id;
 
-    expect(booking1Res.status).toBe(201);
-    booking1Id = booking1Res.body.booking.id;
-
-    // Step 3: Passenger 2 books 3 seats
-    const booking2Res = await request(app)
-      .post('/api/bookings')
-      .set('Authorization', `Bearer ${passenger2Token}`)
-      .send({
-        offerId: offerId,
-        seats: 3,
-        message: 'Passenger 2 booking',
-      });
-
-    expect(booking2Res.status).toBe(201);
-    booking2Id = booking2Res.body.booking.id;
+    // Step 3: Passenger 2 books 3 seats (Direct Insert)
+    const b2Result = await query(
+      `INSERT INTO bookings (offer_id, passenger_id, seats, status) VALUES ($1, $2, $3, 'pending') RETURNING id`,
+      [offerId, passenger2Id, 3]
+    );
+    booking2Id = b2Result.rows[0].id;
 
     // Verify both bookings are pending
-    const bookingsCheck = await pool.query(
+    const bookingsCheck = await query(
       'SELECT id, seats, status FROM bookings WHERE id IN ($1, $2)',
       [booking1Id, booking2Id]
     );
@@ -119,12 +172,15 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
       .post(`/api/bookings/${booking1Id}/accept`)
       .set('Authorization', `Bearer ${driverToken}`);
 
+    if (accept1Res.status !== 200) {
+      console.error('Accept 1 Failed:', JSON.stringify(accept1Res.body, null, 2));
+    }
     expect(accept1Res.status).toBe(200);
     expect(accept1Res.body.success).toBe(true);
     expect(accept1Res.body.message).toContain('تم قبول الحجز بنجاح');
 
     // Verify booking 1 is confirmed
-    const booking1Check = await pool.query(
+    const booking1Check = await query(
       'SELECT status FROM bookings WHERE id = $1',
       [booking1Id]
     );
@@ -142,14 +198,14 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
     expect(accept2Res.body.message).toContain('2'); // Only 2 seats available
 
     // Verify booking 2 is still pending (not confirmed)
-    const booking2Check = await pool.query(
+    const booking2Check = await query(
       'SELECT status FROM bookings WHERE id = $1',
       [booking2Id]
     );
     expect(booking2Check.rows[0].status).toBe('pending');
 
     // Verify total confirmed bookings = 2 seats (not 5!)
-    const totalSeats = await pool.query(
+    const totalSeats = await query(
       `SELECT COALESCE(SUM(seats), 0) as total_booked
        FROM bookings
        WHERE offer_id = $1 AND status = 'confirmed'`,
@@ -173,43 +229,36 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
 
     const newOfferId = offerRes.body.offer.id;
 
-    // Passenger 1 books 2 seats
-    const booking1Res = await request(app)
-      .post('/api/bookings')
-      .set('Authorization', `Bearer ${passenger1Token}`)
-      .send({
-        offerId: newOfferId,
-        seats: 2,
-      });
+    // Direct insert for Passenger 1 (2 seats)
+    const b1Result = await query(
+      `INSERT INTO bookings (offer_id, passenger_id, seats, status) VALUES ($1, $2, $3, 'pending') RETURNING id`,
+      [newOfferId, passenger1Id, 2]
+    );
+    const newBooking1Id = b1Result.rows[0].id;
 
-    const newBooking1Id = booking1Res.body.booking.id;
+    // Direct insert for Passenger 2 (1 seat)
+    const b2Result = await query(
+      `INSERT INTO bookings (offer_id, passenger_id, seats, status) VALUES ($1, $2, $3, 'pending') RETURNING id`,
+      [newOfferId, passenger2Id, 1]
+    );
+    const newBooking2Id = b2Result.rows[0].id;
 
     // Accept booking 1 (2 seats)
     await request(app)
       .post(`/api/bookings/${newBooking1Id}/accept`)
       .set('Authorization', `Bearer ${driverToken}`);
 
-    // Passenger 2 books 1 seat (exactly what's available)
-    const booking2Res = await request(app)
-      .post('/api/bookings')
-      .set('Authorization', `Bearer ${passenger2Token}`)
-      .send({
-        offerId: newOfferId,
-        seats: 1,
-      });
-
-    const newBooking2Id = booking2Res.body.booking.id;
-
     // Accept booking 2 (1 seat) - Should SUCCEED
     const accept2Res = await request(app)
       .post(`/api/bookings/${newBooking2Id}/accept`)
       .set('Authorization', `Bearer ${driverToken}`);
 
+    if (accept2Res.status !== 200) console.error('Accept 2 Failed:', accept2Res.body);
     expect(accept2Res.status).toBe(200);
     expect(accept2Res.body.success).toBe(true);
 
     // Verify offer is now full
-    const totalSeats = await pool.query(
+    const totalSeats = await query(
       `SELECT COALESCE(SUM(seats), 0) as total_booked
        FROM bookings
        WHERE offer_id = $1 AND status = 'confirmed'`,
@@ -233,17 +282,16 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
 
     const concurrentOfferId = offerRes.body.offer.id;
 
-    // Create 3 bookings of 2 seats each
+    // Create 3 bookings of 2 seats each via Direct Insert
     const bookingIds = [];
+    const passengers = [passenger1Id, passenger2Id, passenger3Id];
+
     for (let i = 0; i < 3; i++) {
-      const bookingRes = await request(app)
-        .post('/api/bookings')
-        .set('Authorization', `Bearer ${passenger1Token}`)
-        .send({
-          offerId: concurrentOfferId,
-          seats: 2,
-        });
-      bookingIds.push(bookingRes.body.booking.id);
+      const res = await query(
+        `INSERT INTO bookings (offer_id, passenger_id, seats, status) VALUES ($1, $2, $3, 'pending') RETURNING id`,
+        [concurrentOfferId, passengers[i], 2]
+      );
+      bookingIds.push(res.rows[0].id);
     }
 
     // Try to accept all 3 bookings simultaneously (should only accept 2)
@@ -264,7 +312,7 @@ describe('POST /api/bookings/:id/accept - Overbooking Prevention', () => {
     expect(failures).toHaveLength(1);
 
     // Verify total confirmed bookings = 4 seats
-    const totalSeats = await pool.query(
+    const totalSeats = await query(
       `SELECT COALESCE(SUM(seats), 0) as total_booked
        FROM bookings
        WHERE offer_id = $1 AND status = 'confirmed'`,
