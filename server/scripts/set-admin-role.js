@@ -67,6 +67,11 @@ async function setAdminRole(email) {
   }
 }
 
-// Get email from command line arguments
-const email = process.argv[2];
-setAdminRole(email);
+// Export function for tests
+module.exports = { setAdminRole };
+
+// CLI interface - only run when executed directly (not when required by tests)
+if (require.main === module) {
+  const email = process.argv[2];
+  setAdminRole(email);
+}

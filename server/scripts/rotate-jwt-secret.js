@@ -174,24 +174,33 @@ const generateSecrets = () => {
   console.log('\nSecrets generated successfully!');
 };
 
-// CLI interface
-const command = process.argv[2];
+// Export functions for tests and programmatic use
+module.exports = {
+  rotateSecrets,
+  validateSecrets,
+  generateSecrets
+};
 
-switch (command) {
-  case 'rotate':
-    rotateSecrets();
-    break;
-  case 'validate':
-    validateSecrets();
-    break;
-  case 'generate':
-    generateSecrets();
-    break;
-  default:
-    console.log('JWT Secret Management Tool\n');
-    console.log('Usage:');
-    console.log('  node scripts/rotate-jwt-secret.js rotate    - Rotate existing secrets');
-    console.log('  node scripts/rotate-jwt-secret.js validate  - Validate current secrets');
-    console.log('  node scripts/rotate-jwt-secret.js generate  - Generate new secrets\n');
-    process.exit(1);
+// CLI interface - only run when executed directly (not when required by tests)
+if (require.main === module) {
+  const command = process.argv[2];
+
+  switch (command) {
+    case 'rotate':
+      rotateSecrets();
+      break;
+    case 'validate':
+      validateSecrets();
+      break;
+    case 'generate':
+      generateSecrets();
+      break;
+    default:
+      console.log('JWT Secret Management Tool\n');
+      console.log('Usage:');
+      console.log('  node scripts/rotate-jwt-secret.js rotate    - Rotate existing secrets');
+      console.log('  node scripts/rotate-jwt-secret.js validate  - Validate current secrets');
+      console.log('  node scripts/rotate-jwt-secret.js generate  - Generate new secrets\n');
+      process.exit(1);
+  }
 }

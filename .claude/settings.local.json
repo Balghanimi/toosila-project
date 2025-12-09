@@ -46,7 +46,8 @@
       "Bash(npm test:*)",
       "Bash(ls:*)",
       "Bash(psql:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

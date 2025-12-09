@@ -100,5 +100,10 @@ async function runMigration() {
   }
 }
 
-// تشغيل Migration
-runMigration();
+// Export function for tests
+module.exports = { runMigration };
+
+// CLI interface - only run when executed directly (not when required by tests)
+if (require.main === module) {
+  runMigration();
+}
