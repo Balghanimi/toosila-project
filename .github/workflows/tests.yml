@@ -47,25 +47,34 @@ jobs:
 
       - name: Run DB Migrations
         env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/toosila_test
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: toosila_test
           DB_USER: postgres
           DB_PASSWORD: postgres
+          DB_SSL: false
         run: npm run db:setup
 
       - name: Run tests
         env:
           NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/toosila_test
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: toosila_test
           DB_USER: postgres
           DB_PASSWORD: postgres
+          DB_SSL: false
           JWT_SECRET: test-jwt-secret-key-for-ci
           JWT_REFRESH_SECRET: test-refresh-secret-key-for-ci
           JWT_EXPIRES_IN: 1h
           JWT_REFRESH_EXPIRES_IN: 7d
+          SENTRY_DSN: ''
+          EMAIL_HOST: localhost
+          EMAIL_PORT: 1025
+          EMAIL_USER: test@example.com
+          EMAIL_PASS: test
         run: npm test -- --coverage --passWithNoTests
 
       - name: Generate coverage report

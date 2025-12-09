@@ -3,6 +3,26 @@ const { Pool } = require('pg');
 
 // Database Configuration
 // Priority: DATABASE_URL (Railway/Production) > Individual env vars (Local development)
+
+// Determine SSL configuration
+// DB_SSL=false explicitly disables SSL (useful for CI/test environments)
+// DB_SSL=true enables SSL with rejectUnauthorized: false (production with self-signed certs)
+// Default: auto-detect based on DATABASE_URL (disable for localhost, enable for remote)
+const determineSSL = () => {
+  if (process.env.DB_SSL === 'false') return false;
+  if (process.env.DB_SSL === 'true') return { rejectUnauthorized: false };
+
+  // Auto-detect: disable SSL for localhost/127.0.0.1, enable for remote
+  if (process.env.DATABASE_URL) {
+    const isLocal = process.env.DATABASE_URL.includes('sslmode=disable') ||
+                    process.env.DATABASE_URL.includes('localhost') ||
+                    process.env.DATABASE_URL.includes('127.0.0.1');
+    return isLocal ? false : { rejectUnauthorized: false };
+  }
+
+  return false; // Default: no SSL
+};
+
 let poolConfig;
 
 if (process.env.DATABASE_URL) {
@@ -11,14 +31,9 @@ if (process.env.DATABASE_URL) {
     console.log('📦 Using DATABASE_URL for database connection');
   }
 
-  // Check if SSL should be disabled (for local postgres without SSL)
-  const sslMode = process.env.DATABASE_URL.includes('sslmode=disable') ||
-    process.env.DATABASE_URL.includes('localhost') ||
-    process.env.DATABASE_URL.includes('127.0.0.1');
-
   poolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: sslMode ? false : { rejectUnauthorized: false },
+    ssl: determineSSL(),
     max: 20, // Maximum number of clients in the pool
     min: 2, // Minimum number of clients in the pool
     idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
@@ -26,17 +41,17 @@ if (process.env.DATABASE_URL) {
     maxUses: 7500 // Close and replace connection after 7500 uses
   };
 } else {
-  // Local development: Use individual env vars
+  // Local development: Use individual env vars with sensible fallbacks
   if (process.env.NODE_ENV === 'development') {
     console.log('🔧 Using individual env vars for database connection');
   }
   poolConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'toosila',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    host: process.env.DB_HOST || process.env.PGHOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || process.env.PGPORT || '5432'),
+    database: process.env.DB_NAME || process.env.PGDATABASE || 'toosila',
+    user: process.env.DB_USER || process.env.PGUSER || 'postgres',
+    password: process.env.DB_PASSWORD || process.env.PGPASSWORD,
+    ssl: determineSSL(),
     max: 10, // Lower for local development
     min: 2,
     idleTimeoutMillis: 30000,
@@ -48,7 +63,8 @@ if (process.env.DATABASE_URL) {
       host: poolConfig.host,
       port: poolConfig.port,
       database: poolConfig.database,
-      user: poolConfig.user
+      user: poolConfig.user,
+      ssl: poolConfig.ssl
     });
   }
 }
