@@ -4,6 +4,11 @@
 
 const app = require('../app.js');
 
+// Mock email service to prevent SMTP connections
+jest.mock('../utils/emailService', () => ({
+  sendEmail: jest.fn().mockResolvedValue(true)
+}));
+
 describe('app', () => {
   let req, res, next;
 

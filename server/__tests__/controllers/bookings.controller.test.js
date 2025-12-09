@@ -16,25 +16,64 @@ const {
   getPendingCount
 } = require('../../controllers/bookings.controller');
 
-const Booking = require('../../models/bookings.model');
-const Offer = require('../../models/offers.model');
-
 // Mock dependencies
-jest.mock('../../models/bookings.model');
-jest.mock('../../models/offers.model');
+jest.mock('../../services/booking.service', () => ({
+  createBooking: jest.fn(),
+  updateBookingStatus: jest.fn(),
+  cancelBooking: jest.fn(),
+  verifyBookingAccess: jest.fn(),
+  getBookingStats: jest.fn(),
+  getUserBookingStats: jest.fn(),
+  getPendingCount: jest.fn()
+}));
+
+jest.mock('../../models/bookings.model', () => ({
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findById: jest.fn(),
+  getSentBookings: jest.fn(),
+  getReceivedBookings: jest.fn()
+}));
+
+jest.mock('../../models/offers.model', () => ({
+  findById: jest.fn()
+}));
+
 jest.mock('../../config/db', () => ({
   query: jest.fn()
 }));
+
 jest.mock('../../socket', () => ({
   notifyNewBooking: jest.fn(),
   notifyBookingStatusUpdate: jest.fn()
 }));
 
+// Mock catchAsync to await execution
+jest.mock('../../utils/helpers', () => {
+  const original = jest.requireActual('../../utils/helpers');
+  return {
+    ...original,
+    catchAsync: (fn) => async (req, res, next) => {
+      try {
+        await fn(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    }
+  };
+});
+
 describe('Bookings Controller', () => {
   let req, res, next;
 
+  // Re-require to ensure we have access to the mocked instances
+  const bookingService = require('../../services/booking.service');
+  const Booking = require('../../models/bookings.model');
+
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, 'log').mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => { });
 
     req = {
       body: {},
@@ -46,7 +85,7 @@ describe('Bookings Controller', () => {
         role: 'user'
       },
       app: {
-        get: jest.fn().mockReturnValue(null)
+        get: jest.fn().mockReturnValue(null) // for 'io'
       }
     };
 
@@ -60,24 +99,22 @@ describe('Bookings Controller', () => {
 
   describe('createBooking', () => {
     it('should create a booking successfully', async () => {
-      const mockOffer = {
-        id: 1,
-        driverId: 2,
-        seats: 3,
-        isActive: true,
-        fromCity: 'بغداد',
-        toCity: 'البصرة'
+      const mockBookingResult = {
+        booking: {
+          id: 1,
+          passengerId: 1,
+          offerId: 1,
+          seats: 2,
+          status: 'pending'
+        },
+        offer: {
+          fromCity: 'بغداد',
+          toCity: 'البصرة',
+          driverId: 2
+        }
       };
 
-      const mockBooking = {
-        id: 1,
-        passengerId: 1,
-        offerId: 1,
-        seats: 2,
-        toJSON: jest.fn().mockReturnValue({ id: 1, seats: 2 })
-      };
-
-      const { query } = require('../../config/db');
+      bookingService.createBooking.mockResolvedValue(mockBookingResult);
 
       req.body = {
         offerId: 1,
@@ -85,189 +122,98 @@ describe('Bookings Controller', () => {
         message: 'Test booking'
       };
 
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-      query.mockResolvedValue({ rows: [{ total_booked: '0' }] });
-      Booking.create = jest.fn().mockResolvedValue(mockBooking);
+      await createBooking(req, res, next);
 
-      await createBooking(req, res);
-
-      expect(Offer.findById).toHaveBeenCalledWith(1);
-      expect(Booking.create).toHaveBeenCalledWith({
-        passengerId: 1,
+      expect(bookingService.createBooking).toHaveBeenCalledWith(1, {
         offerId: 1,
         seats: 2,
         message: 'Test booking'
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
+        success: true,
         message: expect.any(String),
-        booking: expect.any(Object)
+        data: {
+          booking: mockBookingResult.booking
+        }
       });
     });
 
-    it('should reject booking if offer not found', async () => {
+    it('should handle validation errors from service', async () => {
+      const error = new Error('Offer not found');
+      error.statusCode = 404;
+      bookingService.createBooking.mockRejectedValue(error);
+
       req.body = { offerId: 999, seats: 1 };
-      Offer.findById = jest.fn().mockResolvedValue(null);
 
-      await createBooking(req, res);
+      await createBooking(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Offer not found',
-          statusCode: 404
-        })
-      );
+      expect(next).toHaveBeenCalledWith(error);
     });
 
-    it('should reject booking if offer is not active', async () => {
-      const mockOffer = {
-        id: 1,
-        driverId: 2,
-        isActive: false
-      };
+    it('should validate missing offerId in controller itself', async () => {
+      req.body = { seats: 1 }; // Missing offerId
 
-      req.body = { offerId: 1, seats: 1 };
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
+      await createBooking(req, res, next);
 
-      await createBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Offer is not available',
-          statusCode: 400
-        })
-      );
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: false,
+        error: 'offerId is required'
+      }));
+      expect(bookingService.createBooking).not.toHaveBeenCalled();
     });
 
-    it('should reject booking own offer', async () => {
-      const mockOffer = {
-        id: 1,
-        driverId: 1, // Same as req.user.id
-        isActive: true
-      };
+    it('should validate invalid seats in controller itself', async () => {
+      req.body = { offerId: 1, seats: 0 };
 
-      req.body = { offerId: 1, seats: 1 };
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
+      await createBooking(req, res, next);
 
-      await createBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'You cannot book your own offer',
-          statusCode: 400
-        })
-      );
-    });
-
-    it('should reject booking if not enough seats available', async () => {
-      const mockOffer = {
-        id: 1,
-        driverId: 2,
-        seats: 3,
-        isActive: true
-      };
-
-      const { query } = require('../../config/db');
-
-      req.body = { offerId: 1, seats: 3 };
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-      query.mockResolvedValue({ rows: [{ total_booked: '2' }] }); // 2 already booked, only 1 available
-
-      await createBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining('seat(s) available'),
-          statusCode: 400
-        })
-      );
-    });
-
-    it('should default to 1 seat if not specified', async () => {
-      const mockOffer = {
-        id: 1,
-        driverId: 2,
-        seats: 3,
-        isActive: true,
-        fromCity: 'بغداد',
-        toCity: 'البصرة'
-      };
-
-      const mockBooking = {
-        id: 1,
-        toJSON: jest.fn().mockReturnValue({ id: 1 })
-      };
-
-      const { query } = require('../../config/db');
-
-      req.body = { offerId: 1 }; // No seats specified
-
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-      query.mockResolvedValue({ rows: [{ total_booked: '0' }] });
-      Booking.create = jest.fn().mockResolvedValue(mockBooking);
-
-      await createBooking(req, res);
-
-      expect(Booking.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          seats: 1
-        })
-      );
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: false,
+        error: 'seats must be between 1 and 7'
+      }));
+      expect(bookingService.createBooking).not.toHaveBeenCalled();
     });
   });
 
   describe('getBookings', () => {
-    it('should get all bookings with default pagination', async () => {
+    it('should get all bookings via Model', async () => {
       const mockResult = {
-        bookings: [{ id: 1 }, { id: 2 }],
-        total: 2,
+        bookings: [{ id: 1 }],
+        total: 1,
         page: 1,
         limit: 10
       };
 
-      Booking.findAll = jest.fn().mockResolvedValue(mockResult);
+      Booking.findAll.mockResolvedValue(mockResult);
 
-      await getBookings(req, res);
+      await getBookings(req, res, next);
 
       expect(Booking.findAll).toHaveBeenCalledWith(1, 10, {});
-      expect(res.json).toHaveBeenCalledWith(mockResult);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: expect.any(String),
+        data: mockResult
+      });
     });
 
-    it('should filter bookings by status', async () => {
-      const mockResult = {
-        bookings: [{ id: 1, status: 'confirmed' }],
-        total: 1
-      };
+    it('should pass filters to Model', async () => {
+      req.query = { status: 'confirmed', userId: '5' };
+      Booking.findAll.mockResolvedValue({ bookings: [] });
 
-      req.query = { status: 'confirmed' };
-      Booking.findAll = jest.fn().mockResolvedValue(mockResult);
+      await getBookings(req, res, next);
 
-      await getBookings(req, res);
-
-      expect(Booking.findAll).toHaveBeenCalledWith(1, 10, { status: 'confirmed' });
-    });
-
-    it('should filter bookings by userId', async () => {
-      req.query = { userId: '5' };
-      Booking.findAll = jest.fn().mockResolvedValue({ bookings: [] });
-
-      await getBookings(req, res);
-
-      expect(Booking.findAll).toHaveBeenCalledWith(1, 10, { passengerId: 5 });
-    });
-
-    it('should filter bookings by offerId', async () => {
-      req.query = { offerId: '10' };
-      Booking.findAll = jest.fn().mockResolvedValue({ bookings: [] });
-
-      await getBookings(req, res);
-
-      expect(Booking.findAll).toHaveBeenCalledWith(1, 10, { offerId: 10 });
+      expect(Booking.findAll).toHaveBeenCalledWith(1, 10, {
+        status: 'confirmed',
+        passengerId: 5
+      });
     });
   });
 
   describe('getBookingById', () => {
-    it('should get booking by ID for passenger', async () => {
+    it('should get booking and verify access', async () => {
       const mockBooking = {
         id: 1,
         passengerId: 1,
@@ -276,448 +222,160 @@ describe('Bookings Controller', () => {
       };
 
       req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
+      Booking.findById.mockResolvedValue(mockBooking);
+      bookingService.verifyBookingAccess.mockResolvedValue(true);
 
-      await getBookingById(req, res);
+      await getBookingById(req, res, next);
 
       expect(Booking.findById).toHaveBeenCalledWith('1');
+      expect(bookingService.verifyBookingAccess).toHaveBeenCalledWith(mockBooking, 1, 'user');
       expect(res.json).toHaveBeenCalledWith({
-        booking: expect.any(Object)
+        success: true,
+        message: expect.any(String),
+        data: {
+          booking: expect.any(Object)
+        }
       });
-    });
-
-    it('should get booking by ID for offer owner', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2,
-        offerId: 1
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 1 // Same as req.user.id
-      };
-
-      req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await getBookingById(req, res);
-
-      expect(res.json).toHaveBeenCalled();
-    });
-
-    it('should allow admin to view any booking', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2,
-        offerId: 1,
-        toJSON: jest.fn().mockReturnValue({ id: 1 })
-      };
-
-      req.params.id = '1';
-      req.user.role = 'admin';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-
-      await getBookingById(req, res);
-
-      expect(res.json).toHaveBeenCalled();
-    });
-
-    it('should deny access if user is not passenger or driver', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2,
-        offerId: 1
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 3 // Different from req.user.id
-      };
-
-      req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await getBookingById(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Access denied',
-          statusCode: 403
-        })
-      );
     });
 
     it('should return 404 if booking not found', async () => {
       req.params.id = '999';
-      Booking.findById = jest.fn().mockResolvedValue(null);
+      Booking.findById.mockResolvedValue(null);
 
-      await getBookingById(req, res);
+      await getBookingById(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Booking not found',
-          statusCode: 404
-        })
-      );
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({
+        statusCode: 404,
+        message: 'Booking not found'
+      }));
     });
   });
 
   describe('updateBookingStatus', () => {
-    it('should update booking status to confirmed', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2,
-        offerId: 1,
-        seats: 2,
-        status: 'pending',
-        updateStatus: jest.fn().mockResolvedValue({
-          id: 1,
-          status: 'confirmed',
-          toJSON: jest.fn().mockReturnValue({ id: 1, status: 'confirmed' })
-        })
+    it('should update status via service', async () => {
+      const mockResult = {
+        booking: { id: 1, status: 'confirmed' },
+        offer: { passengerId: 1 }
       };
 
-      const mockOffer = {
-        id: 1,
-        driverId: 1,
-        seats: 3,
-        fromCity: 'بغداد',
-        toCity: 'البصرة',
-        updateSeats: jest.fn()
-      };
-
-      const { query } = require('../../config/db');
+      bookingService.updateBookingStatus.mockResolvedValue(mockResult);
 
       req.params.id = '1';
       req.body = { status: 'confirmed' };
 
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-      query.mockResolvedValue({ rows: [{ total_booked: '0' }] });
+      await updateBookingStatus(req, res, next);
 
-      await updateBookingStatus(req, res);
-
-      expect(mockOffer.updateSeats).toHaveBeenCalledWith(1); // 3 - 2 = 1
-      expect(mockBooking.updateStatus).toHaveBeenCalledWith('confirmed', undefined);
+      expect(bookingService.updateBookingStatus).toHaveBeenCalledWith(
+        '1', 1, 'user', 'confirmed', undefined
+      );
       expect(res.json).toHaveBeenCalledWith({
+        success: true,
         message: expect.any(String),
-        booking: expect.any(Object)
+        data: {
+          booking: mockResult.booking
+        }
       });
-    });
-
-    it('should restore seats when cancelling confirmed booking', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2,
-        offerId: 1,
-        seats: 2,
-        status: 'confirmed',
-        updateStatus: jest.fn().mockResolvedValue({
-          id: 1,
-          status: 'cancelled',
-          toJSON: jest.fn().mockReturnValue({ id: 1, status: 'cancelled' })
-        })
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 1,
-        seats: 1,
-        fromCity: 'بغداد',
-        toCity: 'البصرة',
-        updateSeats: jest.fn()
-      };
-
-      req.params.id = '1';
-      req.body = { status: 'cancelled' };
-
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await updateBookingStatus(req, res);
-
-      expect(mockOffer.updateSeats).toHaveBeenCalledWith(3); // 1 + 2 = 3
-    });
-
-    it('should reject if user is not offer owner', async () => {
-      const mockBooking = {
-        id: 1,
-        offerId: 1
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 2 // Different from req.user.id
-      };
-
-      req.params.id = '1';
-      req.body = { status: 'confirmed' };
-
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await updateBookingStatus(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining('your offers'),
-          statusCode: 403
-        })
-      );
-    });
-
-    it('should reject invalid status', async () => {
-      const mockBooking = {
-        id: 1,
-        offerId: 1
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 1
-      };
-
-      req.params.id = '1';
-      req.body = { status: 'invalid_status' };
-
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await updateBookingStatus(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Invalid status',
-          statusCode: 400
-        })
-      );
-    });
-
-    it('should allow admin to update any booking', async () => {
-      const mockBooking = {
-        id: 1,
-        offerId: 1,
-        status: 'pending',
-        updateStatus: jest.fn().mockResolvedValue({
-          toJSON: jest.fn().mockReturnValue({ id: 1 })
-        })
-      };
-
-      const mockOffer = {
-        id: 1,
-        driverId: 2,
-        fromCity: 'بغداد',
-        toCity: 'البصرة'
-      };
-
-      req.params.id = '1';
-      req.body = { status: 'cancelled' };
-      req.user.role = 'admin';
-
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-      Offer.findById = jest.fn().mockResolvedValue(mockOffer);
-
-      await updateBookingStatus(req, res);
-
-      expect(mockBooking.updateStatus).toHaveBeenCalled();
     });
   });
 
   describe('cancelBooking', () => {
-    it('should cancel booking successfully', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 1,
-        status: 'pending',
-        updateStatus: jest.fn().mockResolvedValue({
-          toJSON: jest.fn().mockReturnValue({ id: 1, status: 'cancelled' })
-        })
-      };
+    it('should cancel via service', async () => {
+      const mockBooking = { id: 1, status: 'cancelled' };
+      bookingService.cancelBooking.mockResolvedValue(mockBooking);
 
       req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
 
-      await cancelBooking(req, res);
+      await cancelBooking(req, res, next);
 
-      expect(mockBooking.updateStatus).toHaveBeenCalledWith('cancelled');
+      expect(bookingService.cancelBooking).toHaveBeenCalledWith('1', 1, 'user');
       expect(res.json).toHaveBeenCalledWith({
+        success: true,
         message: expect.any(String),
-        booking: expect.any(Object)
+        data: {
+          booking: mockBooking
+        }
       });
-    });
-
-    it('should reject if user is not booking owner', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 2, // Different from req.user.id
-        status: 'pending'
-      };
-
-      req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-
-      await cancelBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining('your own bookings'),
-          statusCode: 403
-        })
-      );
-    });
-
-    it('should reject cancelling already cancelled booking', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 1,
-        status: 'cancelled'
-      };
-
-      req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-
-      await cancelBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Booking is already cancelled',
-          statusCode: 400
-        })
-      );
-    });
-
-    it('should reject cancelling completed booking', async () => {
-      const mockBooking = {
-        id: 1,
-        passengerId: 1,
-        status: 'completed'
-      };
-
-      req.params.id = '1';
-      Booking.findById = jest.fn().mockResolvedValue(mockBooking);
-
-      await cancelBooking(req, res);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: 'Cannot cancel completed booking',
-          statusCode: 400
-        })
-      );
     });
   });
 
   describe('getUserBookings', () => {
-    it('should get current user bookings', async () => {
-      const mockResult = {
-        bookings: [{ id: 1 }],
-        total: 1
-      };
+    it('should get user bookings via Model', async () => {
+      const mockResult = { bookings: [], total: 0 };
+      Booking.getSentBookings.mockResolvedValue(mockResult);
 
-      Booking.getSentBookings = jest.fn().mockResolvedValue(mockResult);
-
-      await getUserBookings(req, res);
+      await getUserBookings(req, res, next);
 
       expect(Booking.getSentBookings).toHaveBeenCalledWith(1, 1, 10);
-      expect(res.json).toHaveBeenCalledWith(mockResult);
-    });
-
-    it('should get specific user bookings', async () => {
-      const mockResult = {
-        bookings: [],
-        total: 0
-      };
-
-      req.params.userId = '5';
-      Booking.getSentBookings = jest.fn().mockResolvedValue(mockResult);
-
-      await getUserBookings(req, res);
-
-      expect(Booking.getSentBookings).toHaveBeenCalledWith('5', 1, 10);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: expect.any(String),
+        data: mockResult
+      });
     });
   });
 
   describe('getOfferBookings', () => {
-    it('should get bookings for user offers', async () => {
-      const mockResult = {
-        bookings: [{ id: 1 }, { id: 2 }],
-        total: 2
-      };
+    it('should get offer bookings via Model', async () => {
+      const mockResult = { bookings: [], total: 0 };
+      Booking.getReceivedBookings.mockResolvedValue(mockResult);
 
-      Booking.getReceivedBookings = jest.fn().mockResolvedValue(mockResult);
-
-      await getOfferBookings(req, res);
+      await getOfferBookings(req, res, next);
 
       expect(Booking.getReceivedBookings).toHaveBeenCalledWith(1, 1, 10);
-      expect(res.json).toHaveBeenCalledWith(mockResult);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: expect.any(String),
+        data: mockResult
+      });
     });
   });
 
   describe('getBookingStats', () => {
-    it('should get booking statistics', async () => {
-      const { query } = require('../../config/db');
-      const mockStats = {
-        total: 100,
-        pending: 20,
-        confirmed: 50,
-        cancelled: 15,
-        completed: 15
-      };
+    it('should get stats via service', async () => {
+      const mockStats = { total: 10 };
+      bookingService.getBookingStats.mockResolvedValue(mockStats);
 
-      query.mockResolvedValue({ rows: [mockStats] });
+      await getBookingStats(req, res, next);
 
-      await getBookingStats(req, res);
-
+      expect(bookingService.getBookingStats).toHaveBeenCalled();
       expect(res.json).toHaveBeenCalledWith({
         success: true,
+        message: expect.any(String),
         data: mockStats
       });
     });
   });
 
   describe('getUserBookingStats', () => {
-    it('should get user booking statistics', async () => {
-      const { query } = require('../../config/db');
-      const mockStats = {
-        total_bookings: 10,
-        pending_bookings: 2,
-        confirmed_bookings: 5,
-        cancelled_bookings: 1,
-        completed_bookings: 2,
-        average_booking_value: 45000
-      };
+    it('should get user stats via service', async () => {
+      const mockStats = { total_bookings: 5 };
+      bookingService.getUserBookingStats.mockResolvedValue(mockStats);
 
-      query.mockResolvedValue({ rows: [mockStats] });
+      await getUserBookingStats(req, res, next);
 
-      await getUserBookingStats(req, res);
-
-      expect(query).toHaveBeenCalledWith(
-        expect.any(String),
-        [1]
-      );
+      expect(bookingService.getUserBookingStats).toHaveBeenCalledWith(1);
       expect(res.json).toHaveBeenCalledWith({
-        stats: mockStats
+        success: true,
+        message: expect.any(String),
+        data: {
+          stats: mockStats
+        }
       });
     });
   });
 
   describe('getPendingCount', () => {
-    it('should get pending bookings count', async () => {
-      const { query } = require('../../config/db');
+    it('should get pending counts via service', async () => {
+      const mockCounts = { totalPending: 5 };
+      bookingService.getPendingCount.mockResolvedValue(mockCounts);
 
-      query
-        .mockResolvedValueOnce({ rows: [{ count: '3' }] }) // received pending
-        .mockResolvedValueOnce({ rows: [{ count: '2' }] }); // sent pending
+      await getPendingCount(req, res, next);
 
-      await getPendingCount(req, res);
-
+      expect(bookingService.getPendingCount).toHaveBeenCalledWith(1);
       expect(res.json).toHaveBeenCalledWith({
-        receivedPending: 3,
-        sentPending: 2,
-        totalPending: 5
+        success: true,
+        message: expect.any(String),
+        data: mockCounts
       });
     });
   });

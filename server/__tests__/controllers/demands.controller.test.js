@@ -22,6 +22,33 @@ jest.mock('../../config/db', () => ({
   query: jest.fn()
 }));
 
+// Mock middlewares/error to avoid Sentry/Logger side effects
+jest.mock('../../middlewares/error', () => ({
+  asyncHandler: (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next),
+  AppError: class AppError extends Error {
+    constructor(message, statusCode) {
+      super(message);
+      this.statusCode = statusCode;
+      this.isOperational = true;
+    }
+  }
+}));
+
+// Mock catchAsync to await execution (if still used)
+jest.mock('../../utils/helpers', () => {
+  const original = jest.requireActual('../../utils/helpers');
+  return {
+    ...original,
+    catchAsync: (fn) => async (req, res, next) => {
+      try {
+        await fn(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    }
+  };
+});
+
 describe('Demands Controller', () => {
   let req, res, next;
 
@@ -68,7 +95,7 @@ describe('Demands Controller', () => {
       req.body = demandData;
       Demand.create = jest.fn().mockResolvedValue(mockDemand);
 
-      await createDemand(req, res);
+      await createDemand(req, res, next);
 
       expect(Demand.create).toHaveBeenCalledWith({
         passengerId: 1,
@@ -90,7 +117,7 @@ describe('Demands Controller', () => {
 
       Demand.create = jest.fn().mockRejectedValue(new Error('Database error'));
 
-      await createDemand(req, res);
+      await createDemand(req, res, next);
 
       expect(next).toHaveBeenCalledWith(expect.any(Error));
     });
@@ -112,7 +139,7 @@ describe('Demands Controller', () => {
 
       Demand.findAll = jest.fn().mockResolvedValue(mockResult);
 
-      await getDemands(req, res);
+      await getDemands(req, res, next);
 
       expect(Demand.findAll).toHaveBeenCalledWith(1, 10, {});
       expect(res.json).toHaveBeenCalledWith(mockResult);
@@ -133,7 +160,7 @@ describe('Demands Controller', () => {
 
       Demand.findAll = jest.fn().mockResolvedValue(mockResult);
 
-      await getDemands(req, res);
+      await getDemands(req, res, next);
 
       expect(Demand.findAll).toHaveBeenCalledWith(2, 20, {
         fromCity: 'بغداد',
@@ -150,7 +177,7 @@ describe('Demands Controller', () => {
 
       Demand.findAll = jest.fn().mockResolvedValue({ demands: [] });
 
-      await getDemands(req, res);
+      await getDemands(req, res, next);
 
       expect(Demand.findAll).toHaveBeenCalledWith(1, 10, {
         maxBudget: 50000,
@@ -163,7 +190,7 @@ describe('Demands Controller', () => {
       req.query = { passengerId: '5' };
       Demand.findAll = jest.fn().mockResolvedValue({ demands: [] });
 
-      await getDemands(req, res);
+      await getDemands(req, res, next);
 
       expect(Demand.findAll).toHaveBeenCalledWith(1, 10, { passengerId: '5' });
     });
@@ -181,7 +208,7 @@ describe('Demands Controller', () => {
       req.params.id = '1';
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await getDemandById(req, res);
+      await getDemandById(req, res, next);
 
       expect(Demand.findById).toHaveBeenCalledWith('1');
       expect(res.json).toHaveBeenCalledWith({
@@ -193,7 +220,7 @@ describe('Demands Controller', () => {
       req.params.id = '999';
       Demand.findById = jest.fn().mockResolvedValue(null);
 
-      await getDemandById(req, res);
+      await getDemandById(req, res, next);
 
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -224,7 +251,7 @@ describe('Demands Controller', () => {
 
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await updateDemand(req, res);
+      await updateDemand(req, res, next);
 
       expect(Demand.findById).toHaveBeenCalledWith('1');
       expect(mockDemand.update).toHaveBeenCalledWith({
@@ -248,7 +275,7 @@ describe('Demands Controller', () => {
 
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await updateDemand(req, res);
+      await updateDemand(req, res, next);
 
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -273,7 +300,7 @@ describe('Demands Controller', () => {
 
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await updateDemand(req, res);
+      await updateDemand(req, res, next);
 
       expect(mockDemand.update).toHaveBeenCalled();
     });
@@ -284,7 +311,7 @@ describe('Demands Controller', () => {
 
       Demand.findById = jest.fn().mockResolvedValue(null);
 
-      await updateDemand(req, res);
+      await updateDemand(req, res, next);
 
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -306,7 +333,7 @@ describe('Demands Controller', () => {
       req.params.id = '1';
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await deactivateDemand(req, res);
+      await deactivateDemand(req, res, next);
 
       expect(mockDemand.deactivate).toHaveBeenCalled();
       expect(res.json).toHaveBeenCalledWith({
@@ -323,7 +350,7 @@ describe('Demands Controller', () => {
       req.params.id = '1';
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await deactivateDemand(req, res);
+      await deactivateDemand(req, res, next);
 
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -345,7 +372,7 @@ describe('Demands Controller', () => {
 
       Demand.findById = jest.fn().mockResolvedValue(mockDemand);
 
-      await deactivateDemand(req, res);
+      await deactivateDemand(req, res, next);
 
       expect(mockDemand.deactivate).toHaveBeenCalled();
     });
@@ -360,7 +387,7 @@ describe('Demands Controller', () => {
 
       Demand.findByPassengerId = jest.fn().mockResolvedValue(mockResult);
 
-      await getUserDemands(req, res);
+      await getUserDemands(req, res, next);
 
       expect(Demand.findByPassengerId).toHaveBeenCalledWith(1, 1, 10);
       expect(res.json).toHaveBeenCalledWith(mockResult);
@@ -375,7 +402,7 @@ describe('Demands Controller', () => {
       req.params.userId = '5';
       Demand.findByPassengerId = jest.fn().mockResolvedValue(mockResult);
 
-      await getUserDemands(req, res);
+      await getUserDemands(req, res, next);
 
       expect(Demand.findByPassengerId).toHaveBeenCalledWith('5', 1, 10);
     });
@@ -384,7 +411,7 @@ describe('Demands Controller', () => {
       req.query = { page: '2', limit: '20' };
       Demand.findByPassengerId = jest.fn().mockResolvedValue({ demands: [] });
 
-      await getUserDemands(req, res);
+      await getUserDemands(req, res, next);
 
       expect(Demand.findByPassengerId).toHaveBeenCalledWith(1, 2, 20);
     });
@@ -403,7 +430,7 @@ describe('Demands Controller', () => {
       req.query = { q: 'بغداد', page: '1', limit: '10' };
       Demand.search = jest.fn().mockResolvedValue(mockResult);
 
-      await searchDemands(req, res);
+      await searchDemands(req, res, next);
 
       expect(Demand.search).toHaveBeenCalledWith('بغداد', 1, 10);
       expect(res.json).toHaveBeenCalledWith(mockResult);
@@ -412,7 +439,7 @@ describe('Demands Controller', () => {
     it('should return 400 if search term is missing', async () => {
       req.query = {};
 
-      await searchDemands(req, res);
+      await searchDemands(req, res, next);
 
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -431,7 +458,7 @@ describe('Demands Controller', () => {
       req.query = { q: 'nonexistent' };
       Demand.search = jest.fn().mockResolvedValue(mockResult);
 
-      await searchDemands(req, res);
+      await searchDemands(req, res, next);
 
       expect(res.json).toHaveBeenCalledWith(mockResult);
     });
@@ -448,7 +475,7 @@ describe('Demands Controller', () => {
 
       query.mockResolvedValue({ rows: mockCategories });
 
-      await getCategories(req, res);
+      await getCategories(req, res, next);
 
       expect(query).toHaveBeenCalledWith(
         'SELECT * FROM categories WHERE is_active = true ORDER BY name'
@@ -462,7 +489,7 @@ describe('Demands Controller', () => {
       const { query } = require('../../config/db');
       query.mockResolvedValue({ rows: [] });
 
-      await getCategories(req, res);
+      await getCategories(req, res, next);
 
       expect(res.json).toHaveBeenCalledWith({
         categories: []

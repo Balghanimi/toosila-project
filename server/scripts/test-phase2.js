@@ -112,8 +112,8 @@ async function testAuditLogsTable() {
     console.log(`✅ Table has ${columns.rows.length} columns`);
 
     const expectedColumns = ['id', 'user_id', 'action', 'category', 'resource',
-                             'resource_id', 'ip_address', 'user_agent', 'success',
-                             'metadata', 'severity', 'created_at'];
+      'resource_id', 'ip_address', 'user_agent', 'success',
+      'metadata', 'severity', 'created_at'];
 
     const actualColumns = columns.rows.map(r => r.column_name);
     const hasAllColumns = expectedColumns.every(col => actualColumns.includes(col));
@@ -268,4 +268,14 @@ async function runAllTests() {
 }
 
 // Run tests
-runAllTests();
+if (require.main === module) {
+  runAllTests();
+}
+module.exports = {
+  testPackages,
+  testDatabaseIndexes,
+  testAuditLogsTable,
+  testPerformanceIndexes,
+  testJWTSecrets,
+  runAllTests
+};
