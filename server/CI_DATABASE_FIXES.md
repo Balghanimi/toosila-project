@@ -13,7 +13,7 @@ Fixed critical database connection issues preventing GitHub Actions CI tests fro
 
 ### 2. Missing Database Columns
 **Error**: "column 'seats' of relation 'bookings' does not exist"
-- Migrations didn't run due to SSL errors
+- Root cause: init-db.sql schema didn't include seats/message columns
 - Tests tried to insert data into missing columns
 - Cascading test failures
 
@@ -217,6 +217,16 @@ DB_SSL=true npm test   # Should fail on localhost (expected)
    - Added dummy email configuration
    - Added empty `SENTRY_DSN`
 
+4. **server/scripts/init-db.sql**
+   - Added `seats` column (INTEGER DEFAULT 1 CHECK 1-7) to bookings table
+   - Added `message` column (TEXT, nullable) to bookings table
+   - Ensures schema consistency from initial creation
+
+5. **server/scripts/setup-test-db.js**
+   - Updated migration 012 to add both seats and message columns
+   - Added CHECK constraint for seats (1-7 range)
+   - Ensures backward compatibility with existing databases
+
 ---
 
 ## Environment Variables Reference
@@ -276,13 +286,14 @@ environment:
 
 ## Next Steps
 
-1. ✅ Local tests passing
-2. ⏳ Push changes and verify CI tests pass
-3. ⏳ Monitor first CI run for any remaining issues
-4. ⏳ Update other migration scripts if needed
+1. ✅ Local tests passing (910 tests)
+2. ✅ Schema fixes applied (init-db.sql updated)
+3. ✅ Migration scripts updated (setup-test-db.js)
+4. ✅ All changes pushed to GitHub (commit b68a635)
+5. ⏳ Awaiting CI validation on GitHub Actions
 
 ---
 
-**Last Updated**: December 10, 2025
-**Status**: ✅ Ready for CI
-**Version**: 2.0.0
+**Last Updated**: December 11, 2025
+**Status**: ✅ Schema Fixed - Awaiting CI Validation
+**Version**: 2.1.0
