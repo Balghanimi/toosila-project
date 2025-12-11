@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     id SERIAL PRIMARY KEY,
     offer_id INTEGER NOT NULL REFERENCES offers(id) ON DELETE CASCADE,
     passenger_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    seats INTEGER DEFAULT 1 CHECK (seats >= 1 AND seats <= 7),
+    message TEXT,
     status VARCHAR(20) DEFAULT 'pending', -- pending, accepted, rejected, cancelled
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

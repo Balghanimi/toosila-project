@@ -60,11 +60,15 @@ async function setupTestDatabase() {
       console.log('✅ Database schema initialized');
 
       // Run additional migrations
-      console.log('📦 Running migration 012 (booking seats)...');
+      console.log('📦 Running migration 012 (booking seats and message)...');
       try {
         await testDbClient.query(`
           ALTER TABLE bookings
-          ADD COLUMN IF NOT EXISTS seats INTEGER DEFAULT 1
+          ADD COLUMN IF NOT EXISTS seats INTEGER DEFAULT 1 CHECK (seats >= 1 AND seats <= 7);
+        `);
+        await testDbClient.query(`
+          ALTER TABLE bookings
+          ADD COLUMN IF NOT EXISTS message TEXT;
         `);
         console.log('✅ Migration 012 completed');
       } catch (err) {
