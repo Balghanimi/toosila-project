@@ -389,8 +389,9 @@ body.dark-mode .header {
   z-index: 1100;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end; /* Put drawer on RIGHT side */
-  direction: ltr; /* Force LTR so flex-end = actual right side of screen */
+  /* للعربية: القائمة تظهر من الجهة اليمنى */
+  justify-content: flex-start; /* Start from RIGHT in RTL */
+  direction: rtl; /* RTL direction for Arabic - drawer appears from RIGHT */
 }
 
 .drawerOverlay {
@@ -414,7 +415,7 @@ body.dark-mode .header {
   height: 100vh;
   height: 100dvh;
   background: var(--surface-primary);
-  border-left: 1px solid var(--border-light);
+  border-left: 1px solid var(--border-light); /* Border on LEFT side (drawer comes from RIGHT) */
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -429,10 +430,10 @@ body.dark-mode .header {
 
 @keyframes slideInFromRight {
   from {
-    transform: translateX(100%);
+    transform: translateX(100%); /* Slide in from RIGHT (outside screen) */
   }
   to {
-    transform: translateX(0);
+    transform: translateX(0); /* End at normal position */
   }
 }
 
