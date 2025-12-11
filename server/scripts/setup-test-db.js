@@ -8,13 +8,21 @@ require('dotenv').config({ path: '.env.test' });
 const { Client } = require('pg');
 
 async function setupTestDatabase() {
+  // Determine SSL configuration (same logic as config/db.js)
+  const determineSSL = () => {
+    if (process.env.DB_SSL === 'false' || process.env.PGSSLMODE === 'disable') return false;
+    if (process.env.DB_SSL === 'true') return { rejectUnauthorized: false };
+    return false; // Default: no SSL for test environments
+  };
+
   // Connect to default postgres database first
   const client = new Client({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
     database: 'postgres', // Connect to default database
     user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'password',
+    password: process.env.DB_PASSWORD || 'postgres',
+    ssl: determineSSL(),
   });
 
   try {
@@ -42,7 +50,8 @@ async function setupTestDatabase() {
       port: process.env.DB_PORT || 5432,
       database: 'toosila_test',
       user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
+      password: process.env.DB_PASSWORD || 'postgres',
+      ssl: determineSSL(),
     });
 
     await testDbClient.connect();

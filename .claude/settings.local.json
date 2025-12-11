@@ -47,7 +47,11 @@
       "Bash(ls:*)",
       "Bash(psql:*)",
       "Bash(git reset:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(gh run list:*)",
+      "Bash(timeout 60 npm test:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(DB_SSL=false PGSSLMODE=disable npm run test:setup:*)"
     ],
     "deny": [],
     "ask": []
