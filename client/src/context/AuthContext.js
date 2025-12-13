@@ -49,8 +49,15 @@ export function AuthProvider({ children }) {
 
               clearTimeout(timeoutId);
 
+              console.log('[DEBUG] Token validation response status:', response.status);
+
               if (!response.ok) {
                 // Token is invalid or expired
+                console.error('[DEBUG] Token validation FAILED!');
+                console.error('[DEBUG] Status:', response.status);
+                console.error('[DEBUG] Token used:', token.substring(0, 30) + '...');
+                const errorBody = await response.text();
+                console.error('[DEBUG] Response body:', errorBody);
                 console.warn('Token validation failed:', response.status);
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('token');
@@ -58,6 +65,7 @@ export function AuthProvider({ children }) {
               } else {
                 // Token is valid, update user data if needed
                 const result = await response.json();
+                console.log('[DEBUG] Token validation SUCCESS, user:', result.data?.user?.name);
                 if (result.data && result.data.user) {
                   const freshUserData = result.data.user;
                   localStorage.setItem('currentUser', JSON.stringify(freshUserData));
