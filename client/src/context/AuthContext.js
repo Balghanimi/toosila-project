@@ -279,23 +279,11 @@ export function AuthProvider({ children }) {
 
     try {
       const newIsDriver = !user.isDriver;
-
-      // Call API to update user type
-      const data = await authAPI.updateProfile({ isDriver: newIsDriver });
-
-      // Update current user
-      const updatedUser = data.data.user;
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-
-      return { success: true, user: updatedUser };
+      // Use updateProfile to handle both user update and token update
+      return await updateProfile({ isDriver: newIsDriver });
     } catch (error) {
       console.error('Error toggling user type:', error);
-      // Fallback: update locally if API fails
-      const updatedUser = { ...user, isDriver: !user.isDriver };
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      return { success: true, user: updatedUser };
+      return { success: false, error: error.message };
     }
   };
 
