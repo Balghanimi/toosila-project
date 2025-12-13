@@ -43,6 +43,10 @@ const apiRequest = async (endpoint, options = {}) => {
     if (!response.ok) {
       // Handle 401 Unauthorized - Token expired or invalid
       if (response.status === 401) {
+        console.error('[DEBUG] 401 Unauthorized Error!');
+        console.error('[DEBUG] Endpoint:', endpoint);
+        console.error('[DEBUG] Response:', JSON.stringify(data, null, 2));
+        console.error('[DEBUG] Token used:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
         console.warn('401 Unauthorized - Token expired or invalid');
         // Clear local storage
         localStorage.removeItem('token');

@@ -438,8 +438,8 @@ body.dark-mode .header {
 
 @keyframes slideInFromRight {
   from {
-    transform: translateX(-100%);
-    /* Negative in RTL = slide from RIGHT (outside screen) */
+    transform: translateX(100%);
+    /* Positive in RTL = slide from RIGHT (outside screen on the right) */
   }
 
   to {
