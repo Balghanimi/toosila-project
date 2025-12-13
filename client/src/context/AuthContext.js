@@ -246,6 +246,11 @@ export function AuthProvider({ children }) {
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
 
+      // Update token if provided (e.g. when role changes)
+      if (data.data.token) {
+        localStorage.setItem('token', data.data.token);
+      }
+
       return { success: true, user: updatedUser };
     } catch (error) {
       setError(error.message);

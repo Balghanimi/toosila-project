@@ -144,7 +144,14 @@ class AuthService {
     if (updateData.isDriver !== undefined) mappedData.is_driver = updateData.isDriver;
 
     const updatedUser = await user.update(mappedData);
-    return updatedUser.toJSON();
+
+    // Generate new token with updated user data (especially important for role changes)
+    const token = generateAccessToken(updatedUser);
+
+    return {
+      user: updatedUser.toJSON(),
+      token
+    };
   }
 
   /**

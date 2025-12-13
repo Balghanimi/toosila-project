@@ -85,13 +85,13 @@ const getProfile = catchAsync(async (req, res) => {
 const updateProfile = catchAsync(async (req, res) => {
   const { name, languagePreference, isDriver } = req.body;
 
-  const user = await authService.updateUserProfile(req.user.id, {
+  const { user, token } = await authService.updateUserProfile(req.user.id, {
     name,
     languagePreference,
     isDriver,
   });
 
-  sendSuccess(res, { user }, RESPONSE_MESSAGES.PROFILE_UPDATED);
+  sendSuccess(res, { user, token }, RESPONSE_MESSAGES.PROFILE_UPDATED);
 });
 
 /**
