@@ -240,15 +240,20 @@ export function AuthProvider({ children }) {
 
       // Call API
       const data = await authAPI.updateProfile(updates);
+      console.log('[DEBUG] updateProfile response:', JSON.stringify(data, null, 2));
 
       // Update current user
       const updatedUser = data.data.user;
+      console.log('[DEBUG] Updated user:', JSON.stringify(updatedUser, null, 2));
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
 
       // Update token if provided (e.g. when role changes)
       if (data.data.token) {
+        console.log('[DEBUG] New token received, storing...');
         localStorage.setItem('token', data.data.token);
+      } else {
+        console.warn('[DEBUG] No token in response! Old token will remain.');
       }
 
       return { success: true, user: updatedUser };
