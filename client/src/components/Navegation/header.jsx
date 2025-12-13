@@ -26,8 +26,10 @@ const Header = () => {
       // Prevent background scroll when drawer is open
       if (newState) {
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden'; // For iOS/safari
       } else {
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
       }
       return newState;
     });
@@ -37,12 +39,14 @@ const Header = () => {
   useEffect(() => {
     setDrawerOpen(false);
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   }, [location.pathname]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     };
   }, []);
 

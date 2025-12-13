@@ -390,8 +390,13 @@ body.dark-mode .header {
   display: flex;
   flex-direction: row;
   /* للعربية: القائمة تظهر من الجهة اليمنى */
-  justify-content: flex-start; /* Start from RIGHT in RTL */
-  direction: rtl; /* RTL direction for Arabic - drawer appears from RIGHT */
+  justify-content: flex-start !important;
+  /* Start from RIGHT in RTL */
+  align-items: stretch;
+  direction: rtl;
+  /* RTL direction for Arabic - drawer appears from RIGHT */
+  touch-action: none;
+  /* Prevent scroll chaining on the background */
 }
 
 .drawerOverlay {
@@ -415,7 +420,8 @@ body.dark-mode .header {
   height: 100vh;
   height: 100dvh;
   background: var(--surface-primary);
-  border-left: 1px solid var(--border-light); /* Border on LEFT side (drawer comes from RIGHT) */
+  border-left: 1px solid var(--border-light);
+  /* Border on LEFT side (drawer comes from RIGHT) */
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -426,14 +432,19 @@ body.dark-mode .header {
   box-sizing: border-box !important;
   flex-shrink: 0 !important;
   direction: rtl;
+  overscroll-behavior: contain;
+  /* Prevent scroll chaining */
 }
 
 @keyframes slideInFromRight {
   from {
-    transform: translateX(-100%); /* Negative in RTL = slide from RIGHT (outside screen) */
+    transform: translateX(-100%);
+    /* Negative in RTL = slide from RIGHT (outside screen) */
   }
+
   to {
-    transform: translateX(0); /* End at normal position */
+    transform: translateX(0);
+    /* End at normal position */
   }
 }
 
@@ -563,7 +574,8 @@ body.dark-mode .header {
   /* HAMBURGER - First column (RIGHT side in RTL) */
   .hamburgerButton {
     display: flex !important;
-    justify-self: start; /* Align to start of first column */
+    justify-self: start;
+    /* Align to start of first column */
     width: 40px;
     height: 40px;
     min-width: 40px;
@@ -603,7 +615,8 @@ body.dark-mode .header {
   .actionButtons {
     display: flex !important;
     align-items: center;
-    justify-self: end; /* Align to end of third column */
+    justify-self: end;
+    /* Align to end of third column */
     gap: 4px;
   }
 
@@ -724,6 +737,7 @@ body.dark-mode .header {
 
 /* Print Styles */
 @media print {
+
   .hamburgerButton,
   .languageChip,
   .loginButton {
