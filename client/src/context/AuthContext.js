@@ -26,7 +26,10 @@ export function AuthProvider({ children }) {
 
         // Debug: Log what we found in localStorage
         console.log('[DEBUG] loadUser called');
-        console.log('[DEBUG] token in localStorage:', token ? token.substring(0, 20) + '...' : 'NULL');
+        console.log(
+          '[DEBUG] token in localStorage:',
+          token ? token.substring(0, 20) + '...' : 'NULL'
+        );
         console.log('[DEBUG] savedUser in localStorage:', savedUser ? 'EXISTS' : 'NULL');
         console.log('[DEBUG] activeMode in localStorage:', activeMode);
 

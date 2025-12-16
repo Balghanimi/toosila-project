@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Profile = () => {
-  const { currentUser, updateProfile, logout, toggleUserType } = useAuth();
+  const { currentUser, logout, toggleUserType } = useAuth();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
