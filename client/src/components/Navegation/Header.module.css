@@ -431,7 +431,7 @@ body.dark-mode .header {
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box !important;
   flex-shrink: 0 !important;
-  direction: rtl;
+  /* Remove direction:rtl here so transform works in LTR coordinate system */
   overscroll-behavior: contain;
   /* Prevent scroll chaining */
 }
