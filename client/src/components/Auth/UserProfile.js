@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function UserProfile({ isOpen, onClose }) {
-  const { user, logout, updateProfile, loading } = useAuth();
+  const { user, logout, updateProfile, toggleUserType, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSwitchingRole, setIsSwitchingRole] = useState(false);
   const [formData, setFormData] = useState({
@@ -76,10 +76,9 @@ export default function UserProfile({ isOpen, onClose }) {
 
   const handleToggleRole = async () => {
     setIsSwitchingRole(true);
-    const newRole = user.userType === 'driver' ? 'passenger' : 'driver';
-    await updateProfile({ isDriver: newRole === 'driver' });
+    // Use toggleUserType for client-side switch
+    await toggleUserType();
     setIsSwitchingRole(false);
-    // Profile will auto-update through context
   };
 
   return (

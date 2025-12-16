@@ -111,7 +111,7 @@ app.use(
 // CORS configuration - Dynamic origin matching for multiple allowed origins
 app.use(
   cors({
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
       // Allow requests with no origin (mobile apps, curl, Postman, etc.)
       if (!origin) return callback(null, true);
 
@@ -205,6 +205,10 @@ if (config.NODE_ENV === 'production') {
   // Handle React client-side routing - catch all non-API routes
   // Express 5: Use splat parameter for catch-all routes
   app.get('/*splat', (req, res) => {
+    // Explicitly disable caching for index.html so clients always get the latest version
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
   });
 }

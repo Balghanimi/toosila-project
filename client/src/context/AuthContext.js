@@ -22,9 +22,23 @@ export function AuthProvider({ children }) {
       try {
         const token = localStorage.getItem('token');
         const savedUser = localStorage.getItem('currentUser');
+        const activeMode = localStorage.getItem('activeMode');
+
+        // Debug: Log what we found in localStorage
+        console.log('[DEBUG] loadUser called');
+        console.log('[DEBUG] token in localStorage:', token ? token.substring(0, 20) + '...' : 'NULL');
+        console.log('[DEBUG] savedUser in localStorage:', savedUser ? 'EXISTS' : 'NULL');
+        console.log('[DEBUG] activeMode in localStorage:', activeMode);
 
         if (token && savedUser) {
-          const userData = JSON.parse(savedUser);
+          let userData = JSON.parse(savedUser);
+
+          // Apply persisted mode preference if it exists
+          if (activeMode) {
+            console.log(`[DEBUG] Applying persisted mode: ${activeMode}`);
+            userData = { ...userData, isDriver: activeMode === 'driver' };
+          }
+
           // Validate user data structure - support both email and phone-based users
           if (userData.id && userData.name && (userData.email || userData.phone)) {
             // Load cached user first for immediate UI rendering
@@ -61,13 +75,21 @@ export function AuthProvider({ children }) {
                 console.warn('Token validation failed:', response.status);
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('token');
+                localStorage.removeItem('activeMode');
                 setUser(null);
               } else {
                 // Token is valid, update user data if needed
                 const result = await response.json();
                 console.log('[DEBUG] Token validation SUCCESS, user:', result.data?.user?.name);
                 if (result.data && result.data.user) {
-                  const freshUserData = result.data.user;
+                  let freshUserData = result.data.user;
+
+                  // Re-apply mode preference to fresh data from server
+                  const currentActiveMode = localStorage.getItem('activeMode');
+                  if (currentActiveMode) {
+                    freshUserData = { ...freshUserData, isDriver: currentActiveMode === 'driver' };
+                  }
+
                   localStorage.setItem('currentUser', JSON.stringify(freshUserData));
                   setUser(freshUserData);
                 }
@@ -80,12 +102,14 @@ export function AuthProvider({ children }) {
           } else {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
+            localStorage.removeItem('activeMode');
           }
         }
       } catch (error) {
         console.error('Error loading user data:', error);
         localStorage.removeItem('currentUser');
         localStorage.removeItem('token');
+        localStorage.removeItem('activeMode');
       } finally {
         setLoading(false);
       }
@@ -136,6 +160,11 @@ export function AuthProvider({ children }) {
       // Save token and user data
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+
+      // Default active mode based on registration
+      const isDriver = data.data.user.userType === 'driver' || data.data.user.isDriver;
+      localStorage.setItem('activeMode', isDriver ? 'driver' : 'passenger');
+
       setUser(data.data.user);
 
       setLoading(false);
@@ -169,6 +198,10 @@ export function AuthProvider({ children }) {
       // Set current user
       const userForStorage = { ...foundUser };
       localStorage.setItem('currentUser', JSON.stringify(userForStorage));
+
+      // Reset active mode on new login
+      localStorage.setItem('activeMode', userForStorage.isDriver ? 'driver' : 'passenger');
+
       setUser(userForStorage);
 
       setLoading(false);
@@ -194,6 +227,10 @@ export function AuthProvider({ children }) {
 
         localStorage.setItem('token', token);
         localStorage.setItem('currentUser', JSON.stringify(userData));
+
+        // Reset active mode on new login
+        localStorage.setItem('activeMode', userData.isDriver ? 'driver' : 'passenger');
+
         setUser(userData);
 
         setLoading(false);
@@ -213,6 +250,11 @@ export function AuthProvider({ children }) {
       // Save token and user data
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+
+      // Reset active mode on new login
+      const isDriver = data.data.user.isDriver;
+      localStorage.setItem('activeMode', isDriver ? 'driver' : 'passenger');
+
       setUser(data.data.user);
 
       setLoading(false);
@@ -228,6 +270,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
+    localStorage.removeItem('activeMode');
     setUser(null);
     setError('');
   };
@@ -251,7 +294,14 @@ export function AuthProvider({ children }) {
       console.log('[DEBUG] updateProfile response:', JSON.stringify(data, null, 2));
 
       // Update current user
-      const updatedUser = data.data.user;
+      let updatedUser = data.data.user;
+
+      // Preserve active mode override if it exists
+      const activeMode = localStorage.getItem('activeMode');
+      if (activeMode) {
+        updatedUser = { ...updatedUser, isDriver: activeMode === 'driver' };
+      }
+
       console.log('[DEBUG] Updated user:', JSON.stringify(updatedUser, null, 2));
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
@@ -286,14 +336,39 @@ export function AuthProvider({ children }) {
   // Check if user is passenger
   const isPassenger = user?.isDriver === false;
 
-  // Toggle user type (driver <-> passenger)
-  const toggleUserType = async () => {
+  // Toggle user type (driver <-> passenger) - CLIENT SIDE ONLY
+  // Accepts optional desiredIsDriver boolean to set specific mode
+  const toggleUserType = async (desiredIsDriver = null) => {
     if (!user) return { success: false, error: 'غير مسجل دخول' };
 
     try {
-      const newIsDriver = !user.isDriver;
-      // Use updateProfile to handle both user update and token update
-      return await updateProfile({ isDriver: newIsDriver });
+      console.log('[DEBUG] Client-side toggleUserType called', { desiredIsDriver });
+      const currentIsDriver = user.isDriver;
+
+      // Determine new state
+      const newIsDriver = desiredIsDriver !== null ? desiredIsDriver : !currentIsDriver;
+
+      // If no change needed, return success immediately
+      if (newIsDriver === currentIsDriver) {
+        return { success: true, user };
+      }
+
+      const newMode = newIsDriver ? 'driver' : 'passenger';
+
+      console.log(`[DEBUG] Switching mode to ${newMode}`);
+
+      // Update local storage for persistence
+      localStorage.setItem('activeMode', newMode);
+
+      // Update user state immediately without API call
+      const updatedUser = { ...user, isDriver: newIsDriver };
+
+      // Update currentUser in localStorage to keep them in sync
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      setUser(updatedUser);
+
+      return { success: true, user: updatedUser };
     } catch (error) {
       console.error('Error toggling user type:', error);
       return { success: false, error: error.message };

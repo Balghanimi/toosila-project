@@ -411,7 +411,7 @@ export function UserTypeModal({ onClose, onSuccess }) {
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { currentUser, setCurrentUser } = useAuth();
+  const { currentUser, toggleUserType } = useAuth();
 
   const currentIsDriver = currentUser?.isDriver || false;
 
@@ -435,12 +435,12 @@ export function UserTypeModal({ onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      const response = await authAPI.updateProfile({ isDriver: newIsDriver });
+      // Use client-side toggle wrapper with explicit mode
+      const result = await toggleUserType(newIsDriver);
 
-      // Update React context state (this also updates localStorage via AuthContext)
-      const updatedUser = response.data?.user || { ...currentUser, isDriver: newIsDriver };
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      setCurrentUser(updatedUser);
+      if (!result.success) {
+        throw new Error(result.error || 'فشل تحديث نوع الحساب');
+      }
 
       const userType = newIsDriver ? 'سائق 🚗' : 'راكب 👤';
       onSuccess(`تم تحديث نوع الحساب إلى ${userType} بنجاح ✅`);

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Profile = () => {
-  const { currentUser, updateProfile, logout } = useAuth();
+  const { currentUser, updateProfile, logout, toggleUserType } = useAuth();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -27,15 +27,13 @@ const Profile = () => {
     setError('');
 
     try {
-      const result = await updateProfile({
-        isDriver: !currentUser.isDriver,
-      });
+      const result = await toggleUserType();
 
       if (result.success) {
         setMessage(
-          currentUser.isDriver
-            ? 'تم التبديل إلى وضع الراكب بنجاح ✅'
-            : 'تم التبديل إلى وضع السائق بنجاح ✅'
+          result.user.isDriver // Check the returned user object
+            ? 'تم التبديل إلى وضع السائق بنجاح ✅' // Note: Logic was inverted in original code? If isDriver is true, we are now driver.
+            : 'تم التبديل إلى وضع الراكブ بنجاح ✅'
         );
         // No page reload needed - React context handles state update automatically
       } else {

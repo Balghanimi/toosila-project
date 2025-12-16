@@ -24,6 +24,7 @@ const server = app.listen(PORT, () => {
     environment: config.NODE_ENV,
     frontendUrl: config.FRONTEND_URL,
     database: `${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`,
+    timestamp: new Date().toISOString(),
   });
 });
 
