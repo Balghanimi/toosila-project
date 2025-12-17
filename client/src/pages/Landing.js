@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import RoleToggle from '../components/RoleToggle';
 import styles from './Landing.module.css';
 // import '../styles/landing-enhancements.css'; // Phase 1 enhancements
 import '../styles/landing-modern.css'; // Modern redesign (GoSwift-inspired)
@@ -13,6 +14,7 @@ import '../styles/landing-layout-fix.css'; // Layout improvements (wider, 2-colu
 const Landing = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const [mode, setMode] = React.useState('passenger'); // 'passenger' | 'driver'
 
   return (
     <div className={styles.container}>
@@ -47,8 +49,15 @@ const Landing = () => {
 
       {/* Simple Search Form */}
       <section className={styles.searchSection}>
+        {/* Role Toggle Switch */}
+        <div className={styles.toggleWrapper}>
+          <RoleToggle mode={mode} onToggle={setMode} />
+        </div>
+
         <div className={styles.searchCard}>
-          <h2 className={styles.searchTitle}>ابحث عن رحلتك</h2>
+          <h2 className={styles.searchTitle}>
+            {mode === 'passenger' ? 'ابحث عن رحلتك' : 'ابدأ رحلتك كسائق'}
+          </h2>
 
           <div className={styles.searchForm}>
             <div className={styles.formGroup}>
@@ -79,9 +88,19 @@ const Landing = () => {
               </div>
             </div>
 
-            <button className={styles.searchButton} onClick={() => navigate('/home')}>
-              ابحث عن رحلة 🔍
-            </button>
+            {mode === 'passenger' ? (
+              <button className={styles.searchButton} onClick={() => navigate('/home')}>
+                ابحث عن رحلة 🔍
+              </button>
+            ) : (
+              <button
+                className={styles.searchButton}
+                onClick={() => navigate(currentUser ? '/lines/create' : '/login')}
+                style={{ backgroundColor: '#28a745' }}
+              >
+                اعرض رحلة 🚗
+              </button>
+            )}
           </div>
         </div>
       </section>

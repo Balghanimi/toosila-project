@@ -106,7 +106,9 @@ export default function App() {
                                 <main className="appContent">
                                   <Suspense fallback={<LoadingSpinner />}>
                                     <Routes>
-                                      <Route path="/" element={<Landing />} />
+                                      {/* Main page is now /home - Landing page deactivated for now */}
+                                      <Route path="/" element={<Home />} />
+                                      {/* <Route path="/landing" element={<Landing />} /> */}
                                       <Route path="/home" element={<Home />} />
                                       <Route path="/dashboard" element={<Dashboard />} />
                                       <Route path="/messages" element={<Messages />} />
