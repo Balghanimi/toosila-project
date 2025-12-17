@@ -102,10 +102,15 @@ const Header = () => {
           </button>
         </div>
 
+        {/* Mobile Role Toggle - Visible only on mobile */}
+        <div className={styles.mobileToggle}>
+          <RoleToggle mode={mode} onToggle={setMode} />
+        </div>
+
         {/* Center Section: Role Toggle + Navigation Links (Desktop only) */}
         <nav className={styles.centerNav}>
-          {/* Role Toggle - Always visible */}
-          <div style={{ marginLeft: '16px' }}>
+          {/* Role Toggle - Desktop only */}
+          <div className={styles.desktopToggle}>
             <RoleToggle mode={mode} onToggle={setMode} />
           </div>
 
