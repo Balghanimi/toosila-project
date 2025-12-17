@@ -1,0 +1,683 @@
+/**
+ * Landing Page - MODERN REDESIGN (GoSwift Inspired)
+ *
+ * This file provides a complete modern transformation of the landing page.
+ * Inspired by modern app designs with neumorphism, bold typography,
+ * and enhanced user engagement elements.
+ *
+ * Features:
+ * - Large, prominent service cards with neumorphic shadows
+ * - Huge centered icons (120px)
+ * - Bold, modern typography
+ * - Color-coded services (Blue for rides, Orange for lines)
+ * - Popular routes quick access section
+ * - Recent activity preview
+ * - Enhanced stats banner
+ * - Mobile-first responsive design
+ *
+ * To activate: Import this file instead of landing-enhancements.css
+ */
+
+/* ========================================
+   ENHANCED STATS BANNER - Modern Look
+   ======================================== */
+
+.landing-stats-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 20px;
+  margin: 0 auto 40px;
+  max-width: 540px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 24px;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.landing-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-stats-icon {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.landing-stats-number {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+}
+
+.landing-stats-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ========================================
+   MODERN SERVICE CARDS - Neumorphic Design
+   ======================================== */
+
+/* Override card container spacing */
+.servicesSection {
+  padding: 20px;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* Section title enhancement */
+.servicesSection .sectionTitle {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 32px;
+}
+
+/* Complete card redesign */
+.servicesSection .serviceCard {
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 48px 32px;
+  margin-bottom: 24px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+  border: none !important;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+/* Remove gradient overlay from enhancements */
+.servicesSection .serviceCard::before {
+  display: none;
+}
+
+/* Rides card - Blue theme */
+.servicesSection .serviceCard:first-of-type {
+  border: 3px solid #3b82f6 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+}
+
+/* Lines card - Orange theme */
+.servicesSection .serviceCard:nth-of-type(2) {
+  border: 3px solid #f59e0b !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
+}
+
+/* Enhanced hover effect - dramatic lift */
+@media (hover: hover) and (pointer: fine) {
+  .servicesSection .serviceCard:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow:
+      0 32px 64px rgba(0, 0, 0, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .servicesSection .serviceCard:first-of-type:hover {
+    box-shadow:
+      0 32px 64px rgba(59, 130, 246, 0.2),
+      0 8px 24px rgba(59, 130, 246, 0.15);
+  }
+
+  .servicesSection .serviceCard:nth-of-type(2):hover {
+    box-shadow:
+      0 32px 64px rgba(245, 158, 11, 0.2),
+      0 8px 24px rgba(245, 158, 11, 0.15);
+  }
+}
+
+/* ========================================
+   BADGES - Enhanced Design
+   ======================================== */
+
+.servicesSection .badgeActive,
+.servicesSection .badgeComingSoon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.servicesSection .badgeActive {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.servicesSection .badgeComingSoon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+@keyframes pulse-badge {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* ========================================
+   HUGE CENTERED ICONS - Modern Look
+   ======================================== */
+
+.servicesSection .cardIcon {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  margin: 0 auto 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.servicesSection .iconGreen {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.servicesSection .iconOrange {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Icon hover effect */
+@media (hover: hover) {
+  .servicesSection .serviceCard:hover .cardIcon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* ========================================
+   BOLD TYPOGRAPHY - Modern Hierarchy
+   ======================================== */
+
+.servicesSection .cardTitle {
+  font-size: 28px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 12px;
+  letter-spacing: -0.5px;
+}
+
+.servicesSection .cardSubtitle {
+  font-size: 18px;
+  color: #3b82f6;
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+
+/* Rides card subtitle - blue */
+.servicesSection .serviceCard:first-of-type .cardSubtitle {
+  color: #3b82f6;
+}
+
+/* Lines card subtitle - orange */
+.servicesSection .serviceCard:nth-of-type(2) .cardSubtitle {
+  color: #f59e0b;
+}
+
+.servicesSection .cardDescription {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0 0 24px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+/* ========================================
+   TAGS - Inline Benefits Style
+   ======================================== */
+
+.servicesSection .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+
+.servicesSection .tag {
+  background: #f1f5f9;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 600;
+  border: 2px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.servicesSection .tag:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   ENHANCED CTA BUTTONS - Bold & Large
+   ======================================== */
+
+.servicesSection .ctaGreen,
+.servicesSection .ctaOrange {
+  width: 100%;
+  padding: 20px 32px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  letter-spacing: -0.3px;
+}
+
+.servicesSection .ctaGreen {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.servicesSection .ctaOrange {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.servicesSection .ctaGreen:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(59, 130, 246, 0.4);
+}
+
+.servicesSection .ctaOrange:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(245, 158, 11, 0.4);
+}
+
+.servicesSection .ctaGreen:active,
+.servicesSection .ctaOrange:active {
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   POPULAR ROUTES SECTION - Quick Access
+   ======================================== */
+
+.popular-routes-section {
+  padding: 20px;
+  max-width: 540px;
+  margin: 32px auto;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.popular-routes-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.popular-routes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.route-tile {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.route-tile:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6;
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+}
+
+.route-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.route-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.route-subtitle {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ========================================
+   RECENT ACTIVITY SECTION - Social Proof
+   ======================================== */
+
+.recent-activity-section {
+  padding: 20px;
+  max-width: 540px;
+  margin: 32px auto;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.recent-activity-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.activity-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.activity-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.activity-badge {
+  background: #dcfce7;
+  color: #166534;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   CARD ENTRANCE ANIMATIONS - Enhanced
+   ======================================== */
+
+@keyframes slideUpFadeModern {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.servicesSection .serviceCard {
+  animation: slideUpFadeModern 0.7s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.servicesSection .serviceCard:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.popular-routes-section {
+  animation: slideUpFadeModern 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+}
+
+.recent-activity-section {
+  animation: slideUpFadeModern 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE - Optimized
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Stats banner mobile */
+  .landing-stats-banner {
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .landing-stats-item {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* Cards mobile */
+  .servicesSection .serviceCard {
+    padding: 40px 24px;
+  }
+
+  .servicesSection .cardIcon {
+    width: 120px;
+    height: 120px;
+    font-size: 64px;
+  }
+
+  .servicesSection .cardTitle {
+    font-size: 24px;
+  }
+
+  .servicesSection .cardSubtitle {
+    font-size: 16px;
+  }
+
+  /* Popular routes mobile */
+  .popular-routes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Faster animations on mobile */
+  .servicesSection .serviceCard,
+  .popular-routes-section,
+  .recent-activity-section {
+    animation-duration: 0.5s;
+  }
+}
+
+@media (max-width: 480px) {
+  .servicesSection .serviceCard {
+    padding: 32px 20px;
+  }
+
+  .servicesSection .cardIcon {
+    width: 100px;
+    height: 100px;
+    font-size: 56px;
+  }
+
+  .servicesSection .cardTitle {
+    font-size: 22px;
+  }
+
+  .servicesSection .ctaGreen,
+  .servicesSection .ctaOrange {
+    padding: 18px 24px;
+    font-size: 16px;
+  }
+
+  .popular-routes-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  /* Stats banner dark */
+  .landing-stats-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-color: #334155;
+  }
+
+  .landing-stats-number {
+    color: #f1f5f9;
+  }
+
+  .landing-stats-label {
+    color: #94a3b8;
+  }
+
+  /* Cards dark */
+  .servicesSection .serviceCard {
+    background: #1e293b;
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .servicesSection .serviceCard:first-of-type {
+    background: linear-gradient(180deg, #1e293b 0%, #1e3a5f 100%);
+  }
+
+  .servicesSection .serviceCard:nth-of-type(2) {
+    background: linear-gradient(180deg, #1e293b 0%, #44331e 100%);
+  }
+
+  .servicesSection .cardTitle {
+    color: #f1f5f9;
+  }
+
+  .servicesSection .cardDescription {
+    color: #94a3b8;
+  }
+
+  .servicesSection .tag {
+    background: #334155;
+    color: #e2e8f0;
+    border-color: #475569;
+  }
+
+  /* Popular routes dark */
+  .popular-routes-title,
+  .recent-activity-title {
+    color: #f1f5f9;
+  }
+
+  .route-tile,
+  .activity-item {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .route-name,
+  .activity-text {
+    color: #f1f5f9;
+  }
+
+  .route-subtitle,
+  .activity-time {
+    color: #94a3b8;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+.servicesSection .serviceCard:focus-within {
+  outline: 4px solid #3b82f6;
+  outline-offset: 4px;
+}
+
+.route-tile:focus,
+.activity-item:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .servicesSection .serviceCard {
+    border-width: 4px !important;
+  }
+
+  .landing-stats-banner,
+  .route-tile,
+  .activity-item {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .servicesSection .serviceCard,
+  .popular-routes-section,
+  .recent-activity-section,
+  .servicesSection .badgeActive {
+    animation: none;
+  }
+
+  .servicesSection .serviceCard:hover,
+  .route-tile:hover,
+  .servicesSection .ctaGreen:hover,
+  .servicesSection .ctaOrange:hover {
+    transform: none;
+  }
+}

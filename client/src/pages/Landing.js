@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './Landing.module.css';
-import '../styles/landing-enhancements.css';
+// import '../styles/landing-enhancements.css'; // Phase 1 enhancements
+import '../styles/landing-modern.css'; // Modern redesign (GoSwift-inspired)
 
 /**
  * Landing Page - Service Selection
@@ -99,6 +100,104 @@ const Landing = () => {
           <button className={styles.ctaOrange} onClick={() => navigate('/lines-coming-soon')}>
             🔔 أبلغني عند التوفر
           </button>
+        </div>
+      </section>
+
+      {/* Popular Routes Section */}
+      <section className="popular-routes-section">
+        <h2 className="popular-routes-title">وجهات شائعة</h2>
+        <div className="popular-routes-grid">
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">🏙️</span>
+            <div className="route-name">بغداد ← البصرة</div>
+            <div className="route-subtitle">٣٠+ رحلة</div>
+          </div>
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">⛰️</span>
+            <div className="route-name">بغداد ← أربيل</div>
+            <div className="route-subtitle">٢٥+ رحلة</div>
+          </div>
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">🕌</span>
+            <div className="route-name">بغداد ← كربلاء</div>
+            <div className="route-subtitle">٤٠+ رحلة</div>
+          </div>
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">🌊</span>
+            <div className="route-name">البصرة ← أربيل</div>
+            <div className="route-subtitle">١٥+ رحلة</div>
+          </div>
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">🏛️</span>
+            <div className="route-name">بغداد ← الموصل</div>
+            <div className="route-subtitle">٢٠+ رحلة</div>
+          </div>
+          <div
+            className="route-tile"
+            onClick={() => navigate('/home')}
+            role="button"
+            tabIndex={0}
+          >
+            <span className="route-icon">⭐</span>
+            <div className="route-name">عرض الكل</div>
+            <div className="route-subtitle">جميع الوجهات</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Activity Section */}
+      <section className="recent-activity-section">
+        <h2 className="recent-activity-title">نشاط حديث</h2>
+        <div className="activity-list">
+          <div className="activity-item">
+            <span className="activity-icon">🚗</span>
+            <div className="activity-content">
+              <div className="activity-text">محمد حجز رحلة إلى البصرة</div>
+              <div className="activity-time">منذ ٥ دقائق</div>
+            </div>
+            <span className="activity-badge">✓ مؤكدة</span>
+          </div>
+          <div className="activity-item">
+            <span className="activity-icon">🚗</span>
+            <div className="activity-content">
+              <div className="activity-text">سارة أضافت عرض رحلة إلى أربيل</div>
+              <div className="activity-time">منذ ١٥ دقيقة</div>
+            </div>
+            <span className="activity-badge">✓ نشطة</span>
+          </div>
+          <div className="activity-item">
+            <span className="activity-icon">⭐</span>
+            <div className="activity-content">
+              <div className="activity-text">أحمد قيّم رحلة بـ ٥ نجوم</div>
+              <div className="activity-time">منذ ٣٠ دقيقة</div>
+            </div>
+            <span className="activity-badge">★ 5.0</span>
+          </div>
         </div>
       </section>
 
