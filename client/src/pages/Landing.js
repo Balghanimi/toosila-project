@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useMode } from '../context/ModeContext';
 import RoleToggle from '../components/RoleToggle';
 import styles from './Landing.module.css';
 // import '../styles/landing-enhancements.css'; // Phase 1 enhancements
@@ -14,7 +15,7 @@ import '../styles/landing-layout-fix.css'; // Layout improvements (wider, 2-colu
 const Landing = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [mode, setMode] = React.useState('passenger'); // 'passenger' | 'driver'
+  const { mode, setMode } = useMode(); // Use global mode context
   const [passengers, setPassengers] = React.useState(1);
   const [price, setPrice] = React.useState(5000);
 

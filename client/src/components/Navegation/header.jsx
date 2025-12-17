@@ -4,10 +4,12 @@ import styles from './Header.module.css';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { useMode } from '../../context/ModeContext';
 import { showLinesInNav, canAccessLines } from '../../config/featureFlags';
 import NotificationBell from '../notifications/NotificationBell';
 import UserMenu from '../Auth/UserMenu';
 import ThemeToggle from '../ThemeToggle';
+import RoleToggle from '../RoleToggle';
 import logoHeader from '../../assets/logo-header.png';
 
 const Header = () => {
@@ -17,6 +19,7 @@ const Header = () => {
   const { user, isAuthenticated, currentUser } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
   const { pendingBookings, unreadMessages } = useNotifications();
+  const { mode, setMode } = useMode();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -99,8 +102,13 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Center Section: Navigation Links (Desktop only, authenticated users) */}
+        {/* Center Section: Role Toggle + Navigation Links (Desktop only) */}
         <nav className={styles.centerNav}>
+          {/* Role Toggle - Always visible */}
+          <div style={{ marginLeft: '16px' }}>
+            <RoleToggle mode={mode} onToggle={setMode} />
+          </div>
+
           {isAuthenticated && (
             <>
               <button
