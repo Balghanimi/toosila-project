@@ -400,12 +400,12 @@ body.dark-mode .header {
   z-index: 1100;
   display: flex;
   flex-direction: row;
-  /* للعربية: القائمة تظهر من الجهة اليمنى */
-  justify-content: flex-start !important;
-  /* Start from RIGHT in RTL */
+  /* القائمة تظهر من اليسار */
+  justify-content: flex-end !important;
+  /* Start from LEFT side */
   align-items: stretch;
-  direction: rtl;
-  /* RTL direction for Arabic - drawer appears from RIGHT */
+  direction: ltr;
+  /* LTR direction - drawer appears from LEFT */
   touch-action: none;
   /* Prevent scroll chaining on the background */
 }
@@ -431,26 +431,25 @@ body.dark-mode .header {
   height: 100vh;
   height: 100dvh;
   background: var(--surface-primary);
-  border-left: 1px solid var(--border-light);
-  /* Border on LEFT side (drawer comes from RIGHT) */
+  border-right: 1px solid var(--border-light);
+  /* Border on RIGHT side (drawer comes from LEFT) */
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  animation: slideInFromRight 0.3s ease-out;
+  animation: slideInFromLeft 0.3s ease-out;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box !important;
   flex-shrink: 0 !important;
-  /* Remove direction:rtl here so transform works in LTR coordinate system */
   overscroll-behavior: contain;
   /* Prevent scroll chaining */
 }
 
-@keyframes slideInFromRight {
+@keyframes slideInFromLeft {
   from {
-    transform: translateX(100%);
-    /* Positive in RTL = slide from RIGHT (outside screen on the right) */
+    transform: translateX(-100%);
+    /* Slide from LEFT (outside screen on the left) */
   }
 
   to {
@@ -544,11 +543,11 @@ body.dark-mode .header {
 
 .drawerItem:hover {
   background: var(--surface-secondary);
-  transform: translateX(-2px);
+  transform: translateX(2px);
 }
 
 .drawerItem:active {
-  transform: translateX(-4px);
+  transform: translateX(4px);
   background: var(--primary-light);
 }
 
