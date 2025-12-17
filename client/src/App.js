@@ -24,7 +24,7 @@ import './styles/enhancements.css';
 import './styles/professional-ui.css';
 
 // Lazy load all pages for code splitting
-const Landing = lazy(() => import('./pages/Landing'));
+// const Landing = lazy(() => import('./pages/Landing')); // Deactivated for now
 const Home = lazy(() => import('./pages/Home'));
 const Messages = lazy(() => import('./pages/Messages'));
 const Profile = lazy(() => import('./pages/Profile'));

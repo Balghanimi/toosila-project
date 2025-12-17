@@ -15,6 +15,16 @@ const Landing = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [mode, setMode] = React.useState('passenger'); // 'passenger' | 'driver'
+  const [passengers, setPassengers] = React.useState(1);
+  const [price, setPrice] = React.useState(5000);
+
+  const handlePassengersChange = (delta) => {
+    setPassengers((prev) => Math.max(1, Math.min(5, prev + delta)));
+  };
+
+  const handlePriceChange = (delta) => {
+    setPrice((prev) => Math.max(1000, prev + delta));
+  };
 
   return (
     <div className={styles.container}>
@@ -70,23 +80,63 @@ const Landing = () => {
               <input type="text" placeholder="المدينة أو المحافظة" className={styles.input} />
             </div>
 
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>التاريخ</label>
-                <input type="date" className={styles.input} />
-              </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>التاريخ</label>
+              <input type="date" className={styles.input} />
+            </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.label}>الركاب</label>
-                <select className={styles.input}>
-                  <option value="1">١</option>
-                  <option value="2">٢</option>
-                  <option value="3">٣</option>
-                  <option value="4">٤</option>
-                  <option value="5">٥+</option>
-                </select>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>عدد المقاعد</label>
+              <div className={styles.counterControl}>
+                <button
+                  type="button"
+                  className={styles.counterBtn}
+                  onClick={() => handlePassengersChange(-1)}
+                  disabled={passengers <= 1}
+                >
+                  −
+                </button>
+                <div className={styles.counterDisplay}>
+                  <span className={styles.counterIcon}>💺</span>
+                  <span className={styles.counterValue}>{passengers}</span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.counterBtn}
+                  onClick={() => handlePassengersChange(1)}
+                  disabled={passengers >= 5}
+                >
+                  +
+                </button>
               </div>
             </div>
+
+            {mode === 'driver' && (
+              <div className={styles.formGroup}>
+                <label className={styles.label}>السعر</label>
+                <div className={styles.counterControl}>
+                  <button
+                    type="button"
+                    className={styles.counterBtn}
+                    onClick={() => handlePriceChange(-500)}
+                    disabled={price <= 1000}
+                  >
+                    −
+                  </button>
+                  <div className={styles.counterDisplay}>
+                    <span className={styles.counterIcon}>💵</span>
+                    <span className={styles.counterValue}>{price.toLocaleString('ar-IQ')}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.counterBtn}
+                    onClick={() => handlePriceChange(500)}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
 
             {mode === 'passenger' ? (
               <button className={styles.searchButton} onClick={() => navigate('/home')}>

@@ -4,7 +4,7 @@ import styles from './RoleToggle.module.css';
 /**
  * Professional Role Toggle Component
  * Switches between 'driver' (سائق) and 'passenger' (راكب) modes.
- * 
+ *
  * @param {string} mode - Current mode: 'passenger' | 'driver'
  * @param {function} onToggle - Callback function(newMode)
  */
@@ -15,9 +15,7 @@ const RoleToggle = ({ mode, onToggle }) => {
   return (
     <div className={styles.toggleContainer} dir="ltr">
       {/* Background Slider Pill */}
-      <div 
-        className={`${styles.slider} ${isDriver ? styles.slideRight : styles.slideLeft}`} 
-      />
+      <div className={`${styles.slider} ${isDriver ? styles.slideRight : styles.slideLeft}`} />
 
       {/* Passenger Button (Left visually in LTR, but logically "Passenger") */}
       {/* 
@@ -32,7 +30,7 @@ const RoleToggle = ({ mode, onToggle }) => {
          - If mode is 'passenger', slider should be on the left (or right depending on order).
          - Let's place "Passenger" (راكب) on the Left and "Driver" (سائق) on the Right for LTR container.
       */}
-      
+
       <button
         type="button"
         className={`${styles.toggleBtn} ${mode === 'passenger' ? styles.active : ''}`}
