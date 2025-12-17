@@ -107,62 +107,32 @@ const Landing = () => {
       <section className="popular-routes-section">
         <h2 className="popular-routes-title">وجهات شائعة</h2>
         <div className="popular-routes-grid">
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">🏙️</span>
             <div className="route-name">بغداد ← البصرة</div>
             <div className="route-subtitle">٣٠+ رحلة</div>
           </div>
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">⛰️</span>
             <div className="route-name">بغداد ← أربيل</div>
             <div className="route-subtitle">٢٥+ رحلة</div>
           </div>
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">🕌</span>
             <div className="route-name">بغداد ← كربلاء</div>
             <div className="route-subtitle">٤٠+ رحلة</div>
           </div>
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">🌊</span>
             <div className="route-name">البصرة ← أربيل</div>
             <div className="route-subtitle">١٥+ رحلة</div>
           </div>
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">🏛️</span>
             <div className="route-name">بغداد ← الموصل</div>
             <div className="route-subtitle">٢٠+ رحلة</div>
           </div>
-          <div
-            className="route-tile"
-            onClick={() => navigate('/home')}
-            role="button"
-            tabIndex={0}
-          >
+          <div className="route-tile" onClick={() => navigate('/home')} role="button" tabIndex={0}>
             <span className="route-icon">⭐</span>
             <div className="route-name">عرض الكل</div>
             <div className="route-subtitle">جميع الوجهات</div>
