@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useMode } from '../context/ModeContext';
 import { demandsAPI, offersAPI, citiesAPI } from '../services/api';
 import { formatLargeNumber, toEnglishNumber } from '../utils/formatters';
 import SearchableCitySelect from '../components/UI/SearchableCitySelect';
@@ -10,8 +11,15 @@ import styles from './Home.module.css';
 
 const Home = () => {
   const { currentUser } = useAuth();
+  const { mode: globalMode } = useMode();
   // Default mode: drivers see 'offer', passengers see 'demand'
-  const [mode, setMode] = useState(currentUser?.isDriver ? 'offer' : 'demand');
+  // Use global mode context to determine default
+  const getDefaultMode = () => {
+    if (globalMode === 'driver') return 'offer';
+    if (globalMode === 'passenger') return 'demand';
+    return currentUser?.isDriver ? 'offer' : 'demand';
+  };
+  const [mode, setMode] = useState(getDefaultMode());
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropLocation, setDropLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState('today');
@@ -35,10 +43,26 @@ const Home = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Update mode when global mode changes (from header toggle)
+  useEffect(() => {
+    console.log('Home: Global mode changed to:', globalMode);
+    if (globalMode === 'driver') {
+      setMode('offer');
+    } else if (globalMode === 'passenger') {
+      setMode('demand');
+    }
+  }, [globalMode]);
+
   // Update mode when user type changes (e.g., role switch)
   useEffect(() => {
-    setMode(currentUser?.isDriver ? 'offer' : 'demand');
-  }, [currentUser?.isDriver]);
+    if (globalMode === 'driver') {
+      setMode('offer');
+    } else if (globalMode === 'passenger') {
+      setMode('demand');
+    } else {
+      setMode(currentUser?.isDriver ? 'offer' : 'demand');
+    }
+  }, [currentUser?.isDriver, globalMode]);
 
   useEffect(() => {
     if (submitError && (pickupLocation || dropLocation || selectedDate)) {
