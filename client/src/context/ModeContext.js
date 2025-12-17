@@ -19,7 +19,9 @@ export const ModeProvider = ({ children }) => {
   }, [mode]);
 
   const toggleMode = (newMode) => {
+    console.log('ModeContext: toggleMode called with:', newMode);
     setMode(newMode);
+    console.log('ModeContext: mode will be set to:', newMode);
   };
 
   return (

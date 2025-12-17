@@ -12,6 +12,15 @@ const RoleToggle = ({ mode, onToggle }) => {
   // Determine if we are in driver mode for styling
   const isDriver = mode === 'driver';
 
+  const handleClick = (newMode) => {
+    console.log('RoleToggle: Button clicked, switching to:', newMode);
+    console.log('RoleToggle: Current mode:', mode);
+    console.log('RoleToggle: onToggle function exists?', typeof onToggle === 'function');
+    if (onToggle) {
+      onToggle(newMode);
+    }
+  };
+
   return (
     <div className={styles.toggleContainer} dir="ltr">
       {/* Background Slider Pill */}
@@ -34,7 +43,7 @@ const RoleToggle = ({ mode, onToggle }) => {
       <button
         type="button"
         className={`${styles.toggleBtn} ${mode === 'passenger' ? styles.active : ''}`}
-        onClick={() => onToggle('passenger')}
+        onClick={() => handleClick('passenger')}
         aria-pressed={mode === 'passenger'}
       >
         راكب
@@ -43,7 +52,7 @@ const RoleToggle = ({ mode, onToggle }) => {
       <button
         type="button"
         className={`${styles.toggleBtn} ${mode === 'driver' ? styles.active : ''}`}
-        onClick={() => onToggle('driver')}
+        onClick={() => handleClick('driver')}
         aria-pressed={mode === 'driver'}
       >
         سائق
