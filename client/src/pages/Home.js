@@ -646,12 +646,13 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Features Section */}
-      <section className={styles.featuresSection}>
-        <h2 className={styles.sectionTitle}>لماذا تختار توصيلة؟</h2>
-        <p className={styles.sectionSubtitle}>نوفر لك تجربة سفر آمنة ومريحة بأفضل الأسعار</p>
+      {/* Features Section - Show only for non-authenticated users */}
+      {!currentUser && (
+        <section className={styles.featuresSection}>
+          <h2 className={styles.sectionTitle}>لماذا تختار توصيلة؟</h2>
+          <p className={styles.sectionSubtitle}>نوفر لك تجربة سفر آمنة ومريحة بأفضل الأسعار</p>
 
-        <div className={styles.featuresGrid}>
+          <div className={styles.featuresGrid}>
           <div className={styles.featureCard}>
             <span className={styles.featureIcon}>🛡️</span>
             <h3 className={styles.featureTitle}>آمن وموثوق</h3>
@@ -704,10 +705,12 @@ const Home = () => {
             </p>
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
-      {/* How It Works Section */}
-      <section className={styles.howItWorksSection}>
+      {/* How It Works Section - Show only for non-authenticated users */}
+      {!currentUser && (
+        <section className={styles.howItWorksSection}>
         <h2 className={styles.sectionTitle}>كيف يعمل توصيلة؟</h2>
         <p className={styles.sectionSubtitle}>ثلاث خطوات بسيطة للوصول إلى وجهتك</p>
 
@@ -734,7 +737,8 @@ const Home = () => {
             <p className={styles.stepDescription}>تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.</p>
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
       {/* Trust Banner */}
       <div className={styles.trustBanner}>
