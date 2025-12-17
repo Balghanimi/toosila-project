@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './Landing.module.css';
+import '../styles/landing-enhancements.css';
 
 /**
  * Landing Page - Service Selection
@@ -45,6 +46,25 @@ const Landing = () => {
       {/* Service Selection */}
       <section className={styles.servicesSection}>
         <h2 className={styles.sectionTitle}>اختر نوع الخدمة</h2>
+
+        {/* Stats Banner - Trust Indicators */}
+        <div className="landing-stats-banner">
+          <div className="landing-stats-item">
+            <span className="landing-stats-icon">🚗</span>
+            <span className="landing-stats-number">+١٠،٠٠٠</span>
+            <span className="landing-stats-label">رحلة ناجحة</span>
+          </div>
+          <div className="landing-stats-item">
+            <span className="landing-stats-icon">⭐</span>
+            <span className="landing-stats-number">٤.٨/٥</span>
+            <span className="landing-stats-label">تقييم المستخدمين</span>
+          </div>
+          <div className="landing-stats-item">
+            <span className="landing-stats-icon">👥</span>
+            <span className="landing-stats-number">+٥،٠٠٠</span>
+            <span className="landing-stats-label">مستخدم نشط</span>
+          </div>
+        </div>
 
         {/* Card 1: Rides (Active) */}
         <div className={styles.serviceCard}>

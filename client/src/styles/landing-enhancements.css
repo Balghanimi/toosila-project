@@ -1,0 +1,265 @@
+/**
+ * Landing Page Enhancements - Phase 1
+ *
+ * This file contains non-breaking enhancements to the Landing page.
+ * Can be safely removed to revert to original design.
+ *
+ * Enhancements:
+ * 1. Stats banner - Trust building metrics
+ * 2. Card gradient overlay - Improved text contrast
+ * 3. Enhanced hover effects - Better interactivity
+ * 4. Card entrance animations - Polished first impression
+ */
+
+/* ========================================
+   1. STATS BANNER - Trust Building Metrics
+   ======================================== */
+
+.landing-stats-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  margin: 0 auto 32px;
+  max-width: 500px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.landing-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0; /* Allows flex items to shrink below content size */
+}
+
+.landing-stats-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.landing-stats-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #065f46;
+  white-space: nowrap;
+}
+
+.landing-stats-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #059669;
+  text-align: center;
+}
+
+/* Mobile responsive - Stack vertically on small screens */
+@media (max-width: 480px) {
+  .landing-stats-banner {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .landing-stats-item {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .landing-stats-number {
+    font-size: 15px;
+  }
+
+  .landing-stats-label {
+    font-size: 12px;
+  }
+}
+
+/* Dark mode support for stats banner */
+@media (prefers-color-scheme: dark) {
+  .landing-stats-banner {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    border-color: #047857;
+  }
+
+  .landing-stats-number {
+    color: #d1fae5;
+  }
+
+  .landing-stats-label {
+    color: #a7f3d0;
+  }
+}
+
+/* ========================================
+   2. CARD GRADIENT OVERLAY - Text Contrast
+   ======================================== */
+
+/* Add subtle gradient overlay to improve text readability */
+.servicesSection .serviceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.03) 50%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure card content stays above overlay */
+.servicesSection .serviceCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Darker overlay for coming soon card (yellow background needs more contrast) */
+.servicesSection .serviceCard.cardComingSoon::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+}
+
+/* Dark mode - reduce overlay intensity */
+@media (prefers-color-scheme: dark) {
+  .servicesSection .serviceCard::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  .servicesSection .serviceCard.cardComingSoon::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+  }
+}
+
+/* ========================================
+   3. ENHANCED HOVER EFFECTS - Interactivity
+   ======================================== */
+
+/* Card lift effect on hover - desktop only */
+@media (hover: hover) and (pointer: fine) {
+  .servicesSection .serviceCard {
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .servicesSection .serviceCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Enhanced shadow for green card on hover */
+  .servicesSection .serviceCard:first-of-type:hover {
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25);
+  }
+
+  /* Enhanced shadow for orange card on hover */
+  .servicesSection .serviceCard.cardComingSoon:hover {
+    box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
+  }
+}
+
+/* Mobile/touch devices - reduced lift effect */
+@media (hover: none) and (pointer: coarse) {
+  .servicesSection .serviceCard {
+    transition: transform 0.2s ease;
+  }
+
+  .servicesSection .serviceCard:active {
+    transform: translateY(-4px);
+  }
+}
+
+/* ========================================
+   4. CARD ENTRANCE ANIMATION - First Impression
+   ======================================== */
+
+/* Keyframe animation for smooth entrance */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animation to cards */
+.servicesSection .serviceCard {
+  animation: slideUpFade 0.6s ease-out backwards;
+}
+
+/* Second card has slight delay for cascading effect */
+.servicesSection .serviceCard:nth-of-type(2) {
+  animation-delay: 0.15s;
+}
+
+/* Mobile - faster animation for better performance */
+@media (max-width: 768px) {
+  .servicesSection .serviceCard {
+    animation-duration: 0.4s;
+  }
+
+  .servicesSection .serviceCard:nth-of-type(2) {
+    animation-delay: 0.1s;
+  }
+}
+
+/* Respect user's reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .servicesSection .serviceCard {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+/* Focus visible for keyboard navigation */
+.servicesSection .serviceCard:focus-within {
+  outline: 3px solid #10b981;
+  outline-offset: 3px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .landing-stats-banner {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+
+  .servicesSection .serviceCard {
+    border-width: 3px;
+  }
+}
