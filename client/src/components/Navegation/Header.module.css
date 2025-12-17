@@ -575,7 +575,7 @@ body.dark-mode .header {
 @media (max-width: 768px) {
   .header {
     display: grid;
-    grid-template-columns: auto auto 1fr auto;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     padding: 0 16px;
     height: 60px;
@@ -615,39 +615,25 @@ body.dark-mode .header {
     transform: scale(1.02);
   }
 
-  /* LOGO - First column (RIGHT side in RTL) */
+  /* LOGO - HIDDEN ON MOBILE */
   .logoSection {
-    justify-self: start;
-    order: 1;
+    display: none !important;
   }
 
-  .logoText {
-    height: 40px;
-  }
-
-  .appName {
-    font-size: var(--text-base);
-  }
-
-  .logo {
-    height: 32px;
-    width: 32px;
-  }
-
-  /* MODE TOGGLE - Second column (Center-Right in RTL) */
+  /* MODE TOGGLE - Center column */
   .mobileToggle {
     display: flex !important;
     justify-self: center;
-    order: 2;
+    order: 1;
   }
 
-  /* MOBILE ACTION BUTTONS - Third column (LEFT side in RTL) */
+  /* MOBILE ACTION BUTTONS - Right column (LEFT side in RTL) */
   .mobileActionButtons {
     display: flex !important;
     align-items: center;
     justify-self: end;
     gap: 8px;
-    order: 3;
+    order: 2;
   }
 
   /* Hide desktop action buttons on mobile */
