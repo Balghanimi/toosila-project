@@ -1,0 +1,524 @@
+/**
+ * Landing Page - LAYOUT FIX
+ *
+ * Fixes the narrow, floating layout issues by:
+ * - Expanding max-widths from 500px to 1100px
+ * - Creating 2-column grid for cards on desktop
+ * - Increasing padding for more substantial feel
+ * - Making cards larger and more grounded
+ * - Maintaining mobile responsiveness
+ *
+ * Import this AFTER landing-modern.css to override
+ */
+
+/* ========================================
+   SERVICES SECTION - Wider Container
+   ======================================== */
+
+/* Override narrow 500px max-width */
+.servicesSection {
+  max-width: 1100px !important;
+  padding: 40px 20px !important;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Desktop: More padding */
+@media (min-width: 768px) {
+  .servicesSection {
+    padding: 48px 32px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .servicesSection {
+    padding: 56px 40px !important;
+  }
+}
+
+/* ========================================
+   SECTION TITLE - Larger, More Prominent
+   ======================================== */
+
+.servicesSection .sectionTitle {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  margin-bottom: 32px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .sectionTitle {
+    font-size: 28px !important;
+    margin-bottom: 40px !important;
+  }
+}
+
+/* ========================================
+   STATS BANNER - Wider
+   ======================================== */
+
+.landing-stats-banner {
+  max-width: 800px !important;
+  margin: 0 auto 48px auto !important;
+  padding: 24px 32px !important;
+}
+
+@media (min-width: 768px) {
+  .landing-stats-banner {
+    max-width: 900px !important;
+    padding: 28px 40px !important;
+    margin-bottom: 56px !important;
+  }
+}
+
+/* ========================================
+   CARDS GRID - 2 Column Layout (Desktop)
+   ======================================== */
+
+/* Cards grid wrapper */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Desktop: 2 columns side by side */
+@media (min-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    gap: 40px;
+  }
+}
+
+/* ========================================
+   SERVICE CARDS - Larger, More Substantial
+   ======================================== */
+
+/* Override small padding from module CSS */
+.servicesSection .serviceCard {
+  padding: 36px 28px !important;
+  min-height: 340px;
+  margin-bottom: 0 !important; /* Grid handles spacing */
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .servicesSection .serviceCard {
+    padding: 44px 36px !important;
+    min-height: 420px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .servicesSection .serviceCard {
+    padding: 52px 44px !important;
+    min-height: 460px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+  .servicesSection .serviceCard {
+    padding: 56px 48px !important;
+    min-height: 480px;
+  }
+}
+
+/* ========================================
+   CARD CONTENT - Better Spacing
+   ======================================== */
+
+/* Larger card title */
+.servicesSection .cardTitle {
+  font-size: 26px !important;
+  margin-bottom: 14px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .cardTitle {
+    font-size: 30px !important;
+    margin-bottom: 16px !important;
+  }
+}
+
+/* Larger subtitle */
+.servicesSection .cardSubtitle {
+  font-size: 17px !important;
+  margin-bottom: 18px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .cardSubtitle {
+    font-size: 19px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* Card description */
+.servicesSection .cardDescription {
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+  margin-bottom: 24px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .cardDescription {
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+    margin-bottom: 28px !important;
+  }
+}
+
+/* Tags spacing */
+.servicesSection .tags {
+  margin-bottom: 28px !important;
+  gap: 10px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .tags {
+    margin-bottom: 32px !important;
+    gap: 12px !important;
+  }
+}
+
+/* Individual tags */
+.servicesSection .tag {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* ========================================
+   CTA BUTTONS - Larger, More Prominent
+   ======================================== */
+
+.servicesSection .ctaGreen,
+.servicesSection .ctaOrange {
+  padding: 18px 32px !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  border-radius: 16px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .ctaGreen,
+  .servicesSection .ctaOrange {
+    padding: 20px 36px !important;
+    font-size: 18px !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* ========================================
+   POPULAR ROUTES - Wider
+   ======================================== */
+
+.popular-routes-section {
+  max-width: 1100px !important;
+  padding: 32px 20px !important;
+  margin: 40px auto !important;
+}
+
+@media (min-width: 768px) {
+  .popular-routes-section {
+    padding: 48px 32px !important;
+    margin: 56px auto !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .popular-routes-section {
+    padding: 56px 40px !important;
+  }
+}
+
+/* Popular routes title */
+.popular-routes-title {
+  font-size: 22px !important;
+  margin-bottom: 28px !important;
+}
+
+@media (min-width: 768px) {
+  .popular-routes-title {
+    font-size: 26px !important;
+    margin-bottom: 36px !important;
+  }
+}
+
+/* Popular routes grid - responsive columns */
+.popular-routes-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 14px !important;
+}
+
+@media (min-width: 600px) {
+  .popular-routes-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .popular-routes-grid {
+    gap: 20px !important;
+  }
+}
+
+/* Route tiles - larger */
+.route-tile {
+  padding: 24px 16px !important;
+  min-height: 120px;
+}
+
+@media (min-width: 768px) {
+  .route-tile {
+    padding: 28px 20px !important;
+    min-height: 140px;
+  }
+}
+
+/* Route icon larger */
+.route-icon {
+  font-size: 36px !important;
+  margin-bottom: 12px !important;
+}
+
+@media (min-width: 768px) {
+  .route-icon {
+    font-size: 40px !important;
+  }
+}
+
+/* Route name */
+.route-name {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+@media (min-width: 768px) {
+  .route-name {
+    font-size: 15px !important;
+  }
+}
+
+/* ========================================
+   RECENT ACTIVITY - Wider
+   ======================================== */
+
+.recent-activity-section {
+  max-width: 1100px !important;
+  padding: 32px 20px !important;
+  margin: 40px auto !important;
+}
+
+@media (min-width: 768px) {
+  .recent-activity-section {
+    padding: 48px 32px !important;
+    margin: 56px auto !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .recent-activity-section {
+    padding: 56px 40px !important;
+  }
+}
+
+/* Recent activity title */
+.recent-activity-title {
+  font-size: 22px !important;
+  margin-bottom: 28px !important;
+}
+
+@media (min-width: 768px) {
+  .recent-activity-title {
+    font-size: 26px !important;
+    margin-bottom: 36px !important;
+  }
+}
+
+/* Activity items - larger */
+.activity-item {
+  padding: 20px 24px !important;
+  border-radius: 18px !important;
+}
+
+@media (min-width: 768px) {
+  .activity-item {
+    padding: 24px 28px !important;
+    border-radius: 20px !important;
+  }
+}
+
+/* Activity icon */
+.activity-icon {
+  font-size: 32px !important;
+}
+
+@media (min-width: 768px) {
+  .activity-icon {
+    font-size: 36px !important;
+  }
+}
+
+/* Activity text */
+.activity-text {
+  font-size: 15px !important;
+}
+
+@media (min-width: 768px) {
+  .activity-text {
+    font-size: 16px !important;
+  }
+}
+
+/* ========================================
+   ICON SIZING - Larger Icons
+   ======================================== */
+
+/* Override modern CSS - make icons even larger */
+.servicesSection .cardIcon {
+  width: 130px !important;
+  height: 130px !important;
+  font-size: 68px !important;
+  margin-bottom: 28px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .cardIcon {
+    width: 150px !important;
+    height: 150px !important;
+    font-size: 76px !important;
+    margin-bottom: 32px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .servicesSection .cardIcon {
+    width: 160px !important;
+    height: 160px !important;
+    font-size: 84px !important;
+  }
+}
+
+/* ========================================
+   BADGES - Larger, More Prominent
+   ======================================== */
+
+.servicesSection .badgeActive,
+.servicesSection .badgeComingSoon {
+  padding: 12px 24px !important;
+  font-size: 15px !important;
+  top: 24px !important;
+  right: 24px !important;
+  border-radius: 28px !important;
+}
+
+@media (min-width: 768px) {
+  .servicesSection .badgeActive,
+  .servicesSection .badgeComingSoon {
+    padding: 14px 28px !important;
+    font-size: 16px !important;
+    top: 28px !important;
+    right: 28px !important;
+  }
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 480px) {
+  /* Smaller padding on very small screens */
+  .servicesSection {
+    padding: 32px 16px !important;
+  }
+
+  .servicesSection .serviceCard {
+    padding: 32px 24px !important;
+    min-height: 320px;
+  }
+
+  .popular-routes-section,
+  .recent-activity-section {
+    padding: 28px 16px !important;
+  }
+
+  /* Single column popular routes on very small screens */
+  .popular-routes-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ========================================
+   ENSURE CONTENT DOESN'T FEEL CRAMPED
+   ======================================== */
+
+/* Add breathing room between sections */
+.servicesSection {
+  margin-bottom: 24px;
+}
+
+.popular-routes-section {
+  margin-top: 48px;
+  margin-bottom: 32px;
+}
+
+.recent-activity-section {
+  margin-top: 32px;
+  margin-bottom: 48px;
+}
+
+@media (min-width: 768px) {
+  .servicesSection {
+    margin-bottom: 32px;
+  }
+
+  .popular-routes-section {
+    margin-top: 64px;
+    margin-bottom: 48px;
+  }
+
+  .recent-activity-section {
+    margin-top: 48px;
+    margin-bottom: 64px;
+  }
+}
+
+/* ========================================
+   SMOOTH TRANSITIONS
+   ======================================== */
+
+.cards-grid {
+  transition: gap 0.3s ease;
+}
+
+.servicesSection .serviceCard,
+.route-tile,
+.activity-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   PRINT OPTIMIZATION
+   ======================================== */
+
+@media print {
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .servicesSection .serviceCard {
+    page-break-inside: avoid;
+  }
+}

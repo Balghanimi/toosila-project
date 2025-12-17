@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import styles from './Landing.module.css';
 // import '../styles/landing-enhancements.css'; // Phase 1 enhancements
 import '../styles/landing-modern.css'; // Modern redesign (GoSwift-inspired)
+import '../styles/landing-layout-fix.css'; // Layout improvements (wider, 2-column grid)
 
 /**
  * Landing Page - Service Selection
@@ -67,39 +68,42 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Card 1: Rides (Active) */}
-        <div className={styles.serviceCard}>
-          <span className={styles.badgeActive}>✨ متوفر الآن</span>
-          <div className={styles.cardIcon + ' ' + styles.iconGreen}>🚗</div>
-          <h3 className={styles.cardTitle}>رحلات بين المدن</h3>
-          <p className={styles.cardSubtitle}>سافر للمحافظات من باب بيتك!</p>
-          <p className={styles.cardDescription}>
-            لا كراج ولا انتظار.. اختر سائقك واتفق على السعر وسافر مرتاح
-          </p>
-          <div className={styles.tags}>
-            <span className={styles.tag}>🚗 عروض سائقين</span>
-            <span className={styles.tag}>💬 محادثة</span>
-            <span className={styles.tag}>⭐ تقييمات</span>
+        {/* Service Cards Grid */}
+        <div className="cards-grid">
+          {/* Card 1: Rides (Active) */}
+          <div className={styles.serviceCard}>
+            <span className={styles.badgeActive}>✨ متوفر الآن</span>
+            <div className={styles.cardIcon + ' ' + styles.iconGreen}>🚗</div>
+            <h3 className={styles.cardTitle}>رحلات بين المدن</h3>
+            <p className={styles.cardSubtitle}>سافر للمحافظات من باب بيتك!</p>
+            <p className={styles.cardDescription}>
+              لا كراج ولا انتظار.. اختر سائقك واتفق على السعر وسافر مرتاح
+            </p>
+            <div className={styles.tags}>
+              <span className={styles.tag}>🚗 عروض سائقين</span>
+              <span className={styles.tag}>💬 محادثة</span>
+              <span className={styles.tag}>⭐ تقييمات</span>
+            </div>
+            <button className={styles.ctaGreen} onClick={() => navigate('/home')}>
+              ابحث عن رحلة ←
+            </button>
           </div>
-          <button className={styles.ctaGreen} onClick={() => navigate('/home')}>
-            ابحث عن رحلة ←
-          </button>
-        </div>
 
-        {/* Card 2: Lines (Coming Soon) */}
-        <div className={styles.serviceCard + ' ' + styles.cardComingSoon}>
-          <span className={styles.badgeComingSoon}>🔜 قريباً</span>
-          <div className={styles.cardIcon + ' ' + styles.iconOrange}>🚌</div>
-          <h3 className={styles.cardTitle}>خطوط منتظمة</h3>
-          <p className={styles.cardSubtitle}>اشتراكات يومية وشهرية</p>
-          <div className={styles.tags}>
-            <span className={styles.tag}>🎓 طلاب</span>
-            <span className={styles.tag}>💼 موظفين</span>
-            <span className={styles.tag}>👩 للنساء</span>
+          {/* Card 2: Lines (Coming Soon) */}
+          <div className={styles.serviceCard + ' ' + styles.cardComingSoon}>
+            <span className={styles.badgeComingSoon}>🔜 قريباً</span>
+            <div className={styles.cardIcon + ' ' + styles.iconOrange}>🚌</div>
+            <h3 className={styles.cardTitle}>خطوط منتظمة</h3>
+            <p className={styles.cardSubtitle}>اشتراكات يومية وشهرية</p>
+            <div className={styles.tags}>
+              <span className={styles.tag}>🎓 طلاب</span>
+              <span className={styles.tag}>💼 موظفين</span>
+              <span className={styles.tag}>👩 للنساء</span>
+            </div>
+            <button className={styles.ctaOrange} onClick={() => navigate('/lines-coming-soon')}>
+              🔔 أبلغني عند التوفر
+            </button>
           </div>
-          <button className={styles.ctaOrange} onClick={() => navigate('/lines-coming-soon')}>
-            🔔 أبلغني عند التوفر
-          </button>
         </div>
       </section>
 
