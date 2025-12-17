@@ -67,9 +67,8 @@ const Header = () => {
     return location.pathname === path;
   };
 
-  // Hide header on Landing page and certain screens
+  // Hide header only on specific screens
   const shouldHideHeader = () => {
-    if (location.pathname === '/') return true;
     const hiddenPaths = ['/lines-coming-soon'];
     return hiddenPaths.some((path) => location.pathname.startsWith(path));
   };
