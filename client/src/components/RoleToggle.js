@@ -15,9 +15,7 @@ const RoleToggle = ({ mode, onToggle }) => {
   return (
     <div className={styles.toggleContainer} dir="ltr">
       {/* Background Slider Pill */}
-      <div
-        className={`${styles.slider} ${isDriver ? styles.slideRight : styles.slideLeft}`}
-      />
+      <div className={`${styles.slider} ${isDriver ? styles.slideRight : styles.slideLeft}`} />
 
       {/* Passenger Button (Left visually in LTR, but logically "Passenger") */}
       {/*
