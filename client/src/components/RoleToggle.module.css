@@ -62,10 +62,26 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .toggleContainer {
+    padding: 3px;
+  }
+
   .toggleBtn {
-    padding: 8px 24px;
-    font-size: 1rem;
-    min-width: 100px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    min-width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggleContainer {
+    padding: 2px;
+  }
+
+  .toggleBtn {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    min-width: 60px;
   }
 }
