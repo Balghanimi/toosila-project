@@ -687,6 +687,284 @@ const About = () => {
             </div>
           </section>
 
+          {/* لماذا تختار توصيلة؟ - Marketing Features */}
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: isMobile ? '1.5rem' : '2rem',
+                  background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+                  borderRadius: '12px',
+                  padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                ✨
+              </div>
+              <h2
+                style={{
+                  fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
+                  fontWeight: '700',
+                  color: isDarkMode ? '#ffffff' : '#1f2937',
+                  margin: 0,
+                }}
+              >
+                لماذا تختار توصيلة؟
+              </h2>
+            </div>
+            <p
+              style={{
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6b7280',
+                fontSize: 'var(--text-base)',
+                marginBottom: 'var(--space-5)',
+              }}
+            >
+              نوفر لك تجربة سفر آمنة ومريحة بأفضل الأسعار
+            </p>
+
+            <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+              {[
+                {
+                  icon: '🛡️',
+                  title: 'آمن وموثوق',
+                  desc: 'جميع المستخدمين موثقون ومراجعين. نظام تقييم شامل لضمان أفضل تجربة.',
+                  color: '#34c759',
+                },
+                {
+                  icon: '💰',
+                  title: 'أسعار معقولة',
+                  desc: 'وفر حتى 70% من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.',
+                  color: '#f59e0b',
+                },
+                {
+                  icon: '⚡',
+                  title: 'حجز فوري',
+                  desc: 'ابحث واحجز رحلتك في ثوانٍ. تأكيد فوري ودعم على مدار الساعة.',
+                  color: '#3b82f6',
+                },
+                {
+                  icon: '🌟',
+                  title: 'تقييمات موثوقة',
+                  desc: 'اقرأ تقييمات المستخدمين الحقيقية واختر أفضل الرحلات والسائقين.',
+                  color: '#8b5cf6',
+                },
+                {
+                  icon: '💬',
+                  title: 'تواصل سهل',
+                  desc: 'نظام مراسلة مدمج للتواصل المباشر مع السائقين والركاب.',
+                  color: '#10b981',
+                },
+                {
+                  icon: '🗺️',
+                  title: 'تغطية شاملة',
+                  desc: 'رحلات إلى جميع المدن العراقية مع جدول واسع من الأوقات المتاحة.',
+                  color: '#06b6d4',
+                },
+              ].map((feature, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: 'var(--space-4)',
+                    background: isDarkMode
+                      ? `linear-gradient(135deg, ${feature.color}15 0%, ${feature.color}08 100%)`
+                      : `${feature.color}08`,
+                    borderRadius: 'var(--radius-lg)',
+                    border: isDarkMode
+                      ? `1px solid ${feature.color}30`
+                      : `2px solid ${feature.color}20`,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateX(-4px)';
+                    e.currentTarget.style.borderColor = feature.color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateX(0)';
+                    e.currentTarget.style.borderColor = isDarkMode
+                      ? `${feature.color}30`
+                      : `${feature.color}20`;
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-3)',
+                      marginBottom: 'var(--space-2)',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.8rem' }}>{feature.icon}</span>
+                    <h3
+                      style={{
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: '700',
+                        color: isDarkMode ? '#ffffff' : '#1f2937',
+                        margin: 0,
+                      }}
+                    >
+                      {feature.title}
+                    </h3>
+                  </div>
+                  <p
+                    style={{
+                      color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6b7280',
+                      fontSize: 'var(--text-sm)',
+                      margin: 0,
+                      paddingRight: '45px',
+                    }}
+                  >
+                    {feature.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* كيف يعمل توصيلة؟ - How It Works Steps */}
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: isMobile ? '1.5rem' : '2rem',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  borderRadius: '12px',
+                  padding: isMobile ? 'var(--space-2)' : 'var(--space-3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                🚀
+              </div>
+              <h2
+                style={{
+                  fontSize: isMobile ? 'var(--text-xl)' : 'var(--text-2xl)',
+                  fontWeight: '700',
+                  color: isDarkMode ? '#ffffff' : '#1f2937',
+                  margin: 0,
+                }}
+              >
+                خطوات استخدام توصيلة
+              </h2>
+            </div>
+            <p
+              style={{
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6b7280',
+                fontSize: 'var(--text-base)',
+                marginBottom: 'var(--space-5)',
+              }}
+            >
+              ثلاث خطوات بسيطة للوصول إلى وجهتك
+            </p>
+
+            <div style={{ display: 'grid', gap: 'var(--space-5)' }}>
+              {[
+                {
+                  number: '1',
+                  title: 'ابحث عن رحلة',
+                  desc: 'اختر مدينة الانطلاق والوجهة، وحدد التاريخ المناسب لك.',
+                  color: '#34c759',
+                },
+                {
+                  number: '2',
+                  title: 'احجز مقعدك',
+                  desc: 'اختر من بين العروض المتاحة واحجز مقعدك مع السائق المفضل.',
+                  color: '#3b82f6',
+                },
+                {
+                  number: '3',
+                  title: 'استمتع برحلتك',
+                  desc: 'تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.',
+                  color: '#8b5cf6',
+                },
+              ].map((step, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 'var(--space-4)',
+                    padding: 'var(--space-5)',
+                    background: isDarkMode
+                      ? `linear-gradient(135deg, ${step.color}10 0%, ${step.color}05 100%)`
+                      : `linear-gradient(135deg, ${step.color}08 0%, ${step.color}03 100%)`,
+                    borderRadius: 'var(--radius-xl)',
+                    border: isDarkMode ? `2px solid ${step.color}40` : `2px solid ${step.color}20`,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.borderColor = step.color;
+                    e.currentTarget.style.boxShadow = `0 10px 30px ${step.color}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.borderColor = isDarkMode
+                      ? `${step.color}40`
+                      : `${step.color}20`;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: isMobile ? '2rem' : '2.5rem',
+                      fontWeight: '800',
+                      color: step.color,
+                      minWidth: isMobile ? '40px' : '50px',
+                      height: isMobile ? '40px' : '50px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: isDarkMode ? `${step.color}20` : `${step.color}15`,
+                      borderRadius: '12px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {step.number}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3
+                      style={{
+                        fontSize: isMobile ? 'var(--text-lg)' : 'var(--text-xl)',
+                        fontWeight: '700',
+                        color: isDarkMode ? '#ffffff' : '#1f2937',
+                        marginBottom: 'var(--space-2)',
+                      }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p
+                      style={{
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6b7280',
+                        fontSize: 'var(--text-base)',
+                        margin: 0,
+                        lineHeight: '1.6',
+                      }}
+                    >
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* معلومات التواصل */}
           <section
             style={{
