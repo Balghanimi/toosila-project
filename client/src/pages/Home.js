@@ -653,90 +653,90 @@ const Home = () => {
           <p className={styles.sectionSubtitle}>نوفر لك تجربة سفر آمنة ومريحة بأفضل الأسعار</p>
 
           <div className={styles.featuresGrid}>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🛡️</span>
-            <h3 className={styles.featureTitle}>آمن وموثوق</h3>
-            <p className={styles.featureDescription}>
-              جميع المستخدمين موثقون ومراجعين. نظام تقييم شامل لضمان أفضل تجربة.
-            </p>
-          </div>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>🛡️</span>
+              <h3 className={styles.featureTitle}>آمن وموثوق</h3>
+              <p className={styles.featureDescription}>
+                جميع المستخدمين موثقون ومراجعين. نظام تقييم شامل لضمان أفضل تجربة.
+              </p>
+            </div>
 
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>💰</span>
-            <h3 className={styles.featureTitle}>أسعار معقولة</h3>
-            <p className={styles.featureDescription}>
-              وفر حتى{' '}
-              <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
-                {toEnglishNumber('70%')}
-              </span>{' '}
-              من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
-            </p>
-          </div>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>💰</span>
+              <h3 className={styles.featureTitle}>أسعار معقولة</h3>
+              <p className={styles.featureDescription}>
+                وفر حتى{' '}
+                <span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                  {toEnglishNumber('70%')}
+                </span>{' '}
+                من تكلفة النقل التقليدي مع رحلات مشتركة اقتصادية.
+              </p>
+            </div>
 
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>⚡</span>
-            <h3 className={styles.featureTitle}>حجز فوري</h3>
-            <p className={styles.featureDescription}>
-              ابحث واحجز رحلتك في ثوانٍ. تأكيد فوري ودعم على مدار الساعة.
-            </p>
-          </div>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>⚡</span>
+              <h3 className={styles.featureTitle}>حجز فوري</h3>
+              <p className={styles.featureDescription}>
+                ابحث واحجز رحلتك في ثوانٍ. تأكيد فوري ودعم على مدار الساعة.
+              </p>
+            </div>
 
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🌟</span>
-            <h3 className={styles.featureTitle}>تقييمات موثوقة</h3>
-            <p className={styles.featureDescription}>
-              اقرأ تقييمات المستخدمين الحقيقية واختر أفضل الرحلات والسائقين.
-            </p>
-          </div>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>🌟</span>
+              <h3 className={styles.featureTitle}>تقييمات موثوقة</h3>
+              <p className={styles.featureDescription}>
+                اقرأ تقييمات المستخدمين الحقيقية واختر أفضل الرحلات والسائقين.
+              </p>
+            </div>
 
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>💬</span>
-            <h3 className={styles.featureTitle}>تواصل سهل</h3>
-            <p className={styles.featureDescription}>
-              نظام مراسلة مدمج للتواصل المباشر مع السائقين والركاب.
-            </p>
-          </div>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>💬</span>
+              <h3 className={styles.featureTitle}>تواصل سهل</h3>
+              <p className={styles.featureDescription}>
+                نظام مراسلة مدمج للتواصل المباشر مع السائقين والركاب.
+              </p>
+            </div>
 
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🗺️</span>
-            <h3 className={styles.featureTitle}>تغطية شاملة</h3>
-            <p className={styles.featureDescription}>
-              رحلات إلى جميع المدن العراقية مع جدول واسع من الأوقات المتاحة.
-            </p>
+            <div className={styles.featureCard}>
+              <span className={styles.featureIcon}>🗺️</span>
+              <h3 className={styles.featureTitle}>تغطية شاملة</h3>
+              <p className={styles.featureDescription}>
+                رحلات إلى جميع المدن العراقية مع جدول واسع من الأوقات المتاحة.
+              </p>
+            </div>
           </div>
-        </div>
         </section>
       )}
 
       {/* How It Works Section - Show only for non-authenticated users */}
       {!currentUser && (
         <section className={styles.howItWorksSection}>
-        <h2 className={styles.sectionTitle}>كيف يعمل توصيلة؟</h2>
-        <p className={styles.sectionSubtitle}>ثلاث خطوات بسيطة للوصول إلى وجهتك</p>
+          <h2 className={styles.sectionTitle}>كيف يعمل توصيلة؟</h2>
+          <p className={styles.sectionSubtitle}>ثلاث خطوات بسيطة للوصول إلى وجهتك</p>
 
-        <div className={styles.stepsGrid}>
-          <div className={styles.stepCard}>
-            <div className={styles.stepNumber}>1</div>
-            <h3 className={styles.stepTitle}>ابحث عن رحلة</h3>
-            <p className={styles.stepDescription}>
-              اختر مدينة الانطلاق والوجهة، وحدد التاريخ المناسب لك.
-            </p>
-          </div>
+          <div className={styles.stepsGrid}>
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>1</div>
+              <h3 className={styles.stepTitle}>ابحث عن رحلة</h3>
+              <p className={styles.stepDescription}>
+                اختر مدينة الانطلاق والوجهة، وحدد التاريخ المناسب لك.
+              </p>
+            </div>
 
-          <div className={styles.stepCard}>
-            <div className={styles.stepNumber}>2</div>
-            <h3 className={styles.stepTitle}>احجز مقعدك</h3>
-            <p className={styles.stepDescription}>
-              اختر من بين العروض المتاحة واحجز مقعدك مع السائق المفضل.
-            </p>
-          </div>
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>2</div>
+              <h3 className={styles.stepTitle}>احجز مقعدك</h3>
+              <p className={styles.stepDescription}>
+                اختر من بين العروض المتاحة واحجز مقعدك مع السائق المفضل.
+              </p>
+            </div>
 
-          <div className={styles.stepCard}>
-            <div className={styles.stepNumber}>3</div>
-            <h3 className={styles.stepTitle}>استمتع برحلتك</h3>
-            <p className={styles.stepDescription}>تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.</p>
+            <div className={styles.stepCard}>
+              <div className={styles.stepNumber}>3</div>
+              <h3 className={styles.stepTitle}>استمتع برحلتك</h3>
+              <p className={styles.stepDescription}>تواصل مع السائق، وانطلق في رحلة آمنة ومريحة.</p>
+            </div>
           </div>
-        </div>
         </section>
       )}
 
