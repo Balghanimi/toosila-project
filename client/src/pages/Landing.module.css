@@ -88,19 +88,96 @@
   font-weight: 400;
 }
 
-/* Services Section */
-.servicesSection {
-  padding: 20px;
-  max-width: 500px;
+/* Search Section */
+.searchSection {
+  padding: 40px 20px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
-.sectionTitle {
-  font-size: 18px;
-  font-weight: 700;
+.searchCard {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 2px solid #10b981;
+}
+
+.searchTitle {
+  font-size: 24px;
+  font-weight: 800;
   color: #1e293b;
   text-align: center;
-  margin-bottom: 24px;
+  margin: 0 0 32px;
+}
+
+.searchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.input {
+  padding: 14px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.input::placeholder {
+  color: #94a3b8;
+}
+
+.searchButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  margin-top: 8px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.searchButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.searchButton:active {
+  transform: translateY(0);
 }
 
 /* Service Cards */
@@ -295,7 +372,7 @@
   }
 
   .logoText,
-  .sectionTitle,
+  .searchTitle,
   .cardTitle {
     color: #f1f5f9;
   }
@@ -304,6 +381,25 @@
   .cardDescription,
   .footerBrand {
     color: #94a3b8;
+  }
+
+  .searchCard {
+    background: #1e293b;
+    border-color: #059669;
+  }
+
+  .input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+
+  .input:focus {
+    border-color: #10b981;
+  }
+
+  .label {
+    color: #cbd5e1;
   }
 
   .serviceCard {
@@ -322,6 +418,30 @@
 }
 
 /* Responsive */
+@media (max-width: 600px) {
+  .searchSection {
+    padding: 32px 16px;
+  }
+
+  .searchCard {
+    padding: 32px 24px;
+  }
+
+  .searchTitle {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .searchButton {
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+}
+
 @media (max-width: 400px) {
   .logoText {
     font-size: 36px;
@@ -331,8 +451,12 @@
     font-size: 14px;
   }
 
-  .servicesSection {
-    padding: 16px;
+  .searchSection {
+    padding: 24px 12px;
+  }
+
+  .searchCard {
+    padding: 24px 20px;
   }
 
   .serviceCard {
