@@ -56,7 +56,7 @@ body {
   padding: var(--space-4);
   padding-top: calc(64px + var(--space-4)); /* Add space for sticky header (64px) */
   padding-bottom: calc(var(--space-4) + 68px + env(safe-area-inset-bottom));
-  min-height: auto;
+  min-height: 100vh; /* Ensure content fills viewport to show bottom nav */
   max-width: 1400px;
   margin: 0 auto;
 }
