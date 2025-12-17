@@ -53,29 +53,18 @@ const Landing = () => {
           <div className={styles.searchForm}>
             <div className={styles.formGroup}>
               <label className={styles.label}>من</label>
-              <input
-                type="text"
-                placeholder="المدينة أو المحافظة"
-                className={styles.input}
-              />
+              <input type="text" placeholder="المدينة أو المحافظة" className={styles.input} />
             </div>
 
             <div className={styles.formGroup}>
               <label className={styles.label}>إلى</label>
-              <input
-                type="text"
-                placeholder="المدينة أو المحافظة"
-                className={styles.input}
-              />
+              <input type="text" placeholder="المدينة أو المحافظة" className={styles.input} />
             </div>
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>التاريخ</label>
-                <input
-                  type="date"
-                  className={styles.input}
-                />
+                <input type="date" className={styles.input} />
               </div>
 
               <div className={styles.formGroup}>
@@ -90,10 +79,7 @@ const Landing = () => {
               </div>
             </div>
 
-            <button
-              className={styles.searchButton}
-              onClick={() => navigate('/home')}
-            >
+            <button className={styles.searchButton} onClick={() => navigate('/home')}>
               ابحث عن رحلة 🔍
             </button>
           </div>
