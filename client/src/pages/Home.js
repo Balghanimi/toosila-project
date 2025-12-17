@@ -339,8 +339,8 @@ const Home = () => {
           aria-label="خيارات البحث والنشر"
           style={{ marginBottom: '1.5rem', flexWrap: 'wrap' }}
         >
-          {/* Show "نشر رحلة" only for drivers */}
-          {currentUser?.isDriver && (
+          {/* Show "نشر رحلة" when in driver mode */}
+          {globalMode === 'driver' && (
             <button
               onClick={() => setMode('offer')}
               className={`${styles.modeButton} ${mode === 'offer' ? styles.offer : ''}`}
@@ -350,21 +350,21 @@ const Home = () => {
               🚗 نشر رحلة
             </button>
           )}
-          {/* Show "طلب رحلة" only for passengers */}
-          {!currentUser?.isDriver && (
+          {/* Show "نشر طلب" when in passenger mode */}
+          {globalMode === 'passenger' && (
             <button
               onClick={() => setMode('demand')}
               className={`${styles.modeButton} ${mode === 'demand' ? styles.demand : ''}`}
-              aria-label="طلب رحلة جديدة"
+              aria-label="نشر طلب رحلة جديد"
               aria-pressed={mode === 'demand'}
             >
-              💺 طلب رحلة
+              🙋 نشر طلب
             </button>
           )}
           {/* Search button visible to all */}
           <button
             onClick={() => {
-              if (currentUser && currentUser.isDriver) {
+              if (globalMode === 'driver') {
                 navigate('/demands');
               } else {
                 navigate('/offers');

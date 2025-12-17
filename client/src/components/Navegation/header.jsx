@@ -18,7 +18,7 @@ const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, isAuthenticated, currentUser } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
-  const { pendingBookings, unreadMessages } = useNotifications();
+  const { pendingBookings } = useNotifications();
   const { mode, setMode } = useMode();
   const location = useLocation();
   const navigate = useNavigate();
@@ -180,35 +180,17 @@ const Header = () => {
             aria-label={isAuthenticated ? 'الملف الشخصي' : 'تسجيل الدخول'}
           >
             {isAuthenticated ? (
-              currentUser?.isDriver ? (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                  <line x1="9" y1="9" x2="9.01" y2="9" />
-                  <line x1="15" y1="9" x2="15.01" y2="9" />
-                </svg>
-              ) : (
-                <span style={{ fontSize: '14px', fontWeight: '700', color: 'white' }}>
-                  {currentUser?.name?.charAt(0)?.toUpperCase() || 'م'}
-                </span>
-              )
+              <span style={{ fontSize: '14px', fontWeight: '700', color: 'white' }}>
+                {currentUser?.name?.charAt(0)?.toUpperCase() || 'م'}
+              </span>
             ) : (
               <svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.5"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
