@@ -154,17 +154,6 @@ const Header = () => {
                   </span>
                 )}
               </button>
-              <button
-                className={`${styles.navLink} ${isActive('/messages') ? styles.navLinkActive : ''}`}
-                onClick={() => navigate('/messages')}
-              >
-                الرسائل
-                {unreadMessages > 0 && (
-                  <span className={styles.navBadge}>
-                    {unreadMessages > 9 ? '9+' : unreadMessages}
-                  </span>
-                )}
-              </button>
             </>
           )}
         </nav>
@@ -484,39 +473,6 @@ const Header = () => {
                   <button
                     className={styles.drawerItem}
                     onClick={() => {
-                      navigate('/messages');
-                      toggleDrawer();
-                    }}
-                    style={{ position: 'relative' }}
-                  >
-                    💬 الرسائل
-                    {unreadMessages > 0 && (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: 'var(--space-3)',
-                          transform: 'translateY(-50%)',
-                          background: '#dc2626',
-                          color: 'white',
-                          borderRadius: '50%',
-                          minWidth: '20px',
-                          height: '20px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: '700',
-                          padding: '0 4px',
-                        }}
-                      >
-                        {unreadMessages > 99 ? '99+' : unreadMessages}
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    className={styles.drawerItem}
-                    onClick={() => {
                       navigate('/profile');
                       toggleDrawer();
                     }}
@@ -591,23 +547,6 @@ const Header = () => {
                   >
                     +964 770 000 0000
                   </a>
-                </div>
-                <div
-                  style={{
-                    marginTop: 'var(--space-3)',
-                    paddingTop: 'var(--space-3)',
-                    borderTop: '1px solid var(--border-light)',
-                  }}
-                >
-                  <button
-                    className={styles.drawerItem}
-                    onClick={() => {
-                      navigate('/messages');
-                      toggleDrawer();
-                    }}
-                  >
-                    💬 مراسلة الدعم الفني
-                  </button>
                 </div>
               </div>
             </div>
