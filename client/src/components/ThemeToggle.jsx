@@ -23,9 +23,7 @@ const ThemeToggle = ({ style = {} }) => {
         cursor: 'pointer',
         background: isDarkMode ? '#1e293b' : '#f8fafc',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: isDarkMode
-          ? '0 2px 6px rgba(0, 0, 0, 0.3)'
-          : '0 2px 6px rgba(0, 0, 0, 0.1)',
+        boxShadow: isDarkMode ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 2px 6px rgba(0, 0, 0, 0.1)',
         flexShrink: 0,
         fontSize: '16px',
         ...style,
