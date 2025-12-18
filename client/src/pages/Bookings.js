@@ -232,7 +232,12 @@ export default function Bookings() {
         setDemands(demandsWithResponses);
       } else if (activeTab === 'myOffers') {
         // جلب عروضي (للسائقين فقط)
-        const response = await offersAPI.getAll({ driverId: currentUser?.id });
+        if (!currentUser?.id) {
+          console.error('❌ Cannot fetch offers: User ID is missing');
+          setMyOffers([]);
+          return;
+        }
+        const response = await offersAPI.getMyOffers(currentUser.id);
         const driverOffers = response.offers || [];
         console.log('📦 Fetched my offers:', driverOffers);
         setMyOffers(driverOffers);

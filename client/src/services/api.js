@@ -175,6 +175,9 @@ export const offersAPI = {
   getById: async (offerId) => {
     return apiRequest(`/offers/${offerId}`, { method: 'GET' });
   },
+  getMyOffers: async (userId) => {
+    return apiRequest(`/offers/user/${userId}`, { method: 'GET' });
+  },
   create: async (offerData) => {
     return apiRequest('/offers', {
       method: 'POST',
