@@ -720,12 +720,12 @@ router.post('/set-password', async (req, res) => {
       });
     }
 
-    // Verify OTP code
+    // Verify OTP code (must be already verified from step 2)
     const otpResult = await query(
       `SELECT * FROM otp_requests
        WHERE phone = $1
        AND code = $2
-       AND verified = false
+       AND verified = true
        AND expires_at > NOW()
        ORDER BY created_at DESC
        LIMIT 1`,
@@ -739,8 +739,7 @@ router.post('/set-password', async (req, res) => {
       });
     }
 
-    // Mark OTP as verified
-    await query(`UPDATE otp_requests SET verified = true WHERE id = $1`, [otpResult.rows[0].id]);
+    // OTP is already verified, no need to update again
 
     // Find user
     const userResult = await query('SELECT * FROM users WHERE phone = $1', [phone]);
