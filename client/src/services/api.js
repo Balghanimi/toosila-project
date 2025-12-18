@@ -514,15 +514,34 @@ export const otpAPI = {
     return response;
   },
 
-  // Complete registration for new users
-  completeRegistration: async (phone, name, isDriver) => {
+  // Complete registration for new users (now requires password)
+  completeRegistration: async (phone, name, isDriver, password) => {
     const response = await apiRequest('/otp/complete-registration', {
       method: 'POST',
       body: JSON.stringify({
         phone,
         name,
         is_driver: isDriver,
+        password,
       }),
+    });
+    return response;
+  },
+
+  // Login with phone and password
+  loginWithPassword: async (phone, password) => {
+    const response = await apiRequest('/otp/login-with-password', {
+      method: 'POST',
+      body: JSON.stringify({ phone, password }),
+    });
+    return response;
+  },
+
+  // Set password for existing users
+  setPassword: async (phone, password, otpCode) => {
+    const response = await apiRequest('/otp/set-password', {
+      method: 'POST',
+      body: JSON.stringify({ phone, password, otpCode }),
     });
     return response;
   },

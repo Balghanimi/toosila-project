@@ -5,15 +5,18 @@ import { otpAPI } from '../services/api';
 import './PhoneLogin.css';
 
 const PhoneLogin = () => {
-  const [step, setStep] = useState(1); // 1: phone, 2: code, 3: profile
+  const [step, setStep] = useState(1); // 1: phone, 2: password OR code, 3: set-password OR profile
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [isDriver, setIsDriver] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [channel, setChannel] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [requiresPassword, setRequiresPassword] = useState(false); // User has password, must login with it
+  const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false); // Existing user needs to set password
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -26,7 +29,7 @@ const PhoneLogin = () => {
       setError('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phone, code, name]);
+  }, [phone, code, name, password]);
 
   // Cleanup countdown timer on unmount
   useEffect(() => {
@@ -64,7 +67,7 @@ const PhoneLogin = () => {
     }, 1000);
   };
 
-  // Send OTP (or direct login for existing users)
+  // Send OTP or check if password is required
   const handleSendOTP = async () => {
     const cleanedPhone = phone.replace(/\D/g, '');
     if (!cleanedPhone || cleanedPhone.length < 10) {
@@ -78,16 +81,32 @@ const PhoneLogin = () => {
     try {
       const response = await otpAPI.send(cleanedPhone);
 
-      // Check if user already exists (no OTP needed)
-      if (response.userExists && response.token) {
-        // Direct login for existing user - token already provided!
-        console.log('Existing user detected, logging in directly (no OTP sent)');
-        login(response.token, response.user);
-        navigate('/home');
+      // User has password - must login with password
+      if (response.requiresPassword || response.hasPassword) {
+        console.log('User has password, require password login');
+        setRequiresPassword(true);
+        setStep(2); // Move to password input step
         return;
       }
 
-      // New user - proceed with OTP verification
+      // Existing user WITHOUT password - need to set password via OTP
+      if (response.userExists && !response.hasPassword) {
+        console.log('Existing user without password, sending OTP to set password');
+        setNeedsPasswordSetup(true);
+        setChannel(response.channel);
+        setStep(2); // Move to OTP verification step
+        startCountdown();
+        // Focus first code input after step change
+        setTimeout(() => {
+          if (codeInputsRef.current[0]) {
+            codeInputsRef.current[0].focus();
+          }
+        }, 100);
+        return;
+      }
+
+      // New user - proceed with OTP verification to register
+      console.log('New user, sending OTP for registration');
       setChannel(response.channel);
       setStep(2);
       startCountdown();
@@ -154,7 +173,32 @@ const PhoneLogin = () => {
     }
   };
 
-  // Verify OTP
+  // Login with password
+  const handlePasswordLogin = async () => {
+    if (!password || password.length < 6) {
+      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const cleanedPhone = phone.replace(/\D/g, '');
+      const response = await otpAPI.loginWithPassword(cleanedPhone, password);
+
+      // Successful login
+      login(response.token, response.user);
+      navigate('/home');
+    } catch (err) {
+      setError(err.message || 'رقم الهاتف أو كلمة المرور غير صحيحة');
+      setPassword('');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify OTP (for new users or existing users setting password)
   const handleVerifyOTP = async (codeString = null) => {
     const otpCode = codeString || code.join('');
     if (otpCode.length !== 6) {
@@ -170,11 +214,12 @@ const PhoneLogin = () => {
       const response = await otpAPI.verify(cleanedPhone, otpCode);
 
       if (response.isNewUser) {
+        // New user - go to registration profile step
         setStep(3);
       } else {
-        // Existing user - login
-        login(response.token, response.user);
-        navigate('/home');
+        // Existing user without password - go to set password step
+        setStep(3);
+        setNeedsPasswordSetup(true);
       }
     } catch (err) {
       setError(err.message || 'رمز التحقق غير صحيح');
@@ -186,10 +231,15 @@ const PhoneLogin = () => {
     }
   };
 
-  // Complete registration
+  // Complete registration (for new users)
   const handleCompleteRegistration = async () => {
     if (!name.trim()) {
       setError('الرجاء إدخال الاسم');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
       return;
     }
 
@@ -198,11 +248,39 @@ const PhoneLogin = () => {
 
     try {
       const cleanedPhone = phone.replace(/\D/g, '');
-      const response = await otpAPI.completeRegistration(cleanedPhone, name.trim(), isDriver);
+      const response = await otpAPI.completeRegistration(
+        cleanedPhone,
+        name.trim(),
+        isDriver,
+        password
+      );
       login(response.token, response.user);
       navigate('/home');
     } catch (err) {
       setError(err.message || 'فشل في إكمال التسجيل');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Set password for existing users
+  const handleSetPassword = async () => {
+    if (!password || password.length < 6) {
+      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const cleanedPhone = phone.replace(/\D/g, '');
+      const otpCode = code.join('');
+      const response = await otpAPI.setPassword(cleanedPhone, password, otpCode);
+      login(response.token, response.user);
+      navigate('/home');
+    } catch (err) {
+      setError(err.message || 'فشل في تعيين كلمة المرور');
     } finally {
       setLoading(false);
     }
@@ -276,8 +354,64 @@ const PhoneLogin = () => {
           </div>
         )}
 
-        {/* Step 2: OTP Code */}
-        {step === 2 && (
+        {/* Step 2: Password Login OR OTP Code */}
+        {step === 2 && requiresPassword && (
+          <div className="login-step">
+            <h2>تسجيل الدخول</h2>
+            <p>
+              أدخل كلمة المرور للرقم
+              <br />
+              <strong dir="ltr" className="phone-display">
+                +964 {formatPhoneDisplay(phone)}
+              </strong>
+            </p>
+
+            <div className="form-group">
+              <label htmlFor="password">كلمة المرور</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={(e) => handleKeyPress(e, handlePasswordLogin)}
+                placeholder="أدخل كلمة المرور"
+                autoFocus
+              />
+            </div>
+
+            {error && <p className="error-message">{error}</p>}
+
+            <button
+              className="submit-btn"
+              onClick={handlePasswordLogin}
+              disabled={loading || !password}
+            >
+              {loading ? (
+                <span className="loading-spinner">
+                  <span className="spinner"></span>
+                  جاري تسجيل الدخول...
+                </span>
+              ) : (
+                'دخول'
+              )}
+            </button>
+
+            <button
+              className="back-btn"
+              onClick={() => {
+                setStep(1);
+                setPassword('');
+                setRequiresPassword(false);
+                setError('');
+              }}
+            >
+              ← تغيير رقم الهاتف
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: OTP Code (for new users or existing users without password) */}
+        {step === 2 && !requiresPassword && (
           <div className="login-step">
             <h2>رمز التحقق</h2>
             <p>
@@ -350,8 +484,47 @@ const PhoneLogin = () => {
           </div>
         )}
 
-        {/* Step 3: Complete Profile */}
-        {step === 3 && (
+        {/* Step 3: Set Password (for existing users) OR Complete Profile (new users) */}
+        {step === 3 && needsPasswordSetup && (
+          <div className="login-step">
+            <h2>تعيين كلمة المرور</h2>
+            <p>من فضلك قم بإنشاء كلمة مرور لحسابك لتأمين تسجيل الدخول</p>
+
+            <div className="form-group">
+              <label htmlFor="password">كلمة المرور الجديدة</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={(e) => handleKeyPress(e, handleSetPassword)}
+                placeholder="6 أحرف على الأقل"
+                autoFocus
+              />
+              <small className="input-hint">يجب أن تتكون من 6 أحرف على الأقل</small>
+            </div>
+
+            {error && <p className="error-message">{error}</p>}
+
+            <button
+              className="submit-btn"
+              onClick={handleSetPassword}
+              disabled={loading || !password || password.length < 6}
+            >
+              {loading ? (
+                <span className="loading-spinner">
+                  <span className="spinner"></span>
+                  جاري حفظ كلمة المرور...
+                </span>
+              ) : (
+                'حفظ وتسجيل الدخول'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Step 3: Complete Profile (for new users) */}
+        {step === 3 && !needsPasswordSetup && (
           <div className="login-step">
             <h2>أكمل معلوماتك</h2>
             <p>مرحباً! أخبرنا المزيد عنك</p>
@@ -363,10 +536,21 @@ const PhoneLogin = () => {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                onKeyPress={(e) => handleKeyPress(e, handleCompleteRegistration)}
                 placeholder="أدخل اسمك"
                 autoFocus
               />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-password">كلمة المرور</label>
+              <input
+                type="password"
+                id="reg-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="6 أحرف على الأقل"
+              />
+              <small className="input-hint">يجب أن تتكون من 6 أحرف على الأقل</small>
             </div>
 
             <div className="user-type-selector">
@@ -398,7 +582,7 @@ const PhoneLogin = () => {
             <button
               className="submit-btn"
               onClick={handleCompleteRegistration}
-              disabled={loading || !name.trim()}
+              disabled={loading || !name.trim() || !password || password.length < 6}
             >
               {loading ? (
                 <span className="loading-spinner">
