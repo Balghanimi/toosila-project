@@ -4,6 +4,7 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { query } = require('../config/db');
 const config = require('../config/env');
+const { hashPassword, verifyPassword, validatePasswordStrength } = require('../utils/password');
 
 const OTPIQ_API_KEY = process.env.OTPIQ_API_KEY;
 
@@ -95,38 +96,31 @@ router.post('/send', async (req, res) => {
     }
 
     // ============================================
-    // CHECK IF USER EXISTS (skip OTP for existing users)
+    // CHECK IF USER EXISTS
     // ============================================
     console.log('Checking if user exists...');
     const existingUser = await query('SELECT * FROM users WHERE phone = $1', [phone]);
 
     if (existingUser.rows.length > 0) {
-      // User exists - LOGIN DIRECTLY (NO OTP needed = NO COST!)
+      // User exists - check if they have a password set
       const user = existingUser.rows[0];
-      console.log('User exists, logging in directly (NO OTP sent):', user.id);
+      console.log('User exists:', user.id, 'Has password:', !!user.password);
 
-      // Generate JWT token directly
-      const token = jwt.sign(
-        { id: user.id, phone: phone, role: user.role || 'user' },
-        config.JWT_SECRET,
-        { expiresIn: '30d' }
-      );
-
-      return res.json({
-        success: true,
-        userExists: true,
-        message: 'تم تسجيل الدخول بنجاح',
-        token: token,
-        user: {
-          id: user.id,
-          name: user.name,
-          phone: phone,
-          email: user.email,
-          isDriver: user.is_driver,
-          role: user.role,
-          phoneVerified: user.phone_verified,
-        },
-      });
+      if (user.password) {
+        // User has password - require password login (NO automatic login!)
+        console.log('User has password, redirecting to password login');
+        return res.json({
+          success: true,
+          userExists: true,
+          hasPassword: true,
+          requiresPassword: true,
+          message: 'يرجى إدخال كلمة المرور لتسجيل الدخول',
+        });
+      } else {
+        // User exists but NO password - need to set password with OTP verification
+        console.log('User exists but no password, sending OTP to set password');
+        // Continue to send OTP (below) - user will set password after verification
+      }
     }
 
     console.log('New user, proceeding with OTP...');
@@ -429,13 +423,30 @@ router.post('/verify', async (req, res) => {
  */
 router.post('/complete-registration', async (req, res) => {
   try {
-    let { phone, name, is_driver } = req.body;
+    let { phone, name, is_driver, password } = req.body;
 
     phone = formatIraqiPhone(phone);
     if (!phone || !name || !name.trim()) {
       return res.status(400).json({
         success: false,
         error: 'البيانات غير مكتملة. يرجى إدخال الاسم ورقم الهاتف.',
+      });
+    }
+
+    // Password is now REQUIRED for new users
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        error: 'كلمة المرور مطلوبة',
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        error: passwordValidation.message,
       });
     }
 
@@ -464,12 +475,15 @@ router.post('/complete-registration', async (req, res) => {
       });
     }
 
-    // Create new user
+    // Hash password before storing
+    const hashedPassword = await hashPassword(password);
+
+    // Create new user with password
     const result = await query(
-      `INSERT INTO users (name, phone, phone_verified, phone_verified_at, is_driver, role, language_preference)
-       VALUES ($1, $2, true, NOW(), $3, 'user', 'ar')
+      `INSERT INTO users (name, phone, phone_verified, phone_verified_at, is_driver, role, language_preference, password, password_changed_at)
+       VALUES ($1, $2, true, NOW(), $3, 'user', 'ar', $4, NOW())
        RETURNING id, name, phone, is_driver, role, created_at`,
-      [name.trim(), phone, is_driver || false]
+      [name.trim(), phone, is_driver || false, hashedPassword]
     );
 
     const user = result.rows[0];
@@ -575,6 +589,210 @@ router.post('/login-existing', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'حدث خطأ في تسجيل الدخول. حاول مرة أخرى.',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /otp/login-with-password:
+ *   post:
+ *     summary: Login with phone number and password
+ *     description: Secure login for users who have set a password
+ *     tags: [OTP]
+ */
+router.post('/login-with-password', async (req, res) => {
+  console.log('=== Password Login Request ===');
+
+  try {
+    let { phone, password } = req.body;
+
+    // Validate and format phone number
+    phone = formatIraqiPhone(phone);
+
+    if (!phone) {
+      return res.status(400).json({
+        success: false,
+        error: 'رقم الهاتف غير صحيح',
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        error: 'كلمة المرور مطلوبة',
+      });
+    }
+
+    // Find the user
+    const userResult = await query('SELECT * FROM users WHERE phone = $1', [phone]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        error: 'رقم الهاتف أو كلمة المرور غير صحيحة',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Check if user has a password set
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        error: 'لم يتم تعيين كلمة مرور لهذا الحساب. يرجى استخدام رمز التحقق OTP',
+        requiresPasswordSetup: true,
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await verifyPassword(password, user.password);
+
+    if (!isPasswordValid) {
+      console.log('Invalid password for user:', user.id);
+      return res.status(401).json({
+        success: false,
+        error: 'رقم الهاتف أو كلمة المرور غير صحيحة',
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, phone: phone, role: user.role || 'user' },
+      config.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    console.log('User logged in successfully with password:', user.id);
+
+    res.json({
+      success: true,
+      token: token,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: phone,
+        email: user.email,
+        isDriver: user.is_driver,
+        role: user.role || 'user',
+        phoneVerified: user.phone_verified,
+      },
+    });
+  } catch (error) {
+    console.error('Password Login Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'حدث خطأ في تسجيل الدخول. حاول مرة أخرى.',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /otp/set-password:
+ *   post:
+ *     summary: Set password for existing user (requires OTP verification)
+ *     description: Allows existing users without password to set one after OTP verification
+ *     tags: [OTP]
+ */
+router.post('/set-password', async (req, res) => {
+  console.log('=== Set Password Request ===');
+
+  try {
+    let { phone, password, otpCode } = req.body;
+
+    // Validate and format phone number
+    phone = formatIraqiPhone(phone);
+
+    if (!phone || !password || !otpCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'جميع الحقول مطلوبة',
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        error: passwordValidation.message,
+      });
+    }
+
+    // Verify OTP code
+    const otpResult = await query(
+      `SELECT * FROM otp_requests
+       WHERE phone = $1
+       AND code = $2
+       AND verified = false
+       AND expires_at > NOW()
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [phone, otpCode]
+    );
+
+    if (otpResult.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'رمز التحقق غير صحيح أو منتهي الصلاحية',
+      });
+    }
+
+    // Mark OTP as verified
+    await query(`UPDATE otp_requests SET verified = true WHERE id = $1`, [otpResult.rows[0].id]);
+
+    // Find user
+    const userResult = await query('SELECT * FROM users WHERE phone = $1', [phone]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'المستخدم غير موجود',
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+
+    // Update user with password
+    await query(
+      `UPDATE users
+       SET password = $1, password_changed_at = NOW(), phone_verified = true, phone_verified_at = NOW()
+       WHERE id = $2`,
+      [hashedPassword, user.id]
+    );
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, phone: phone, role: user.role || 'user' },
+      config.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    console.log('Password set successfully for user:', user.id);
+
+    res.json({
+      success: true,
+      token: token,
+      message: 'تم تعيين كلمة المرور بنجاح',
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: phone,
+        email: user.email,
+        isDriver: user.is_driver,
+        role: user.role || 'user',
+        phoneVerified: true,
+      },
+    });
+  } catch (error) {
+    console.error('Set Password Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'حدث خطأ في تعيين كلمة المرور. حاول مرة أخرى.',
     });
   }
 });

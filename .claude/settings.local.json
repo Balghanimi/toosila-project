@@ -51,7 +51,8 @@
       "Bash(gh run list:*)",
       "Bash(timeout 60 npm test:*)",
       "Bash(PGPASSWORD=postgres psql:*)",
-      "Bash(DB_SSL=false PGSSLMODE=disable npm run test:setup:*)"
+      "Bash(DB_SSL=false PGSSLMODE=disable npm run test:setup:*)",
+      "Bash(node scripts/run-add-password-migration.js:*)"
     ],
     "deny": [],
     "ask": []
