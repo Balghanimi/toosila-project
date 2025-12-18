@@ -327,6 +327,27 @@
   }
 }
 
+/* ===== Mobile Overlay ===== */
+.admin-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .admin-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+    touch-action: none; /* Prevent scrolling */
+  }
+}
+
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
   .admin-sidebar.open {
@@ -347,5 +368,12 @@
 
   .admin-content {
     padding: 20px 16px;
+  }
+
+  /* Prevent body scroll when sidebar is open on mobile */
+  body:has(.admin-sidebar.open) {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
   }
 }

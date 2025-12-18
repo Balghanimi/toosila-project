@@ -11,6 +11,25 @@ const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Prevent body scroll on mobile when sidebar is open
+  React.useEffect(() => {
+    if (window.innerWidth <= 768 && sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [sidebarOpen]);
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -42,6 +61,15 @@ const AdminLayout = () => {
 
   return (
     <div className="admin-layout">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="admin-overlay"
+          onClick={() => setSidebarOpen(false)}
+          onTouchStart={(e) => e.preventDefault()}
+        />
+      )}
+
       {/* Sidebar */}
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         {/* Logo & Title */}

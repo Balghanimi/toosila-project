@@ -10,6 +10,18 @@ const UserMenu = ({ onClose }) => {
 
   useEffect(() => {
     setIsAnimated(true);
+
+    // Prevent body scroll when menu is open
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+
+    return () => {
+      // Restore scroll when menu closes
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
   }, []);
 
   const handleLogout = () => {
@@ -20,6 +32,12 @@ const UserMenu = ({ onClose }) => {
   return (
     <div
       onClick={onClose}
+      onTouchStart={(e) => {
+        // Prevent touch events from passing through
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+        }
+      }}
       style={{
         position: 'fixed',
         top: 0,
@@ -36,6 +54,7 @@ const UserMenu = ({ onClose }) => {
         backdropFilter: 'blur(8px)',
         opacity: isAnimated ? 1 : 0,
         transition: 'opacity 0.3s ease-out',
+        touchAction: 'none', // Prevent touch scrolling
       }}
     >
       <div
