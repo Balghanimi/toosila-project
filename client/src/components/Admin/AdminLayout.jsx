@@ -7,7 +7,8 @@ import './AdminLayout.css';
  * Admin Panel Layout with Sidebar Navigation
  */
 const AdminLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // On mobile, start with sidebar closed
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -29,6 +30,13 @@ const AdminLayout = () => {
       document.body.style.width = '';
     };
   }, [sidebarOpen]);
+
+  // Close sidebar on mobile when clicking nav item
+  const handleNavClick = () => {
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -99,6 +107,7 @@ const AdminLayout = () => {
               to={item.path}
               end={item.end}
               className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+              onClick={handleNavClick}
             >
               <span className="admin-nav-icon">{item.icon}</span>
               {sidebarOpen && <span className="admin-nav-label">{item.label}</span>}
@@ -108,11 +117,25 @@ const AdminLayout = () => {
 
         {/* Bottom Actions */}
         <div className="admin-sidebar-footer">
-          <button onClick={() => navigate('/')} className="admin-action-btn" title="العودة للموقع">
+          <button
+            onClick={() => {
+              navigate('/');
+              handleNavClick();
+            }}
+            className="admin-action-btn"
+            title="العودة للموقع"
+          >
             <span className="admin-nav-icon">🏠</span>
             {sidebarOpen && <span className="admin-nav-label">الموقع الرئيسي</span>}
           </button>
-          <button onClick={handleLogout} className="admin-action-btn logout" title="تسجيل الخروج">
+          <button
+            onClick={() => {
+              handleLogout();
+              handleNavClick();
+            }}
+            className="admin-action-btn logout"
+            title="تسجيل الخروج"
+          >
             <span className="admin-nav-icon">🚪</span>
             {sidebarOpen && <span className="admin-nav-label">تسجيل الخروج</span>}
           </button>

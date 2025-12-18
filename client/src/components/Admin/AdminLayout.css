@@ -351,7 +351,13 @@
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
   .admin-sidebar.open {
-    width: 240px;
+    width: 85%; /* Increase width to 85% of screen */
+    max-width: 320px;
+  }
+
+  .admin-sidebar.closed {
+    width: 0;
+    overflow: hidden;
   }
 
   .admin-main {
@@ -366,8 +372,78 @@
     transform: translateX(0);
   }
 
+  /* Make sidebar header more compact on mobile */
+  .admin-sidebar-header {
+    padding: 16px;
+  }
+
+  /* User info more compact */
+  .admin-user-info {
+    padding: 12px 16px;
+  }
+
+  .admin-user-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .admin-user-name {
+    font-size: 14px;
+  }
+
+  .admin-user-role {
+    font-size: 11px;
+  }
+
+  /* Navigation items more touch-friendly */
+  .admin-nav {
+    padding: 12px 8px;
+  }
+
+  .admin-nav-item {
+    padding: 14px 16px;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .admin-nav-icon {
+    font-size: 20px;
+    min-width: 24px;
+  }
+
+  /* Footer actions more compact */
+  .admin-sidebar-footer {
+    padding: 12px 8px;
+  }
+
+  .admin-action-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  /* Content padding */
   .admin-content {
-    padding: 20px 16px;
+    padding: 16px;
+  }
+
+  /* Topbar adjustments */
+  .admin-topbar {
+    padding: 12px 16px;
+  }
+
+  .admin-topbar-title h1 {
+    font-size: 16px;
+  }
+
+  .admin-user-badge {
+    padding: 6px 12px;
+  }
+
+  .admin-user-badge-name {
+    font-size: 13px;
   }
 
   /* Prevent body scroll when sidebar is open on mobile */
@@ -375,5 +451,25 @@
     overflow: hidden;
     position: fixed;
     width: 100%;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .admin-sidebar.open {
+    width: 90%;
+    max-width: none;
+  }
+
+  .admin-topbar-title h1 {
+    font-size: 14px;
+  }
+
+  .admin-user-badge-name {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 12px;
   }
 }
