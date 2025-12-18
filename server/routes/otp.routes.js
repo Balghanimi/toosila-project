@@ -697,14 +697,17 @@ router.post('/login-with-password', async (req, res) => {
  */
 router.post('/set-password', async (req, res) => {
   console.log('=== Set Password Request ===');
+  console.log('Request body:', { phone: req.body.phone, hasPassword: !!req.body.password, otpCode: req.body.otpCode });
 
   try {
     let { phone, password, otpCode } = req.body;
 
     // Validate and format phone number
     phone = formatIraqiPhone(phone);
+    console.log('Formatted phone:', phone);
 
     if (!phone || !password || !otpCode) {
+      console.log('Missing fields:', { phone: !!phone, password: !!password, otpCode: !!otpCode });
       return res.status(400).json({
         success: false,
         error: 'جميع الحقول مطلوبة',
@@ -721,6 +724,7 @@ router.post('/set-password', async (req, res) => {
     }
 
     // Verify OTP code (must be already verified from step 2)
+    console.log('Looking for OTP with phone:', phone, 'code:', otpCode);
     const otpResult = await query(
       `SELECT * FROM otp_requests
        WHERE phone = $1
@@ -732,7 +736,18 @@ router.post('/set-password', async (req, res) => {
       [phone, otpCode]
     );
 
+    console.log('OTP search result:', { found: otpResult.rows.length > 0, rowCount: otpResult.rows.length });
+
     if (otpResult.rows.length === 0) {
+      // Let's check what OTPs exist for this phone
+      const allOtps = await query(
+        `SELECT code, verified, expires_at > NOW() as not_expired FROM otp_requests
+         WHERE phone = $1
+         ORDER BY created_at DESC LIMIT 5`,
+        [phone]
+      );
+      console.log('All recent OTPs for this phone:', allOtps.rows);
+
       return res.status(400).json({
         success: false,
         error: 'رمز التحقق غير صحيح أو منتهي الصلاحية',
@@ -789,9 +804,11 @@ router.post('/set-password', async (req, res) => {
     });
   } catch (error) {
     console.error('Set Password Error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: 'حدث خطأ في تعيين كلمة المرور. حاول مرة أخرى.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 });
