@@ -312,10 +312,17 @@ router.get('/admin/stats', requireAdmin, getBookingStats);
  *       200:
  *         description: Booking accepted successfully
  */
-router.post('/:id/accept', validateIntId, async (req, res, next) => {
+router.post('/:id/accept', validateId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
     const driverId = req.user.id;
+
+    console.log('✅ Accept booking - ID validation passed:', {
+      bookingId,
+      type: typeof bookingId,
+      length: bookingId?.length,
+      driverId,
+    });
 
     // Start transaction to prevent race conditions
     await pool.query('BEGIN');
@@ -434,10 +441,17 @@ router.post('/:id/accept', validateIntId, async (req, res, next) => {
  *       200:
  *         description: Booking rejected successfully
  */
-router.post('/:id/reject', validateIntId, async (req, res, next) => {
+router.post('/:id/reject', validateId, async (req, res, next) => {
   try {
     const bookingId = req.params.id;
     const driverId = req.user.id;
+
+    console.log('✅ Reject booking - ID validation passed:', {
+      bookingId,
+      type: typeof bookingId,
+      length: bookingId?.length,
+      driverId,
+    });
 
     // التحقق من أن الحجز موجود وللسائق الحالي
     const bookingResult = await pool.query(
