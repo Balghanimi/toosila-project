@@ -228,9 +228,7 @@ const UserManagement = () => {
                 <div key={user.id} className="user-card-mobile">
                   <div className="user-card-header">
                     <div className="user-cell">
-                      <div className="user-avatar">
-                        {user.name?.charAt(0).toUpperCase() || 'U'}
-                      </div>
+                      <div className="user-avatar">{user.name?.charAt(0).toUpperCase() || 'U'}</div>
                       <div>
                         <div className="user-name">{user.name}</div>
                         {user.email && <div className="user-email">{user.email}</div>}
