@@ -156,69 +156,130 @@ const UserManagement = () => {
             <p>لا توجد مستخدمين</p>
           </div>
         ) : (
-          <div className="table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>الاسم</th>
-                  <th>البريد الإلكتروني</th>
-                  <th>النوع</th>
-                  <th>الدور</th>
-                  <th>الحالة</th>
-                  <th>تاريخ التسجيل</th>
-                  <th>الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className="user-cell">
-                        <div className="user-avatar">
-                          {user.name?.charAt(0).toUpperCase() || 'U'}
+          <>
+            {/* Desktop Table View */}
+            <div className="table-responsive desktop-only">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>النوع</th>
+                    <th>الدور</th>
+                    <th>الحالة</th>
+                    <th>تاريخ التسجيل</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className="user-cell">
+                          <div className="user-avatar">
+                            {user.name?.charAt(0).toUpperCase() || 'U'}
+                          </div>
+                          <span className="user-name">{user.name}</span>
                         </div>
-                        <span className="user-name">{user.name}</span>
+                      </td>
+                      <td>{user.email}</td>
+                      <td>
+                        {user.isDriver ? (
+                          <Badge variant="primary">سائق</Badge>
+                        ) : (
+                          <Badge variant="neutral">راكب</Badge>
+                        )}
+                      </td>
+                      <td>
+                        {user.role === 'admin' && <Badge variant="error">مدير</Badge>}
+                        {user.role === 'moderator' && <Badge variant="warning">مشرف</Badge>}
+                        {user.role === 'user' && <Badge variant="neutral">مستخدم</Badge>}
+                      </td>
+                      <td>
+                        {user.isActive ? (
+                          <span className="status-indicator status-active">نشط</span>
+                        ) : (
+                          <span className="status-indicator status-inactive">معطل</span>
+                        )}
+                      </td>
+                      <td>{new Date(user.createdAt).toLocaleDateString('ar-IQ')}</td>
+                      <td>
+                        <div className="action-buttons">
+                          {user.role !== 'admin' && (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleDeactivateUser(user.id)}
+                            >
+                              تعطيل
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="mobile-only users-cards">
+              {filteredUsers.map((user) => (
+                <div key={user.id} className="user-card-mobile">
+                  <div className="user-card-header">
+                    <div className="user-cell">
+                      <div className="user-avatar">
+                        {user.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
+                      <div>
+                        <div className="user-name">{user.name}</div>
+                        {user.email && <div className="user-email">{user.email}</div>}
+                      </div>
+                    </div>
+                    {user.isActive ? (
+                      <span className="status-indicator status-active">نشط</span>
+                    ) : (
+                      <span className="status-indicator status-inactive">معطل</span>
+                    )}
+                  </div>
+
+                  <div className="user-card-body">
+                    <div className="user-info-row">
+                      <span className="label">النوع:</span>
                       {user.isDriver ? (
                         <Badge variant="primary">سائق</Badge>
                       ) : (
                         <Badge variant="neutral">راكب</Badge>
                       )}
-                    </td>
-                    <td>
+                    </div>
+                    <div className="user-info-row">
+                      <span className="label">الدور:</span>
                       {user.role === 'admin' && <Badge variant="error">مدير</Badge>}
                       {user.role === 'moderator' && <Badge variant="warning">مشرف</Badge>}
                       {user.role === 'user' && <Badge variant="neutral">مستخدم</Badge>}
-                    </td>
-                    <td>
-                      {user.isActive ? (
-                        <span className="status-indicator status-active">نشط</span>
-                      ) : (
-                        <span className="status-indicator status-inactive">معطل</span>
-                      )}
-                    </td>
-                    <td>{new Date(user.createdAt).toLocaleDateString('ar-IQ')}</td>
-                    <td>
-                      <div className="action-buttons">
-                        {user.role !== 'admin' && (
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDeactivateUser(user.id)}
-                          >
-                            تعطيل
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <div className="user-info-row">
+                      <span className="label">تاريخ التسجيل:</span>
+                      <span>{new Date(user.createdAt).toLocaleDateString('ar-IQ')}</span>
+                    </div>
+                  </div>
+
+                  {user.role !== 'admin' && (
+                    <div className="user-card-footer">
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeactivateUser(user.id)}
+                        style={{ width: '100%' }}
+                      >
+                        تعطيل المستخدم
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </Card>
 
@@ -369,9 +430,114 @@ const UserManagement = () => {
           color: var(--color-slate-700, #334155);
         }
 
-        @media (max-width: 1024px) {
+        /* Mobile/Desktop visibility toggles */
+        .desktop-only {
+          display: block;
+        }
+
+        .mobile-only {
+          display: none;
+        }
+
+        /* Mobile User Cards */
+        .users-cards {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .user-card-mobile {
+          background: white;
+          border: 1px solid var(--color-slate-200, #e2e8f0);
+          border-radius: 12px;
+          overflow: hidden;
+          transition: all 0.2s;
+        }
+
+        .user-card-mobile:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px;
+          background: var(--color-slate-50, #f8fafc);
+          border-bottom: 1px solid var(--color-slate-200, #e2e8f0);
+        }
+
+        .user-email {
+          font-size: 12px;
+          color: var(--color-slate-500, #64748b);
+          margin-top: 4px;
+          direction: ltr;
+          text-align: right;
+        }
+
+        .user-card-body {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .user-info-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 14px;
+        }
+
+        .user-info-row .label {
+          font-weight: 600;
+          color: var(--color-slate-600, #475569);
+        }
+
+        .user-card-footer {
+          padding: 12px 16px;
+          background: var(--color-slate-50, #f8fafc);
+          border-top: 1px solid var(--color-slate-200, #e2e8f0);
+        }
+
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+
+          .mobile-only {
+            display: block;
+          }
+
           .filters-container {
             grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .filter-item {
+            width: 100%;
+          }
+
+          .admin-page-title {
+            font-size: 20px;
+          }
+
+          .admin-page-subtitle {
+            font-size: 13px;
+          }
+
+          .table-title {
+            font-size: 18px;
+          }
+        }
+
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .filters-container {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .filter-search {
+            grid-column: 1 / -1;
           }
 
           .admin-table {
