@@ -8,6 +8,7 @@ const PhoneLogin = () => {
   const [step, setStep] = useState(1); // 1: phone, 2: password OR code, 3: set-password OR profile
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [verifiedOtpCode, setVerifiedOtpCode] = useState(''); // Store verified OTP for set-password step
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
@@ -214,6 +215,9 @@ const PhoneLogin = () => {
       const cleanedPhone = phone.replace(/\D/g, '');
       const response = await otpAPI.verify(cleanedPhone, otpCode);
 
+      // Save verified OTP code for later use in set-password step
+      setVerifiedOtpCode(otpCode);
+
       if (response.isNewUser) {
         // New user - go to registration profile step
         setStep(3);
@@ -271,13 +275,18 @@ const PhoneLogin = () => {
       return;
     }
 
+    if (!verifiedOtpCode) {
+      setError('خطأ: لم يتم العثور على رمز التحقق. يرجى المحاولة مرة أخرى');
+      setStep(1); // Go back to start
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       const cleanedPhone = phone.replace(/\D/g, '');
-      const otpCode = code.join('');
-      const response = await otpAPI.setPassword(cleanedPhone, password, otpCode);
+      const response = await otpAPI.setPassword(cleanedPhone, password, verifiedOtpCode);
       login(response.token, response.user);
       navigate('/home');
     } catch (err) {
