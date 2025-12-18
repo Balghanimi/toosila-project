@@ -17,8 +17,8 @@ async function hashPassword(plainPassword) {
     throw new Error('Password must be a non-empty string');
   }
 
-  if (plainPassword.length < 6) {
-    throw new Error('Password must be at least 6 characters long');
+  if (plainPassword.length < 5) {
+    throw new Error('Password must be at least 5 characters long');
   }
 
   try {
@@ -56,7 +56,7 @@ async function verifyPassword(plainPassword, hashedPassword) {
  * @returns {Object} Validation result with isValid and message
  */
 function validatePasswordStrength(password) {
-  const minLength = 6;
+  const minLength = 5;
   const errors = [];
 
   if (!password) {

@@ -10,6 +10,7 @@ const PhoneLogin = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [isDriver, setIsDriver] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -175,8 +176,8 @@ const PhoneLogin = () => {
 
   // Login with password
   const handlePasswordLogin = async () => {
-    if (!password || password.length < 6) {
-      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
+    if (!password || password.length < 5) {
+      setError('الرجاء إدخال كلمة المرور (5 أحرف على الأقل)');
       return;
     }
 
@@ -238,8 +239,8 @@ const PhoneLogin = () => {
       return;
     }
 
-    if (!password || password.length < 6) {
-      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
+    if (!password || password.length < 5) {
+      setError('الرجاء إدخال كلمة المرور (5 أحرف على الأقل)');
       return;
     }
 
@@ -265,8 +266,8 @@ const PhoneLogin = () => {
 
   // Set password for existing users
   const handleSetPassword = async () => {
-    if (!password || password.length < 6) {
-      setError('الرجاء إدخال كلمة المرور (6 أحرف على الأقل)');
+    if (!password || password.length < 5) {
+      setError('الرجاء إدخال كلمة المرور (5 أحرف على الأقل)');
       return;
     }
 
@@ -368,15 +369,39 @@ const PhoneLogin = () => {
 
             <div className="form-group">
               <label htmlFor="password">كلمة المرور</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => handleKeyPress(e, handlePasswordLogin)}
-                placeholder="أدخل كلمة المرور"
-                autoFocus
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => handleKeyPress(e, handlePasswordLogin)}
+                  placeholder="أدخل كلمة المرور"
+                  autoFocus
+                  style={{ paddingLeft: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    padding: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
             </div>
 
             {error && <p className="error-message">{error}</p>}
@@ -401,6 +426,7 @@ const PhoneLogin = () => {
               onClick={() => {
                 setStep(1);
                 setPassword('');
+                setShowPassword(false);
                 setRequiresPassword(false);
                 setError('');
               }}
@@ -492,16 +518,40 @@ const PhoneLogin = () => {
 
             <div className="form-group">
               <label htmlFor="password">كلمة المرور الجديدة</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => handleKeyPress(e, handleSetPassword)}
-                placeholder="6 أحرف على الأقل"
-                autoFocus
-              />
-              <small className="input-hint">يجب أن تتكون من 6 أحرف على الأقل</small>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => handleKeyPress(e, handleSetPassword)}
+                  placeholder="5 أحرف على الأقل"
+                  autoFocus
+                  style={{ paddingLeft: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    padding: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              <small className="input-hint">يجب أن تتكون من 5 أحرف على الأقل</small>
             </div>
 
             {error && <p className="error-message">{error}</p>}
@@ -509,7 +559,7 @@ const PhoneLogin = () => {
             <button
               className="submit-btn"
               onClick={handleSetPassword}
-              disabled={loading || !password || password.length < 6}
+              disabled={loading || !password || password.length < 5}
             >
               {loading ? (
                 <span className="loading-spinner">
@@ -543,14 +593,38 @@ const PhoneLogin = () => {
 
             <div className="form-group">
               <label htmlFor="reg-password">كلمة المرور</label>
-              <input
-                type="password"
-                id="reg-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="6 أحرف على الأقل"
-              />
-              <small className="input-hint">يجب أن تتكون من 6 أحرف على الأقل</small>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="reg-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="5 أحرف على الأقل"
+                  style={{ paddingLeft: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    padding: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              <small className="input-hint">يجب أن تتكون من 5 أحرف على الأقل</small>
             </div>
 
             <div className="user-type-selector">
@@ -582,7 +656,7 @@ const PhoneLogin = () => {
             <button
               className="submit-btn"
               onClick={handleCompleteRegistration}
-              disabled={loading || !name.trim() || !password || password.length < 6}
+              disabled={loading || !name.trim() || !password || password.length < 5}
             >
               {loading ? (
                 <span className="loading-spinner">
