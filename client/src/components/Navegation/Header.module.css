@@ -190,13 +190,13 @@ body.dark-mode .header {
 .hamburgerButton {
   appearance: none;
   border: none;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
   padding: var(--space-2);
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: var(--text-xl);
-  color: var(--text-primary);
+  color: #ffffff;
   width: 44px;
   height: 44px;
   display: flex;
@@ -204,6 +204,7 @@ body.dark-mode .header {
   justify-content: center;
   outline: none;
   position: relative;
+  backdrop-filter: blur(10px);
 }
 
 .hamburgerButton::before {
@@ -217,7 +218,7 @@ body.dark-mode .header {
 }
 
 .hamburgerButton:hover {
-  background: var(--surface-secondary);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
