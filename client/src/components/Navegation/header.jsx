@@ -410,15 +410,18 @@ const Header = () => {
                   >
                     📊 لوحة التحكم
                   </button>
-                  <button
-                    className={styles.drawerItem}
-                    onClick={() => {
-                      navigate(currentUser.isDriver ? '/demands' : '/offers');
-                      toggleDrawer();
-                    }}
-                  >
-                    👀 {currentUser.isDriver ? 'عرض الطلبات' : 'عرض العروض'}
-                  </button>
+                  {/* Show Demands only for drivers */}
+                  {currentUser.isDriver && (
+                    <button
+                      className={styles.drawerItem}
+                      onClick={() => {
+                        navigate('/demands');
+                        toggleDrawer();
+                      }}
+                    >
+                      👀 عرض الطلبات
+                    </button>
+                  )}
                   <button
                     className={styles.drawerItem}
                     onClick={() => {
