@@ -121,17 +121,15 @@ const Header = () => {
               >
                 الرئيسية
               </button>
-              {/* Show Offers only for passengers */}
-              {!currentUser?.isDriver && (
-                <button
-                  className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
-                  onClick={() => navigate('/offers')}
-                  title="عروض السائقين"
-                >
-                  <span style={{ marginLeft: '4px' }}>🚗</span>
-                  العروض
-                </button>
-              )}
+              {/* Show Offers for both drivers and passengers */}
+              <button
+                className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
+                onClick={() => navigate('/offers')}
+                title="عروض السائقين"
+              >
+                <span style={{ marginLeft: '4px' }}>🚗</span>
+                العروض
+              </button>
               {/* Show Demands only for drivers */}
               {currentUser?.isDriver && (
                 <button
@@ -325,6 +323,15 @@ const Header = () => {
                     className={styles.drawerItem}
                     onClick={() => {
                       navigate('/offers');
+                      toggleDrawer();
+                    }}
+                  >
+                    🚗 عرض العروض
+                  </button>
+                  <button
+                    className={styles.drawerItem}
+                    onClick={() => {
+                      navigate('/bookings');
                       toggleDrawer();
                     }}
                   >
