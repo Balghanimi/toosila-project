@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useMode } from '../context/ModeContext';
 import { useNotifications } from '../context/NotificationContext';
 import { bookingsAPI, demandsAPI, demandResponsesAPI, offersAPI } from '../services/api';
 import DemandResponsesList from '../components/DemandResponsesList';
@@ -11,13 +12,14 @@ import { formatDate, formatTime, formatPrice, formatSeats } from '../utils/forma
 export default function Bookings() {
   const location = useLocation();
   const { currentUser, loading: authLoading } = useAuth();
+  const { mode: globalMode } = useMode();
   const { showSuccess, showError, showInfo, fetchPendingCount } = useNotifications();
   const navigate = useNavigate();
 
-  // Determine if user is a driver
-  const isDriver = currentUser?.isDriver || false;
+  // Determine if user is in driver mode
+  const isDriver = globalMode === 'driver';
 
-  // Get default tab based on user type
+  // Get default tab based on user mode
   const getDefaultTab = () => {
     if (location.state?.tab) return location.state.tab;
     return isDriver ? 'received' : 'demands';
@@ -75,6 +77,13 @@ export default function Bookings() {
     }
     setActiveTab(tab.id);
   };
+
+  // Update active tab when global mode changes
+  useEffect(() => {
+    console.log('[Bookings] Global mode changed to:', globalMode);
+    const newDefaultTab = globalMode === 'driver' ? 'received' : 'demands';
+    setActiveTab(newDefaultTab);
+  }, [globalMode]);
 
   useEffect(() => {
     // Wait for auth to finish loading before checking user
