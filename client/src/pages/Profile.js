@@ -34,7 +34,7 @@ const Profile = () => {
       setMode(newMode);
 
       // Also update AuthContext for consistency
-      const result = await toggleUserType();
+      await toggleUserType();
 
       setMessage(
         newMode === 'driver'
