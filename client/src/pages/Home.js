@@ -143,7 +143,7 @@ const Home = () => {
         return;
       }
 
-      if (currentUser && currentUser.isDriver) {
+      if (globalMode === 'driver') {
         navigate('/demands', { state: searchParams });
       } else {
         navigate('/offers', { state: searchParams });
@@ -371,9 +371,9 @@ const Home = () => {
               }
             }}
             className={`${styles.modeButton} ${mode === 'find' ? styles.find : ''}`}
-            aria-label="البحث عن رحلة متاحة"
+            aria-label={globalMode === 'driver' ? 'البحث عن طلب متاح' : 'البحث عن رحلة متاحة'}
           >
-            🔍 ابحث عن رحلة
+            🔍 {globalMode === 'driver' ? 'ابحث عن طلب' : 'ابحث عن رحلة'}
           </button>
         </div>
         {/* Location Container */}
@@ -717,7 +717,9 @@ const Home = () => {
           <div className={styles.stepsGrid}>
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>1</div>
-              <h3 className={styles.stepTitle}>ابحث عن رحلة</h3>
+              <h3 className={styles.stepTitle}>
+                {globalMode === 'driver' ? 'ابحث عن طلب' : 'ابحث عن رحلة'}
+              </h3>
               <p className={styles.stepDescription}>
                 اختر مدينة الانطلاق والوجهة، وحدد التاريخ المناسب لك.
               </p>
