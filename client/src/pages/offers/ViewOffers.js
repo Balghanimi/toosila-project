@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { offersAPI, demandsAPI, bookingsAPI, citiesAPI } from '../../services/api';
+import { offersAPI, bookingsAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm';
@@ -97,12 +97,7 @@ const ViewOffers = React.memo(function ViewOffers() {
   }, []);
 
   useEffect(() => {
-    // Redirect drivers to demands page
-    if (isDriver) {
-      navigate('/demands', { replace: true, state: location.state });
-      return;
-    }
-
+    // ✅ NO REDIRECT - ViewOffers shows driver offers for EVERYONE
     setIsAnimated(true);
 
     // استقبال معايير البحث من Home
@@ -130,24 +125,17 @@ const ViewOffers = React.memo(function ViewOffers() {
       filterParams.page = 1;
       filterParams.limit = 50;
 
-      let response;
-      // If user is a driver, show demands (passenger requests)
-      // If user is a passenger, show offers (driver offers)
-      if (isDriver) {
-        response = await demandsAPI.getAll(filterParams);
-        setOffers(response.demands || []);
-      } else {
-        response = await offersAPI.getAll(filterParams);
-        setOffers(response.offers || []);
-      }
+      // ✅ ALWAYS fetch and show driver offers (for EVERYONE)
+      const response = await offersAPI.getAll(filterParams);
+      setOffers(response.offers || []);
 
       // Save pagination data
       setTotal(response.total || 0);
       setTotalPages(response.totalPages || 1);
       setPage(1);
     } catch (err) {
-      console.error('Error fetching offers/demands:', err);
-      setError(isDriver ? 'حدث خطأ أثناء تحميل الطلبات' : 'حدث خطأ أثناء تحميل العروض');
+      console.error('Error fetching offers:', err);
+      setError('حدث خطأ أثناء تحميل العروض');
     } finally {
       setLoading(false);
     }
@@ -171,14 +159,9 @@ const ViewOffers = React.memo(function ViewOffers() {
       filterParams.page = page + 1;
       filterParams.limit = 50;
 
-      let response;
-      if (isDriver) {
-        response = await demandsAPI.getAll(filterParams);
-        setOffers((prev) => [...prev, ...(response.demands || [])]);
-      } else {
-        response = await offersAPI.getAll(filterParams);
-        setOffers((prev) => [...prev, ...(response.offers || [])]);
-      }
+      // ✅ ALWAYS fetch driver offers (for EVERYONE)
+      const response = await offersAPI.getAll(filterParams);
+      setOffers((prev) => [...prev, ...(response.offers || [])]);
 
       setPage(page + 1);
       setTotal(response.total || 0);
@@ -505,7 +488,7 @@ const ViewOffers = React.memo(function ViewOffers() {
               fontFamily: '"Cairo", sans-serif',
             }}
           >
-            {isDriver ? '📋 طلبات الركاب' : '🚗 العروض المتاحة'}
+            🚗 العروض المتاحة
           </h1>
           <p
             style={{
@@ -515,7 +498,7 @@ const ViewOffers = React.memo(function ViewOffers() {
               fontWeight: '600',
             }}
           >
-            {isDriver ? 'ابحث عن ركاب يحتاجون رحلة' : 'ابحث عن رحلتك المثالية'}
+            ابحث عن رحلتك المثالية
           </p>
         </div>
 
