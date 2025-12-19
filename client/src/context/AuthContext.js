@@ -271,12 +271,22 @@ export function AuthProvider({ children }) {
         const userData = userDataOrNull;
 
         console.log('[AUTH] 💾 Saving to localStorage...');
+        console.log('[AUTH] Token to save:', token ? token.substring(0, 30) + '...' : 'NULL');
         localStorage.setItem('token', token);
         localStorage.setItem('currentUser', JSON.stringify(userData));
 
         // Reset active mode on new login
         const mode = userData.isDriver ? 'driver' : 'passenger';
         localStorage.setItem('activeMode', mode);
+
+        // VERIFY token was saved
+        const verifyToken = localStorage.getItem('token');
+        const verifyUser = localStorage.getItem('currentUser');
+        console.log(
+          '[AUTH] ✅ Verification - token saved:',
+          verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
+        );
+        console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
 
         console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
         console.log('[AUTH] User:', userData.name, '| Mode:', mode);
@@ -299,6 +309,10 @@ export function AuthProvider({ children }) {
       const data = await authAPI.login(email, password);
 
       console.log('[AUTH] 💾 Saving to localStorage...');
+      console.log(
+        '[AUTH] Token to save:',
+        data.data.token ? data.data.token.substring(0, 30) + '...' : 'NULL'
+      );
       // Save token and user data
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('currentUser', JSON.stringify(data.data.user));
@@ -307,6 +321,15 @@ export function AuthProvider({ children }) {
       const isDriver = data.data.user.isDriver;
       const mode = isDriver ? 'driver' : 'passenger';
       localStorage.setItem('activeMode', mode);
+
+      // VERIFY token was saved
+      const verifyToken = localStorage.getItem('token');
+      const verifyUser = localStorage.getItem('currentUser');
+      console.log(
+        '[AUTH] ✅ Verification - token saved:',
+        verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
+      );
+      console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
 
       console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
       console.log('[AUTH] User:', data.data.user.name, '| Mode:', mode);
