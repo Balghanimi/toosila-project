@@ -121,17 +121,19 @@ const Header = () => {
               >
                 الرئيسية
               </button>
-              {/* Show Offers for both drivers and passengers */}
-              <button
-                className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
-                onClick={() => navigate('/offers')}
-                title="عروض السائقين"
-              >
-                <span style={{ marginLeft: '4px' }}>🚗</span>
-                العروض
-              </button>
+              {/* Show Offers only for passengers */}
+              {mode === 'passenger' && (
+                <button
+                  className={`${styles.navLink} ${isActive('/offers') ? styles.navLinkActive : ''}`}
+                  onClick={() => navigate('/offers')}
+                  title="عروض السائقين"
+                >
+                  <span style={{ marginLeft: '4px' }}>🚗</span>
+                  العروض
+                </button>
+              )}
               {/* Show Demands only for drivers */}
-              {currentUser?.isDriver && (
+              {mode === 'driver' && (
                 <button
                   className={`${styles.navLink} ${isActive('/demands') ? styles.navLinkActive : ''}`}
                   onClick={() => navigate('/demands')}
@@ -307,7 +309,7 @@ const Header = () => {
               </button>
 
               {/* قسم السائقين */}
-              {currentUser?.isDriver && (
+              {mode === 'driver' && (
                 <>
                   <div className={styles.drawerSection}>قسم السائقين</div>
                   <button
@@ -322,15 +324,6 @@ const Header = () => {
                   <button
                     className={styles.drawerItem}
                     onClick={() => {
-                      navigate('/offers');
-                      toggleDrawer();
-                    }}
-                  >
-                    🚗 عرض العروض
-                  </button>
-                  <button
-                    className={styles.drawerItem}
-                    onClick={() => {
                       navigate('/bookings');
                       toggleDrawer();
                     }}
@@ -341,7 +334,7 @@ const Header = () => {
               )}
 
               {/* قسم الركاب */}
-              {currentUser && !currentUser.isDriver && (
+              {mode === 'passenger' && (
                 <>
                   <div className={styles.drawerSection}>قسم الركاب</div>
                   <button
@@ -418,7 +411,7 @@ const Header = () => {
                     📊 لوحة التحكم
                   </button>
                   {/* Show Demands only for drivers */}
-                  {currentUser.isDriver && (
+                  {mode === 'driver' && (
                     <button
                       className={styles.drawerItem}
                       onClick={() => {
