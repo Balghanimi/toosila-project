@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useMode } from '../context/ModeContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Profile = () => {
   const { currentUser, logout, toggleUserType } = useAuth();
+  const { mode, setMode } = useMode();
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -27,18 +29,18 @@ const Profile = () => {
     setError('');
 
     try {
+      // Toggle mode using ModeContext
+      const newMode = mode === 'driver' ? 'passenger' : 'driver';
+      setMode(newMode);
+
+      // Also update AuthContext for consistency
       const result = await toggleUserType();
 
-      if (result.success) {
-        setMessage(
-          result.user.isDriver // Check the returned user object
-            ? 'تم التبديل إلى وضع السائق بنجاح ✅' // Note: Logic was inverted in original code? If isDriver is true, we are now driver.
-            : 'تم التبديل إلى وضع الراكブ بنجاح ✅'
-        );
-        // No page reload needed - React context handles state update automatically
-      } else {
-        setError(result.error || 'حدث خطأ أثناء التحديث. حاول مرة أخرى.');
-      }
+      setMessage(
+        newMode === 'driver'
+          ? 'تم التبديل إلى وضع السائق بنجاح ✅'
+          : 'تم التبديل إلى وضع الراكب بنجاح ✅'
+      );
     } catch (err) {
       console.error('Error updating profile:', err);
       setError('حدث خطأ أثناء التحديث. حاول مرة أخرى.');
@@ -534,7 +536,7 @@ const Profile = () => {
           }}
         >
           يمكنك التبديل بين دور السائق والراكب في أي وقت.
-          {currentUser.isDriver
+          {mode === 'driver'
             ? ' حالياً أنت سائق - يمكنك نشر عروض الرحلات.'
             : ' حالياً أنت راكب - يمكنك طلب رحلات.'}
         </p>
@@ -590,7 +592,7 @@ const Profile = () => {
               جاري التحديث...
             </>
           ) : (
-            <>{currentUser.isDriver ? '🧑‍💼 التبديل إلى راكب' : '🚗 التبديل إلى سائق'}</>
+            <>{mode === 'driver' ? '🧑‍💼 التبديل إلى راكب' : '🚗 التبديل إلى سائق'}</>
           )}
         </button>
       </div>
