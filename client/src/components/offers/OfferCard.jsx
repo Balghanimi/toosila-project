@@ -126,13 +126,11 @@ const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, 
               <span className={styles.buttonIcon}>🎫</span>
             </button>
           )}
-          {/* Message Driver Button - Only show if not own offer */}
-          {!isOwnOffer && (
-            <button type="button" onClick={handleMessageClick} className={styles.messageButton}>
-              <span>مراسلة السائق</span>
-              <span className={styles.buttonIcon}>💬</span>
-            </button>
-          )}
+          {/* Message Driver Button - Always show */}
+          <button type="button" onClick={handleMessageClick} className={styles.messageButton}>
+            <span>مراسلة السائق</span>
+            <span className={styles.buttonIcon}>💬</span>
+          </button>
         </div>
       )}
 
