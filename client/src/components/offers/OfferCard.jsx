@@ -29,10 +29,6 @@ const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, 
     }
   };
 
-  // Check if current user is the driver of this offer
-  const isOwnOffer =
-    currentUser && (currentUser.id === offer.driverId || currentUser.id === offer.driver_id);
-
   // User booking status (from API response)
   const userHasBooking = offer.userHasBooking || offer.user_has_booking || false;
   const userBookingStatus = offer.userBookingStatus || offer.user_booking_status || null;
