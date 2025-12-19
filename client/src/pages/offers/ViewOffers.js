@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { offersAPI, bookingsAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useMode } from '../../context/ModeContext';
 import { useNotifications } from '../../context/NotificationContext';
 import CollapsibleSearchForm from '../../components/offers/CollapsibleSearchForm';
 import OfferCard from '../../components/offers/OfferCard';
@@ -54,12 +55,20 @@ const ViewOffers = React.memo(function ViewOffers() {
   const [availableCities, setAvailableCities] = useState([]);
 
   const { currentUser, user } = useAuth();
+  const { mode } = useMode();
   const { showSuccess, showError } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Determine if user is a driver
   const isDriver = user?.isDriver || currentUser?.isDriver || false;
+
+  // Redirect to /demands when user switches to driver mode
+  useEffect(() => {
+    if (mode === 'driver') {
+      navigate('/demands', { replace: true });
+    }
+  }, [mode, navigate]);
 
   // Fetch cities from database with caching
   useEffect(() => {

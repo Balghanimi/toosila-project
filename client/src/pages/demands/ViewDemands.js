@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { demandsAPI, demandResponsesAPI, citiesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useMode } from '../../context/ModeContext';
 import { useNotifications } from '../../context/NotificationContext';
 import DemandResponseForm from '../../components/DemandResponseForm';
 import DemandResponsesList from '../../components/DemandResponsesList';
@@ -56,6 +57,7 @@ export default function ViewDemands() {
   const [responsesLoading, setResponsesLoading] = useState(false);
 
   const { currentUser } = useAuth();
+  const { mode } = useMode();
   const { showSuccess } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,13 +65,12 @@ export default function ViewDemands() {
   // Determine if user is a driver
   const isDriver = currentUser?.isDriver || false;
 
-  // Redirect passengers to offers page - demands page is for drivers only
+  // Redirect to /offers when user switches to passenger mode
   useEffect(() => {
-    if (currentUser && !isDriver) {
-      // Passenger trying to access demands page - redirect to offers
+    if (mode === 'passenger') {
       navigate('/offers', { replace: true });
     }
-  }, [currentUser, isDriver, navigate]);
+  }, [mode, navigate]);
 
   // Fetch cities from database with caching
   useEffect(() => {
