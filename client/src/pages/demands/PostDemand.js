@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useMode } from '../../context/ModeContext';
 import { demandsAPI } from '../../services/api';
 
 export default function PostDemand() {
@@ -22,8 +23,16 @@ export default function PostDemand() {
 
   const [errors, setErrors] = useState({});
   const { currentUser } = useAuth();
+  const { mode } = useMode();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Redirect drivers to demands page
+  useEffect(() => {
+    if (mode === 'driver') {
+      navigate('/demands', { replace: true });
+    }
+  }, [mode, navigate]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -87,8 +96,8 @@ export default function PostDemand() {
     // eslint-disable-next-line
   }, [currentUser, navigate]);
 
-  // Check if user is a passenger (not driver)
-  if (currentUser && currentUser.isDriver) {
+  // Check if user is a passenger (not driver) - using mode for consistency
+  if (currentUser && mode === 'driver') {
     return (
       <div
         style={{
