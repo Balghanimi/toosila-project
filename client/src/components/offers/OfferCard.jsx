@@ -104,7 +104,7 @@ const OfferCard = ({ offer, onBookNow, onMessageDriver, formatDate, formatTime, 
       )}
 
       {/* Action Buttons */}
-      {currentUser && !currentUser.isDriver && (
+      {currentUser && (
         <div className={styles.actionButtons}>
           {/* Show booking status badge if user has a booking */}
           {userHasBooking ? (
