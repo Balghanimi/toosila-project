@@ -22,7 +22,10 @@ export function AuthProvider({ children }) {
       try {
         console.log('========================================');
         console.log('[AUTH] 🔍 APP RELOAD - Checking stored auth data');
-        console.log('[AUTH] Device:', /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 MOBILE' : '💻 DESKTOP');
+        console.log(
+          '[AUTH] Device:',
+          /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 MOBILE' : '💻 DESKTOP'
+        );
         console.log('[AUTH] User Agent:', navigator.userAgent);
         console.log('========================================');
 
@@ -35,11 +38,20 @@ export function AuthProvider({ children }) {
         const sessionUser = sessionStorage.getItem('currentUser');
 
         // Debug: Log what we found in localStorage
-        console.log('[AUTH] 📦 localStorage.token:', token ? `✅ EXISTS (${token.substring(0, 30)}...)` : '❌ NULL');
+        console.log(
+          '[AUTH] 📦 localStorage.token:',
+          token ? `✅ EXISTS (${token.substring(0, 30)}...)` : '❌ NULL'
+        );
         console.log('[AUTH] 📦 localStorage.currentUser:', savedUser ? '✅ EXISTS' : '❌ NULL');
         console.log('[AUTH] 📦 localStorage.activeMode:', activeMode || '❌ NULL');
-        console.log('[AUTH] 📦 sessionStorage.token:', sessionToken ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)');
-        console.log('[AUTH] 📦 sessionStorage.currentUser:', sessionUser ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)');
+        console.log(
+          '[AUTH] 📦 sessionStorage.token:',
+          sessionToken ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)'
+        );
+        console.log(
+          '[AUTH] 📦 sessionStorage.currentUser:',
+          sessionUser ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)'
+        );
 
         if (token && savedUser) {
           console.log('[AUTH] ✅ Both token and savedUser found');
@@ -65,20 +77,21 @@ export function AuthProvider({ children }) {
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-              const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://toosila-backend-production.up.railway.app/api' : 'http://localhost:5000/api');
+              const apiUrl =
+                process.env.REACT_APP_API_URL ||
+                (process.env.NODE_ENV === 'production'
+                  ? 'https://toosila-backend-production.up.railway.app/api'
+                  : 'http://localhost:5000/api');
               console.log('[AUTH] 🌐 API URL:', apiUrl);
 
-              const response = await fetch(
-                `${apiUrl}/auth/me`,
-                {
-                  method: 'GET',
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                  },
-                  signal: controller.signal,
-                }
-              );
+              const response = await fetch(`${apiUrl}/auth/me`, {
+                method: 'GET',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                signal: controller.signal,
+              });
 
               clearTimeout(timeoutId);
 
@@ -120,7 +133,10 @@ export function AuthProvider({ children }) {
             } catch (tokenError) {
               // Network error or timeout - keep cached user (offline mode)
               // Token will be validated on next API call
-              console.warn('[AUTH] ⚠️ Token validation failed (network error):', tokenError.message);
+              console.warn(
+                '[AUTH] ⚠️ Token validation failed (network error):',
+                tokenError.message
+              );
               console.log('[AUTH] 📴 Keeping cached user (offline mode)');
             }
           } else {
