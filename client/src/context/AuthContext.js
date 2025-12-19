@@ -20,40 +20,56 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
+        console.log('========================================');
+        console.log('[AUTH] 🔍 APP RELOAD - Checking stored auth data');
+        console.log('[AUTH] Device:', /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 MOBILE' : '💻 DESKTOP');
+        console.log('[AUTH] User Agent:', navigator.userAgent);
+        console.log('========================================');
+
         const token = localStorage.getItem('token');
         const savedUser = localStorage.getItem('currentUser');
         const activeMode = localStorage.getItem('activeMode');
 
+        // Also check sessionStorage (should be empty)
+        const sessionToken = sessionStorage.getItem('token');
+        const sessionUser = sessionStorage.getItem('currentUser');
+
         // Debug: Log what we found in localStorage
-        console.log('[DEBUG] loadUser called');
-        console.log(
-          '[DEBUG] token in localStorage:',
-          token ? token.substring(0, 20) + '...' : 'NULL'
-        );
-        console.log('[DEBUG] savedUser in localStorage:', savedUser ? 'EXISTS' : 'NULL');
-        console.log('[DEBUG] activeMode in localStorage:', activeMode);
+        console.log('[AUTH] 📦 localStorage.token:', token ? `✅ EXISTS (${token.substring(0, 30)}...)` : '❌ NULL');
+        console.log('[AUTH] 📦 localStorage.currentUser:', savedUser ? '✅ EXISTS' : '❌ NULL');
+        console.log('[AUTH] 📦 localStorage.activeMode:', activeMode || '❌ NULL');
+        console.log('[AUTH] 📦 sessionStorage.token:', sessionToken ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)');
+        console.log('[AUTH] 📦 sessionStorage.currentUser:', sessionUser ? '⚠️ FOUND (SHOULD BE EMPTY!)' : '✅ Empty (correct)');
 
         if (token && savedUser) {
+          console.log('[AUTH] ✅ Both token and savedUser found');
           let userData = JSON.parse(savedUser);
+          console.log('[AUTH] 👤 User data:', userData.name, `(ID: ${userData.id})`);
 
           // Apply persisted mode preference if it exists
           if (activeMode) {
-            console.log(`[DEBUG] Applying persisted mode: ${activeMode}`);
+            console.log(`[AUTH] 🔄 Applying persisted mode: ${activeMode}`);
             userData = { ...userData, isDriver: activeMode === 'driver' };
           }
 
           // Validate user data structure - support both email and phone-based users
           if (userData.id && userData.name && (userData.email || userData.phone)) {
+            console.log('[AUTH] ✅ User data is valid, setting user state...');
             // Load cached user first for immediate UI rendering
             setUser(userData);
+            console.log('[AUTH] ✅ User state set, now validating token...');
 
             // Validate token with backend (5-second timeout)
             try {
+              console.log('[AUTH] 🔐 Starting token validation with backend...');
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+              const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://toosila-backend-production.up.railway.app/api' : 'http://localhost:5000/api');
+              console.log('[AUTH] 🌐 API URL:', apiUrl);
+
               const response = await fetch(
-                `${process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://toosila-backend-production.up.railway.app/api' : 'http://localhost:5000/api')}/auth/me`,
+                `${apiUrl}/auth/me`,
                 {
                   method: 'GET',
                   headers: {
@@ -66,16 +82,16 @@ export function AuthProvider({ children }) {
 
               clearTimeout(timeoutId);
 
-              console.log('[DEBUG] Token validation response status:', response.status);
+              console.log('[AUTH] 📡 Token validation response status:', response.status);
 
               if (!response.ok) {
                 // Token is invalid or expired
-                console.error('[DEBUG] Token validation FAILED!');
-                console.error('[DEBUG] Status:', response.status);
-                console.error('[DEBUG] Token used:', token.substring(0, 30) + '...');
+                console.error('[AUTH] ❌ Token validation FAILED!');
+                console.error('[AUTH] Status:', response.status);
+                console.error('[AUTH] Token used:', token.substring(0, 30) + '...');
                 const errorBody = await response.text();
-                console.error('[DEBUG] Response body:', errorBody);
-                console.warn('Token validation failed:', response.status);
+                console.error('[AUTH] Response body:', errorBody);
+                console.warn('[AUTH] ⚠️ CLEARING localStorage and logging out user');
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('token');
                 localStorage.removeItem('activeMode');
@@ -83,30 +99,39 @@ export function AuthProvider({ children }) {
               } else {
                 // Token is valid, update user data if needed
                 const result = await response.json();
-                console.log('[DEBUG] Token validation SUCCESS, user:', result.data?.user?.name);
+                console.log('[AUTH] ✅ Token validation SUCCESS!');
+                console.log('[AUTH] User from server:', result.data?.user?.name);
                 if (result.data && result.data.user) {
                   let freshUserData = result.data.user;
 
                   // Re-apply mode preference to fresh data from server
                   const currentActiveMode = localStorage.getItem('activeMode');
                   if (currentActiveMode) {
+                    console.log('[AUTH] 🔄 Re-applying mode preference:', currentActiveMode);
                     freshUserData = { ...freshUserData, isDriver: currentActiveMode === 'driver' };
                   }
 
+                  console.log('[AUTH] 💾 Saving fresh user data to localStorage');
                   localStorage.setItem('currentUser', JSON.stringify(freshUserData));
                   setUser(freshUserData);
+                  console.log('[AUTH] ✅ User restored successfully!');
                 }
               }
             } catch (tokenError) {
               // Network error or timeout - keep cached user (offline mode)
               // Token will be validated on next API call
-              console.warn('Token validation failed (network error):', tokenError.message);
+              console.warn('[AUTH] ⚠️ Token validation failed (network error):', tokenError.message);
+              console.log('[AUTH] 📴 Keeping cached user (offline mode)');
             }
           } else {
+            console.error('[AUTH] ❌ User data validation FAILED - missing required fields');
+            console.error('[AUTH] User data:', userData);
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
             localStorage.removeItem('activeMode');
           }
+        } else {
+          console.log('[AUTH] ❌ No token or savedUser found - user not logged in');
         }
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -224,15 +249,21 @@ export function AuthProvider({ children }) {
     try {
       // Check if this is a direct login with token and user (from OTP verification)
       if (typeof credentialsOrToken === 'string' && userDataOrNull) {
+        console.log('[AUTH] 🔐 Direct login with token (OTP flow)');
         // Direct login with token and user object
         const token = credentialsOrToken;
         const userData = userDataOrNull;
 
+        console.log('[AUTH] 💾 Saving to localStorage...');
         localStorage.setItem('token', token);
         localStorage.setItem('currentUser', JSON.stringify(userData));
 
         // Reset active mode on new login
-        localStorage.setItem('activeMode', userData.isDriver ? 'driver' : 'passenger');
+        const mode = userData.isDriver ? 'driver' : 'passenger';
+        localStorage.setItem('activeMode', mode);
+
+        console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
+        console.log('[AUTH] User:', userData.name, '| Mode:', mode);
 
         setUser(userData);
 
@@ -241,6 +272,7 @@ export function AuthProvider({ children }) {
       }
 
       // Traditional email/password login
+      console.log('[AUTH] 🔐 Email/password login');
       const { email, password } = credentialsOrToken;
 
       if (!email || !password) {
@@ -250,19 +282,25 @@ export function AuthProvider({ children }) {
       // Call API
       const data = await authAPI.login(email, password);
 
+      console.log('[AUTH] 💾 Saving to localStorage...');
       // Save token and user data
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('currentUser', JSON.stringify(data.data.user));
 
       // Reset active mode on new login
       const isDriver = data.data.user.isDriver;
-      localStorage.setItem('activeMode', isDriver ? 'driver' : 'passenger');
+      const mode = isDriver ? 'driver' : 'passenger';
+      localStorage.setItem('activeMode', mode);
+
+      console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
+      console.log('[AUTH] User:', data.data.user.name, '| Mode:', mode);
 
       setUser(data.data.user);
 
       setLoading(false);
       return { success: true, user: data.data.user };
     } catch (error) {
+      console.error('[AUTH] ❌ Login failed:', error.message);
       setError(error.message);
       setLoading(false);
       return { success: false, error: error.message };
