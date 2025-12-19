@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useMode } from '../../context/ModeContext';
 import { offersAPI } from '../../services/api';
 
 export default function PostOfferModern() {
@@ -20,8 +21,16 @@ export default function PostOfferModern() {
 
   const [errors, setErrors] = useState({});
   const { currentUser } = useAuth();
+  const { mode } = useMode();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Redirect passengers to offers page
+  useEffect(() => {
+    if (mode === 'passenger') {
+      navigate('/offers', { replace: true });
+    }
+  }, [mode, navigate]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -58,8 +67,8 @@ export default function PostOfferModern() {
     // eslint-disable-next-line
   }, [currentUser, navigate]);
 
-  // Check if user is a driver
-  if (currentUser && !currentUser.isDriver) {
+  // Check if user is a driver (using mode for consistency)
+  if (currentUser && mode === 'passenger') {
     return (
       <div
         style={{
