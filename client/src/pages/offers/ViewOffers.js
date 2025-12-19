@@ -265,10 +265,12 @@ const ViewOffers = React.memo(function ViewOffers() {
     }
 
     // Navigate to messages page with offer context
-    navigate(`/messages`, {
+    navigate('/messages', {
       state: {
         rideType: 'offer',
         rideId: offer.id,
+        otherUserId: offer.driver_id || offer.driverId || offer.user_id,
+        otherUserName: offer.driverName || offer.name || offer.userName,
         driverName: offer.driverName || offer.name,
         fromCity: offer.fromCity,
         toCity: offer.toCity,
