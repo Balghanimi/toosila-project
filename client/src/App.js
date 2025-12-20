@@ -37,6 +37,7 @@ const ViewOffers = lazy(() => import('./pages/offers/ViewOffers'));
 
 // Demands
 const ViewDemands = lazy(() => import('./pages/demands/ViewDemands'));
+const PostDemand = lazy(() => import('./pages/demands/PostDemand'));
 
 // Rating Management
 const RatingManagement = lazy(() => import('./pages/RatingManagement'));
@@ -124,6 +125,7 @@ export default function App() {
                                         <Route path="/offers" element={<ViewOffers />} />
                                         {/* مسارات الطلبات */}
                                         <Route path="/demands" element={<ViewDemands />} />
+                                        <Route path="/post-demand" element={<PostDemand />} />
 
                                         {/* إدارة التقييمات */}
                                         <Route path="/ratings" element={<RatingManagement />} />
