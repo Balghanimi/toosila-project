@@ -202,17 +202,19 @@ const Profile = () => {
               alignItems: 'center',
               gap: 'var(--space-2)',
               padding: 'var(--space-2) var(--space-5)',
-              background: mode === 'driver'
-                ? 'linear-gradient(135deg, #34c759 0%, #28a745 100%)'
-                : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              background:
+                mode === 'driver'
+                  ? 'linear-gradient(135deg, #34c759 0%, #28a745 100%)'
+                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
               color: 'white',
               borderRadius: '50px',
               fontSize: 'var(--text-sm)',
               fontWeight: '700',
               fontFamily: '"Cairo", sans-serif',
-              boxShadow: mode === 'driver'
-                ? '0 4px 15px rgba(52, 199, 89, 0.3)'
-                : '0 4px 15px rgba(59, 130, 246, 0.3)',
+              boxShadow:
+                mode === 'driver'
+                  ? '0 4px 15px rgba(52, 199, 89, 0.3)'
+                  : '0 4px 15px rgba(59, 130, 246, 0.3)',
             }}
           >
             <span style={{ fontSize: '1.2rem' }}>{mode === 'driver' ? '🚗' : '👤'}</span>
