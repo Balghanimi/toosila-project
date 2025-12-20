@@ -1049,10 +1049,37 @@ export default function Bookings() {
                   fontSize: 'var(--text-lg)',
                   color: 'var(--text-secondary)',
                   fontFamily: '"Cairo", sans-serif',
+                  marginBottom: 'var(--space-4)',
                 }}
               >
                 لم تقم بإنشاء أي طلبات بعد
               </p>
+              <button
+                onClick={() => navigate('/post-demand')}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-3) var(--space-6)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '600',
+                  fontFamily: '"Cairo", sans-serif',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 12px -2px rgba(16, 185, 129, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(16, 185, 129, 0.3)';
+                }}
+              >
+                + إنشاء طلب جديد
+              </button>
             </div>
           ) : (
             <div>
