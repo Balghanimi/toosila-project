@@ -237,6 +237,10 @@ export default function Bookings() {
           setMyOffers([]);
           return;
         }
+        console.log('🔍 DEBUG - Calling getMyOffers with userId:', currentUser.id);
+        console.log('🔍 DEBUG - userId length:', currentUser.id.length);
+        console.log('🔍 DEBUG - userId type:', typeof currentUser.id);
+        console.log('🔍 DEBUG - Full currentUser:', currentUser);
         const response = await offersAPI.getMyOffers(currentUser.id);
         const driverOffers = response.offers || [];
         console.log('📦 Fetched my offers:', driverOffers);
