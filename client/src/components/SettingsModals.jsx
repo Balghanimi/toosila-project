@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useMode } from '../context/ModeContext';
 
 // Modal Wrapper Component
 export function Modal({ title, children, onClose }) {
@@ -412,6 +413,7 @@ export function UserTypeModal({ onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { currentUser, toggleUserType } = useAuth();
+  const { setMode } = useMode();
 
   const currentIsDriver = currentUser?.isDriver || false;
 
@@ -435,6 +437,10 @@ export function UserTypeModal({ onClose, onSuccess }) {
 
     setLoading(true);
     try {
+      // Update ModeContext first
+      const newMode = newIsDriver ? 'driver' : 'passenger';
+      setMode(newMode);
+
       // Use client-side toggle wrapper with explicit mode
       const result = await toggleUserType(newIsDriver);
 
