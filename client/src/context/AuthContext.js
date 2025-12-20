@@ -319,7 +319,10 @@ export function AuthProvider({ children }) {
             verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
           );
           console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
-          console.log('[AUTH] ✅ Verification - mode saved:', verifyMode ? `✅ ${verifyMode}` : '❌ NULL');
+          console.log(
+            '[AUTH] ✅ Verification - mode saved:',
+            verifyMode ? `✅ ${verifyMode}` : '❌ NULL'
+          );
           console.log('[AUTH] ========================================');
         }, 100);
 
@@ -396,7 +399,10 @@ export function AuthProvider({ children }) {
           verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
         );
         console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
-        console.log('[AUTH] ✅ Verification - mode saved:', verifyMode ? `✅ ${verifyMode}` : '❌ NULL');
+        console.log(
+          '[AUTH] ✅ Verification - mode saved:',
+          verifyMode ? `✅ ${verifyMode}` : '❌ NULL'
+        );
         console.log('[AUTH] ========================================');
       }, 100);
 
