@@ -272,21 +272,56 @@ export function AuthProvider({ children }) {
 
         console.log('[AUTH] 💾 Saving to localStorage...');
         console.log('[AUTH] Token to save:', token ? token.substring(0, 30) + '...' : 'NULL');
-        localStorage.setItem('token', token);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
+
+        // Test localStorage availability
+        try {
+          localStorage.setItem('__test__', 'test');
+          localStorage.removeItem('__test__');
+          console.log('[AUTH] ✅ localStorage is available and working');
+        } catch (e) {
+          console.error('[AUTH] ❌ localStorage test FAILED:', e);
+          console.error('[AUTH] ❌ CRITICAL: localStorage is NOT available on this device!');
+        }
+
+        // Save with error handling
+        try {
+          localStorage.setItem('token', token);
+          console.log('[AUTH] ✅ Step 1: token setItem() called');
+        } catch (e) {
+          console.error('[AUTH] ❌ FAILED to save token:', e);
+        }
+
+        try {
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          console.log('[AUTH] ✅ Step 2: currentUser setItem() called');
+        } catch (e) {
+          console.error('[AUTH] ❌ FAILED to save currentUser:', e);
+        }
 
         // Reset active mode on new login
         const mode = userData.isDriver ? 'driver' : 'passenger';
-        localStorage.setItem('activeMode', mode);
+        try {
+          localStorage.setItem('activeMode', mode);
+          console.log('[AUTH] ✅ Step 3: activeMode setItem() called');
+        } catch (e) {
+          console.error('[AUTH] ❌ FAILED to save activeMode:', e);
+        }
 
-        // VERIFY token was saved
-        const verifyToken = localStorage.getItem('token');
-        const verifyUser = localStorage.getItem('currentUser');
-        console.log(
-          '[AUTH] ✅ Verification - token saved:',
-          verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
-        );
-        console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
+        // VERIFY token was saved - with delay for mobile
+        setTimeout(() => {
+          const verifyToken = localStorage.getItem('token');
+          const verifyUser = localStorage.getItem('currentUser');
+          const verifyMode = localStorage.getItem('activeMode');
+          console.log('[AUTH] ========================================');
+          console.log('[AUTH] 🔍 VERIFICATION CHECK (after 100ms delay):');
+          console.log(
+            '[AUTH] ✅ Verification - token saved:',
+            verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
+          );
+          console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
+          console.log('[AUTH] ✅ Verification - mode saved:', verifyMode ? `✅ ${verifyMode}` : '❌ NULL');
+          console.log('[AUTH] ========================================');
+        }, 100);
 
         console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
         console.log('[AUTH] User:', userData.name, '| Mode:', mode);
@@ -313,23 +348,57 @@ export function AuthProvider({ children }) {
         '[AUTH] Token to save:',
         data.data.token ? data.data.token.substring(0, 30) + '...' : 'NULL'
       );
-      // Save token and user data
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+
+      // Test localStorage availability
+      try {
+        localStorage.setItem('__test__', 'test');
+        localStorage.removeItem('__test__');
+        console.log('[AUTH] ✅ localStorage is available and working');
+      } catch (e) {
+        console.error('[AUTH] ❌ localStorage test FAILED:', e);
+        console.error('[AUTH] ❌ CRITICAL: localStorage is NOT available on this device!');
+      }
+
+      // Save with error handling
+      try {
+        localStorage.setItem('token', data.data.token);
+        console.log('[AUTH] ✅ Step 1: token setItem() called');
+      } catch (e) {
+        console.error('[AUTH] ❌ FAILED to save token:', e);
+      }
+
+      try {
+        localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+        console.log('[AUTH] ✅ Step 2: currentUser setItem() called');
+      } catch (e) {
+        console.error('[AUTH] ❌ FAILED to save currentUser:', e);
+      }
 
       // Reset active mode on new login
       const isDriver = data.data.user.isDriver;
       const mode = isDriver ? 'driver' : 'passenger';
-      localStorage.setItem('activeMode', mode);
+      try {
+        localStorage.setItem('activeMode', mode);
+        console.log('[AUTH] ✅ Step 3: activeMode setItem() called');
+      } catch (e) {
+        console.error('[AUTH] ❌ FAILED to save activeMode:', e);
+      }
 
-      // VERIFY token was saved
-      const verifyToken = localStorage.getItem('token');
-      const verifyUser = localStorage.getItem('currentUser');
-      console.log(
-        '[AUTH] ✅ Verification - token saved:',
-        verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
-      );
-      console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
+      // VERIFY token was saved - with delay for mobile
+      setTimeout(() => {
+        const verifyToken = localStorage.getItem('token');
+        const verifyUser = localStorage.getItem('currentUser');
+        const verifyMode = localStorage.getItem('activeMode');
+        console.log('[AUTH] ========================================');
+        console.log('[AUTH] 🔍 VERIFICATION CHECK (after 100ms delay):');
+        console.log(
+          '[AUTH] ✅ Verification - token saved:',
+          verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
+        );
+        console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
+        console.log('[AUTH] ✅ Verification - mode saved:', verifyMode ? `✅ ${verifyMode}` : '❌ NULL');
+        console.log('[AUTH] ========================================');
+      }, 100);
 
       console.log('[AUTH] ✅ Login successful - token and user saved to localStorage');
       console.log('[AUTH] User:', data.data.user.name, '| Mode:', mode);
