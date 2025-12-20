@@ -65,8 +65,15 @@ export function AuthProvider({ children }) {
           }
 
           // Validate user data structure - support both email and phone-based users
-          if (userData.id && userData.name && (userData.email || userData.phone)) {
+          // Only require: id is present (name, email, and phone are all optional)
+          if (userData.id) {
             console.log('[AUTH] ✅ User data is valid, setting user state...');
+            console.log('[AUTH] User fields:', {
+              id: !!userData.id,
+              name: !!userData.name,
+              email: !!userData.email,
+              phone: !!userData.phone,
+            });
             // Load cached user first for immediate UI rendering
             setUser(userData);
             console.log('[AUTH] ✅ User state set, now validating token...');
