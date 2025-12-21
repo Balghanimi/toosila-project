@@ -133,7 +133,7 @@ const getRideMessages = asyncHandler(async (req, res) => {
        WHERE o.id = $1 AND o.is_active = true AND (
          o.driver_id = $2 OR
          EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
-         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id = $2)
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND (sender_id = $2 OR receiver_id = $2))
        )`,
       [rideId, req.user.id]
     );
@@ -204,7 +204,8 @@ const markAsRead = asyncHandler(async (req, res) => {
     accessCheck = await query(
       `SELECT 1 FROM offers WHERE id = $1 AND (
          driver_id = $2 OR
-         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND (sender_id = $2 OR receiver_id = $2))
        )`,
       [message.rideId, req.user.id]
     );
@@ -247,7 +248,8 @@ const markConversationAsRead = asyncHandler(async (req, res) => {
     accessCheck = await query(
       `SELECT 1 FROM offers WHERE id = $1 AND (
          driver_id = $2 OR
-         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2)
+         EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND (sender_id = $2 OR receiver_id = $2))
        )`,
       [rideId, req.user.id]
     );
