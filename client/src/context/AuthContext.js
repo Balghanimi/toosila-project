@@ -57,6 +57,9 @@ export function AuthProvider({ children }) {
           console.log('[AUTH] ✅ Both token and savedUser found');
           let userData = JSON.parse(savedUser);
           console.log('[AUTH] 👤 User data:', userData.name, `(ID: ${userData.id})`);
+          console.log('[AUTH] 🔍 User ID from localStorage:', userData.id);
+          console.log('[AUTH] 🔍 User ID length:', userData.id?.length);
+          console.log('[AUTH] 🔍 User ID type:', typeof userData.id);
 
           // Apply persisted mode preference if it exists
           if (activeMode) {
@@ -277,6 +280,14 @@ export function AuthProvider({ children }) {
         const token = credentialsOrToken;
         const userData = userDataOrNull;
 
+        console.log('[AUTH] ========================================');
+        console.log('[AUTH] 📥 RECEIVED userData in login function:');
+        console.log('[AUTH] Full userData:', JSON.stringify(userData, null, 2));
+        console.log('[AUTH] User ID received:', userData.id);
+        console.log('[AUTH] User ID length:', userData.id?.length);
+        console.log('[AUTH] User ID type:', typeof userData.id);
+        console.log('[AUTH] ========================================');
+
         console.log('[AUTH] 💾 Saving to localStorage...');
         console.log('[AUTH] Token to save:', token ? token.substring(0, 30) + '...' : 'NULL');
 
@@ -326,6 +337,11 @@ export function AuthProvider({ children }) {
             verifyToken ? verifyToken.substring(0, 30) + '...' : '❌ NULL'
           );
           console.log('[AUTH] ✅ Verification - user saved:', verifyUser ? '✅ YES' : '❌ NULL');
+          if (verifyUser) {
+            const parsedUser = JSON.parse(verifyUser);
+            console.log('[AUTH] 🔍 Verification - User ID in storage:', parsedUser.id);
+            console.log('[AUTH] 🔍 Verification - User ID length:', parsedUser.id?.length);
+          }
           console.log(
             '[AUTH] ✅ Verification - mode saved:',
             verifyMode ? `✅ ${verifyMode}` : '❌ NULL'

@@ -259,6 +259,13 @@ const PhoneLogin = () => {
         isDriver,
         password
       );
+      console.log('[PHONELOG] ========================================');
+      console.log('[PHONELOG] 📥 RAW API RESPONSE from completeRegistration:');
+      console.log('[PHONELOG] Full response:', JSON.stringify(response, null, 2));
+      console.log('[PHONELOG] User ID from response:', response.user?.id);
+      console.log('[PHONELOG] User ID length:', response.user?.id?.length);
+      console.log('[PHONELOG] User ID type:', typeof response.user?.id);
+      console.log('[PHONELOG] ========================================');
       login(response.token, response.user);
       navigate('/home');
     } catch (err) {
