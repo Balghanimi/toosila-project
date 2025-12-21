@@ -80,13 +80,16 @@ export const NotificationProvider = ({ children }) => {
 
     try {
       const response = await messagesAPI.getUnreadCount();
-      const newCount = response.count || 0;
+      console.log('[NOTIFICATION] 📡 Raw API Response:', response);
+      // FIX: API returns unreadCount, not count
+      const newCount = response.unreadCount || response.count || 0;
 
       console.log('[NOTIFICATION] 📊 Count check:', {
         previous: previousUnreadCount,
         new: newCount,
         increased: newCount > previousUnreadCount,
         isFirstFetch,
+        responseObject: response,
       });
 
       // Play sound if count increased (new message received)
