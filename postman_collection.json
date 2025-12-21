@@ -1928,6 +1928,54 @@
             "description": "Logs in an existing user directly without OTP verification"
           },
           "response": []
+        },
+        {
+          "name": "Login with phone number and password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/login-with-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "login-with-password"
+              ]
+            },
+            "description": "Secure login for users who have set a password"
+          },
+          "response": []
+        },
+        {
+          "name": "Set password for existing user (requires OTP verification)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/otp/set-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "otp",
+                "set-password"
+              ]
+            },
+            "description": "Allows existing users without password to set one after OTP verification"
+          },
+          "response": []
         }
       ]
     }

@@ -93,19 +93,24 @@ export const MessagesProvider = ({ children }) => {
 
   // Fetch ride-specific conversation messages (offer or demand)
   const fetchRideConversation = useCallback(
-    async (rideType, rideId) => {
+    async (rideType, rideId, otherUserId = null) => {
       if (!currentUser) return;
 
       try {
         setLoading(true);
-        console.log('[MESSAGES] 📥 Fetching ride conversation:', { rideType, rideId });
-        const response = await messagesAPI.getRideMessages(rideType, rideId);
+        console.log('[MESSAGES] 📥 Fetching ride conversation:', {
+          rideType,
+          rideId,
+          otherUserId,
+        });
+        const response = await messagesAPI.getRideMessages(rideType, rideId, 1, 50, otherUserId);
         console.log('[MESSAGES] 📨 API Response:', {
           messagesCount: response.messages?.length || 0,
           total: response.total,
           page: response.page,
           limit: response.limit,
           totalPages: response.totalPages,
+          filteredByUser: otherUserId,
         });
         console.log('[MESSAGES] 📋 Messages array:', response.messages);
         setCurrentConversation(response.messages || []);

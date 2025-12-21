@@ -3,170 +3,135 @@
 
 ---
 
+## 🔒 GOLDEN RULE: DO NOT TOUCH WORKING CODE (القاعدة الذهبية)
+
+```
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   🚨 STOP! BEFORE CHANGING ANY FILE, ASK YOURSELF:           ║
+║                                                               ║
+║   "Does this file NEED to change for THIS SPECIFIC task?"    ║
+║                                                               ║
+║   If NO → DO NOT TOUCH IT                                    ║
+║   If YES → Make MINIMAL changes only                         ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+### BEFORE Making Any Changes:
+```
+1. IDENTIFY which files MUST change (not "might be nice to change")
+2. LIST files that are WORKING FINE → DO NOT TOUCH THEM
+3. ANNOUNCE your plan: "I will modify X.js and Y.js. I will NOT touch Z.js"
+4. Proceed with minimal changes
+```
+
+### NEVER Change:
+```
+❌ Files not mentioned in the task
+❌ Code that already works correctly
+❌ Unrelated components or pages
+❌ "Improvements" you noticed while working
+❌ Refactoring that wasn't requested
+❌ Adding features that weren't asked for
+```
+
+### ALWAYS:
+```
+✅ Make MINIMAL changes only
+✅ Change ONE file at a time
+✅ Test after EACH change
+✅ If something breaks → REVERT immediately
+✅ If unsure → ASK before changing
+```
+
+### WHEN FIXING A BUG:
+```
+✅ Fix ONLY the bug
+✅ Touch ONLY the file with the bug
+❌ Do NOT "improve" other code
+❌ Do NOT refactor
+❌ Do NOT add features
+❌ Do NOT change working pages
+```
+
+---
+
 ## 🧠 THE THREE-WAY THINKING (التفكير الثلاثي)
 
 Before ANY action, think through ALL THREE perspectives:
 
 ### 1. 👤 As a Regular User (كمستخدم عادي)
 ```
-Ask yourself:
 ├── What do I see on the screen?
 ├── Is it clear what I should do?
 ├── Does the flow make sense?
-├── Would my grandmother understand this?
 ├── Is the Arabic text correct and natural?
-├── Does RTL layout look right?
-└── Am I confused at any point?
+└── Does RTL layout look right?
 ```
 
 ### 2. 🔧 As an Expert Developer (كخبير تقني)
 ```
-Ask yourself:
 ├── Is the code correct and efficient?
 ├── Are there any bugs or edge cases?
 ├── Is security properly handled?
-├── Are there race conditions?
 ├── Is error handling complete?
-├── Does it follow best practices?
-└── Will this scale?
+└── Does it follow best practices?
 ```
 
 ### 3. 💡 Outside the Box (خارج الصندوق)
 ```
-Ask yourself:
 ├── Am I solving the right problem?
 ├── Is there a simpler solution?
 ├── What am I missing?
-├── Could the bug be somewhere else entirely?
-├── Do we even need this feature?
-├── What would break if I do this?
-└── Is there a pattern I'm not seeing?
-```
-
----
-
-## ⚖️ CORE PRINCIPLES (المبادئ الأساسية)
-
-### Simplicity Above All (البساطة فوق كل شيء)
-```
-✅ DO:
-- Make the smallest change possible
-- One change = one purpose
-- If it works, don't over-engineer it
-- Prefer readable over clever
-
-❌ DON'T:
-- Add features "just in case"
-- Refactor unrelated code
-- Create abstractions too early
-- Write clever one-liners
-```
-
-### Never Be Lazy (لا تكن كسولاً أبداً)
-```
-✅ DO:
-- Find and fix the ROOT CAUSE
-- Test your changes thoroughly
-- Document what you changed and why
-- Consider all edge cases
-
-❌ DON'T:
-- Add temporary fixes / band-aids
-- Skip error handling
-- Ignore warnings
-- Leave TODO comments without tracking
-```
-
-### Senior Developer Mindset (عقلية المطور الخبير)
-```
-✅ DO:
-- Own the problem completely
-- Ask "why" 5 times to find root cause
-- Consider future maintainability
-- Leave code better than you found it
-
-❌ DON'T:
-- Blame others or external factors
-- Say "it works on my machine"
-- Make changes you don't understand
-- Copy-paste without understanding
+└── What would break if I do this?
 ```
 
 ---
 
 ## 📋 WORKFLOW RULES (قواعد سير العمل)
 
-### Before Starting Any Task:
+### Before Starting:
 ```
-1. □ Read and understand the FULL requirement
-2. □ Identify which files will be affected
-3. □ Create a plan in tasks/todo.md
-4. □ Think through all three perspectives
-5. □ Ask clarifying questions if needed
+1. □ Read and understand the requirement
+2. □ Identify which files MUST be changed
+3. □ List files that should NOT be touched
+4. □ ANNOUNCE: "I will change X. I will NOT touch Y, Z"
+5. □ Proceed with the task
 ```
 
 ### While Working:
 ```
-1. □ Work on ONE todo item at a time
+1. □ Work on ONE file at a time
 2. □ Make the SMALLEST change possible
 3. □ Test after EACH change
-4. □ Mark items complete as you go
-5. □ Explain changes at high level
+4. □ DO NOT touch files outside your plan
 ```
 
 ### After Completing:
 ```
 1. □ Review all changes made
-2. □ Update todo.md with summary
-3. □ List all files modified
-4. □ Provide testing instructions
-5. □ Note any remaining concerns
+2. □ List all files modified
+3. □ Provide testing instructions
 ```
 
 ---
 
 ## 🚫 ABSOLUTE DON'Ts (ممنوعات مطلقة)
 
-### Never Do These:
 ```
 ❌ Modify files outside the scope of the task
+❌ "Improve" code that wasn't mentioned
+❌ Refactor working code while fixing a bug
 ❌ Add new npm packages without asking
 ❌ Delete or rename existing files without asking
 ❌ Change database schema without asking
-❌ Modify backend when task is frontend-only
 ❌ Make "improvements" not requested
-❌ Skip error handling
-❌ Use console.log in production code
-❌ Hardcode values that should be configurable
-❌ Ignore existing patterns in the codebase
-```
-
-### Never Say These:
-```
-❌ "This should work" (test it!)
-❌ "I'll fix this later" (fix it now!)
-❌ "This is good enough" (make it right!)
-❌ "I don't know why this works" (understand it!)
-❌ "Let me refactor everything" (minimal changes!)
 ```
 
 ---
 
 ## ✅ CODE STANDARDS (معايير الكود)
-
-### React Components:
-```javascript
-// ✅ GOOD
-const MyComponent = ({ user }) => {
-  if (!user) return <Loading />;
-  return <div>{user.name}</div>;
-};
-
-// ❌ BAD
-const MyComponent = (props) => {
-  return <div>{props.user && props.user.name ? props.user.name : 'Loading...'}</div>;
-};
-```
 
 ### Error Handling:
 ```javascript
@@ -178,45 +143,21 @@ try {
   console.error('Failed to fetch data:', error);
   setError('حدث خطأ في تحميل البيانات');
 }
-
-// ❌ BAD
-const data = await api.fetchData();
-setData(data);
-```
-
-### Conditionals:
-```javascript
-// ✅ GOOD - Clear and readable
-const isAdmin = user?.role === 'admin';
-if (isAdmin) {
-  return <AdminPanel />;
-}
-
-// ❌ BAD - Confusing
-if (user && user.role && user.role.toLowerCase() === 'admin') {
-  return <AdminPanel />;
-}
 ```
 
 ### API Calls:
 ```javascript
 // ✅ GOOD
-const fetchLines = async () => {
+const fetchData = async () => {
   setLoading(true);
   try {
-    const response = await linesAPI.getAll();
-    setLines(response.data);
+    const response = await api.getData();
+    setData(response.data);
   } catch (error) {
     setError(error.message);
   } finally {
     setLoading(false);
   }
-};
-
-// ❌ BAD
-const fetchLines = async () => {
-  const response = await linesAPI.getAll();
-  setLines(response.data);
 };
 ```
 
@@ -228,30 +169,21 @@ const fetchLines = async () => {
 ```
 ✅ Always test with Arabic text
 ✅ Check RTL layout looks correct
-✅ Use Cairo font for Arabic
 ✅ Currency format: "150,000 د.ع"
-✅ Date format: Iraqi format
 ✅ Phone format: Iraqi format (+964)
 ```
 
-### User Roles:
+### Mode Context:
 ```javascript
-// The three roles in Toosila:
-const ROLES = {
-  ADMIN: 'admin',      // Full access, testing features
-  DRIVER: 'driver',    // Creates offers, manages bookings
-  PASSENGER: 'passenger' // Browses, books, rates
-};
+// mode === 'driver' → Show driver features (الطلبات)
+// mode === 'passenger' → Show passenger features (العروض)
 
-// Role-based rendering pattern:
-if (user.role === 'admin') {
-  return <FullFeature />;
-} else {
-  return <ComingSoon />;
-}
+// IMPORTANT: When fixing mode-related issues:
+// - ONLY change the specific component mentioned
+// - DO NOT change ViewOffers.js when fixing ViewDemands.js
 ```
 
-### Cities (Iraqi Cities):
+### Cities:
 ```javascript
 const IRAQI_CITIES = [
   'بغداد', 'البصرة', 'أربيل', 'الموصل',
@@ -260,187 +192,47 @@ const IRAQI_CITIES = [
 ];
 ```
 
-### Ladies Only Feature:
-```javascript
-// Always include ladies-only filter option
-// Show 👩 icon for ladies-only rides
-// Filter: isLadiesOnly: true/false
+---
+
+## 🔍 DEBUGGING (تصحيح الأخطاء)
+
+```
+1. REPRODUCE → Can I see the bug?
+2. ISOLATE → Which file has the bug?
+3. IDENTIFY → What is the root cause?
+4. FIX → Minimal fix, ONLY this file
+5. VERIFY → Is it fixed? Did anything break?
 ```
 
 ---
 
-## 🔍 DEBUGGING METHODOLOGY (منهجية تصحيح الأخطاء)
+## 📁 FILE ORGANIZATION
 
-### Step-by-Step Debugging:
-```
-1. REPRODUCE
-   └── Can I see the bug myself?
-   
-2. ISOLATE
-   └── Where exactly does it break?
-   
-3. IDENTIFY
-   └── What is the root cause?
-   
-4. FIX
-   └── What is the minimal fix?
-   
-5. VERIFY
-   └── Is it actually fixed?
-   
-6. PREVENT
-   └── How do we prevent this again?
-```
-
-### Common Bug Patterns:
-```
-| Symptom                  | Likely Cause                    |
-|--------------------------|--------------------------------|
-| Component not showing    | Route not defined / Import missing |
-| Data not loading         | API URL wrong / Auth header missing |
-| Infinite loop            | useEffect dependencies wrong   |
-| Stale data               | State not updating correctly   |
-| Role check failing       | Case sensitivity / Async timing |
-| Arabic text wrong        | Missing RTL / Wrong encoding   |
-```
-
-### Debug Commands:
-```bash
-# Search for patterns
-grep -rn "pattern" client/src/
-
-# Find all files with name
-find . -name "*.js" | xargs grep "searchterm"
-
-# Check for console errors
-# Open browser DevTools → Console
-
-# Check network requests
-# Open browser DevTools → Network
-```
-
----
-
-## 📁 FILE ORGANIZATION (تنظيم الملفات)
-
-### Where Things Go:
 ```
 client/src/
-├── pages/           # Route-level components (one per route)
-├── components/      # Reusable UI components
-├── context/         # Global state (React Context)
-├── services/        # API calls (api.js)
-├── hooks/           # Custom React hooks
-├── utils/           # Helper functions
+├── pages/           # Route-level components
+├── components/      # Reusable UI
+├── context/         # Global state
+├── services/        # API calls
 └── styles/          # CSS files
 
 server/
-├── routes/          # API route definitions
+├── routes/          # API routes
 ├── controllers/     # Request handlers
 ├── models/          # Database queries
-├── middlewares/     # Auth, validation, etc.
-└── utils/           # Server helpers
-```
-
-### Naming Conventions:
-```
-Pages:        PascalCase.js       (LinesHome.js)
-Components:   PascalCase.jsx      (LineCard.jsx)
-Contexts:     PascalCase.js       (LinesContext.js)
-Services:     camelCase.js        (api.js)
-Utils:        camelCase.js        (formatDate.js)
-CSS Modules:  ComponentName.module.css
+└── middlewares/     # Auth, validation
 ```
 
 ---
 
-## 📝 TODO.MD FORMAT (تنسيق ملف المهام)
+## 🎯 QUICK CHECKLIST
 
-### Template:
-```markdown
-# Task: [Task Name]
-
-## Problem
-[Clear description of the issue]
-
-## Investigation
-- [ ] Check file X for Y
-- [ ] Verify Z is working
-- [ ] Test with different roles
-
-## Plan
-- [ ] Step 1: Do X
-- [ ] Step 2: Do Y
-- [ ] Step 3: Test
-
-## Changes Made
-| File | Change |
-|------|--------|
-| path/to/file.js | Added X |
-
-## Testing
-1. Login as admin
-2. Go to /lines
-3. Should see full page
-
-## Review
-### Summary
-[What was done and why]
-
-### Files Modified
-- file1.js
-- file2.js
-
-### Notes
-[Any concerns or follow-ups]
 ```
-
----
-
-## 💬 COMMUNICATION RULES (قواعد التواصل)
-
-### When Explaining Changes:
-```
-✅ DO:
-- Give high-level summary first
-- Explain WHY, not just WHAT
-- Use simple language
-- Show before/after when helpful
-
-❌ DON'T:
-- Dump entire code blocks
-- Use jargon without explaining
-- Skip the reasoning
-- Assume context is known
-```
-
-### When Asking Questions:
-```
-✅ DO:
-- Ask one question at a time
-- Provide options when possible
-- Explain why you're asking
-
-❌ DON'T:
-- Ask vague questions
-- Ask multiple questions at once
-- Ask without context
-```
-
----
-
-## 🎯 QUICK REFERENCE CHECKLIST
-
-Before submitting ANY change:
-```
-□ Did I think as a USER? (Is it usable?)
-□ Did I think as an EXPERT? (Is it correct?)
-□ Did I think OUTSIDE THE BOX? (Am I missing something?)
+□ Did I ONLY change files mentioned in the task?
+□ Did I touch any working file? (If yes → REVERT!)
 □ Is this the SIMPLEST solution?
 □ Did I find the ROOT CAUSE?
 □ Did I test it?
-□ Did I document it?
-□ Would I be proud of this code?
 ```
 
 ---
@@ -449,21 +241,15 @@ Before submitting ANY change:
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║   "Simplicity is the ultimate sophistication"                 ║
-║                        - Leonardo da Vinci                    ║
-║                                                               ║
-║   "البساطة هي قمة التطور"                                      ║
-║                                                               ║
+║   🔒 GOLDEN RULE: DO NOT TOUCH WORKING CODE                  ║
+║   "إذا كان يعمل، لا تلمسه"                                     ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
 **You are a SENIOR DEVELOPER.**
-**You NEVER take shortcuts.**
-**You ALWAYS find the root cause.**
-**You make code BETTER, not just working.**
+**You NEVER touch working code.**
+**You change ONLY what needs to be changed.**
 
 ---
 
-*Last Updated: December 2025*
 *Project: Toosila (توصيلة) - Iraqi Ride-Sharing App*

@@ -49,23 +49,41 @@ class Message {
     return result.rows.length > 0 ? new Message(result.rows[0]) : null;
   }
 
-  // Get messages for a specific ride
-  static async getByRide(rideType, rideId, page = 1, limit = 50) {
+  // Get messages for a specific ride (with privacy filtering)
+  static async getByRide(rideType, rideId, page = 1, limit = 50, currentUserId = null, otherUserId = null) {
     const offset = (page - 1) * limit;
-    
+
+    // PRIVACY FIX: Filter messages to only show conversation between current user and specific other user
+    // This prevents users from seeing messages between other passengers and the driver
+    let whereClause = 'm.ride_type = $1 AND m.ride_id = $2';
+    const params = [rideType, rideId];
+    let paramCount = 3;
+
+    if (currentUserId && otherUserId) {
+      // Show only messages between currentUserId and otherUserId
+      whereClause += ` AND (
+        (m.sender_id = $${paramCount} OR m.sender_id = $${paramCount + 1})
+      )`;
+      params.push(currentUserId, otherUserId);
+      paramCount += 2;
+    }
+
+    params.push(limit, offset);
+
     const result = await query(
       `SELECT m.*, u.name as sender_name
        FROM messages m
        JOIN users u ON m.sender_id = u.id
-       WHERE m.ride_type = $1 AND m.ride_id = $2
+       WHERE ${whereClause}
        ORDER BY m.created_at ASC
-       LIMIT $3 OFFSET $4`,
-      [rideType, rideId, limit, offset]
+       LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
+      params
     );
 
+    const countParams = params.slice(0, -2); // Remove limit and offset
     const countResult = await query(
-      'SELECT COUNT(*) FROM messages WHERE ride_type = $1 AND ride_id = $2',
-      [rideType, rideId]
+      `SELECT COUNT(*) FROM messages m WHERE ${whereClause}`,
+      countParams
     );
 
     return {

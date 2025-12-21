@@ -226,8 +226,12 @@ export const messagesAPI = {
   getConversations: async () => {
     return apiRequest('/messages/conversations', { method: 'GET' });
   },
-  getRideMessages: async (rideType, rideId, page = 1, limit = 50) => {
-    return apiRequest(`/messages/${rideType}/${rideId}?page=${page}&limit=${limit}`, {
+  getRideMessages: async (rideType, rideId, page = 1, limit = 50, otherUserId = null) => {
+    let url = `/messages/${rideType}/${rideId}?page=${page}&limit=${limit}`;
+    if (otherUserId) {
+      url += `&other_user_id=${otherUserId}`;
+    }
+    return apiRequest(url, {
       method: 'GET',
     });
   },

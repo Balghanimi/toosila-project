@@ -66,8 +66,8 @@ const ChatInterface = ({
   // Load messages for this conversation
   useEffect(() => {
     if (tripId && user?.id) {
-      // Use ride-based conversation fetching
-      fetchRideConversation(rideType, tripId);
+      // Use ride-based conversation fetching WITH privacy filter by otherUserId
+      fetchRideConversation(rideType, tripId, otherUserId);
     } else if (otherUserId && user?.id) {
       // Fallback to user-based conversation (deprecated)
       fetchConversation(otherUserId);
@@ -89,9 +89,9 @@ const ChatInterface = ({
 
       showSuccess('✅ تم إرسال الرسالة بنجاح!');
 
-      // Refresh conversation (use ride-based if tripId exists)
+      // Refresh conversation (use ride-based with privacy filter if tripId exists)
       if (tripId) {
-        fetchRideConversation(rideType, tripId);
+        fetchRideConversation(rideType, tripId, otherUserId);
       } else if (otherUserId) {
         fetchConversation(otherUserId);
       }

@@ -115,7 +115,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 // Get messages for a specific ride
 const getRideMessages = asyncHandler(async (req, res) => {
   const { rideType, rideId } = req.params;
-  const { page = 1, limit = 50 } = req.query;
+  const { page = 1, limit = 50, other_user_id } = req.query;
 
   // Validate ride type
   if (!['offer', 'demand'].includes(rideType)) {
@@ -156,7 +156,15 @@ const getRideMessages = asyncHandler(async (req, res) => {
     }
   }
 
-  const result = await Message.getByRide(rideType, rideId, parseInt(page), parseInt(limit));
+  // PRIVACY FIX: Pass other_user_id to filter messages for this specific conversation
+  const result = await Message.getByRide(
+    rideType,
+    rideId,
+    parseInt(page),
+    parseInt(limit),
+    req.user.id,
+    other_user_id || null
+  );
 
   res.json(result);
 });
