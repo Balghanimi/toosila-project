@@ -21,7 +21,32 @@ export const NotificationProvider = ({ children }) => {
     totalPending: 0,
   });
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [previousUnreadCount, setPreviousUnreadCount] = useState(0);
   const [toasts, setToasts] = useState([]);
+
+  // Play notification sound
+  const playNotificationSound = useCallback(() => {
+    try {
+      // Simple notification beep using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800; // Frequency in Hz
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      console.log('Could not play notification sound:', error);
+    }
+  }, []);
 
   // Fetch pending bookings count
   const fetchPendingCount = useCallback(async () => {
@@ -43,17 +68,27 @@ export const NotificationProvider = ({ children }) => {
   const fetchUnreadCount = useCallback(async () => {
     if (!currentUser) {
       setUnreadMessages(0);
+      setPreviousUnreadCount(0);
       return;
     }
 
     try {
       const response = await messagesAPI.getUnreadCount();
-      setUnreadMessages(response.count || 0);
+      const newCount = response.count || 0;
+
+      // Play sound if count increased (new message received)
+      if (newCount > previousUnreadCount && previousUnreadCount > 0) {
+        playNotificationSound();
+        console.log('[NOTIFICATION] New message received! Playing sound...');
+      }
+
+      setPreviousUnreadCount(newCount);
+      setUnreadMessages(newCount);
     } catch (error) {
       // Silently fail - backend might not have messages API implemented yet
       setUnreadMessages(0);
     }
-  }, [currentUser]);
+  }, [currentUser, previousUnreadCount, playNotificationSound]);
 
   // Polling for bookings every 30 seconds
   useEffect(() => {
