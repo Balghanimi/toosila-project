@@ -28,10 +28,17 @@ export const MessagesProvider = ({ children }) => {
 
     try {
       setLoading(true);
+      console.log('[MESSAGES] 📥 Fetching conversations list...');
       const response = await messagesAPI.getConversations();
+      console.log('[MESSAGES] 📨 Conversations API Response:', {
+        conversationsCount: response.conversations?.length || 0,
+        total: response.total,
+        conversations: response.conversations,
+      });
       setConversations(response.conversations || []);
     } catch (error) {
       // Silently fail - backend might not have messages API implemented yet
+      console.error('[MESSAGES] ❌ Error fetching conversations:', error);
       setConversations([]);
     } finally {
       setLoading(false);
@@ -91,7 +98,16 @@ export const MessagesProvider = ({ children }) => {
 
       try {
         setLoading(true);
+        console.log('[MESSAGES] 📥 Fetching ride conversation:', { rideType, rideId });
         const response = await messagesAPI.getRideMessages(rideType, rideId);
+        console.log('[MESSAGES] 📨 API Response:', {
+          messagesCount: response.messages?.length || 0,
+          total: response.total,
+          page: response.page,
+          limit: response.limit,
+          totalPages: response.totalPages,
+        });
+        console.log('[MESSAGES] 📋 Messages array:', response.messages);
         setCurrentConversation(response.messages || []);
 
         // Auto mark conversation as read
@@ -105,7 +121,7 @@ export const MessagesProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching ride conversation:', error);
+        console.error('[MESSAGES] ❌ Error fetching ride conversation:', error);
         setCurrentConversation([]);
       } finally {
         setLoading(false);
