@@ -173,7 +173,8 @@ const BottomNav = () => {
             key: 'lines',
             label: 'الخطوط',
             icon: '🚌',
-            action: () => navigate('/lines'),
+            comingSoon: true,
+            action: () => alert('الخطوط قريباً! 🚌\n\nهذه الميزة قيد التطوير وستكون متاحة قريباً.'),
           },
           // My Subscriptions - shown only when logged in and has full lines access
           ...(currentUser && canAccessLines(currentUser)
@@ -501,6 +502,20 @@ const BottomNav = () => {
                   >
                     {menuItem.label}
                   </span>
+                  {menuItem.comingSoon && (
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: '600',
+                        color: '#9ca3af',
+                        textAlign: 'center',
+                        lineHeight: '1',
+                        marginTop: '-4px',
+                      }}
+                    >
+                      (قريباً)
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
