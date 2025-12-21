@@ -22,13 +22,17 @@ export const NotificationProvider = ({ children }) => {
   });
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [previousUnreadCount, setPreviousUnreadCount] = useState(0);
+  const [isFirstFetch, setIsFirstFetch] = useState(true);
   const [toasts, setToasts] = useState([]);
 
   // Play notification sound
   const playNotificationSound = useCallback(() => {
+    console.log('[NOTIFICATION] 🎵 playNotificationSound called');
     try {
       // Simple notification beep using Web Audio API
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      console.log('[NOTIFICATION] 🎵 AudioContext created:', audioContext.state);
+
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -43,8 +47,10 @@ export const NotificationProvider = ({ children }) => {
 
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
+
+      console.log('[NOTIFICATION] ✅ Sound played successfully');
     } catch (error) {
-      console.log('Could not play notification sound:', error);
+      console.error('[NOTIFICATION] ❌ Could not play notification sound:', error);
     }
   }, []);
 
@@ -76,19 +82,35 @@ export const NotificationProvider = ({ children }) => {
       const response = await messagesAPI.getUnreadCount();
       const newCount = response.count || 0;
 
+      console.log('[NOTIFICATION] 📊 Count check:', {
+        previous: previousUnreadCount,
+        new: newCount,
+        increased: newCount > previousUnreadCount,
+        isFirstFetch,
+      });
+
       // Play sound if count increased (new message received)
-      if (newCount > previousUnreadCount && previousUnreadCount > 0) {
+      // Skip sound on first fetch to avoid false positives on app load
+      if (newCount > previousUnreadCount && !isFirstFetch) {
+        console.log('[NOTIFICATION] 🔔 New message detected! Playing sound...');
         playNotificationSound();
-        console.log('[NOTIFICATION] New message received! Playing sound...');
+      }
+
+      // Mark first fetch as complete
+      if (isFirstFetch) {
+        console.log('[NOTIFICATION] ✅ First fetch complete, baseline set to:', newCount);
+        setIsFirstFetch(false);
       }
 
       setPreviousUnreadCount(newCount);
       setUnreadMessages(newCount);
+      console.log('[NOTIFICATION] 💾 Updated counts - unread:', newCount);
     } catch (error) {
+      console.error('[NOTIFICATION] ❌ Error fetching unread count:', error);
       // Silently fail - backend might not have messages API implemented yet
       setUnreadMessages(0);
     }
-  }, [currentUser, previousUnreadCount, playNotificationSound]);
+  }, [currentUser, previousUnreadCount, isFirstFetch, playNotificationSound]);
 
   // Polling for bookings every 30 seconds
   useEffect(() => {
@@ -105,15 +127,26 @@ export const NotificationProvider = ({ children }) => {
 
   // Polling for messages every 10 seconds
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log('[NOTIFICATION] ⏸️ Polling stopped - no user logged in');
+      return;
+    }
+
+    console.log('[NOTIFICATION] ▶️ Starting message polling for user:', currentUser.name);
 
     // Initial fetch
     fetchUnreadCount();
 
     // Set up polling
-    const interval = setInterval(fetchUnreadCount, 10000); // 10 seconds
+    const interval = setInterval(() => {
+      console.log('[NOTIFICATION] 🔄 Polling for new messages...');
+      fetchUnreadCount();
+    }, 10000); // 10 seconds
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('[NOTIFICATION] ⏹️ Stopping message polling');
+      clearInterval(interval);
+    };
   }, [currentUser, fetchUnreadCount]);
 
   // Remove toast
