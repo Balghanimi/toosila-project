@@ -20,6 +20,7 @@ const { moderateLimiter } = require('../middlewares/rateLimiters');
 const {
   validateRatingCreation,
   validateId,
+  validateUserId,
   validatePagination
 } = require('../middlewares/validate');
 
@@ -27,8 +28,8 @@ const {
 router.get('/', validatePagination, getRatings);
 router.get('/top-users', getTopRatedUsers);
 router.get('/stats', getRatingStats);
-router.get('/user/:userId', validateId, validatePagination, getUserRatings);
-router.get('/user/:userId/average', validateId, getUserAverageRating);
+router.get('/user/:userId', validateUserId, validatePagination, getUserRatings);
+router.get('/user/:userId/average', validateUserId, getUserAverageRating);
 router.get('/:id', validateId, getRatingById);
 
 // Protected routes

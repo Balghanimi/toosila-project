@@ -160,6 +160,12 @@ const validateId = [
   handleValidationErrors,
 ];
 
+// User ID parameter validation
+const validateUserId = [
+  param('userId').isUUID(4).withMessage('Invalid ID format / معرّف غير صالح'),
+  handleValidationErrors,
+];
+
 // Integer ID validation (for bookings, offers, etc.)
 const validateIntId = [
   param('id').isInt({ min: 1 }).withMessage('Invalid ID format / معرّف غير صالح'),
@@ -188,6 +194,7 @@ module.exports = {
   validateMessageCreation,
   validateRatingCreation,
   validateId,
+  validateUserId,
   validateIntId,
   validatePagination,
 };

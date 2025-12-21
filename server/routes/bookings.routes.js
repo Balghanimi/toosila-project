@@ -22,6 +22,7 @@ const { moderateLimiter } = require('../middlewares/rateLimiters');
 const {
   validateBookingCreation,
   validateId,
+  validateUserId,
   validateIntId,
   validatePagination
 } = require('../middlewares/validate');
@@ -239,7 +240,7 @@ router.put('/:id/cancel', moderateLimiter, cancelBooking);
  *       200:
  *         description: User bookings retrieved successfully
  */
-router.get('/user/:userId', validateId, validatePagination, getUserBookings);
+router.get('/user/:userId', validateUserId, validatePagination, getUserBookings);
 
 /**
  * @swagger

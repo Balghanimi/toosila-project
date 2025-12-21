@@ -21,6 +21,7 @@ const { moderateLimiter } = require('../middlewares/rateLimiters');
 const {
   validateDemandCreation,
   validateId,
+  validateUserId,
   validatePagination,
 } = require('../middlewares/validate');
 const { requireEmailVerified } = require('../controllers/emailVerification.controller');
@@ -398,7 +399,7 @@ router.delete('/:id', authenticateToken, moderateLimiter, deleteDemand);
  *                 pagination:
  *                   $ref: '#/components/schemas/Pagination'
  */
-router.get('/user/:userId', validateId, validatePagination, getUserDemands);
+router.get('/user/:userId', validateUserId, validatePagination, getUserDemands);
 
 /**
  * @swagger

@@ -21,6 +21,7 @@ const {
   validateOfferCreation,
   validateOfferUpdate,
   validateId,
+  validateUserId,
   validatePagination
 } = require('../middlewares/validate');
 const { requireEmailVerified } = require('../controllers/emailVerification.controller');
@@ -381,7 +382,7 @@ router.put('/:id/deactivate', moderateLimiter, deactivateOffer);
  *                 pagination:
  *                   $ref: '#/components/schemas/Pagination'
  */
-router.get('/user/:userId', validateId, validatePagination, getUserOffers);
+router.get('/user/:userId', validateUserId, validatePagination, getUserOffers);
 
 /**
  * @swagger
