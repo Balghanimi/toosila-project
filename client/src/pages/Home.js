@@ -314,6 +314,43 @@ const Home = () => {
         <p className={styles.heroSubtitle} style={{ fontSize: '0.95rem', marginBottom: '0' }}>
           رحلات مشتركة آمنة وموثوقة في جميع أنحاء العراق
         </p>
+
+        {/* Login/Signup Button - Only for guests */}
+        {!currentUser && (
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              marginTop: '16px',
+              padding: '12px 32px',
+              background: 'linear-gradient(135deg, #34c759 0%, #28a745 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '1rem',
+              fontWeight: '700',
+              fontFamily: '"Cairo", sans-serif',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(52, 199, 89, 0.3)',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              justifyContent: 'center',
+              minWidth: '200px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(52, 199, 89, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(52, 199, 89, 0.3)';
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>🔐</span>
+            تسجيل الدخول / إنشاء حساب
+          </button>
+        )}
       </section>
 
       {/* Error Message */}
