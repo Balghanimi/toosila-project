@@ -66,49 +66,57 @@ const sendMessage = asyncHandler(async (req, res) => {
     content
   });
 
-  // Get other participants in the conversation to notify them
-  const io = req.app.get('io');
-  if (io) {
-    let participantsQuery;
-
-    if (rideType === 'offer') {
-      // Notify driver and all users who have messaged about this offer
-      participantsQuery = await query(
-        `SELECT DISTINCT u.id, u.name
-         FROM users u
-         WHERE u.id != $1 AND (
-           u.id = (SELECT driver_id FROM offers WHERE id = $2) OR
-           u.id IN (SELECT passenger_id FROM bookings WHERE offer_id = $2 AND status IN ('pending', 'accepted')) OR
-           u.id IN (SELECT DISTINCT sender_id FROM messages WHERE ride_type = 'offer' AND ride_id = $2)
-         )`,
-        [req.user.id, rideId]
-      );
-    } else {
-      // Notify passenger and all drivers with accepted responses
-      participantsQuery = await query(
-        `SELECT DISTINCT u.id, u.name
-         FROM users u
-         WHERE u.id != $1 AND (
-           u.id = (SELECT passenger_id FROM demands WHERE id = $2) OR
-           u.id IN (SELECT driver_id FROM demand_responses WHERE demand_id = $2 AND status IN ('pending', 'accepted'))
-         )`,
-        [req.user.id, rideId]
-      );
-    }
-
-    // Send notification to each participant
-    participantsQuery.rows.forEach(participant => {
-      notifyNewMessage(io, participant.id, {
-        ...message.toJSON(),
-        senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
-        ride: rideCheck.rows[0]
-      });
-    });
-  }
-
+  // PERFORMANCE FIX: Send response immediately, then send notifications in background
   res.status(201).json({
     message: 'Message sent successfully',
     messageData: message.toJSON()
+  });
+
+  // Send notifications in background (non-blocking)
+  setImmediate(async () => {
+    try {
+      const io = req.app.get('io');
+      if (!io) return;
+
+      let participantsQuery;
+
+      if (rideType === 'offer') {
+        // Notify driver and all users who have messaged about this offer
+        participantsQuery = await query(
+          `SELECT DISTINCT u.id, u.name
+           FROM users u
+           WHERE u.id != $1 AND (
+             u.id = (SELECT driver_id FROM offers WHERE id = $2) OR
+             u.id IN (SELECT passenger_id FROM bookings WHERE offer_id = $2 AND status IN ('pending', 'accepted')) OR
+             u.id IN (SELECT DISTINCT sender_id FROM messages WHERE ride_type = 'offer' AND ride_id = $2)
+           )`,
+          [req.user.id, rideId]
+        );
+      } else {
+        // Notify passenger and all drivers with accepted responses
+        participantsQuery = await query(
+          `SELECT DISTINCT u.id, u.name
+           FROM users u
+           WHERE u.id != $1 AND (
+             u.id = (SELECT passenger_id FROM demands WHERE id = $2) OR
+             u.id IN (SELECT driver_id FROM demand_responses WHERE demand_id = $2 AND status IN ('pending', 'accepted'))
+           )`,
+          [req.user.id, rideId]
+        );
+      }
+
+      // Send notification to each participant
+      participantsQuery.rows.forEach(participant => {
+        notifyNewMessage(io, participant.id, {
+          ...message.toJSON(),
+          senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
+          ride: rideCheck.rows[0]
+        });
+      });
+    } catch (error) {
+      console.error('[MESSAGES] Error sending notifications:', error);
+      // Don't throw - notifications are non-critical
+    }
   });
 });
 
