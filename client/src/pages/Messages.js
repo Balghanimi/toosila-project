@@ -48,6 +48,13 @@ const Messages = () => {
   }, [location.state, navigate, location.pathname]);
 
   const handleSelectConversation = (conversation) => {
+    console.log('[MESSAGES PAGE] Conversation selected:', {
+      conversation,
+      otherUserId: conversation.otherUserId || conversation.other_user_id,
+      otherUserName: conversation.otherUserName || conversation.other_user_name,
+      tripId: conversation.tripId || conversation.ride_id,
+      rideType: conversation.rideType || conversation.ride_type,
+    });
     setSelectedConversation(conversation);
   };
 
