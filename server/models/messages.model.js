@@ -26,10 +26,7 @@ class Message {
     );
 
     // Fetch sender name
-    const senderResult = await query(
-      'SELECT name FROM users WHERE id = $1',
-      [senderId]
-    );
+    const senderResult = await query('SELECT name FROM users WHERE id = $1', [senderId]);
 
     const messageRow = result.rows[0];
     messageRow.sender_name = senderResult.rows[0]?.name || null;
@@ -50,7 +47,14 @@ class Message {
   }
 
   // Get messages for a specific ride (with privacy filtering)
-  static async getByRide(rideType, rideId, page = 1, limit = 50, currentUserId = null, otherUserId = null) {
+  static async getByRide(
+    rideType,
+    rideId,
+    page = 1,
+    limit = 50,
+    currentUserId = null,
+    otherUserId = null
+  ) {
     const offset = (page - 1) * limit;
 
     // DEBUG LOGGING
@@ -101,12 +105,15 @@ class Message {
     const result = await query(fullQuery, params);
 
     console.log('[MESSAGES MODEL] Query returned', result.rows.length, 'messages');
-    console.log('[MESSAGES MODEL] Message senders:', result.rows.map(r => ({
-      id: r.id,
-      sender_id: r.sender_id,
-      sender_name: r.sender_name,
-      content_preview: r.content?.substring(0, 30)
-    })));
+    console.log(
+      '[MESSAGES MODEL] Message senders:',
+      result.rows.map((r) => ({
+        id: r.id,
+        sender_id: r.sender_id,
+        sender_name: r.sender_name,
+        content_preview: r.content?.substring(0, 30),
+      }))
+    );
 
     const countParams = params.slice(0, -2); // Remove limit and offset
     const countResult = await query(
@@ -115,11 +122,11 @@ class Message {
     );
 
     return {
-      messages: result.rows.map(row => new Message(row)),
+      messages: result.rows.map((row) => new Message(row)),
       total: parseInt(countResult.rows[0].count),
       page,
       limit,
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
     };
   }
 
@@ -166,11 +173,11 @@ class Message {
     );
 
     return {
-      messages: result.rows.map(row => new Message(row)),
+      messages: result.rows.map((row) => new Message(row)),
       total: parseInt(countResult.rows[0].count),
       page,
       limit,
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
     };
   }
 
@@ -194,7 +201,7 @@ class Message {
       [userId, limit]
     );
 
-    return result.rows.map(row => new Message(row));
+    return result.rows.map((row) => new Message(row));
   }
 
   // Get message count for a ride
@@ -230,18 +237,31 @@ class Message {
          FROM offers o
          WHERE o.id IN (SELECT offer_id FROM bookings WHERE passenger_id = $1)
        ),
-       latest_messages AS (
-         SELECT DISTINCT ON (m.ride_type, m.ride_id)
+       all_senders AS (
+         -- Find all unique senders on each ride (excluding current user)
+         SELECT DISTINCT
                 m.ride_type,
                 m.ride_id,
+                m.sender_id as other_user_id
+         FROM messages m
+         WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
+           AND m.sender_id != $1
+       ),
+       latest_messages AS (
+         -- For each conversation pair (ride + other_user), get the latest message
+         SELECT DISTINCT ON (m.ride_type, m.ride_id, s.other_user_id)
+                m.ride_type,
+                m.ride_id,
+                s.other_user_id,
                 m.content as last_message,
                 m.created_at as last_message_time,
                 m.sender_id as last_sender_id,
                 u.name as last_sender_name
          FROM messages m
+         JOIN all_senders s ON m.ride_type = s.ride_type AND m.ride_id = s.ride_id
          JOIN users u ON m.sender_id = u.id
-         WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
-         ORDER BY m.ride_type, m.ride_id, m.created_at DESC
+         WHERE m.sender_id IN ($1, s.other_user_id)
+         ORDER BY m.ride_type, m.ride_id, s.other_user_id, m.created_at DESC
        )
        SELECT lm.*,
               ur.from_city,
@@ -250,29 +270,10 @@ class Message {
               ur.price,
               ur.seats,
               ur.owner_id,
-              CASE
-                WHEN ur.owner_id = $1 THEN (
-                  SELECT u2.name FROM messages m2
-                  JOIN users u2 ON m2.sender_id = u2.id
-                  WHERE m2.ride_type = lm.ride_type
-                    AND m2.ride_id = lm.ride_id
-                    AND m2.sender_id != $1
-                  LIMIT 1
-                )
-                ELSE (SELECT name FROM users WHERE id = ur.owner_id)
-              END as other_user_name,
-              CASE
-                WHEN ur.owner_id = $1 THEN (
-                  SELECT m2.sender_id FROM messages m2
-                  WHERE m2.ride_type = lm.ride_type
-                    AND m2.ride_id = lm.ride_id
-                    AND m2.sender_id != $1
-                  LIMIT 1
-                )
-                ELSE ur.owner_id
-              END as other_user_id
+              u2.name as other_user_name
        FROM latest_messages lm
        JOIN user_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
+       JOIN users u2 ON lm.other_user_id = u2.id
        ORDER BY lm.last_message_time DESC
        LIMIT $2 OFFSET $3`,
       [userId, limit, offset]
@@ -287,9 +288,10 @@ class Message {
          SELECT 'offer' as ride_type, offer_id as ride_id
          FROM bookings WHERE passenger_id = $1
        )
-       SELECT COUNT(DISTINCT (m.ride_type, m.ride_id)) as count
+       SELECT COUNT(DISTINCT (m.ride_type, m.ride_id, m.sender_id)) as count
        FROM messages m
-       WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)`,
+       WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
+         AND m.sender_id != $1`,
       [userId]
     );
 
@@ -298,7 +300,7 @@ class Message {
       total: parseInt(countResult.rows[0].count),
       page,
       limit,
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
     };
   }
 
@@ -323,7 +325,7 @@ class Message {
        RETURNING *`,
       [rideType, rideId, userId]
     );
-    return result.rows.map(row => new Message(row));
+    return result.rows.map((row) => new Message(row));
   }
 
   // Get unread count for a user
@@ -373,7 +375,7 @@ class Message {
       total: 0,
       page,
       limit,
-      totalPages: 0
+      totalPages: 0,
     };
   }
 
@@ -391,7 +393,7 @@ class Message {
       isRead: this.isRead,
       readAt: this.readAt,
       readBy: this.readBy,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 }
