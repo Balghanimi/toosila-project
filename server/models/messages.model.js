@@ -53,6 +53,18 @@ class Message {
   static async getByRide(rideType, rideId, page = 1, limit = 50, currentUserId = null, otherUserId = null) {
     const offset = (page - 1) * limit;
 
+    // DEBUG LOGGING
+    console.log('[MESSAGES MODEL] getByRide called with:', {
+      rideType,
+      rideId,
+      page,
+      limit,
+      currentUserId,
+      otherUserId,
+      hasCurrentUser: !!currentUserId,
+      hasOtherUser: !!otherUserId,
+    });
+
     // PRIVACY FIX: Filter messages to only show conversation between current user and specific other user
     // This prevents users from seeing messages between other passengers and the driver
     let whereClause = 'm.ride_type = $1 AND m.ride_id = $2';
@@ -66,19 +78,35 @@ class Message {
       whereClause += ` AND m.sender_id IN ($${paramCount}, $${paramCount + 1})`;
       params.push(currentUserId, otherUserId);
       paramCount += 2;
+      console.log('[MESSAGES MODEL] Privacy filter applied - sender must be one of:', {
+        currentUserId,
+        otherUserId,
+      });
+    } else {
+      console.log('[MESSAGES MODEL] ⚠️ WARNING: No privacy filter! Showing ALL messages for ride');
     }
 
     params.push(limit, offset);
 
-    const result = await query(
-      `SELECT m.*, u.name as sender_name
+    const fullQuery = `SELECT m.*, u.name as sender_name
        FROM messages m
        JOIN users u ON m.sender_id = u.id
        WHERE ${whereClause}
        ORDER BY m.created_at ASC
-       LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
-      params
-    );
+       LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+
+    console.log('[MESSAGES MODEL] Executing query:', fullQuery);
+    console.log('[MESSAGES MODEL] Query params:', params);
+
+    const result = await query(fullQuery, params);
+
+    console.log('[MESSAGES MODEL] Query returned', result.rows.length, 'messages');
+    console.log('[MESSAGES MODEL] Message senders:', result.rows.map(r => ({
+      id: r.id,
+      sender_id: r.sender_id,
+      sender_name: r.sender_name,
+      content_preview: r.content?.substring(0, 30)
+    })));
 
     const countParams = params.slice(0, -2); // Remove limit and offset
     const countResult = await query(

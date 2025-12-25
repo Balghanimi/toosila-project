@@ -165,6 +165,17 @@ const getRideMessages = asyncHandler(async (req, res) => {
   }
 
   // PRIVACY FIX: Pass other_user_id to filter messages for this specific conversation
+  console.log('[MESSAGES CONTROLLER] getRideMessages called:', {
+    rideType,
+    rideId,
+    page,
+    limit,
+    currentUserId: req.user.id,
+    currentUserName: req.user.name,
+    other_user_id,
+    hasOtherUserId: !!other_user_id,
+  });
+
   const result = await Message.getByRide(
     rideType,
     rideId,
@@ -173,6 +184,8 @@ const getRideMessages = asyncHandler(async (req, res) => {
     req.user.id,
     other_user_id || null
   );
+
+  console.log('[MESSAGES CONTROLLER] Returning', result.messages.length, 'messages to client');
 
   res.json(result);
 });
