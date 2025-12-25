@@ -102,6 +102,8 @@ export const MessagesProvider = ({ children }) => {
           rideType,
           rideId,
           otherUserId,
+          otherUserIdType: typeof otherUserId,
+          hasOtherUserId: !!otherUserId,
         });
         const response = await messagesAPI.getRideMessages(rideType, rideId, 1, 50, otherUserId);
         console.log('[MESSAGES] 📨 API Response:', {
@@ -112,7 +114,12 @@ export const MessagesProvider = ({ children }) => {
           totalPages: response.totalPages,
           filteredByUser: otherUserId,
         });
-        console.log('[MESSAGES] 📋 Messages array:', response.messages);
+        console.log('[MESSAGES] 📋 Messages senders:', response.messages?.map(m => ({
+          id: m.id,
+          senderId: m.senderId,
+          senderName: m.senderName,
+          content: m.content?.substring(0, 30)
+        })));
         setCurrentConversation(response.messages || []);
 
         // Auto mark conversation as read

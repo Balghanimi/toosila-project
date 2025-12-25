@@ -65,11 +65,21 @@ const ChatInterface = ({
 
   // Load messages for this conversation
   useEffect(() => {
+    console.log('[CHAT INTERFACE] Loading conversation with:', {
+      tripId,
+      rideType,
+      otherUserId,
+      otherUserName,
+      currentUserId: user?.id,
+    });
+
     if (tripId && user?.id) {
       // Use ride-based conversation fetching WITH privacy filter by otherUserId
+      console.log('[CHAT INTERFACE] Calling fetchRideConversation with otherUserId:', otherUserId);
       fetchRideConversation(rideType, tripId, otherUserId);
     } else if (otherUserId && user?.id) {
       // Fallback to user-based conversation (deprecated)
+      console.log('[CHAT INTERFACE] Calling fetchConversation (deprecated)');
       fetchConversation(otherUserId);
     }
   }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);

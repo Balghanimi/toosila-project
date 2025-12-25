@@ -231,6 +231,7 @@ export const messagesAPI = {
     if (otherUserId) {
       url += `&other_user_id=${otherUserId}`;
     }
+    console.log('[API] getRideMessages URL:', url, { otherUserId, hasOtherUserId: !!otherUserId });
     return apiRequest(url, {
       method: 'GET',
     });
