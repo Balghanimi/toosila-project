@@ -60,10 +60,10 @@ class Message {
     let paramCount = 3;
 
     if (currentUserId && otherUserId) {
-      // Show only messages between currentUserId and otherUserId
-      whereClause += ` AND (
-        (m.sender_id = $${paramCount} OR m.sender_id = $${paramCount + 1})
-      )`;
+      // CRITICAL PRIVACY FIX: Show ONLY messages between these two specific users
+      // NOT just any message from either user - must be a conversation between them
+      // This prevents User A and User B's conversation from showing User C's messages
+      whereClause += ` AND m.sender_id IN ($${paramCount}, $${paramCount + 1})`;
       params.push(currentUserId, otherUserId);
       paramCount += 2;
     }
