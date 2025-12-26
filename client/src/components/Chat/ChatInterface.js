@@ -21,7 +21,6 @@ const ChatInterface = ({
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showRideDetails, setShowRideDetails] = useState(false);
   const [rideDetails, setRideDetails] = useState(null);
@@ -324,55 +323,10 @@ const ChatInterface = ({
       >
         <MessageInput
           onSendMessage={handleSendMessage}
-          disabled={isLoading}
+          disabled={false}
           placeholder="اكتب رسالتك هنا..."
         />
       </div>
-
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(255, 255, 255, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              padding: 'var(--space-3) var(--space-4)',
-              background: 'var(--surface-primary)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-md)',
-              fontFamily: '"Cairo", sans-serif',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <div
-              style={{
-                width: '16px',
-                height: '16px',
-                border: '2px solid var(--border-light)',
-                borderTop: '2px solid var(--primary)',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }}
-            />
-            جاري الإرسال...
-          </div>
-        </div>
-      )}
 
       {/* Loading Details Overlay */}
       {loadingDetails && (
