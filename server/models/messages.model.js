@@ -56,6 +56,7 @@ class Message {
     otherUserId = null
   ) {
     const offset = (page - 1) * limit;
+    const startTime = Date.now();
 
     // DEBUG LOGGING
     console.log('[MESSAGES MODEL] getByRide called with:', {
@@ -68,6 +69,7 @@ class Message {
       hasCurrentUser: !!currentUserId,
       hasOtherUser: !!otherUserId,
     });
+    console.log('[PERF] getByRide START');
 
     // PRIVACY FIX: Filter messages to only show conversation between current user and specific other user
     // This prevents users from seeing messages between other passengers and the driver
@@ -102,8 +104,13 @@ class Message {
     console.log('[MESSAGES MODEL] Executing query:', fullQuery);
     console.log('[MESSAGES MODEL] Query params:', params);
 
+    const queryStartTime = Date.now();
     const result = await query(fullQuery, params);
+    const queryDuration = Date.now() - queryStartTime;
 
+    console.log(
+      `[PERF] getByRide main query took ${queryDuration}ms, returned ${result.rows.length} messages`
+    );
     console.log('[MESSAGES MODEL] Query returned', result.rows.length, 'messages');
     console.log(
       '[MESSAGES MODEL] Message senders:',
@@ -116,10 +123,16 @@ class Message {
     );
 
     const countParams = params.slice(0, -2); // Remove limit and offset
+    const countStartTime = Date.now();
     const countResult = await query(
       `SELECT COUNT(*) FROM messages m WHERE ${whereClause}`,
       countParams
     );
+    const countDuration = Date.now() - countStartTime;
+
+    const totalDuration = Date.now() - startTime;
+    console.log(`[PERF] getByRide count query took ${countDuration}ms`);
+    console.log(`[PERF] getByRide TOTAL time: ${totalDuration}ms`);
 
     return {
       messages: result.rows.map((row) => new Message(row)),
@@ -216,6 +229,9 @@ class Message {
   // Get conversation list for a user (optimized with proper JOINs)
   static async getConversationList(userId, page = 1, limit = 20) {
     const offset = (page - 1) * limit;
+    const startTime = Date.now();
+
+    console.log('[PERF] getConversationList START for userId:', userId);
 
     const result = await query(
       `WITH user_rides AS (
@@ -279,6 +295,12 @@ class Message {
       [userId, limit, offset]
     );
 
+    const queryDuration = Date.now() - startTime;
+    console.log(
+      `[PERF] getConversationList main query took ${queryDuration}ms, returned ${result.rows.length} conversations`
+    );
+
+    const countStartTime = Date.now();
     const countResult = await query(
       `WITH user_rides AS (
          SELECT 'offer' as ride_type, id as ride_id FROM offers WHERE driver_id = $1
@@ -294,6 +316,11 @@ class Message {
          AND m.sender_id != $1`,
       [userId]
     );
+
+    const countDuration = Date.now() - countStartTime;
+    const totalDuration = Date.now() - startTime;
+    console.log(`[PERF] getConversationList count query took ${countDuration}ms`);
+    console.log(`[PERF] getConversationList TOTAL time: ${totalDuration}ms`);
 
     return {
       conversations: result.rows,
