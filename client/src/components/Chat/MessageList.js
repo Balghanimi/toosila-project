@@ -228,7 +228,13 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                         gap: '2px',
                       }}
                     >
-                      {message.status === 'sent' && (
+                      {/* Show sending indicator for optimistic messages */}
+                      {message.isOptimistic && (
+                        <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px' }}>
+                          ⏳
+                        </span>
+                      )}
+                      {!message.isOptimistic && message.status === 'sent' && (
                         <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>✓</span>
                       )}
                       {message.status === 'delivered' && (

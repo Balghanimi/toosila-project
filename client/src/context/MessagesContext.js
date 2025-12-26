@@ -114,12 +114,15 @@ export const MessagesProvider = ({ children }) => {
           totalPages: response.totalPages,
           filteredByUser: otherUserId,
         });
-        console.log('[MESSAGES] 📋 Messages senders:', response.messages?.map(m => ({
-          id: m.id,
-          senderId: m.senderId,
-          senderName: m.senderName,
-          content: m.content?.substring(0, 30)
-        })));
+        console.log(
+          '[MESSAGES] 📋 Messages senders:',
+          response.messages?.map((m) => ({
+            id: m.id,
+            senderId: m.senderId,
+            senderName: m.senderName,
+            content: m.content?.substring(0, 30),
+          }))
+        );
         setCurrentConversation(response.messages || []);
 
         // Auto mark conversation as read
@@ -150,19 +153,53 @@ export const MessagesProvider = ({ children }) => {
     }
   }, [currentUser, fetchConversations, fetchUnreadCount]);
 
-  // Send a message
+  // Send a message with optimistic update
   const sendMessage = async (rideType, rideId, content) => {
     if (!currentUser) return null;
+
+    // Create optimistic message immediately
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      content,
+      senderId: currentUser.id,
+      senderName: currentUser.name || `${currentUser.firstName} ${currentUser.lastName}`,
+      createdAt: new Date().toISOString(),
+      rideType,
+      rideId,
+      isOptimistic: true, // Flag to show sending state
+    };
+
+    // Add to conversation immediately (optimistic update)
+    setCurrentConversation((prev) => [...prev, optimisticMessage]);
 
     try {
       const response = await messagesAPI.sendMessage(rideType, rideId, content);
 
-      // Refresh conversations after sending
+      // Replace optimistic message with real one from server
+      setCurrentConversation((prev) =>
+        prev.map((msg) =>
+          msg.id === optimisticMessage.id
+            ? {
+                ...response.messageData,
+                id: response.messageData.id,
+                senderId: response.messageData.sender_id || response.messageData.senderId,
+                senderName: response.messageData.sender_name || response.messageData.senderName,
+                createdAt: response.messageData.created_at || response.messageData.createdAt,
+              }
+            : msg
+        )
+      );
+
+      // Refresh conversations list in background (don't block)
       fetchConversations();
 
       return response;
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Remove optimistic message on error
+      setCurrentConversation((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+
       throw error;
     }
   };

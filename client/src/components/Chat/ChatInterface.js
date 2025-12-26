@@ -84,34 +84,48 @@ const ChatInterface = ({
     }
   }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
 
-  // Handle sending a message
-  const handleSendMessage = async (content) => {
-    if (!user?.id || !tripId || !content.trim()) {
-      return;
-    }
+  // REAL-TIME POLLING: Auto-refresh messages every 3 seconds when chat is open
+  useEffect(() => {
+    if (!tripId || !user?.id) return;
 
-    setIsLoading(true);
-    setError('');
+    console.log('[CHAT INTERFACE] Starting message polling (3s interval)');
 
-    try {
-      // Use the rideType prop for flexibility (offer or demand)
-      await sendMessage(rideType, tripId, content);
-
-      showSuccess('✅ تم إرسال الرسالة بنجاح!');
-
-      // Refresh conversation (use ride-based with privacy filter if tripId exists)
+    const pollInterval = setInterval(() => {
+      // Silently fetch new messages without showing loading state
       if (tripId) {
         fetchRideConversation(rideType, tripId, otherUserId);
       } else if (otherUserId) {
         fetchConversation(otherUserId);
       }
+    }, 3000); // Poll every 3 seconds for real-time feel
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[CHAT INTERFACE] Stopping message polling');
+      clearInterval(pollInterval);
+    };
+  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
+
+  // Handle sending a message (with optimistic update - no loading overlay needed)
+  const handleSendMessage = async (content) => {
+    if (!user?.id || !tripId || !content.trim()) {
+      return;
+    }
+
+    setError('');
+
+    try {
+      // sendMessage in MessagesContext now handles optimistic updates
+      // Message appears instantly, no need to block UI or refetch
+      await sendMessage(rideType, tripId, content);
+
+      // Success notification (no overlay, message already visible)
+      showSuccess('✅ تم إرسال الرسالة بنجاح!');
     } catch (err) {
       const errorMsg = err.message || 'فشل في إرسال الرسالة. حاول مرة أخرى.';
       setError(errorMsg);
       showError(errorMsg);
       console.error('Error sending message:', err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
