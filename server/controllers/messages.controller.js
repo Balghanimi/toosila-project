@@ -63,13 +63,13 @@ const sendMessage = asyncHandler(async (req, res) => {
     rideType,
     rideId,
     senderId: req.user.id,
-    content
+    content,
   });
 
   // PERFORMANCE FIX: Send response immediately, then send notifications in background
   res.status(201).json({
     message: 'Message sent successfully',
-    messageData: message.toJSON()
+    messageData: message.toJSON(),
   });
 
   // Send notifications in background (non-blocking)
@@ -106,11 +106,11 @@ const sendMessage = asyncHandler(async (req, res) => {
       }
 
       // Send notification to each participant
-      participantsQuery.rows.forEach(participant => {
+      participantsQuery.rows.forEach((participant) => {
         notifyNewMessage(io, participant.id, {
           ...message.toJSON(),
           senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
-          ride: rideCheck.rows[0]
+          ride: rideCheck.rows[0],
         });
       });
     } catch (error) {
@@ -165,13 +165,16 @@ const getRideMessages = asyncHandler(async (req, res) => {
   }
 
   // PRIVACY FIX: Pass other_user_id to filter messages for this specific conversation
+  const currentUserName =
+    req.user.name || `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim() || 'User';
+
   console.log('[MESSAGES CONTROLLER] getRideMessages called:', {
     rideType,
     rideId,
     page,
     limit,
     currentUserId: req.user.id,
-    currentUserName: req.user.name,
+    currentUserName,
     other_user_id,
     hasOtherUserId: !!other_user_id,
   });
@@ -192,7 +195,10 @@ const getRideMessages = asyncHandler(async (req, res) => {
 
 // Get conversation between two users (deprecated - use ride-based instead)
 const getConversation = asyncHandler(async (req, res) => {
-  throw new AppError('This endpoint is deprecated. Use GET /messages/:rideType/:rideId instead', 410);
+  throw new AppError(
+    'This endpoint is deprecated. Use GET /messages/:rideType/:rideId instead',
+    410
+  );
 });
 
 // Get user's conversation list
@@ -212,7 +218,7 @@ const getRecentMessages = asyncHandler(async (req, res) => {
 
   res.json({
     messages,
-    total: messages.length
+    total: messages.length,
   });
 });
 
@@ -256,7 +262,7 @@ const markAsRead = asyncHandler(async (req, res) => {
 
   res.json({
     message: 'Message marked as read',
-    messageData: updatedMessage.toJSON()
+    messageData: updatedMessage.toJSON(),
   });
 });
 
@@ -300,7 +306,7 @@ const markConversationAsRead = asyncHandler(async (req, res) => {
 
   res.json({
     message: 'Conversation marked as read',
-    updatedCount: updatedMessages.length
+    updatedCount: updatedMessages.length,
   });
 });
 
@@ -309,7 +315,7 @@ const getUnreadCount = asyncHandler(async (req, res) => {
   const count = await Message.getUnreadCount(req.user.id);
 
   res.json({
-    unreadCount: count
+    unreadCount: count,
   });
 });
 
@@ -349,7 +355,7 @@ const getMessageById = asyncHandler(async (req, res) => {
   }
 
   res.json({
-    message: message.toJSON()
+    message: message.toJSON(),
   });
 });
 
@@ -370,7 +376,7 @@ const getMessageStats = asyncHandler(async (req, res) => {
   `);
 
   res.json({
-    stats: result.rows[0]
+    stats: result.rows[0],
   });
 });
 
@@ -378,7 +384,8 @@ const getMessageStats = asyncHandler(async (req, res) => {
 const getUserMessageStats = asyncHandler(async (req, res) => {
   const { query } = require('../config/db');
 
-  const result = await query(`
+  const result = await query(
+    `
     SELECT
       COUNT(*)::int as total_messages,
       COUNT(CASE WHEN sender_id = $1 THEN 1 END)::int as sent_messages,
@@ -390,10 +397,12 @@ const getUserMessageStats = asyncHandler(async (req, res) => {
        OR (ride_type = 'offer' AND ride_id IN (SELECT offer_id FROM bookings WHERE passenger_id = $1))
        OR (ride_type = 'demand' AND ride_id IN (SELECT id FROM demands WHERE passenger_id = $1))
        OR (ride_type = 'demand' AND ride_id IN (SELECT demand_id FROM demand_responses WHERE driver_id = $1))
-  `, [req.user.id]);
+  `,
+    [req.user.id]
+  );
 
   res.json({
-    stats: result.rows[0]
+    stats: result.rows[0],
   });
 });
 
@@ -419,5 +428,5 @@ module.exports = {
   getUnreadCount, // requires migration
   getMessageById,
   getMessageStats,
-  getUserMessageStats
+  getUserMessageStats,
 };

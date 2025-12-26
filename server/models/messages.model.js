@@ -88,8 +88,27 @@ class Message {
         currentUserId,
         otherUserId,
       });
+    } else if (currentUserId) {
+      // SECURITY: If otherUserId is missing, only show messages sent BY currentUser
+      // NEVER show all messages - this would be a privacy violation
+      whereClause += ` AND m.sender_id = $${paramCount}`;
+      params.push(currentUserId);
+      paramCount += 1;
+      console.log(
+        '[MESSAGES MODEL] ⚠️ Partial filter: only showing messages FROM currentUser (otherUserId missing)'
+      );
     } else {
-      console.log('[MESSAGES MODEL] ⚠️ WARNING: No privacy filter! Showing ALL messages for ride');
+      // CRITICAL: No user context - return empty result to prevent privacy leak
+      console.error(
+        '[MESSAGES MODEL] 🚨 SECURITY: No user context! Returning empty result to prevent privacy leak'
+      );
+      return {
+        messages: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      };
     }
 
     params.push(limit, offset);
