@@ -186,12 +186,12 @@ export const MessagesProvider = ({ children }) => {
         prev.map((msg) =>
           msg.id === optimisticMessage.id
             ? {
-              ...response.messageData,
-              id: response.messageData.id,
-              senderId: response.messageData.sender_id || response.messageData.senderId,
-              senderName: response.messageData.sender_name || response.messageData.senderName,
-              createdAt: response.messageData.created_at || response.messageData.createdAt,
-            }
+                ...response.messageData,
+                id: response.messageData.id,
+                senderId: response.messageData.sender_id || response.messageData.senderId,
+                senderName: response.messageData.sender_name || response.messageData.senderName,
+                createdAt: response.messageData.created_at || response.messageData.createdAt,
+              }
             : msg
         )
       );
@@ -281,9 +281,7 @@ export const MessagesProvider = ({ children }) => {
   // Update message in current conversation (for Socket.io real-time updates)
   const updateMessageInConversation = (updatedMessage) => {
     setCurrentConversation((prev) =>
-      prev.map((msg) =>
-        msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg
-      )
+      prev.map((msg) => (msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg))
     );
   };
 
@@ -291,9 +289,7 @@ export const MessagesProvider = ({ children }) => {
   const removeMessageFromConversation = (messageId) => {
     setCurrentConversation((prev) =>
       prev.map((msg) =>
-        msg.id === messageId
-          ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true }
-          : msg
+        msg.id === messageId ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true } : msg
       )
     );
   };

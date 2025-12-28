@@ -24,7 +24,7 @@ const ChatInterface = ({
     clearCurrentConversation,
   } = useMessages();
   const { user } = useAuth();
-  const { showSuccess, showError } = useNotifications();
+  const { showError } = useNotifications();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [showRideDetails, setShowRideDetails] = useState(false);
@@ -101,7 +101,15 @@ const ChatInterface = ({
         clearCurrentConversation();
       }
     };
-  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation, clearCurrentConversation]);
+  }, [
+    tripId,
+    rideType,
+    otherUserId,
+    user?.id,
+    fetchRideConversation,
+    fetchConversation,
+    clearCurrentConversation,
+  ]);
 
   // REAL-TIME POLLING: Auto-refresh messages every 3 seconds when chat is open
   useEffect(() => {
