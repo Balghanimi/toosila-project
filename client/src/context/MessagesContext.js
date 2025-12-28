@@ -186,12 +186,12 @@ export const MessagesProvider = ({ children }) => {
         prev.map((msg) =>
           msg.id === optimisticMessage.id
             ? {
-                ...response.messageData,
-                id: response.messageData.id,
-                senderId: response.messageData.sender_id || response.messageData.senderId,
-                senderName: response.messageData.sender_name || response.messageData.senderName,
-                createdAt: response.messageData.created_at || response.messageData.createdAt,
-              }
+              ...response.messageData,
+              id: response.messageData.id,
+              senderId: response.messageData.sender_id || response.messageData.senderId,
+              senderName: response.messageData.sender_name || response.messageData.senderName,
+              createdAt: response.messageData.created_at || response.messageData.createdAt,
+            }
             : msg
         )
       );
@@ -208,6 +208,94 @@ export const MessagesProvider = ({ children }) => {
 
       throw error;
     }
+  };
+
+  // Edit message
+  const editMessage = async (messageId, content) => {
+    try {
+      const response = await messagesAPI.editMessage(messageId, content);
+
+      // Update message in current conversation
+      setCurrentConversation((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, content, isEdited: true, lastEditedAt: new Date().toISOString() }
+            : msg
+        )
+      );
+
+      return response;
+    } catch (error) {
+      console.error('Error editing message:', error);
+      throw error;
+    }
+  };
+
+  // Delete message
+  const deleteMessage = async (messageId, deleteForAll = false) => {
+    try {
+      const response = await messagesAPI.deleteMessage(messageId, deleteForAll);
+
+      if (deleteForAll) {
+        // Mark as deleted for everyone in UI
+        setCurrentConversation((prev) =>
+          prev.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, deletedForEveryone: true }
+              : msg
+          )
+        );
+      } else {
+        // Remove from UI for "delete for me"
+        setCurrentConversation((prev) => prev.filter((msg) => msg.id !== messageId));
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      throw error;
+    }
+  };
+
+  // Delete entire conversation
+  const deleteConversation = async (rideType, rideId) => {
+    try {
+      const response = await messagesAPI.deleteConversation(rideType, rideId);
+
+      // Clear current conversation if it's the one being deleted
+      if (currentConversationKey === `${rideType}-${rideId}`) {
+        setCurrentConversation([]);
+        setCurrentConversationKey(null);
+      }
+
+      // Refresh conversations list
+      fetchConversations();
+
+      return response;
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      throw error;
+    }
+  };
+
+  // Update message in current conversation (for Socket.io real-time updates)
+  const updateMessageInConversation = (updatedMessage) => {
+    setCurrentConversation((prev) =>
+      prev.map((msg) =>
+        msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg
+      )
+    );
+  };
+
+  // Remove message from conversation (for Socket.io delete events)
+  const removeMessageFromConversation = (messageId) => {
+    setCurrentConversation((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true }
+          : msg
+      )
+    );
   };
 
   // Mark message as read
@@ -247,6 +335,9 @@ export const MessagesProvider = ({ children }) => {
     unreadCount,
     loading,
     sendMessage,
+    editMessage,
+    deleteMessage,
+    deleteConversation,
     markAsRead,
     getMessages,
     getUnreadCount,
@@ -257,6 +348,8 @@ export const MessagesProvider = ({ children }) => {
     fetchRideConversation,
     fetchUnreadCount,
     clearCurrentConversation,
+    updateMessageInConversation,
+    removeMessageFromConversation,
   };
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

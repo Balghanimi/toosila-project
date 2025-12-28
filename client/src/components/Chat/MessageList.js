@@ -248,10 +248,26 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                     fontFamily: '"Cairo", sans-serif',
                     wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
+                    // Style deleted messages differently
+                    fontStyle: message.isDeleted ? 'italic' : 'normal',
+                    opacity: message.isDeleted ? 0.6 : 1,
                   }}
                 >
-                  {message.content}
+                  {message.isDeleted ? 'تم حذف هذه الرسالة' : message.content}
                 </div>
+
+                {/* Edited indicator */}
+                {message.isEdited && !message.isDeleted && (
+                  <span
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      color: isOwnMessage ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-muted)',
+                      marginRight: 'var(--space-1)',
+                    }}
+                  >
+                    (معدلة)
+                  </span>
+                )}
 
                 {/* Message timestamp and read status */}
                 <div

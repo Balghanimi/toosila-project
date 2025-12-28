@@ -259,6 +259,25 @@ export const messagesAPI = {
   getUnreadCount: async () => {
     return apiRequest('/messages/unread-count', { method: 'GET' });
   },
+  // Edit a message (sender only, within 15 mins)
+  editMessage: async (messageId, content) => {
+    return apiRequest(`/messages/${messageId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content }),
+    });
+  },
+  // Delete a message
+  deleteMessage: async (messageId, deleteForAll = false) => {
+    return apiRequest(`/messages/${messageId}?deleteForAll=${deleteForAll}`, {
+      method: 'DELETE',
+    });
+  },
+  // Delete entire conversation
+  deleteConversation: async (rideType, rideId) => {
+    return apiRequest(`/messages/conversation/${rideType}/${rideId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 export const bookingsAPI = {

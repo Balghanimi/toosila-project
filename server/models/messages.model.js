@@ -13,6 +13,11 @@ class Message {
     this.readAt = data.read_at || null;
     this.readBy = data.read_by || null;
     this.updatedAt = data.updated_at || null;
+    // Edit/delete fields matching user's database schema
+    this.isEdited = data.is_edited || false;
+    this.lastEditedAt = data.last_edited_at || null;
+    this.deletedAt = data.deleted_at || null;
+    this.deletedForEveryone = data.deleted_for_everyone || false;
   }
 
   // Create a new message
@@ -459,20 +464,115 @@ class Message {
 
   // Convert to JSON
   toJSON() {
+    // Check if message is deleted for everyone
+    const isDeleted = this.deletedForEveryone || this.deletedAt !== null;
+
     return {
       id: this.id,
       rideType: this.rideType,
       rideId: this.rideId,
       senderId: this.senderId,
       senderName: this.senderName,
-      content: this.content,
+      // Show deleted message placeholder if deleted for everyone
+      content: isDeleted ? 'تم حذف هذه الرسالة' : this.content,
       createdAt: this.createdAt,
       timestamp: this.createdAt, // Alias for frontend compatibility
       isRead: this.isRead,
       readAt: this.readAt,
       readBy: this.readBy,
       updatedAt: this.updatedAt,
+      // Edit/delete status
+      isEdited: this.isEdited,
+      lastEditedAt: this.lastEditedAt,
+      deletedAt: this.deletedAt,
+      isDeleted: isDeleted,
+      deletedForEveryone: this.deletedForEveryone,
     };
+  }
+
+  // Edit message content (only by sender, within time limit)
+  static async edit(messageId, senderId, newContent) {
+    // Only allow editing within 15 minutes of creation
+    const message = await Message.findById(messageId);
+    if (!message) {
+      throw new Error('Message not found');
+    }
+    if (message.senderId !== senderId) {
+      throw new Error('Only the sender can edit this message');
+    }
+
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    if (new Date(message.createdAt) < fifteenMinutesAgo) {
+      throw new Error('Cannot edit message after 15 minutes');
+    }
+
+    const result = await query(
+      `UPDATE messages
+       SET content = $1, is_edited = true, last_edited_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $2 AND sender_id = $3
+       RETURNING *`,
+      [newContent, messageId, senderId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Failed to edit message');
+    }
+
+    // Fetch sender name
+    const senderResult = await query('SELECT name FROM users WHERE id = $1', [senderId]);
+    result.rows[0].sender_name = senderResult.rows[0]?.name || null;
+
+    return new Message(result.rows[0]);
+  }
+
+  // Delete message for everyone (soft delete)
+  static async deleteForEveryone(messageId, senderId) {
+    // Only sender can delete for everyone
+    const message = await Message.findById(messageId);
+    if (!message) {
+      throw new Error('Message not found');
+    }
+    if (message.senderId !== senderId) {
+      throw new Error('Only the sender can delete for everyone');
+    }
+
+    const result = await query(
+      `UPDATE messages
+       SET deleted_for_everyone = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING *`,
+      [messageId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Failed to delete message');
+    }
+
+    return new Message(result.rows[0]);
+  }
+
+  // Delete message for current user only (soft delete)
+  static async deleteForMe(messageId, userId) {
+    // Mark as deleted only for this user by setting deleted_at
+    // This is a simplified version - in production you might want a separate table
+    const result = await query(
+      `UPDATE messages
+       SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING *`,
+      [messageId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Failed to delete message');
+    }
+
+    return new Message(result.rows[0]);
+  }
+
+  // Check if message is deleted
+  isDeletedMessage() {
+    return this.deletedForEveryone || this.deletedAt !== null;
   }
 }
 

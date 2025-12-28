@@ -223,6 +223,48 @@ function isUserOnline(userId) {
   return activeUsers.has(userId);
 }
 
+/**
+ * Emit message edited notification to all participants of a ride conversation
+ * @param {SocketIO.Server} io - Socket.io instance
+ * @param {string} rideType - 'offer' or 'demand'
+ * @param {string} rideId - Ride ID
+ * @param {object} message - Edited message data
+ */
+function notifyMessageEdited(io, rideType, rideId, message) {
+  if (!io) return;
+
+  // Emit to a room based on the ride conversation
+  const room = `${rideType}:${rideId}`;
+  io.to(room).emit('message-edited', {
+    type: 'message-edited',
+    messageData: message,
+    rideType,
+    rideId,
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Emit message deleted notification to all participants of a ride conversation
+ * @param {SocketIO.Server} io - Socket.io instance
+ * @param {string} rideType - 'offer' or 'demand'
+ * @param {string} rideId - Ride ID
+ * @param {string} messageId - Deleted message ID
+ */
+function notifyMessageDeleted(io, rideType, rideId, messageId) {
+  if (!io) return;
+
+  // Emit to a room based on the ride conversation
+  const room = `${rideType}:${rideId}`;
+  io.to(room).emit('message-deleted', {
+    type: 'message-deleted',
+    messageId,
+    rideType,
+    rideId,
+    timestamp: new Date().toISOString()
+  });
+}
+
 module.exports = {
   initializeSocket,
   emitToUser,
@@ -232,5 +274,7 @@ module.exports = {
   notifyNewDemandResponse,
   notifyDemandResponseStatusUpdate,
   getActiveUsersCount,
-  isUserOnline
+  isUserOnline,
+  notifyMessageEdited,
+  notifyMessageDeleted
 };

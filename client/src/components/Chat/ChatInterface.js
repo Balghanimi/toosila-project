@@ -69,6 +69,13 @@ const ChatInterface = ({
 
   // Load messages for this conversation
   useEffect(() => {
+    // CRITICAL FIX: Clear messages IMMEDIATELY when conversation changes
+    // This prevents identity mixing between different conversations
+    if (clearCurrentConversation) {
+      console.log('[CHAT INTERFACE] 🧹 Clearing previous conversation before loading new one');
+      clearCurrentConversation();
+    }
+
     console.log('[CHAT INTERFACE] Loading conversation with:', {
       tripId,
       rideType,
@@ -86,17 +93,15 @@ const ChatInterface = ({
       console.log('[CHAT INTERFACE] Calling fetchConversation (deprecated)');
       fetchConversation(otherUserId);
     }
-  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
 
-  // Cleanup: Clear messages when conversation changes to prevent identity mixing
-  useEffect(() => {
+    // Cleanup on unmount
     return () => {
-      console.log('[CHAT INTERFACE] 🧹 Cleaning up conversation state');
+      console.log('[CHAT INTERFACE] 🧹 Component unmounting - clearing state');
       if (clearCurrentConversation) {
         clearCurrentConversation();
       }
     };
-  }, [tripId, rideType, otherUserId, clearCurrentConversation]);
+  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation, clearCurrentConversation]);
 
   // REAL-TIME POLLING: Auto-refresh messages every 3 seconds when chat is open
   useEffect(() => {
@@ -146,10 +151,8 @@ const ChatInterface = ({
     try {
       // sendMessage in MessagesContext now handles optimistic updates
       // Message appears instantly, no need to block UI or refetch
+      // WhatsApp-style: Silent send - no success notification
       await sendMessage(rideType, tripId, content);
-
-      // Success notification - disappears in 1 second
-      showSuccess('✅ تم الإرسال');
     } catch (err) {
       const errorMsg = err.message || 'فشل في إرسال الرسالة. حاول مرة أخرى.';
       setError(errorMsg);

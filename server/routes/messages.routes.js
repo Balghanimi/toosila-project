@@ -15,7 +15,10 @@ const {
   getUnreadCount,
   getMessageById,
   getMessageStats,
-  getUserMessageStats
+  getUserMessageStats,
+  editMessage,
+  deleteMessage,
+  deleteConversation
 } = require('../controllers/messages.controller');
 
 // Import middlewares
@@ -50,5 +53,10 @@ router.get('/:rideType/:rideId', validatePagination, getRideMessages);
 router.get('/:id', validateId, getMessageById);
 router.put('/:id/read', validateId, markAsRead);
 router.put('/conversation/:rideType/:rideId/read', markConversationAsRead);
+
+// Message edit and delete routes
+router.put('/:id', validateId, editMessage); // Edit message
+router.delete('/:id', validateId, deleteMessage); // Delete message
+router.delete('/conversation/:rideType/:rideId', deleteConversation); // Delete conversation
 
 module.exports = router;

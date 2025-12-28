@@ -423,6 +423,122 @@ const getUserMessageStats = asyncHandler(async (req, res) => {
   });
 });
 
+// Edit a message (sender only, within 15 mins)
+const editMessage = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { content } = req.body;
+
+  if (!content || content.trim().length === 0) {
+    throw new AppError('Message content is required', 400);
+  }
+
+  if (content.trim().length > 1000) {
+    throw new AppError('Message is too long (max 1000 characters)', 400);
+  }
+
+  try {
+    const message = await Message.edit(id, req.user.id, content.trim());
+
+    // Send real-time notification
+    const io = req.app.get('io');
+    if (io) {
+      const { notifyMessageEdited } = require('../socket');
+      if (notifyMessageEdited) {
+        notifyMessageEdited(io, message.rideType, message.rideId, message.toJSON());
+      }
+    }
+
+    res.json({
+      message: 'تم تعديل الرسالة بنجاح',
+      messageData: message.toJSON(),
+    });
+  } catch (error) {
+    if (error.message.includes('not found')) {
+      throw new AppError('Message not found', 404);
+    }
+    if (error.message.includes('sender')) {
+      throw new AppError('يمكنك فقط تعديل رسائلك', 403);
+    }
+    if (error.message.includes('15 minutes')) {
+      throw new AppError('لا يمكن تعديل الرسالة بعد مرور 15 دقيقة', 400);
+    }
+    throw error;
+  }
+});
+
+// Delete a message
+const deleteMessage = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { deleteForAll } = req.query;
+
+  try {
+    let message;
+
+    if (deleteForAll === 'true') {
+      // Delete for everyone (sender only)
+      message = await Message.deleteForEveryone(id, req.user.id);
+    } else {
+      // Delete for me only
+      message = await Message.deleteForMe(id, req.user.id);
+    }
+
+    // Send real-time notification for delete-for-all
+    if (deleteForAll === 'true') {
+      const io = req.app.get('io');
+      if (io) {
+        const { notifyMessageDeleted } = require('../socket');
+        if (notifyMessageDeleted) {
+          notifyMessageDeleted(io, message.rideType, message.rideId, message.id);
+        }
+      }
+    }
+
+    res.json({
+      message: deleteForAll === 'true' ? 'تم حذف الرسالة للجميع' : 'تم حذف الرسالة',
+      messageId: id,
+      deleteForAll: deleteForAll === 'true',
+    });
+  } catch (error) {
+    if (error.message.includes('not found')) {
+      throw new AppError('Message not found', 404);
+    }
+    if (error.message.includes('sender')) {
+      throw new AppError('يمكنك فقط حذف رسائلك للجميع', 403);
+    }
+    throw error;
+  }
+});
+
+// Delete entire conversation for current user
+const deleteConversation = asyncHandler(async (req, res) => {
+  const { rideType, rideId } = req.params;
+
+  // Validate ride type
+  if (!['offer', 'demand'].includes(rideType)) {
+    throw new AppError('Invalid ride type', 400);
+  }
+
+  const { query } = require('../config/db');
+
+  // Delete all messages in this conversation for the current user
+  const result = await query(
+    `UPDATE messages
+     SET deleted_for_user_ids = array_append(deleted_for_user_ids, $3::uuid),
+         updated_at = CURRENT_TIMESTAMP
+     WHERE ride_type = $1 AND ride_id = $2
+       AND NOT ($3::uuid = ANY(deleted_for_user_ids))
+     RETURNING id`,
+    [rideType, rideId, req.user.id]
+  );
+
+  res.json({
+    message: 'تم حذف المحادثة بنجاح',
+    deletedCount: result.rows.length,
+    rideType,
+    rideId,
+  });
+});
+
 // Deprecated endpoints for backward compatibility
 const getInbox = asyncHandler(async (req, res) => {
   throw new AppError('This endpoint is deprecated. Use GET /messages/conversations instead', 410);
@@ -440,10 +556,14 @@ module.exports = {
   getSentMessages, // deprecated
   getConversationList,
   getRecentMessages,
-  markAsRead, // requires migration
-  markConversationAsRead, // requires migration
-  getUnreadCount, // requires migration
+  markAsRead,
+  markConversationAsRead,
+  getUnreadCount,
   getMessageById,
   getMessageStats,
   getUserMessageStats,
+  // New endpoints
+  editMessage,
+  deleteMessage,
+  deleteConversation,
 };
