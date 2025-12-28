@@ -211,7 +211,8 @@ export const MessagesProvider = ({ children }) => {
             ? {
               ...response.messageData,
               id: response.messageData.id,
-              senderId: response.messageData.sender_id || response.messageData.senderId,
+              senderId:
+                response.messageData.sender_id || response.messageData.senderId,
               senderName:
                 response.messageData.sender_name || response.messageData.senderName,
               createdAt:
