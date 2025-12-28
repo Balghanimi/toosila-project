@@ -114,7 +114,10 @@ export default function App() {
                                         <Route path="/home" element={<Home />} />
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/messages" element={<Messages />} />
-                                        <Route path="/messages/diagnostics" element={<MessagesDiagnostics />} />
+                                        <Route
+                                          path="/messages/diagnostics"
+                                          element={<MessagesDiagnostics />}
+                                        />
                                         <Route path="/profile" element={<Profile />} />
                                         <Route path="/bookings" element={<Bookings />} />
                                         <Route path="/settings" element={<Settings />} />

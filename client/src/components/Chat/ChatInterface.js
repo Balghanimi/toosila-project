@@ -16,8 +16,13 @@ const ChatInterface = ({
   tripInfo,
   onClose,
 }) => {
-  const { sendMessage, currentConversation, fetchConversation, fetchRideConversation, clearCurrentConversation } =
-    useMessages();
+  const {
+    sendMessage,
+    currentConversation,
+    fetchConversation,
+    fetchRideConversation,
+    clearCurrentConversation,
+  } = useMessages();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const navigate = useNavigate();
