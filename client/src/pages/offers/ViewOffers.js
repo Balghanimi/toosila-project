@@ -730,19 +730,19 @@ const ViewOffers = React.memo(function ViewOffers() {
           offerDetails={
             selectedOffer
               ? {
-                id: selectedOffer.id,
-                fromCity: selectedOffer.fromCity,
-                toCity: selectedOffer.toCity,
-                departureDate: selectedOffer.departureTime,
-                departureTime: selectedOffer.departureTime,
-                price: selectedOffer.price,
-                driverName: selectedOffer.name || 'غير متوفر',
-                availableSeats:
-                  selectedOffer.availableSeats ??
-                  selectedOffer.seatsAvailable ??
-                  selectedOffer.seats ??
-                  0,
-              }
+                  id: selectedOffer.id,
+                  fromCity: selectedOffer.fromCity,
+                  toCity: selectedOffer.toCity,
+                  departureDate: selectedOffer.departureTime,
+                  departureTime: selectedOffer.departureTime,
+                  price: selectedOffer.price,
+                  driverName: selectedOffer.name || 'غير متوفر',
+                  availableSeats:
+                    selectedOffer.availableSeats ??
+                    selectedOffer.seatsAvailable ??
+                    selectedOffer.seats ??
+                    0,
+                }
               : null
           }
           onConfirm={handleConfirmBooking}
