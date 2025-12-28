@@ -209,15 +209,12 @@ export const MessagesProvider = ({ children }) => {
         prev.map((msg) =>
           msg.id === optimisticMessage.id
             ? {
-              ...response.messageData,
-              id: response.messageData.id,
-              senderId:
-                response.messageData.sender_id || response.messageData.senderId,
-              senderName:
-                response.messageData.sender_name || response.messageData.senderName,
-              createdAt:
-                response.messageData.created_at || response.messageData.createdAt,
-            }
+                ...response.messageData,
+                id: response.messageData.id,
+                senderId: response.messageData.sender_id || response.messageData.senderId,
+                senderName: response.messageData.sender_name || response.messageData.senderName,
+                createdAt: response.messageData.created_at || response.messageData.createdAt,
+              }
             : msg
         )
       );
