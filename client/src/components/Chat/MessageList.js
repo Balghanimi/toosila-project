@@ -11,11 +11,33 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   // Mark messages as read when component mounts or messages change
   useEffect(() => {
     if (messages.length > 0 && onMarkAsRead) {
-      const unreadMessages = messages.filter((msg) => msg.senderId !== currentUserId && !msg.read);
+      // FIX: Normalize IDs with trim() and case-insensitive comparison (consistent with rendering logic)
+      const normalizedCurrentUserId = String(currentUserId || '').trim();
+
+      // Validate that currentUserId is not empty, null, undefined, or "undefined" string
+      if (!normalizedCurrentUserId || normalizedCurrentUserId === 'undefined') {
+        return; // Skip if currentUserId is invalid
+      }
+
+      const unreadMessages = messages.filter((msg) => {
+        const msgSenderId = String(msg.senderId || msg.sender_id || '').trim();
+
+        // Validate msgSenderId
+        if (!msgSenderId || msgSenderId === 'undefined') {
+          return false; // Skip invalid sender IDs
+        }
+
+        // Case-insensitive comparison (consistent with rendering logic)
+        const isNotOwnMessage =
+          msgSenderId !== normalizedCurrentUserId &&
+          msgSenderId.toLowerCase() !== normalizedCurrentUserId.toLowerCase();
+
+        return isNotOwnMessage && !msg.read;
+      });
 
       if (unreadMessages.length > 0) {
         // Get the sender ID from the first unread message
-        const senderId = unreadMessages[0].senderId;
+        const senderId = unreadMessages[0].senderId || unreadMessages[0].sender_id;
         const tripId = unreadMessages[0].tripId;
         onMarkAsRead(currentUserId, tripId, senderId);
       }
@@ -109,7 +131,40 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
       }}
     >
       {messages.map((message, index) => {
-        const isOwnMessage = message.senderId === currentUserId;
+        // FIX: Normalize both IDs to strings, trim whitespace, and handle all field name variations
+        // UUIDs are case-insensitive, so normalize to lowercase for comparison
+        const messageSenderId = String(message.senderId || message.sender_id || '').trim();
+        const normalizedCurrentUserId = String(currentUserId || '').trim();
+
+        // Validate IDs before comparison (prevent "undefined" string comparison)
+        const isValidMessageId = messageSenderId && messageSenderId !== 'undefined';
+        const isValidCurrentId = normalizedCurrentUserId && normalizedCurrentUserId !== 'undefined';
+
+        // Compare with both original and lowercase versions to handle any casing issues
+        const isOwnMessage =
+          isValidMessageId &&
+          isValidCurrentId &&
+          (messageSenderId === normalizedCurrentUserId ||
+            messageSenderId.toLowerCase() === normalizedCurrentUserId.toLowerCase());
+
+        // DEBUG: Log comparison for troubleshooting (only first message to avoid spam)
+        if (index === 0) {
+          console.log('[MessageList] 🔍 ID Comparison:', {
+            messageSenderId,
+            normalizedCurrentUserId,
+            isValidMessageId,
+            isValidCurrentId,
+            isOwnMessage,
+            exactMatch: messageSenderId === normalizedCurrentUserId,
+            caseInsensitiveMatch:
+              messageSenderId.toLowerCase() === normalizedCurrentUserId.toLowerCase(),
+            rawMessageSenderId: message.senderId,
+            rawMessage_sender_id: message.sender_id,
+            rawCurrentUserId: currentUserId,
+            messagesTotal: messages.length,
+          });
+        }
+
         const msgTimestamp = getTimestamp(message);
         const prevMsgTimestamp = index > 0 ? getTimestamp(messages[index - 1]) : null;
 
@@ -171,7 +226,7 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                 }}
               >
                 {/* Sender name for received messages */}
-                {!isOwnMessage && message.senderName && (
+                {!isOwnMessage && (message.senderName || message.sender_name) && (
                   <div
                     style={{
                       fontSize: 'var(--text-xs)',
@@ -181,7 +236,7 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
                       fontFamily: '"Cairo", sans-serif',
                     }}
                   >
-                    {message.senderName}
+                    {message.senderName || message.sender_name}
                   </div>
                 )}
 

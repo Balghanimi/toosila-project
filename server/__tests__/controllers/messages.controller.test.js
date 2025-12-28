@@ -45,6 +45,9 @@ describe('Messages Controller', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Fix for setImmediate usage in controller (run synchronously for tests)
+    global.setImmediate = (cb) => cb();
+
     req = {
       body: {},
       params: {},
@@ -123,6 +126,24 @@ describe('Messages Controller', () => {
         message: expect.any(String),
         messageData: expect.any(Object)
       });
+    });
+
+    it('should allow driver to message on demand without response', async () => {
+      // Logic for demands was relaxed
+      const { query } = require('../../config/db');
+
+      req.body = { rideType: 'demand', rideId: 10, content: 'Hi' };
+
+      // Mock DB: demand exists
+      query.mockResolvedValueOnce({ rows: [{ id: 10, passenger_id: 99 }] }); // Demand check (passenger 99 != user 1)
+      query.mockResolvedValueOnce({ rows: [] }); // Participants check
+
+      Message.create = jest.fn().mockResolvedValue({ id: 200, toJSON: () => ({ id: 200 }) });
+
+      await sendMessage(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(Message.create).toHaveBeenCalled();
     });
 
     it('should reject if ride not found', async () => {

@@ -29,7 +29,18 @@ function initializeSocket(server) {
       credentials: true,
       methods: ['GET', 'POST']
     },
-    transports: ['websocket', 'polling']
+    transports: ['websocket', 'polling'],
+    // Enhanced settings for better iOS compatibility
+    pingTimeout: 60000,      // 60 seconds - longer timeout for mobile connections
+    pingInterval: 25000,     // 25 seconds - more frequent pings
+    upgradeTimeout: 30000,   // 30 seconds - longer upgrade timeout
+    maxHttpBufferSize: 1e8,  // 100 MB
+    allowEIO3: true,         // Allow Engine.IO v3 for compatibility
+    // Connection state recovery for better reconnection
+    connectionStateRecovery: {
+      maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
+      skipMiddlewares: true,
+    }
   });
 
   // Authentication middleware

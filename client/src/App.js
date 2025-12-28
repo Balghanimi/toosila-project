@@ -27,6 +27,7 @@ import './styles/professional-ui.css';
 // Lazy load all pages for code splitting
 const Home = lazy(() => import('./pages/Home'));
 const Messages = lazy(() => import('./pages/Messages'));
+const MessagesDiagnostics = lazy(() => import('./pages/MessagesDiagnostics'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Bookings = lazy(() => import('./pages/Bookings'));
 const Settings = lazy(() => import('./pages/Settings'));
@@ -113,6 +114,7 @@ export default function App() {
                                         <Route path="/home" element={<Home />} />
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/messages" element={<Messages />} />
+                                        <Route path="/messages/diagnostics" element={<MessagesDiagnostics />} />
                                         <Route path="/profile" element={<Profile />} />
                                         <Route path="/bookings" element={<Bookings />} />
                                         <Route path="/settings" element={<Settings />} />

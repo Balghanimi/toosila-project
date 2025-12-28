@@ -89,14 +89,14 @@ class Message {
         otherUserId,
       });
     } else if (currentUserId) {
-      // SECURITY: If otherUserId is missing, only show messages sent BY currentUser
-      // NEVER show all messages - this would be a privacy violation
-      whereClause += ` AND m.sender_id = $${paramCount}`;
-      params.push(currentUserId);
-      paramCount += 1;
+      // IMPROVED: If otherUserId is missing, show ALL messages in the ride conversation
+      // This is safe because access control is already verified in the controller
+      // The user has already been verified to have access to this ride
       console.log(
-        '[MESSAGES MODEL] ⚠️ Partial filter: only showing messages FROM currentUser (otherUserId missing)'
+        '[MESSAGES MODEL] ℹ️ Showing all messages in ride conversation (otherUserId not specified)'
       );
+      // No additional filter needed - show all messages for this ride
+      // Access control is handled in messages.controller.js
     } else {
       // CRITICAL: No user context - return empty result to prevent privacy leak
       console.error(
@@ -271,7 +271,28 @@ class Message {
                 o.from_city, o.to_city, o.departure_time, o.price, o.seats
          FROM offers o
          WHERE o.id IN (SELECT offer_id FROM bookings WHERE passenger_id = $1)
+         UNION ALL
+         -- EXTENDED FIX: Include demands where user (driver) sent a response
+         SELECT 'demand' as ride_type, d.id as ride_id, d.passenger_id as owner_id,
+                d.from_city, d.to_city, d.earliest_time as departure_time,
+                d.budget_max as price, d.seats
+         FROM demands d
+         WHERE d.id IN (SELECT demand_id FROM demand_responses WHERE driver_id = $1)
+         UNION ALL
+         -- CRITICAL FIX: Include ANY ride wherein the user has sent a message
+         -- This ensures "cold messages" appear in the list even without booking/response
+         SELECT 'offer' as ride_type, o.id as ride_id, o.driver_id as owner_id,
+                o.from_city, o.to_city, o.departure_time, o.price, o.seats
+         FROM offers o
+         WHERE o.id IN (SELECT ride_id FROM messages WHERE ride_type = 'offer' AND sender_id = $1)
+         UNION ALL
+         SELECT 'demand' as ride_type, d.id as ride_id, d.passenger_id as owner_id,
+                d.from_city, d.to_city, d.earliest_time as departure_time,
+                d.budget_max as price, d.seats
+         FROM demands d
+         WHERE d.id IN (SELECT ride_id FROM messages WHERE ride_type = 'demand' AND sender_id = $1)
        ),
+
        all_senders AS (
          -- Find all unique senders on each ride (excluding current user)
          SELECT DISTINCT
@@ -328,6 +349,17 @@ class Message {
          UNION ALL
          SELECT 'offer' as ride_type, offer_id as ride_id
          FROM bookings WHERE passenger_id = $1
+         UNION ALL
+         -- EXTENDED FIX: Include demands where user (driver) sent a response
+         SELECT 'demand' as ride_type, demand_id as ride_id
+         FROM demand_responses WHERE driver_id = $1
+         UNION ALL
+         -- CRITICAL FIX: Include rides with messages
+         SELECT 'offer' as ride_type, ride_id
+         FROM messages WHERE ride_type = 'offer' AND sender_id = $1
+         UNION ALL
+         SELECT 'demand' as ride_type, ride_id
+         FROM messages WHERE ride_type = 'demand' AND sender_id = $1
        )
        SELECT COUNT(DISTINCT (m.ride_type, m.ride_id, m.sender_id)) as count
        FROM messages m

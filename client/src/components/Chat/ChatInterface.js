@@ -16,7 +16,7 @@ const ChatInterface = ({
   tripInfo,
   onClose,
 }) => {
-  const { sendMessage, currentConversation, fetchConversation, fetchRideConversation } =
+  const { sendMessage, currentConversation, fetchConversation, fetchRideConversation, clearCurrentConversation } =
     useMessages();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
@@ -83,24 +83,49 @@ const ChatInterface = ({
     }
   }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
 
+  // Cleanup: Clear messages when conversation changes to prevent identity mixing
+  useEffect(() => {
+    return () => {
+      console.log('[CHAT INTERFACE] 🧹 Cleaning up conversation state');
+      if (clearCurrentConversation) {
+        clearCurrentConversation();
+      }
+    };
+  }, [tripId, rideType, otherUserId, clearCurrentConversation]);
+
   // REAL-TIME POLLING: Auto-refresh messages every 3 seconds when chat is open
   useEffect(() => {
     if (!tripId || !user?.id) return;
 
     console.log('[CHAT INTERFACE] Starting message polling (3s interval)');
+    let isActive = true; // Track if component is still mounted
 
-    const pollInterval = setInterval(() => {
-      // Silently fetch new messages without showing loading state
-      if (tripId) {
-        fetchRideConversation(rideType, tripId, otherUserId);
-      } else if (otherUserId) {
-        fetchConversation(otherUserId);
+    // Polling function with error handling
+    const pollMessages = async () => {
+      if (!isActive) return;
+
+      try {
+        if (tripId) {
+          await fetchRideConversation(rideType, tripId, otherUserId);
+        } else if (otherUserId) {
+          await fetchConversation(otherUserId);
+        }
+      } catch (error) {
+        console.error('[CHAT INTERFACE] Polling error:', error);
+        // Continue polling even on error - don't break the interval
       }
-    }, 3000); // Poll every 3 seconds for real-time feel
+    };
+
+    // Initial fetch
+    pollMessages();
+
+    // Set up interval for subsequent fetches
+    const pollInterval = setInterval(pollMessages, 3000); // Poll every 3 seconds
 
     // Cleanup on unmount
     return () => {
       console.log('[CHAT INTERFACE] Stopping message polling');
+      isActive = false; // Prevent state updates after unmount
       clearInterval(pollInterval);
     };
   }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
@@ -118,8 +143,8 @@ const ChatInterface = ({
       // Message appears instantly, no need to block UI or refetch
       await sendMessage(rideType, tripId, content);
 
-      // Success notification (no overlay, message already visible)
-      showSuccess('✅ تم إرسال الرسالة بنجاح!');
+      // Success notification - disappears in 1 second
+      showSuccess('✅ تم الإرسال');
     } catch (err) {
       const errorMsg = err.message || 'فشل في إرسال الرسالة. حاول مرة أخرى.';
       setError(errorMsg);

@@ -54,7 +54,10 @@
       "Bash(DB_SSL=false PGSSLMODE=disable npm run test:setup:*)",
       "Bash(node scripts/run-add-password-migration.js:*)",
       "Bash(git fetch:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(node test-passenger-api.js:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

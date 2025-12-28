@@ -16,8 +16,16 @@ export const MessagesProvider = ({ children }) => {
   const { currentUser } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [currentConversation, setCurrentConversation] = useState([]);
+  const [currentConversationKey, setCurrentConversationKey] = useState(null); // Track active conversation
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // Clear current conversation (call before switching)
+  const clearCurrentConversation = useCallback(() => {
+    console.log('[MESSAGES] 🧹 Clearing current conversation state');
+    setCurrentConversation([]);
+    setCurrentConversationKey(null);
+  }, []);
 
   // Fetch conversations list
   const fetchConversations = useCallback(async () => {
@@ -96,34 +104,33 @@ export const MessagesProvider = ({ children }) => {
     async (rideType, rideId, otherUserId = null) => {
       if (!currentUser) return;
 
+      // Create unique key for this conversation
+      const conversationKey = `${rideType}-${rideId}-${otherUserId || 'all'}`;
+
       try {
         setLoading(true);
         console.log('[MESSAGES] 📥 Fetching ride conversation:', {
           rideType,
           rideId,
           otherUserId,
-          otherUserIdType: typeof otherUserId,
-          hasOtherUserId: !!otherUserId,
+          conversationKey,
         });
+
+        // Set the conversation key BEFORE fetching
+        setCurrentConversationKey(conversationKey);
+
         const response = await messagesAPI.getRideMessages(rideType, rideId, 1, 50, otherUserId);
-        console.log('[MESSAGES] 📨 API Response:', {
-          messagesCount: response.messages?.length || 0,
-          total: response.total,
-          page: response.page,
-          limit: response.limit,
-          totalPages: response.totalPages,
-          filteredByUser: otherUserId,
+
+        // Only update if this is still the active conversation (prevents race conditions)
+        setCurrentConversationKey((prevKey) => {
+          if (prevKey === conversationKey) {
+            console.log('[MESSAGES] 📨 Updating conversation:', conversationKey);
+            setCurrentConversation(response.messages || []);
+          } else {
+            console.log('[MESSAGES] ⚠️ Conversation changed, skipping update');
+          }
+          return prevKey;
         });
-        console.log(
-          '[MESSAGES] 📋 Messages senders:',
-          response.messages?.map((m) => ({
-            id: m.id,
-            senderId: m.senderId,
-            senderName: m.senderName,
-            content: m.content?.substring(0, 30),
-          }))
-        );
-        setCurrentConversation(response.messages || []);
 
         // Auto mark conversation as read
         if (response.messages && response.messages.length > 0) {
@@ -131,7 +138,6 @@ export const MessagesProvider = ({ children }) => {
             await messagesAPI.markConversationAsRead(rideType, rideId);
             fetchUnreadCount();
           } catch (markError) {
-            // Silently fail - marking as read is not critical
             console.warn('Could not mark conversation as read:', markError);
           }
         }
@@ -180,12 +186,12 @@ export const MessagesProvider = ({ children }) => {
         prev.map((msg) =>
           msg.id === optimisticMessage.id
             ? {
-                ...response.messageData,
-                id: response.messageData.id,
-                senderId: response.messageData.sender_id || response.messageData.senderId,
-                senderName: response.messageData.sender_name || response.messageData.senderName,
-                createdAt: response.messageData.created_at || response.messageData.createdAt,
-              }
+              ...response.messageData,
+              id: response.messageData.id,
+              senderId: response.messageData.sender_id || response.messageData.senderId,
+              senderName: response.messageData.sender_name || response.messageData.senderName,
+              createdAt: response.messageData.created_at || response.messageData.createdAt,
+            }
             : msg
         )
       );
@@ -237,6 +243,7 @@ export const MessagesProvider = ({ children }) => {
   const value = {
     conversations,
     currentConversation,
+    currentConversationKey,
     unreadCount,
     loading,
     sendMessage,
@@ -249,6 +256,7 @@ export const MessagesProvider = ({ children }) => {
     fetchConversation,
     fetchRideConversation,
     fetchUnreadCount,
+    clearCurrentConversation,
   };
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

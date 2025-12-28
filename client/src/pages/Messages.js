@@ -168,10 +168,36 @@ const Messages = () => {
               fontSize: 'var(--text-lg)',
               fontFamily: '"Cairo", sans-serif',
               fontWeight: '500',
+              marginBottom: 'var(--space-3)',
             }}
           >
             تواصل مع السائقين والركاب بسهولة
           </p>
+          <button
+            onClick={() => navigate('/messages/diagnostics')}
+            style={{
+              padding: 'var(--space-2) var(--space-4)',
+              background: 'var(--surface-secondary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-light)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'var(--transition)',
+              fontFamily: '"Cairo", sans-serif',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.borderColor = 'var(--primary)';
+              e.target.style.color = 'var(--primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.borderColor = 'var(--border-light)';
+              e.target.style.color = 'var(--text-secondary)';
+            }}
+          >
+            🔍 تشخيص المشاكل
+          </button>
         </div>
 
         {/* Main Content */}

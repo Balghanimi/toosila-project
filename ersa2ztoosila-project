@@ -1,0 +1,15 @@
+warning: in the working copy of '.claude/settings.local.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/__tests__/controllers/messages.controller.test.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'server/socket/index.js', CRLF will be replaced by LF the next time Git touches it
+ .claude/settings.local.json                        |  5 [32m+[m[31m-[m
+ client/src/App.js                                  |  2 [32m+[m
+ client/src/components/Chat/ChatInterface.js        | 45 [32m+++++++++++[m[31m----[m
+ client/src/components/Chat/MessageInput.js         | 17 [32m+++++[m[31m-[m
+ client/src/components/Chat/MessageList.js          | 65 [32m++++++++++++++++++++[m[31m--[m
+ client/src/context/MessagesContext.js              | 60 [32m+++++++++++[m[31m---------[m
+ client/src/pages/Messages.js                       | 26 [32m+++++++++[m
+ .../controllers/messages.controller.test.js        | 21 [32m+++++++[m
+ server/controllers/messages.controller.js          | 43 [32m+++++++++[m[31m-----[m
+ server/models/messages.model.js                    | 44 [32m+++++++++++++[m[31m--[m
+ server/socket/index.js                             | 13 [32m++++[m[31m-[m
+ 11 files changed, 278 insertions(+), 63 deletions(-)

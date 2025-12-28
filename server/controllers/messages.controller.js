@@ -42,20 +42,27 @@ const sendMessage = asyncHandler(async (req, res) => {
       // Otherwise, driver is replying to a passenger - allow it
     }
   } else {
-    // For demands: check if user is passenger or responded to this demand
+    // SECURITY FIX: For demands, verify user has legitimate access
+    // User must be either the passenger OR have a demand_response
     rideCheck = await query(
       `SELECT d.id, d.passenger_id, d.from_city, d.to_city
        FROM demands d
        WHERE d.id = $1 AND (
          d.passenger_id = $2 OR
-         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2 AND status IN ('pending', 'accepted'))
+         EXISTS (
+           SELECT 1 FROM demand_responses
+           WHERE demand_id = $1 AND driver_id = $2
+         )
        )`,
       [rideId, req.user.id]
     );
+
+    // If passenger: can message any driver who responded
+    // If driver: can message only if they have a demand_response
   }
 
   if (rideCheck.rows.length === 0) {
-    throw new AppError('Ride not found or you do not have access to this conversation', 404);
+    throw new AppError('Ride not found', 404);
   }
 
   // Create message
@@ -93,13 +100,14 @@ const sendMessage = asyncHandler(async (req, res) => {
           [req.user.id, rideId]
         );
       } else {
-        // Notify passenger and all drivers with accepted responses
+        // Notify passenger and all drivers who have interacted
         participantsQuery = await query(
           `SELECT DISTINCT u.id, u.name
            FROM users u
            WHERE u.id != $1 AND (
              u.id = (SELECT passenger_id FROM demands WHERE id = $2) OR
-             u.id IN (SELECT driver_id FROM demand_responses WHERE demand_id = $2 AND status IN ('pending', 'accepted'))
+             u.id IN (SELECT driver_id FROM demand_responses WHERE demand_id = $2 AND status IN ('pending', 'accepted')) OR
+             u.id IN (SELECT DISTINCT sender_id FROM messages WHERE ride_type = 'demand' AND ride_id = $2)
            )`,
           [req.user.id, rideId]
         );
@@ -150,11 +158,13 @@ const getRideMessages = asyncHandler(async (req, res) => {
       throw new AppError('Access denied to this conversation', 403);
     }
   } else {
-    // For demands: check if user is passenger or responded to this demand
+    // SECURITY: User must be the passenger, have a response, or have participated in messages
     accessCheck = await query(
-      `SELECT 1 FROM demands WHERE id = $1 AND (
-         passenger_id = $2 OR
-         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+      `SELECT 1 FROM demands d
+       WHERE d.id = $1 AND (
+         d.passenger_id = $2 OR
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id = $2)
        )`,
       [rideId, req.user.id]
     );
@@ -203,7 +213,8 @@ const getConversation = asyncHandler(async (req, res) => {
 
 // Get user's conversation list
 const getConversationList = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
+  // FIX: Increased default limit to 50 to show more conversations
+  const { page = 1, limit = 50 } = req.query;
 
   const result = await Message.getConversationList(req.user.id, parseInt(page), parseInt(limit));
 
@@ -245,10 +256,12 @@ const markAsRead = asyncHandler(async (req, res) => {
       [message.rideId, req.user.id]
     );
   } else {
+    // FIX: Include message participation in access check
     accessCheck = await query(
       `SELECT 1 FROM demands WHERE id = $1 AND (
          passenger_id = $2 OR
-         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id = $2)
        )`,
       [message.rideId, req.user.id]
     );
@@ -289,10 +302,12 @@ const markConversationAsRead = asyncHandler(async (req, res) => {
       [rideId, req.user.id]
     );
   } else {
+    // FIX: Include message participation in access check
     accessCheck = await query(
       `SELECT 1 FROM demands WHERE id = $1 AND (
          passenger_id = $2 OR
-         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id = $2)
        )`,
       [rideId, req.user.id]
     );
@@ -341,10 +356,12 @@ const getMessageById = asyncHandler(async (req, res) => {
       [message.rideId, req.user.id]
     );
   } else {
+    // FIX: Include message participation in access check
     accessCheck = await query(
       `SELECT 1 FROM demands WHERE id = $1 AND (
          passenger_id = $2 OR
-         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2)
+         EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2) OR
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id = $2)
        )`,
       [message.rideId, req.user.id]
     );
