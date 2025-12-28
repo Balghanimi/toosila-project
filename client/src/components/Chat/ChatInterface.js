@@ -157,7 +157,15 @@ const ChatInterface = ({
       clearTimeout(initialFetchTimeout);
       clearInterval(pollInterval);
     };
-  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation, currentConversationKey]);
+  }, [
+    tripId,
+    rideType,
+    otherUserId,
+    user?.id,
+    fetchRideConversation,
+    fetchConversation,
+    currentConversationKey,
+  ]);
 
   // Handle sending a message (with optimistic update - no loading overlay needed)
   const handleSendMessage = async (content) => {

@@ -110,8 +110,12 @@ export const MessagesProvider = ({ children }) => {
       // CRITICAL FIX: Check if we're switching to a different conversation
       setCurrentConversationKey((prevKey) => {
         if (prevKey && prevKey !== conversationKey) {
-          // IMMEDIATELY clear old messages to prevent bleeding
-          console.log('[MESSAGES] 🧹 Switching conversation - clearing old messages:', prevKey, '->', conversationKey);
+          console.log(
+            '[MESSAGES] 🧹 Switching conversation - clearing old messages:',
+            prevKey,
+            '->',
+            conversationKey
+          );
           setCurrentConversation([]);
         }
         return conversationKey; // Update to new key
@@ -131,7 +135,13 @@ export const MessagesProvider = ({ children }) => {
         // Only update if this is still the active conversation (prevents race conditions)
         setCurrentConversationKey((prevKey) => {
           if (prevKey === conversationKey) {
-            console.log('[MESSAGES] 📨 Updating conversation:', conversationKey, 'with', response.messages?.length || 0, 'messages');
+            console.log(
+              '[MESSAGES] 📨 Updating conversation:',
+              conversationKey,
+              'with',
+              response.messages?.length || 0,
+              'messages'
+            );
             setCurrentConversation(response.messages || []);
           } else {
             console.log('[MESSAGES] ⚠️ Conversation changed during fetch, skipping stale update');
@@ -202,8 +212,10 @@ export const MessagesProvider = ({ children }) => {
               ...response.messageData,
               id: response.messageData.id,
               senderId: response.messageData.sender_id || response.messageData.senderId,
-              senderName: response.messageData.sender_name || response.messageData.senderName,
-              createdAt: response.messageData.created_at || response.messageData.createdAt,
+              senderName:
+                response.messageData.sender_name || response.messageData.senderName,
+              createdAt:
+                response.messageData.created_at || response.messageData.createdAt,
             }
             : msg
         )
