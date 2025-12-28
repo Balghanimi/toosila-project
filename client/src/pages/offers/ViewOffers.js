@@ -257,8 +257,8 @@ const ViewOffers = React.memo(function ViewOffers() {
       return;
     }
 
-    if (currentUser.isDriver) {
-      showError('⚠️ لا يمكن للسائقين حجز رحلات. هذا الحساب مسجل كسائق');
+    if (mode === 'driver') {
+      showError('⚠️ لا يمكن للسائقين حجز رحلات. يرجى التبديل إلى وضع الراكب');
       return;
     }
 
@@ -730,19 +730,19 @@ const ViewOffers = React.memo(function ViewOffers() {
           offerDetails={
             selectedOffer
               ? {
-                  id: selectedOffer.id,
-                  fromCity: selectedOffer.fromCity,
-                  toCity: selectedOffer.toCity,
-                  departureDate: selectedOffer.departureTime,
-                  departureTime: selectedOffer.departureTime,
-                  price: selectedOffer.price,
-                  driverName: selectedOffer.name || 'غير متوفر',
-                  availableSeats:
-                    selectedOffer.availableSeats ??
-                    selectedOffer.seatsAvailable ??
-                    selectedOffer.seats ??
-                    0,
-                }
+                id: selectedOffer.id,
+                fromCity: selectedOffer.fromCity,
+                toCity: selectedOffer.toCity,
+                departureDate: selectedOffer.departureTime,
+                departureTime: selectedOffer.departureTime,
+                price: selectedOffer.price,
+                driverName: selectedOffer.name || 'غير متوفر',
+                availableSeats:
+                  selectedOffer.availableSeats ??
+                  selectedOffer.seatsAvailable ??
+                  selectedOffer.seats ??
+                  0,
+              }
               : null
           }
           onConfirm={handleConfirmBooking}
