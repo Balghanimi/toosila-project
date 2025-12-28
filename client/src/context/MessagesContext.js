@@ -107,6 +107,16 @@ export const MessagesProvider = ({ children }) => {
       // Create unique key for this conversation
       const conversationKey = `${rideType}-${rideId}-${otherUserId || 'all'}`;
 
+      // CRITICAL FIX: Check if we're switching to a different conversation
+      setCurrentConversationKey((prevKey) => {
+        if (prevKey && prevKey !== conversationKey) {
+          // IMMEDIATELY clear old messages to prevent bleeding
+          console.log('[MESSAGES] 🧹 Switching conversation - clearing old messages:', prevKey, '->', conversationKey);
+          setCurrentConversation([]);
+        }
+        return conversationKey; // Update to new key
+      });
+
       try {
         setLoading(true);
         console.log('[MESSAGES] 📥 Fetching ride conversation:', {
@@ -116,18 +126,15 @@ export const MessagesProvider = ({ children }) => {
           conversationKey,
         });
 
-        // Set the conversation key BEFORE fetching
-        setCurrentConversationKey(conversationKey);
-
         const response = await messagesAPI.getRideMessages(rideType, rideId, 1, 50, otherUserId);
 
         // Only update if this is still the active conversation (prevents race conditions)
         setCurrentConversationKey((prevKey) => {
           if (prevKey === conversationKey) {
-            console.log('[MESSAGES] 📨 Updating conversation:', conversationKey);
+            console.log('[MESSAGES] 📨 Updating conversation:', conversationKey, 'with', response.messages?.length || 0, 'messages');
             setCurrentConversation(response.messages || []);
           } else {
-            console.log('[MESSAGES] ⚠️ Conversation changed, skipping update');
+            console.log('[MESSAGES] ⚠️ Conversation changed during fetch, skipping stale update');
           }
           return prevKey;
         });
@@ -143,7 +150,13 @@ export const MessagesProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('[MESSAGES] ❌ Error fetching ride conversation:', error);
-        setCurrentConversation([]);
+        // Only clear if still on this conversation
+        setCurrentConversationKey((prevKey) => {
+          if (prevKey === conversationKey) {
+            setCurrentConversation([]);
+          }
+          return prevKey;
+        });
       } finally {
         setLoading(false);
       }
@@ -186,12 +199,12 @@ export const MessagesProvider = ({ children }) => {
         prev.map((msg) =>
           msg.id === optimisticMessage.id
             ? {
-                ...response.messageData,
-                id: response.messageData.id,
-                senderId: response.messageData.sender_id || response.messageData.senderId,
-                senderName: response.messageData.sender_name || response.messageData.senderName,
-                createdAt: response.messageData.created_at || response.messageData.createdAt,
-              }
+              ...response.messageData,
+              id: response.messageData.id,
+              senderId: response.messageData.sender_id || response.messageData.senderId,
+              senderName: response.messageData.sender_name || response.messageData.senderName,
+              createdAt: response.messageData.created_at || response.messageData.createdAt,
+            }
             : msg
         )
       );

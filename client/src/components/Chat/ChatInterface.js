@@ -19,6 +19,7 @@ const ChatInterface = ({
   const {
     sendMessage,
     currentConversation,
+    currentConversationKey,
     fetchConversation,
     fetchRideConversation,
     clearCurrentConversation,
@@ -115,12 +116,21 @@ const ChatInterface = ({
   useEffect(() => {
     if (!tripId || !user?.id) return;
 
-    console.log('[CHAT INTERFACE] Starting message polling (3s interval)');
+    // Create expected conversation key for this chat
+    const expectedKey = `${rideType}-${tripId}-${otherUserId || 'all'}`;
+    console.log('[CHAT INTERFACE] Starting message polling for:', expectedKey);
     let isActive = true; // Track if component is still mounted
 
-    // Polling function with error handling
+    // Polling function with conversation key validation
     const pollMessages = async () => {
       if (!isActive) return;
+
+      // CRITICAL FIX: Verify we're still on the same conversation before polling
+      // This prevents fetching messages for a different conversation
+      if (currentConversationKey && currentConversationKey !== expectedKey) {
+        console.log('[CHAT INTERFACE] ⚠️ Conversation changed, stopping stale poll');
+        return;
+      }
 
       try {
         if (tripId) {
@@ -134,19 +144,20 @@ const ChatInterface = ({
       }
     };
 
-    // Initial fetch
-    pollMessages();
+    // Initial fetch (after a small delay to ensure state is updated)
+    const initialFetchTimeout = setTimeout(pollMessages, 100);
 
     // Set up interval for subsequent fetches
     const pollInterval = setInterval(pollMessages, 3000); // Poll every 3 seconds
 
     // Cleanup on unmount
     return () => {
-      console.log('[CHAT INTERFACE] Stopping message polling');
+      console.log('[CHAT INTERFACE] Stopping message polling for:', expectedKey);
       isActive = false; // Prevent state updates after unmount
+      clearTimeout(initialFetchTimeout);
       clearInterval(pollInterval);
     };
-  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation]);
+  }, [tripId, rideType, otherUserId, user?.id, fetchRideConversation, fetchConversation, currentConversationKey]);
 
   // Handle sending a message (with optimistic update - no loading overlay needed)
   const handleSendMessage = async (content) => {
