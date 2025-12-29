@@ -204,6 +204,7 @@ class Message {
 
     // STRICT PRIVACY: Only get messages between these two specific users
     // Using both sender_id AND receiver_id columns
+    // BACKWARDS COMPAT: Also include old messages with NULL receiver_id where sender is one of the two users
     const params = [rideType, rideId, currentUserId, otherUserId, limit, offset];
 
     const fullQuery = `SELECT m.*, u.name as sender_name
@@ -215,6 +216,8 @@ class Message {
            (m.sender_id = $3 AND m.receiver_id = $4)
            OR
            (m.sender_id = $4 AND m.receiver_id = $3)
+           OR
+           (m.receiver_id IS NULL AND m.sender_id IN ($3, $4))
          )
        ORDER BY m.created_at ASC
        LIMIT $5 OFFSET $6`;
@@ -238,6 +241,8 @@ class Message {
            (m.sender_id = $3 AND m.receiver_id = $4)
            OR
            (m.sender_id = $4 AND m.receiver_id = $3)
+           OR
+           (m.receiver_id IS NULL AND m.sender_id IN ($3, $4))
          )`,
       [rideType, rideId, currentUserId, otherUserId]
     );
