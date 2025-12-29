@@ -56,17 +56,17 @@ export default function Bookings() {
   // For Passengers: Active tabs first (demands, sent), then disabled (myOffers, received)
   const tabs = isDriver
     ? [
-        { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: true },
-        { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: true },
-        { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: false },
-        { id: 'demands', label: 'طلباتي', icon: '👤', enabled: false },
-      ]
+      { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: true },
+      { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: true },
+      { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: false },
+      { id: 'demands', label: 'طلباتي', icon: '👤', enabled: false },
+    ]
     : [
-        { id: 'demands', label: 'طلباتي', icon: '👤', enabled: true },
-        { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: true },
-        { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: false },
-        { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: false },
-      ];
+      { id: 'demands', label: 'طلباتي', icon: '👤', enabled: true },
+      { id: 'sent', label: 'حجوزاتي', icon: '👤', enabled: true },
+      { id: 'myOffers', label: 'عروضي', icon: '🚗', enabled: false },
+      { id: 'received', label: 'الحجوزات الواردة', icon: '🚗', enabled: false },
+    ];
 
   // Handle tab click
   const handleTabClick = (tab) => {
@@ -412,12 +412,12 @@ export default function Bookings() {
         prevDemands.map((demand) =>
           demand.id === editingDemand.id
             ? {
-                ...demand,
-                earliestTime: updateData.earliestTime,
-                latestTime: updateData.latestTime,
-                seats: updateData.seats,
-                budgetMax: updateData.budgetMax,
-              }
+              ...demand,
+              earliestTime: updateData.earliestTime,
+              latestTime: updateData.latestTime,
+              seats: updateData.seats,
+              budgetMax: updateData.budgetMax,
+            }
             : demand
         )
       );
@@ -1186,9 +1186,9 @@ export default function Bookings() {
                         🕐{' '}
                         {demand.earliestTime
                           ? new Date(demand.earliestTime).toLocaleTimeString('ar-EG', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
                           : '--:--'}
                       </div>
                       <div>
@@ -1263,8 +1263,8 @@ export default function Bookings() {
                       </div>
                     </div>
                     {demand.responses &&
-                    demand.responses.length > 0 &&
-                    showResponsesFor === demand.id ? (
+                      demand.responses.length > 0 &&
+                      showResponsesFor === demand.id ? (
                       <DemandResponsesList
                         responses={demand.responses}
                         isOwner={true}
@@ -1402,11 +1402,9 @@ export default function Bookings() {
                       style={{
                         padding: 'var(--space-1) var(--space-3)',
                         background:
-                          offer.status === 'active'
+                          offer.isActive
                             ? '#22c55e'
-                            : offer.status === 'completed'
-                              ? '#3b82f6'
-                              : '#6b7280',
+                            : '#6b7280',
                         color: 'white',
                         borderRadius: 'var(--radius-full)',
                         fontSize: 'var(--text-xs)',
@@ -1414,11 +1412,7 @@ export default function Bookings() {
                         fontFamily: '"Cairo", sans-serif',
                       }}
                     >
-                      {offer.status === 'active'
-                        ? 'نشط'
-                        : offer.status === 'completed'
-                          ? 'مكتمل'
-                          : 'غير نشط'}
+                      {offer.isActive ? 'نشط' : 'غير نشط'}
                     </div>
                   </div>
 
