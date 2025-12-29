@@ -43,6 +43,7 @@ input[type='radio']:focus-visible {
 }
 
 @media (max-width: 768px) {
+
   /* All interactive elements */
   button,
   a,
@@ -97,7 +98,8 @@ input[type='radio']:focus-visible {
   textarea {
     min-height: 48px;
     padding: 12px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    /* Prevents zoom on iOS */
   }
 
   /* Links in paragraphs and lists */
@@ -120,8 +122,8 @@ input[type='radio']:focus-visible {
   }
 
   /* Checkbox/Radio container for proper touch target */
-  input[type='checkbox'] + label,
-  input[type='radio'] + label {
+  input[type='checkbox']+label,
+  input[type='radio']+label {
     padding: 12px;
     min-height: 48px;
     display: inline-flex;
@@ -148,7 +150,8 @@ input[type='radio']:focus-visible {
   /* Dropdown/Select improvements */
   select {
     min-height: 48px;
-    padding-right: 40px; /* Space for dropdown arrow */
+    padding-right: 40px;
+    /* Space for dropdown arrow */
   }
 
   /* Card action buttons */
@@ -196,6 +199,7 @@ input[type='radio']:focus-visible {
 
 /* Tablet specific adjustments */
 @media (min-width: 769px) and (max-width: 1024px) {
+
   button,
   a[role='button'],
   input[type='button'],
@@ -207,6 +211,7 @@ input[type='radio']:focus-visible {
 
 /* Ensure touch targets are visually centered */
 @media (max-width: 768px) {
+
   button,
   [role='button'],
   a {
@@ -232,15 +237,20 @@ input[type='radio']:focus-visible {
     right: 0;
     bottom: 0;
     background: white;
-    z-index: 100;
+    z-index: 1001;
+    /* Higher than BottomNav (1000) */
     display: flex;
     flex-direction: column;
   }
 
   .chat-interface .chat-interface-container {
     height: 100vh !important;
+    height: 100dvh !important;
+    /* Dynamic viewport height for mobile */
     max-height: 100vh !important;
+    max-height: 100dvh !important;
     min-height: 100vh !important;
+    min-height: 100dvh !important;
     border-radius: 0 !important;
   }
 }

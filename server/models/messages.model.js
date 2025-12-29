@@ -430,7 +430,7 @@ class Message {
             OR (m.sender_id = p.other_user_id AND m.receiver_id = $1)
             OR (m.receiver_id IS NULL AND m.sender_id IN ($1, p.other_user_id))
          ORDER BY m.ride_type, m.ride_id, p.other_user_id, m.created_at DESC
-       )
+       ),
        -- Deduplicate user_rides to prevent duplicate conversations
        distinct_rides AS (
          SELECT DISTINCT ON (ride_type, ride_id)
