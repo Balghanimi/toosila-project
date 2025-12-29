@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessagesContext';
@@ -15,9 +15,36 @@ const Messages = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Handle closing chat - memoized for use in effects
+  const handleCloseChat = useCallback(() => {
+    setSelectedConversation(null);
+  }, []);
+
   useEffect(() => {
     setIsAnimated(true);
   }, []);
+
+  // MOBILE FIX: Handle Android back button when chat is open
+  useEffect(() => {
+    if (!selectedConversation) return;
+
+    // Push a dummy state when chat opens so back button has something to pop
+    window.history.pushState({ chatOpen: true }, '');
+
+    const handlePopState = (event) => {
+      // When back button pressed while chat is open, close the chat
+      if (selectedConversation) {
+        event.preventDefault();
+        handleCloseChat();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [selectedConversation, handleCloseChat]);
 
   // Load conversations when component mounts
   useEffect(() => {
@@ -56,10 +83,6 @@ const Messages = () => {
       rideType: conversation.rideType || conversation.ride_type,
     });
     setSelectedConversation(conversation);
-  };
-
-  const handleCloseChat = () => {
-    setSelectedConversation(null);
   };
 
   if (!isAuthenticated) {
