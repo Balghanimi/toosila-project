@@ -376,45 +376,55 @@ class Message {
          FROM demands d
          WHERE d.id IN (SELECT demand_id FROM demand_responses WHERE driver_id = $1)
          UNION ALL
-         -- CRITICAL FIX: Include ANY ride wherein the user has sent a message
-         -- This ensures "cold messages" appear in the list even without booking/response
+         -- CRITICAL FIX: Include ANY ride wherein the user has sent OR received a message
+         -- This ensures conversations appear in the list even without booking/response
          SELECT 'offer' as ride_type, o.id as ride_id, o.driver_id as owner_id,
                 o.from_city, o.to_city, o.departure_time, o.price, o.seats
          FROM offers o
-         WHERE o.id IN (SELECT ride_id FROM messages WHERE ride_type = 'offer' AND sender_id = $1)
+         WHERE o.id IN (SELECT ride_id FROM messages WHERE ride_type = 'offer' AND (sender_id = $1 OR receiver_id = $1))
          UNION ALL
          SELECT 'demand' as ride_type, d.id as ride_id, d.passenger_id as owner_id,
                 d.from_city, d.to_city, d.earliest_time as departure_time,
                 d.budget_max as price, d.seats
          FROM demands d
-         WHERE d.id IN (SELECT ride_id FROM messages WHERE ride_type = 'demand' AND sender_id = $1)
+         WHERE d.id IN (SELECT ride_id FROM messages WHERE ride_type = 'demand' AND (sender_id = $1 OR receiver_id = $1))
        ),
 
-       all_senders AS (
-         -- Find all unique senders on each ride (excluding current user)
+       all_participants AS (
+         -- Find all unique participants on each ride (excluding current user)
+         -- PRIVACY FIX: Use BOTH sender_id and receiver_id to find conversation partners
          SELECT DISTINCT
                 m.ride_type,
                 m.ride_id,
-                m.sender_id as other_user_id
+                CASE 
+                  WHEN m.sender_id = $1 THEN m.receiver_id
+                  ELSE m.sender_id
+                END as other_user_id
          FROM messages m
          WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
-           AND m.sender_id != $1
+           AND (m.sender_id = $1 OR m.receiver_id = $1)
+           AND COALESCE(
+             CASE WHEN m.sender_id = $1 THEN m.receiver_id ELSE m.sender_id END,
+             m.sender_id
+           ) != $1
        ),
        latest_messages AS (
          -- For each conversation pair (ride + other_user), get the latest message
-         SELECT DISTINCT ON (m.ride_type, m.ride_id, s.other_user_id)
+         SELECT DISTINCT ON (m.ride_type, m.ride_id, p.other_user_id)
                 m.ride_type,
                 m.ride_id,
-                s.other_user_id,
+                p.other_user_id,
                 m.content as last_message,
                 m.created_at as last_message_time,
                 m.sender_id as last_sender_id,
                 u.name as last_sender_name
          FROM messages m
-         JOIN all_senders s ON m.ride_type = s.ride_type AND m.ride_id = s.ride_id
+         JOIN all_participants p ON m.ride_type = p.ride_type AND m.ride_id = p.ride_id
          JOIN users u ON m.sender_id = u.id
-         WHERE m.sender_id IN ($1, s.other_user_id)
-         ORDER BY m.ride_type, m.ride_id, s.other_user_id, m.created_at DESC
+         WHERE (m.sender_id = $1 AND m.receiver_id = p.other_user_id)
+            OR (m.sender_id = p.other_user_id AND m.receiver_id = $1)
+            OR (m.receiver_id IS NULL AND m.sender_id IN ($1, p.other_user_id))
+         ORDER BY m.ride_type, m.ride_id, p.other_user_id, m.created_at DESC
        )
        SELECT lm.*,
               ur.from_city,
@@ -451,17 +461,21 @@ class Message {
          SELECT 'demand' as ride_type, demand_id as ride_id
          FROM demand_responses WHERE driver_id = $1
          UNION ALL
-         -- CRITICAL FIX: Include rides with messages
+         -- CRITICAL FIX: Include rides with messages (as sender OR receiver)
          SELECT 'offer' as ride_type, ride_id
-         FROM messages WHERE ride_type = 'offer' AND sender_id = $1
+         FROM messages WHERE ride_type = 'offer' AND (sender_id = $1 OR receiver_id = $1)
          UNION ALL
          SELECT 'demand' as ride_type, ride_id
-         FROM messages WHERE ride_type = 'demand' AND sender_id = $1
+         FROM messages WHERE ride_type = 'demand' AND (sender_id = $1 OR receiver_id = $1)
        )
-       SELECT COUNT(DISTINCT (m.ride_type, m.ride_id, m.sender_id)) as count
+       SELECT COUNT(DISTINCT (
+         m.ride_type, 
+         m.ride_id, 
+         CASE WHEN m.sender_id = $1 THEN m.receiver_id ELSE m.sender_id END
+       )) as count
        FROM messages m
        WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
-         AND m.sender_id != $1`,
+         AND (m.sender_id = $1 OR m.receiver_id = $1)`,
       [userId]
     );
 
