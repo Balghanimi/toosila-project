@@ -393,20 +393,25 @@ class Message {
        all_participants AS (
          -- Find all unique participants on each ride (excluding current user)
          -- PRIVACY FIX: Use BOTH sender_id and receiver_id to find conversation partners
+         -- DEDUP FIX: Only include entries where we can definitively identify the other user
          SELECT DISTINCT
                 m.ride_type,
                 m.ride_id,
                 CASE 
-                  WHEN m.sender_id = $1 THEN m.receiver_id
-                  ELSE m.sender_id
+                  WHEN m.sender_id = $1 AND m.receiver_id IS NOT NULL THEN m.receiver_id
+                  WHEN m.receiver_id = $1 AND m.sender_id IS NOT NULL THEN m.sender_id
+                  WHEN m.receiver_id IS NULL AND m.sender_id != $1 THEN m.sender_id
+                  ELSE NULL
                 END as other_user_id
          FROM messages m
          WHERE EXISTS (SELECT 1 FROM user_rides ur WHERE ur.ride_type = m.ride_type AND ur.ride_id = m.ride_id)
-           AND (m.sender_id = $1 OR m.receiver_id = $1)
-           AND COALESCE(
-             CASE WHEN m.sender_id = $1 THEN m.receiver_id ELSE m.sender_id END,
-             m.sender_id
-           ) != $1
+           AND (m.sender_id = $1 OR m.receiver_id = $1 OR (m.receiver_id IS NULL AND m.sender_id != $1))
+       ),
+       -- Filter out NULL other_user_id entries
+       valid_participants AS (
+         SELECT DISTINCT ride_type, ride_id, other_user_id
+         FROM all_participants
+         WHERE other_user_id IS NOT NULL
        ),
        latest_messages AS (
          -- For each conversation pair (ride + other_user), get the latest message
@@ -419,7 +424,7 @@ class Message {
                 m.sender_id as last_sender_id,
                 u.name as last_sender_name
          FROM messages m
-         JOIN all_participants p ON m.ride_type = p.ride_type AND m.ride_id = p.ride_id
+         JOIN valid_participants p ON m.ride_type = p.ride_type AND m.ride_id = p.ride_id
          JOIN users u ON m.sender_id = u.id
          WHERE (m.sender_id = $1 AND m.receiver_id = p.other_user_id)
             OR (m.sender_id = p.other_user_id AND m.receiver_id = $1)
