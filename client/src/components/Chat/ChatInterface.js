@@ -225,6 +225,8 @@ const ChatInterface = ({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: '400px', // Ensure minimum height
+        maxHeight: '100vh', // Don't exceed viewport on mobile
         background: 'var(--surface-primary)',
         borderRadius: 'var(--radius-xl)',
         overflow: 'hidden',
@@ -232,6 +234,7 @@ const ChatInterface = ({
         border: '1px solid var(--border-light)',
         direction: 'rtl',
       }}
+      className="chat-interface-container"
     >
       {/* Chat Header */}
       <div
