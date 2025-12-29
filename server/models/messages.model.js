@@ -431,7 +431,14 @@ class Message {
             OR (m.receiver_id IS NULL AND m.sender_id IN ($1, p.other_user_id))
          ORDER BY m.ride_type, m.ride_id, p.other_user_id, m.created_at DESC
        )
-       SELECT lm.*,
+       -- Deduplicate user_rides to prevent duplicate conversations
+       distinct_rides AS (
+         SELECT DISTINCT ON (ride_type, ride_id)
+                ride_type, ride_id, owner_id, from_city, to_city, departure_time, price, seats
+         FROM user_rides
+       )
+       SELECT DISTINCT ON (lm.ride_type, lm.ride_id, lm.other_user_id)
+              lm.*,
               ur.from_city,
               ur.to_city,
               ur.departure_time,
@@ -440,12 +447,16 @@ class Message {
               ur.owner_id,
               u2.name as other_user_name
        FROM latest_messages lm
-       JOIN user_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
+       JOIN distinct_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
        JOIN users u2 ON lm.other_user_id = u2.id
-       ORDER BY lm.last_message_time DESC
-       LIMIT $2 OFFSET $3`,
+       ORDER BY lm.ride_type, lm.ride_id, lm.other_user_id, lm.last_message_time DESC`,
       [userId, limit, offset]
     );
+
+    // Apply limit and offset after deduplication
+    const finalRows = result.rows.sort((a, b) =>
+      new Date(b.last_message_time) - new Date(a.last_message_time)
+    ).slice(offset, offset + limit);
 
     const queryDuration = Date.now() - startTime;
     console.log(
@@ -490,7 +501,7 @@ class Message {
     console.log(`[PERF] getConversationList TOTAL time: ${totalDuration}ms`);
 
     return {
-      conversations: result.rows,
+      conversations: finalRows,
       total: parseInt(countResult.rows[0].count),
       page,
       limit,
