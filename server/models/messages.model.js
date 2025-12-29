@@ -6,6 +6,7 @@ class Message {
     this.rideType = data.ride_type;
     this.rideId = data.ride_id;
     this.senderId = data.sender_id;
+    this.receiverId = data.receiver_id || null; // NEW: receiver_id for message bleeding fix
     this.senderName = data.sender_name || null;
     this.content = data.content;
     this.createdAt = data.created_at;
@@ -20,14 +21,14 @@ class Message {
     this.deletedForEveryone = data.deleted_for_everyone || false;
   }
 
-  // Create a new message
+  // Create a new message with receiver_id
   static async create(messageData) {
-    const { rideType, rideId, senderId, content } = messageData;
+    const { rideType, rideId, senderId, receiverId, content } = messageData;
     const result = await query(
-      `INSERT INTO messages (ride_type, ride_id, sender_id, content)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO messages (ride_type, ride_id, sender_id, receiver_id, content)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [rideType, rideId, senderId, content]
+      [rideType, rideId, senderId, receiverId, content]
     );
 
     // Fetch sender name
@@ -157,6 +158,92 @@ class Message {
     const totalDuration = Date.now() - startTime;
     console.log(`[PERF] getByRide count query took ${countDuration}ms`);
     console.log(`[PERF] getByRide TOTAL time: ${totalDuration}ms`);
+
+    return {
+      messages: result.rows.map((row) => new Message(row)),
+      total: parseInt(countResult.rows[0].count),
+      page,
+      limit,
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
+    };
+  }
+
+  // STRICT: Get messages for a specific conversation between two users on a ride
+  // This prevents message bleeding - only shows messages where
+  // (sender = currentUser AND receiver = otherUser) OR (sender = otherUser AND receiver = currentUser)
+  static async getByRideStrict(
+    rideType,
+    rideId,
+    page = 1,
+    limit = 50,
+    currentUserId,
+    otherUserId
+  ) {
+    if (!currentUserId || !otherUserId) {
+      console.error('[MESSAGES MODEL] getByRideStrict: Missing required user IDs');
+      return {
+        messages: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+      };
+    }
+
+    const offset = (page - 1) * limit;
+    const startTime = Date.now();
+
+    console.log('[MESSAGES MODEL] getByRideStrict called with:', {
+      rideType,
+      rideId,
+      page,
+      limit,
+      currentUserId,
+      otherUserId,
+    });
+
+    // STRICT PRIVACY: Only get messages between these two specific users
+    // Using both sender_id AND receiver_id columns
+    const params = [rideType, rideId, currentUserId, otherUserId, limit, offset];
+
+    const fullQuery = `SELECT m.*, u.name as sender_name
+       FROM messages m
+       JOIN users u ON m.sender_id = u.id
+       WHERE m.ride_type = $1 
+         AND m.ride_id = $2
+         AND (
+           (m.sender_id = $3 AND m.receiver_id = $4)
+           OR
+           (m.sender_id = $4 AND m.receiver_id = $3)
+         )
+       ORDER BY m.created_at ASC
+       LIMIT $5 OFFSET $6`;
+
+    console.log('[MESSAGES MODEL] getByRideStrict query params:', params);
+
+    const queryStartTime = Date.now();
+    const result = await query(fullQuery, params);
+    const queryDuration = Date.now() - queryStartTime;
+
+    console.log(
+      `[PERF] getByRideStrict main query took ${queryDuration}ms, returned ${result.rows.length} messages`
+    );
+
+    // Count query for pagination
+    const countResult = await query(
+      `SELECT COUNT(*) FROM messages m 
+       WHERE m.ride_type = $1 
+         AND m.ride_id = $2
+         AND (
+           (m.sender_id = $3 AND m.receiver_id = $4)
+           OR
+           (m.sender_id = $4 AND m.receiver_id = $3)
+         )`,
+      [rideType, rideId, currentUserId, otherUserId]
+    );
+
+    const totalDuration = Date.now() - startTime;
+    console.log(`[PERF] getByRideStrict TOTAL time: ${totalDuration}ms`);
 
     return {
       messages: result.rows.map((row) => new Message(row)),
@@ -472,6 +559,7 @@ class Message {
       rideType: this.rideType,
       rideId: this.rideId,
       senderId: this.senderId,
+      receiverId: this.receiverId, // Include receiver_id in JSON output
       senderName: this.senderName,
       // Show deleted message placeholder if deleted for everyone
       content: isDeleted ? 'تم حذف هذه الرسالة' : this.content,

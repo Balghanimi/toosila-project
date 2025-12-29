@@ -4,16 +4,17 @@ const { notifyNewMessage } = require('../socket');
 
 // Send a new message (ride-based)
 const sendMessage = asyncHandler(async (req, res) => {
-  const { rideType, rideId, content } = req.body;
+  const { rideType, rideId, content, receiverId } = req.body;
 
   // Validate ride type
   if (!['offer', 'demand'].includes(rideType)) {
     throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
   }
 
-  // Verify the ride exists
+  // Verify the ride exists and determine receiver_id
   const { query } = require('../config/db');
   let rideCheck;
+  let determinedReceiverId = receiverId || null;
 
   if (rideType === 'offer') {
     // For offers: check if offer exists and is active
@@ -24,22 +25,30 @@ const sendMessage = asyncHandler(async (req, res) => {
       [rideId]
     );
 
-    // If user is the driver of this offer, only allow if they're REPLYING to existing messages
-    // (i.e., there are already messages from other users in this conversation)
-    if (rideCheck.rows.length > 0 && rideCheck.rows[0].driver_id === req.user.id) {
-      // Check if there are any messages from OTHER users in this conversation
-      const existingMessages = await query(
-        `SELECT 1 FROM messages
-         WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id != $2
-         LIMIT 1`,
-        [rideId, req.user.id]
-      );
+    if (rideCheck.rows.length > 0) {
+      const ride = rideCheck.rows[0];
 
-      if (existingMessages.rows.length === 0) {
-        // Driver is trying to start a conversation with themselves - block this
-        throw new AppError('You cannot start a conversation on your own offer', 400);
+      // RECEIVER_ID LOGIC: Determine receiver based on who is sending
+      if (req.user.id === ride.driver_id) {
+        // Sender is driver (ride owner) - receiver should be provided or found from existing messages
+        if (!determinedReceiverId) {
+          // Find the other user from existing conversation
+          const existingConvo = await query(
+            `SELECT DISTINCT sender_id FROM messages
+             WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id != $2
+             ORDER BY created_at DESC LIMIT 1`,
+            [rideId, req.user.id]
+          );
+          if (existingConvo.rows.length > 0) {
+            determinedReceiverId = existingConvo.rows[0].sender_id;
+          } else {
+            throw new AppError('You cannot start a conversation on your own offer', 400);
+          }
+        }
+      } else {
+        // Sender is passenger - receiver is the driver (ride owner)
+        determinedReceiverId = ride.driver_id;
       }
-      // Otherwise, driver is replying to a passenger - allow it
     }
   } else {
     // SECURITY FIX: For demands, verify user has legitimate access
@@ -57,19 +66,47 @@ const sendMessage = asyncHandler(async (req, res) => {
       [rideId, req.user.id]
     );
 
-    // If passenger: can message any driver who responded
-    // If driver: can message only if they have a demand_response
+    if (rideCheck.rows.length > 0) {
+      const ride = rideCheck.rows[0];
+
+      // RECEIVER_ID LOGIC for demand
+      if (req.user.id === ride.passenger_id) {
+        // Sender is passenger (ride owner) - receiver should be provided or found
+        if (!determinedReceiverId) {
+          const existingConvo = await query(
+            `SELECT DISTINCT sender_id FROM messages
+             WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id != $2
+             ORDER BY created_at DESC LIMIT 1`,
+            [rideId, req.user.id]
+          );
+          if (existingConvo.rows.length > 0) {
+            determinedReceiverId = existingConvo.rows[0].sender_id;
+          }
+        }
+      } else {
+        // Sender is driver - receiver is the passenger (ride owner)
+        determinedReceiverId = ride.passenger_id;
+      }
+    }
   }
 
   if (rideCheck.rows.length === 0) {
     throw new AppError('Ride not found', 404);
   }
 
-  // Create message
+  // Validate receiver_id is set
+  if (!determinedReceiverId) {
+    throw new AppError('Could not determine message receiver', 400);
+  }
+
+  console.log('[MESSAGES] Creating message with receiver_id:', determinedReceiverId, 'sender_id:', req.user.id);
+
+  // Create message with receiver_id
   const message = await Message.create({
     rideType,
     rideId,
     senderId: req.user.id,
+    receiverId: determinedReceiverId,
     content,
   });
 
@@ -113,13 +150,12 @@ const sendMessage = asyncHandler(async (req, res) => {
         );
       }
 
-      // Send notification to each participant
-      participantsQuery.rows.forEach((participant) => {
-        notifyNewMessage(io, participant.id, {
-          ...message.toJSON(),
-          senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
-          ride: rideCheck.rows[0],
-        });
+      // PRIVACY FIX: Only notify the specific receiver, not all participants
+      notifyNewMessage(io, determinedReceiverId, {
+        ...message.toJSON(),
+        receiverId: determinedReceiverId,
+        senderName: req.user.name || `${req.user.firstName} ${req.user.lastName}`,
+        ride: rideCheck.rows[0],
       });
     } catch (error) {
       console.error('[MESSAGES] Error sending notifications:', error);
@@ -128,7 +164,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   });
 });
 
-// Get messages for a specific ride
+// Get messages for a specific ride - STRICT FILTERING by sender_id and receiver_id
 const getRideMessages = asyncHandler(async (req, res) => {
   const { rideType, rideId } = req.params;
   const { page = 1, limit = 50, other_user_id } = req.query;
@@ -136,6 +172,18 @@ const getRideMessages = asyncHandler(async (req, res) => {
   // Validate ride type
   if (!['offer', 'demand'].includes(rideType)) {
     throw new AppError('Invalid ride type. Must be "offer" or "demand"', 400);
+  }
+
+  // STRICT PRIVACY: other_user_id is REQUIRED to prevent message bleeding
+  if (!other_user_id) {
+    console.warn('[MESSAGES CONTROLLER] ⚠️ other_user_id not provided - returning empty for privacy');
+    return res.json({
+      messages: [],
+      total: 0,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: 0,
+    });
   }
 
   // Verify user has access to this ride
@@ -149,7 +197,7 @@ const getRideMessages = asyncHandler(async (req, res) => {
        WHERE o.id = $1 AND o.is_active = true AND (
          o.driver_id = $2 OR
          EXISTS (SELECT 1 FROM bookings WHERE offer_id = $1 AND passenger_id = $2) OR
-         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id = $2)
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'offer' AND ride_id = $1 AND (sender_id = $2 OR receiver_id = $2))
        )`,
       [rideId, req.user.id]
     );
@@ -164,7 +212,7 @@ const getRideMessages = asyncHandler(async (req, res) => {
        WHERE d.id = $1 AND (
          d.passenger_id = $2 OR
          EXISTS (SELECT 1 FROM demand_responses WHERE demand_id = $1 AND driver_id = $2) OR
-         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id = $2)
+         EXISTS (SELECT 1 FROM messages WHERE ride_type = 'demand' AND ride_id = $1 AND (sender_id = $2 OR receiver_id = $2))
        )`,
       [rideId, req.user.id]
     );
@@ -174,11 +222,11 @@ const getRideMessages = asyncHandler(async (req, res) => {
     }
   }
 
-  // PRIVACY FIX: Pass other_user_id to filter messages for this specific conversation
+  // STRICT PRIVACY FIX: Filter messages by BOTH sender_id AND receiver_id
   const currentUserName =
     req.user.name || `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim() || 'User';
 
-  console.log('[MESSAGES CONTROLLER] getRideMessages called:', {
+  console.log('[MESSAGES CONTROLLER] getRideMessages called with STRICT filtering:', {
     rideType,
     rideId,
     page,
@@ -186,16 +234,15 @@ const getRideMessages = asyncHandler(async (req, res) => {
     currentUserId: req.user.id,
     currentUserName,
     other_user_id,
-    hasOtherUserId: !!other_user_id,
   });
 
-  const result = await Message.getByRide(
+  const result = await Message.getByRideStrict(
     rideType,
     rideId,
     parseInt(page),
     parseInt(limit),
     req.user.id,
-    other_user_id || null
+    other_user_id
   );
 
   console.log('[MESSAGES CONTROLLER] Returning', result.messages.length, 'messages to client');
