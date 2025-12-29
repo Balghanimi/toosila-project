@@ -34,7 +34,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         if (!determinedReceiverId) {
           // Find the other user from existing conversation
           const existingConvo = await query(
-            `SELECT DISTINCT sender_id FROM messages
+            `SELECT sender_id FROM messages
              WHERE ride_type = 'offer' AND ride_id = $1 AND sender_id != $2
              ORDER BY created_at DESC LIMIT 1`,
             [rideId, req.user.id]
@@ -74,7 +74,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         // Sender is passenger (ride owner) - receiver should be provided or found
         if (!determinedReceiverId) {
           const existingConvo = await query(
-            `SELECT DISTINCT sender_id FROM messages
+            `SELECT sender_id FROM messages
              WHERE ride_type = 'demand' AND ride_id = $1 AND sender_id != $2
              ORDER BY created_at DESC LIMIT 1`,
             [rideId, req.user.id]
