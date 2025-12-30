@@ -11,7 +11,7 @@ import RideDetailsModal from './RideDetailsModal';
 const ChatInterface = ({
   tripId,
   rideType = 'offer',
-  otherUserId,
+  otherUserId: propOtherUserId,
   otherUserName,
   tripInfo,
   onClose,
@@ -25,12 +25,27 @@ const ChatInterface = ({
     clearCurrentConversation,
   } = useMessages();
   const { user } = useAuth();
-  const { showError } = useNotifications();
+  const location = useLocation(); // Hook to access state passed via navigation
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [showRideDetails, setShowRideDetails] = useState(false);
   const [rideDetails, setRideDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+
+  // Determine the effective otherUserId from props or location state
+  // This fixes the issue where messages don't load if otherUserId is missing from props
+  const otherUserId =
+    propOtherUserId || location.state?.otherUserId || location.state?.other_user_id;
+
+  // Debug log to trace where otherUserId is coming from
+  useEffect(() => {
+    if (!otherUserId) {
+      console.warn('[CHAT INTERFACE] ⚠️ otherUserId is missing!', {
+        prop: propOtherUserId,
+        state: location.state,
+      });
+    }
+  }, [otherUserId, propOtherUserId, location.state]);
 
   // Handle click on header to show ride details modal
   const handleHeaderClick = async () => {
