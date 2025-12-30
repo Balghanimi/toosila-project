@@ -123,6 +123,8 @@ class Message {
        FROM messages m
        JOIN users u ON m.sender_id = u.id
        WHERE ${whereClause}
+         AND m.deleted_for_everyone = false
+         AND m.deleted_at IS NULL
        ORDER BY m.created_at ASC
        LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
 
@@ -219,6 +221,9 @@ class Message {
            OR
            (m.receiver_id IS NULL AND m.sender_id IN ($3, $4))
          )
+         -- CRITICAL FIX: Exclude deleted messages from conversation history
+         AND m.deleted_for_everyone = false
+         AND m.deleted_at IS NULL
        ORDER BY m.created_at ASC
        LIMIT $5 OFFSET $6`;
 
@@ -243,7 +248,9 @@ class Message {
            (m.sender_id = $4 AND m.receiver_id = $3)
            OR
            (m.receiver_id IS NULL AND m.sender_id IN ($3, $4))
-         )`,
+         )
+         AND m.deleted_for_everyone = false
+         AND m.deleted_at IS NULL`,
       [rideType, rideId, currentUserId, otherUserId]
     );
 
@@ -429,6 +436,9 @@ class Message {
          WHERE (m.sender_id = $1 AND m.receiver_id = p.other_user_id)
             OR (m.sender_id = p.other_user_id AND m.receiver_id = $1)
             OR (m.receiver_id IS NULL AND m.sender_id IN ($1, p.other_user_id))
+            -- CRITICAL FIX: Exclude deleted messages to prevent showing "تم حذف هذه الرسالة" in conversation list
+            AND m.deleted_for_everyone = false
+            AND m.deleted_at IS NULL
          ORDER BY m.ride_type, m.ride_id, p.other_user_id, m.created_at DESC
        ),
        -- Deduplicate user_rides to prevent duplicate conversations
@@ -450,7 +460,7 @@ class Message {
        JOIN distinct_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
        JOIN users u2 ON lm.other_user_id = u2.id
        ORDER BY lm.ride_type, lm.ride_id, lm.other_user_id, lm.last_message_time DESC`,
-      [userId, limit, offset]
+      [userId]
     );
 
     // Apply limit and offset after deduplication
