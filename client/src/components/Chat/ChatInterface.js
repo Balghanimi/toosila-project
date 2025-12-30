@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useMessages } from '../../context/MessagesContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -25,6 +25,7 @@ const ChatInterface = ({
     clearCurrentConversation,
   } = useMessages();
   const { user } = useAuth();
+  const { showError } = useNotifications();
   const location = useLocation(); // Hook to access state passed via navigation
   const navigate = useNavigate();
   const [error, setError] = useState('');
