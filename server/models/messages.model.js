@@ -455,7 +455,17 @@ class Message {
               ur.price,
               ur.seats,
               ur.owner_id,
-              u2.name as other_user_name
+              u2.name as other_user_name,
+              -- Calculate unread messages count for this conversation
+              (SELECT COUNT(*)::int FROM messages m2 
+               WHERE m2.ride_type = lm.ride_type 
+                 AND m2.ride_id = lm.ride_id
+                 AND m2.sender_id = lm.other_user_id
+                 AND m2.receiver_id = $1
+                 AND m2.is_read = false
+                 AND m2.deleted_for_everyone = false
+                 AND m2.deleted_at IS NULL
+              ) as unread_count
        FROM latest_messages lm
        JOIN distinct_rides ur ON lm.ride_type = ur.ride_type AND lm.ride_id = ur.ride_id
        JOIN users u2 ON lm.other_user_id = u2.id
