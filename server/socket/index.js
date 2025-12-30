@@ -224,43 +224,41 @@ function isUserOnline(userId) {
 }
 
 /**
- * Emit message edited notification to all participants of a ride conversation
+ * Emit message edited notification to the specific recipient
+ * PRIVACY FIX: Use direct user targeting instead of ride rooms to prevent message bleeding
  * @param {SocketIO.Server} io - Socket.io instance
- * @param {string} rideType - 'offer' or 'demand'
- * @param {string} rideId - Ride ID
+ * @param {string} recipientId - Recipient's user ID (the other participant)
  * @param {object} message - Edited message data
  */
-function notifyMessageEdited(io, rideType, rideId, message) {
-  if (!io) return;
+function notifyMessageEdited(io, recipientId, message) {
+  if (!io || !recipientId) return;
 
-  // Emit to a room based on the ride conversation
-  const room = `${rideType}:${rideId}`;
-  io.to(room).emit('message-edited', {
+  // PRIVACY FIX: Emit directly to the specific recipient, not to a ride room
+  emitToUser(io, recipientId, 'message-edited', {
     type: 'message-edited',
     messageData: message,
-    rideType,
-    rideId,
+    rideType: message.rideType,
+    rideId: message.rideId,
     timestamp: new Date().toISOString()
   });
 }
 
 /**
- * Emit message deleted notification to all participants of a ride conversation
+ * Emit message deleted notification to the specific recipient
+ * PRIVACY FIX: Use direct user targeting instead of ride rooms to prevent message bleeding
  * @param {SocketIO.Server} io - Socket.io instance
- * @param {string} rideType - 'offer' or 'demand'
- * @param {string} rideId - Ride ID
- * @param {string} messageId - Deleted message ID
+ * @param {string} recipientId - Recipient's user ID (the other participant)
+ * @param {object} messageInfo - Object containing messageId, rideType, rideId
  */
-function notifyMessageDeleted(io, rideType, rideId, messageId) {
-  if (!io) return;
+function notifyMessageDeleted(io, recipientId, messageInfo) {
+  if (!io || !recipientId) return;
 
-  // Emit to a room based on the ride conversation
-  const room = `${rideType}:${rideId}`;
-  io.to(room).emit('message-deleted', {
+  // PRIVACY FIX: Emit directly to the specific recipient, not to a ride room
+  emitToUser(io, recipientId, 'message-deleted', {
     type: 'message-deleted',
-    messageId,
-    rideType,
-    rideId,
+    messageId: messageInfo.messageId,
+    rideType: messageInfo.rideType,
+    rideId: messageInfo.rideId,
     timestamp: new Date().toISOString()
   });
 }

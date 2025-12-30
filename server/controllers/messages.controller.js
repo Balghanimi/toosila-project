@@ -486,12 +486,16 @@ const editMessage = asyncHandler(async (req, res) => {
   try {
     const message = await Message.edit(id, req.user.id, content.trim());
 
-    // Send real-time notification
+    // Send real-time notification to the other participant
     const io = req.app.get('io');
     if (io) {
       const { notifyMessageEdited } = require('../socket');
       if (notifyMessageEdited) {
-        notifyMessageEdited(io, message.rideType, message.rideId, message.toJSON());
+        // PRIVACY FIX: Send notification only to the other participant
+        const recipientId = message.receiverId || message.senderId;
+        if (recipientId && recipientId !== req.user.id) {
+          notifyMessageEdited(io, recipientId, message.toJSON());
+        }
       }
     }
 
@@ -535,7 +539,15 @@ const deleteMessage = asyncHandler(async (req, res) => {
       if (io) {
         const { notifyMessageDeleted } = require('../socket');
         if (notifyMessageDeleted) {
-          notifyMessageDeleted(io, message.rideType, message.rideId, message.id);
+          // PRIVACY FIX: Send notification only to the other participant
+          const recipientId = message.receiverId || message.senderId;
+          if (recipientId && recipientId !== req.user.id) {
+            notifyMessageDeleted(io, recipientId, {
+              messageId: message.id,
+              rideType: message.rideType,
+              rideId: message.rideId
+            });
+          }
         }
       }
     }
