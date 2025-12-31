@@ -119,14 +119,33 @@ const normalizeMessage = (msg) => ({
 });
 
 // ============================================================
-// SOCKET IMPORT (optional)
+// SAFE SOCKET HOOK (follows React Hooks rules)
 // ============================================================
-let useSocket;
+// We create a wrapper that always returns something, avoiding conditional hook calls
+let SocketContextModule = null;
 try {
-  useSocket = require('./SocketContext').useSocket;
+  SocketContextModule = require('./SocketContext');
 } catch (e) {
-  useSocket = null;
+  // SocketContext doesn't exist in this environment
 }
+
+/**
+ * Safe wrapper for useSocket that follows React Hooks rules
+ * Always returns an object (never throws), with socket being null if unavailable
+ */
+const useSocketSafe = () => {
+  // If SocketContext module exists, use its hook
+  if (SocketContextModule && SocketContextModule.useSocket) {
+    try {
+      return SocketContextModule.useSocket();
+    } catch (e) {
+      // Hook call failed (likely not within provider)
+      return { socket: null, isConnected: false };
+    }
+  }
+  // Return safe default if module doesn't exist
+  return { socket: null, isConnected: false };
+};
 
 // ============================================================
 // CONTEXT CREATION
@@ -153,17 +172,11 @@ export const MessagesProvider = ({ children }) => {
   const { currentUser } = useAuth();
 
   // ========================================
-  // SOCKET CONNECTION (optional)
+  // SOCKET CONNECTION (using safe wrapper hook)
   // ========================================
-  let socket = null;
-  try {
-    if (useSocket) {
-      const socketContext = useSocket();
-      socket = socketContext?.socket;
-    }
-  } catch (e) {
-    // Socket context not available - that's okay
-  }
+  // useSocketSafe is always called (following React Hooks rules)
+  // Returns { socket: null } if SocketContext unavailable
+  const { socket } = useSocketSafe();
 
   // ========================================
   // STATE MANAGEMENT

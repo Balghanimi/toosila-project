@@ -157,37 +157,37 @@ const BottomNav = () => {
     // Role switcher - shown only when logged in
     ...(currentUser
       ? [
-        {
-          key: 'role-switch',
-          label: currentUser.isDriver ? 'التبديل إلى راكب' : 'التبديل إلى سائق',
-          icon: currentUser.isDriver ? '👤' : '🚗',
-          action: handleRoleToggle,
-          highlight: true, // Special styling for this item
-        },
-      ]
+          {
+            key: 'role-switch',
+            label: currentUser.isDriver ? 'التبديل إلى راكب' : 'التبديل إلى سائق',
+            icon: currentUser.isDriver ? '👤' : '🚗',
+            action: handleRoleToggle,
+            highlight: true, // Special styling for this item
+          },
+        ]
       : []),
     // Lines feature - show to everyone (goes to coming soon for non-admins)
     ...(showLinesInNav()
       ? [
-        {
-          key: 'lines',
-          label: 'الخطوط',
-          icon: '🚌',
-          comingSoon: true,
-          action: () => alert('الخطوط قريباً! 🚌\n\nهذه الميزة قيد التطوير وستكون متاحة قريباً.'),
-        },
-        // My Subscriptions - shown only when logged in and has full lines access
-        ...(currentUser && canAccessLines(currentUser)
-          ? [
-            {
-              key: 'subscriptions',
-              label: 'اشتراكاتي',
-              icon: '📋',
-              action: () => navigate('/subscriptions'),
-            },
-          ]
-          : []),
-      ]
+          {
+            key: 'lines',
+            label: 'الخطوط',
+            icon: '🚌',
+            comingSoon: true,
+            action: () => alert('الخطوط قريباً! 🚌\n\nهذه الميزة قيد التطوير وستكون متاحة قريباً.'),
+          },
+          // My Subscriptions - shown only when logged in and has full lines access
+          ...(currentUser && canAccessLines(currentUser)
+            ? [
+                {
+                  key: 'subscriptions',
+                  label: 'اشتراكاتي',
+                  icon: '📋',
+                  action: () => navigate('/subscriptions'),
+                },
+              ]
+            : []),
+        ]
       : []),
     {
       key: 'settings',
