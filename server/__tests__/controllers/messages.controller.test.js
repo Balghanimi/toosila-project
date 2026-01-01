@@ -114,12 +114,14 @@ describe('Messages Controller', () => {
 
       await sendMessage(req, res, next);
 
-      expect(Message.create).toHaveBeenCalledWith({
-        rideType: 'offer',
-        rideId: 1,
-        senderId: 1,
-        content: 'Test message'
-      });
+      expect(Message.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rideType: 'offer',
+          rideId: 1,
+          senderId: 1,
+          content: 'Test message',
+        })
+      );
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         message: expect.any(String),

@@ -1,7 +1,7 @@
 // SECURITY: JWT Secret Validation for Production
 // This code should be inserted before module.exports = config;
 
-if (config.NODE_ENV === 'production') {
+if (typeof config !== 'undefined' && config && config.NODE_ENV === 'production') {
   const MIN_SECRET_LENGTH = 32;
 
   // Check JWT_SECRET strength
