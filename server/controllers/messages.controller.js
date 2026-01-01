@@ -4,7 +4,7 @@ const { notifyNewMessage } = require('../socket');
 
 // Send a new message (ride-based)
 const sendMessage = asyncHandler(async (req, res) => {
-  const { rideType, rideId, content, receiverId } = req.body;
+  const { rideType, rideId, content, receiverId, replyToId } = req.body;
 
   // Validate ride type
   if (!['offer', 'demand'].includes(rideType)) {
@@ -108,6 +108,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     senderId: req.user.id,
     receiverId: determinedReceiverId,
     content,
+    replyToId: replyToId || null,
   });
 
   // PERFORMANCE FIX: Send response immediately, then send notifications in background

@@ -19,16 +19,20 @@ class Message {
     this.lastEditedAt = data.last_edited_at || null;
     this.deletedAt = data.deleted_at || null;
     this.deletedForEveryone = data.deleted_for_everyone || false;
+    // Reply-to feature
+    this.replyToId = data.reply_to_id || null;
+    this.replyToContent = data.reply_to_content || null;
+    this.replyToSenderName = data.reply_to_sender_name || null;
   }
 
-  // Create a new message with receiver_id
+  // Create a new message with receiver_id and optional reply_to_id
   static async create(messageData) {
-    const { rideType, rideId, senderId, receiverId, content } = messageData;
+    const { rideType, rideId, senderId, receiverId, content, replyToId } = messageData;
     const result = await query(
-      `INSERT INTO messages (ride_type, ride_id, sender_id, receiver_id, content)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO messages (ride_type, ride_id, sender_id, receiver_id, content, reply_to_id)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [rideType, rideId, senderId, receiverId, content]
+      [rideType, rideId, senderId, receiverId, content, replyToId || null]
     );
 
     // Fetch sender name
@@ -36,6 +40,21 @@ class Message {
 
     const messageRow = result.rows[0];
     messageRow.sender_name = senderResult.rows[0]?.name || null;
+
+    // If replying to a message, fetch reply-to info
+    if (replyToId) {
+      const replyResult = await query(
+        `SELECT m.content, u.name as sender_name 
+         FROM messages m 
+         JOIN users u ON m.sender_id = u.id 
+         WHERE m.id = $1`,
+        [replyToId]
+      );
+      if (replyResult.rows.length > 0) {
+        messageRow.reply_to_content = replyResult.rows[0].content;
+        messageRow.reply_to_sender_name = replyResult.rows[0].sender_name;
+      }
+    }
 
     return new Message(messageRow);
   }
