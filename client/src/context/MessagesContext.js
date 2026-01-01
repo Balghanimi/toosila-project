@@ -121,31 +121,23 @@ const normalizeMessage = (msg) => ({
 // ============================================================
 // SAFE SOCKET HOOK (follows React Hooks rules)
 // ============================================================
-// We create a wrapper that always returns something, avoiding conditional hook calls
-let SocketContextModule = null;
+// Import SocketContext and get hook reference at module level
+let useSocketHook = null;
 try {
-  SocketContextModule = require('./SocketContext');
+  const SocketContextModule = require('./SocketContext');
+  if (SocketContextModule && SocketContextModule.useSocket) {
+    useSocketHook = SocketContextModule.useSocket;
+  }
 } catch (e) {
   // SocketContext doesn't exist in this environment
 }
 
-/**
- * Safe wrapper for useSocket that follows React Hooks rules
- * Always returns an object (never throws), with socket being null if unavailable
- */
-const useSocketSafe = () => {
-  // If SocketContext module exists, use its hook
-  if (SocketContextModule && SocketContextModule.useSocket) {
-    try {
-      return SocketContextModule.useSocket();
-    } catch (e) {
-      // Hook call failed (likely not within provider)
-      return { socket: null, isConnected: false };
-    }
-  }
-  // Return safe default if module doesn't exist
-  return { socket: null, isConnected: false };
-};
+// Create a dummy hook for when SocketContext is unavailable
+const useDummySocket = () => ({ socket: null, isConnected: false });
+
+// Use whichever hook is available - this is determined at module load time, not at runtime
+// This satisfies React Hooks rules because the same hook is always called
+const useSocketSafe = useSocketHook || useDummySocket;
 
 // ============================================================
 // CONTEXT CREATION
