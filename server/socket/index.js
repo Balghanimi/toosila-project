@@ -71,7 +71,7 @@ function initializeSocket(server) {
     // Store user connection
     activeUsers.set(userId, socket.id);
 
-    // Join user's personal room
+    // Join user's personal room for direct messages
     socket.join(`user:${userId}`);
 
     // Send connection confirmation
@@ -80,9 +80,75 @@ function initializeSocket(server) {
       userId: userId
     });
 
+    // ========================================
+    // RIDE ROOM MANAGEMENT
+    // ========================================
+
+    // Join a specific ride room (for group conversations)
+    socket.on('join-ride', ({ rideType, rideId }) => {
+      const roomName = `ride:${rideType}:${rideId}`;
+      socket.join(roomName);
+      console.log(`[SOCKET] User ${userId} joined room ${roomName}`);
+    });
+
+    // Leave a ride room
+    socket.on('leave-ride', ({ rideType, rideId }) => {
+      const roomName = `ride:${rideType}:${rideId}`;
+      socket.leave(roomName);
+      console.log(`[SOCKET] User ${userId} left room ${roomName}`);
+    });
+
+    // ========================================
+    // TYPING INDICATORS (WhatsApp-like)
+    // ========================================
+
+    // User starts typing
+    socket.on('typing-start', ({ rideType, rideId, receiverId }) => {
+      // Send to specific receiver (private typing indicator)
+      if (receiverId) {
+        io.to(`user:${receiverId}`).emit('user-typing', {
+          userId: userId,
+          rideType,
+          rideId,
+          isTyping: true
+        });
+      }
+    });
+
+    // User stops typing
+    socket.on('typing-stop', ({ rideType, rideId, receiverId }) => {
+      if (receiverId) {
+        io.to(`user:${receiverId}`).emit('user-typing', {
+          userId: userId,
+          rideType,
+          rideId,
+          isTyping: false
+        });
+      }
+    });
+
+    // ========================================
+    // MESSAGE READ RECEIPTS (Blue Ticks)
+    // ========================================
+
+    // Mark message as read event from client
+    socket.on('message-read', ({ messageId, senderId }) => {
+      // Notify the original sender that their message was read
+      io.to(`user:${senderId}`).emit('message-read-receipt', {
+        messageId,
+        readBy: userId,
+        readAt: new Date().toISOString()
+      });
+    });
+
+    // ========================================
+    // CONNECTION LIFECYCLE
+    // ========================================
+
     // Handle disconnection
     socket.on('disconnect', (reason) => {
       activeUsers.delete(userId);
+      console.log(`[SOCKET] User ${userId} disconnected: ${reason}`);
     });
 
     // Handle manual reconnection
@@ -263,9 +329,42 @@ function notifyMessageDeleted(io, recipientId, messageInfo) {
   });
 }
 
+/**
+ * Emit message read notification to the original sender (Blue Ticks)
+ * @param {SocketIO.Server} io - Socket.io instance
+ * @param {string} senderId - Original sender's user ID
+ * @param {string} messageId - ID of the message that was read
+ * @param {string} readBy - ID of the user who read the message
+ */
+function notifyMessageRead(io, senderId, messageId, readBy) {
+  if (!io || !senderId) return;
+
+  emitToUser(io, senderId, 'message-read', {
+    type: 'message-read',
+    messageId,
+    readBy,
+    readAt: new Date().toISOString()
+  });
+}
+
+/**
+ * Emit to a specific ride room (for broadcast to all participants)
+ * @param {SocketIO.Server} io - Socket.io instance
+ * @param {string} rideType - 'offer' or 'demand'
+ * @param {string|number} rideId - Ride ID
+ * @param {string} event - Event name
+ * @param {object} data - Event data
+ */
+function emitToRideRoom(io, rideType, rideId, event, data) {
+  if (!io) return;
+  const roomName = `ride:${rideType}:${rideId}`;
+  io.to(roomName).emit(event, data);
+}
+
 module.exports = {
   initializeSocket,
   emitToUser,
+  emitToRideRoom,
   notifyNewBooking,
   notifyBookingStatusUpdate,
   notifyNewMessage,
@@ -274,5 +373,6 @@ module.exports = {
   getActiveUsersCount,
   isUserOnline,
   notifyMessageEdited,
-  notifyMessageDeleted
+  notifyMessageDeleted,
+  notifyMessageRead
 };
