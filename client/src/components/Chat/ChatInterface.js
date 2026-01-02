@@ -240,14 +240,10 @@ const ChatInterface = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        minHeight: '400px', // Ensure minimum height
-        maxHeight: '100vh', // Don't exceed viewport on mobile
+        height: '100dvh', // Dynamic viewport height for mobile
+        position: 'relative',
         background: 'var(--surface-primary)',
-        borderRadius: 'var(--radius-xl)',
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-xl)',
-        border: '1px solid var(--border-light)',
+        overflow: 'hidden', // Parent NEVER scrolls
         direction: 'rtl',
       }}
       className="chat-interface-container"
@@ -255,13 +251,14 @@ const ChatInterface = ({
       {/* Chat Header */}
       <div
         style={{
+          flexShrink: 0, // Never shrink
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: 'var(--space-4)',
+          paddingTop: 'calc(var(--space-4) + env(safe-area-inset-top, 0px))', // Safe area for iOS
           background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
           color: 'white',
-          borderBottom: '1px solid var(--border-light)',
         }}
       >
         <div
@@ -380,22 +377,15 @@ const ChatInterface = ({
         </div>
       )}
 
-      {/* Messages Area */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-        }}
-      >
-        <MessageList messages={currentConversation} currentUserId={user?.id} />
-      </div>
+      {/* Messages Area - Takes ALL available space */}
+      <MessageList messages={currentConversation} currentUserId={user?.id} />
 
-      {/* Message Input */}
+      {/* Message Input - Anchored to bottom */}
       <div
         style={{
+          flexShrink: 0, // Never shrink
           padding: 'var(--space-4)',
+          paddingBottom: 'calc(var(--space-4) + env(safe-area-inset-bottom, 0px))', // Safe area for iOS
           background: 'var(--surface-primary)',
           borderTop: '1px solid var(--border-light)',
         }}
