@@ -87,7 +87,7 @@ const debounce = (fn, delay) => {
  * Compare IDs safely (handles string/number mismatch)
  */
 const idsMatch = (id1, id2) => {
-  if (id1 == null || id2 == null) return false;
+  if (id1 === null || id1 === undefined || id2 === null || id2 === undefined) return false;
   return String(id1) === String(id2);
 };
 
@@ -356,7 +356,9 @@ export const MessagesProvider = ({ children }) => {
               if (append) {
                 setCurrentConversation((prev) => {
                   const existingIds = new Set(prev.map((m) => String(m.id)));
-                  const newMessages = normalizedMessages.filter((m) => !existingIds.has(String(m.id)));
+                  const newMessages = normalizedMessages.filter(
+                    (m) => !existingIds.has(String(m.id))
+                  );
                   return [...prev, ...newMessages];
                 });
               } else {
@@ -492,9 +494,9 @@ export const MessagesProvider = ({ children }) => {
 
       setCurrentConversation((prev) =>
         prev.map((msg) =>
-        (idsMatch(msg.id, messageId)
-          ? { ...msg, content: newContent, isEdited: true, is_edited: true }
-          : msg)
+          idsMatch(msg.id, messageId)
+            ? { ...msg, content: newContent, isEdited: true, is_edited: true }
+            : msg
         )
       );
     };
@@ -518,9 +520,9 @@ export const MessagesProvider = ({ children }) => {
         if (deleteForAll) {
           // Show "Message deleted" placeholder for all users
           return prev.map((msg) =>
-          (idsMatch(msg.id, messageId)
-            ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, is_deleted: true }
-            : msg)
+            idsMatch(msg.id, messageId)
+              ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, is_deleted: true }
+              : msg
           );
         } else {
           // Delete for me: Filter it out completely
@@ -624,7 +626,7 @@ export const MessagesProvider = ({ children }) => {
         // Mark optimistic message as failed
         setCurrentConversation((prev) =>
           prev.map((msg) =>
-            (idsMatch(msg.id, tempId) ? { ...msg, isSending: false, isFailed: true } : msg)
+            idsMatch(msg.id, tempId) ? { ...msg, isSending: false, isFailed: true } : msg
           )
         );
 
@@ -743,9 +745,7 @@ export const MessagesProvider = ({ children }) => {
           // Re-add message in correct order
           setCurrentConversation((prev) => {
             const newConversation = [...prev, originalMessage];
-            return newConversation.sort(
-              (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-            );
+            return newConversation.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
           });
         }
       }
@@ -801,7 +801,7 @@ export const MessagesProvider = ({ children }) => {
   const updateMessageInConversation = useCallback((updatedMessage) => {
     setCurrentConversation((prev) =>
       prev.map((msg) =>
-        (idsMatch(msg.id, updatedMessage.id) ? { ...msg, ...normalizeMessage(updatedMessage) } : msg)
+        idsMatch(msg.id, updatedMessage.id) ? { ...msg, ...normalizeMessage(updatedMessage) } : msg
       )
     );
   }, []);
@@ -812,7 +812,9 @@ export const MessagesProvider = ({ children }) => {
   const removeMessageFromConversation = useCallback((messageId) => {
     setCurrentConversation((prev) =>
       prev.map((msg) =>
-        (idsMatch(msg.id, messageId) ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true } : msg)
+        idsMatch(msg.id, messageId)
+          ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true }
+          : msg
       )
     );
   }, []);
