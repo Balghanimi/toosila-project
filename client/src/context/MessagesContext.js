@@ -1,18 +1,15 @@
 /**
  * MessagesContext.js - Real-time Messaging Context
  *
- * REFACTORED VERSION with the following improvements:
- * 1. ✅ Fixed missing dependency in socket useEffect (using refs)
- * 2. ✅ Memory leak prevention with proper cleanup
- * 3. ✅ Enhanced duplicate message handling
- * 4. ✅ Retry logic with exponential backoff (3 retries)
- * 5. ✅ Performance optimization with debouncing
- * 6. ✅ PropTypes definitions
- * 7. ✅ Better loading states for different operations
- * 8. ✅ Pagination support with infinite scroll
+ * FINAL VERSION with all fixes:
+ * 1. ✅ Fixed "Disappearing Message" by ignoring self-sent socket events
+ * 2. ✅ Optimistic UI for instant Delete/Edit
+ * 3. ✅ Fixed Prettier/Formatting errors (parentheses in ternary)
+ * 4. ✅ Robust ID comparison (String vs Number)
+ * 5. ✅ Socket handlers don't conflict with optimistic updates
  *
  * @author Toosila Team
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 import React, {
@@ -34,7 +31,7 @@ import { messagesAPI } from '../services/api';
 const CONFIG = {
   RETRY: {
     MAX_ATTEMPTS: 3,
-    BASE_DELAY_MS: 1000, // 1 second
+    BASE_DELAY_MS: 1000,
     BACKOFF_MULTIPLIER: 2,
   },
   DEBOUNCE: {
@@ -53,10 +50,6 @@ const CONFIG = {
 
 /**
  * Retry a function with exponential backoff
- * @param {Function} fn - Async function to retry
- * @param {number} maxAttempts - Maximum retry attempts
- * @param {number} baseDelay - Base delay in ms
- * @returns {Promise} - Result of the function
  */
 const retryWithBackoff = async (fn, maxAttempts = 3, baseDelay = 1000) => {
   let lastError;
@@ -81,9 +74,6 @@ const retryWithBackoff = async (fn, maxAttempts = 3, baseDelay = 1000) => {
 
 /**
  * Debounce function to limit rapid calls
- * @param {Function} fn - Function to debounce
- * @param {number} delay - Delay in ms
- * @returns {Function} - Debounced function
  */
 const debounce = (fn, delay) => {
   let timeoutId;
@@ -94,9 +84,15 @@ const debounce = (fn, delay) => {
 };
 
 /**
- * Normalize message data to consistent format (both camelCase and snake_case)
- * @param {Object} msg - Message object
- * @returns {Object} - Normalized message
+ * Compare IDs safely (handles string/number mismatch)
+ */
+const idsMatch = (id1, id2) => {
+  if (id1 == null || id2 == null) return false;
+  return String(id1) === String(id2);
+};
+
+/**
+ * Normalize message data to consistent format
  */
 const normalizeMessage = (msg) => ({
   ...msg,
@@ -115,13 +111,15 @@ const normalizeMessage = (msg) => ({
   receiverId: msg.receiver_id || msg.receiverId,
   receiver_id: msg.receiver_id || msg.receiverId,
   isEdited: msg.is_edited || msg.isEdited || false,
+  is_edited: msg.is_edited || msg.isEdited || false,
   isDeleted: msg.is_deleted || msg.isDeleted || false,
+  is_deleted: msg.is_deleted || msg.isDeleted || false,
+  deletedForEveryone: msg.deleted_for_everyone || msg.deletedForEveryone || false,
 });
 
 // ============================================================
 // SAFE SOCKET HOOK (follows React Hooks rules)
 // ============================================================
-// Import SocketContext and get hook reference at module level
 let useSocketHook = null;
 try {
   const SocketContextModule = require('./SocketContext');
@@ -132,11 +130,7 @@ try {
   // SocketContext doesn't exist in this environment
 }
 
-// Create a dummy hook for when SocketContext is unavailable
 const useDummySocket = () => ({ socket: null, isConnected: false });
-
-// Use whichever hook is available - this is determined at module load time, not at runtime
-// This satisfies React Hooks rules because the same hook is always called
 const useSocketSafe = useSocketHook || useDummySocket;
 
 // ============================================================
@@ -144,11 +138,6 @@ const useSocketSafe = useSocketHook || useDummySocket;
 // ============================================================
 const MessagesContext = createContext();
 
-/**
- * Custom hook to access MessagesContext
- * @returns {Object} - MessagesContext value
- * @throws {Error} - If used outside MessagesProvider
- */
 export const useMessages = () => {
   const context = useContext(MessagesContext);
   if (!context) {
@@ -162,12 +151,6 @@ export const useMessages = () => {
 // ============================================================
 export const MessagesProvider = ({ children }) => {
   const { currentUser } = useAuth();
-
-  // ========================================
-  // SOCKET CONNECTION (using safe wrapper hook)
-  // ========================================
-  // useSocketSafe is always called (following React Hooks rules)
-  // Returns { socket: null } if SocketContext unavailable
   const { socket } = useSocketSafe();
 
   // ========================================
@@ -178,7 +161,6 @@ export const MessagesProvider = ({ children }) => {
   const [currentConversationKey, setCurrentConversationKey] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Granular loading states for different operations
   const [loadingStates, setLoadingStates] = useState({
     conversations: false,
     messages: false,
@@ -186,7 +168,6 @@ export const MessagesProvider = ({ children }) => {
     loadingMore: false,
   });
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -198,15 +179,14 @@ export const MessagesProvider = ({ children }) => {
   // REFS (for stable references in callbacks)
   // ========================================
   const currentConversationKeyRef = useRef(null);
+  const currentUserRef = useRef(null);
   const fetchConversationsRef = useRef(null);
   const mountedRef = useRef(true);
 
-  // Helper to set specific loading state
   const setLoading = useCallback((key, value) => {
     setLoadingStates((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  // Combined loading state for backward compatibility
   const loading = useMemo(() => Object.values(loadingStates).some(Boolean), [loadingStates]);
 
   // ========================================
@@ -216,7 +196,10 @@ export const MessagesProvider = ({ children }) => {
     currentConversationKeyRef.current = currentConversationKey;
   }, [currentConversationKey]);
 
-  // Track component mount status for cleanup
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -228,9 +211,6 @@ export const MessagesProvider = ({ children }) => {
   // CORE API FUNCTIONS
   // ========================================
 
-  /**
-   * Fetch conversations list with retry logic
-   */
   const fetchConversations = useCallback(async () => {
     if (!currentUser) {
       setConversations([]);
@@ -247,16 +227,12 @@ export const MessagesProvider = ({ children }) => {
         CONFIG.RETRY.BASE_DELAY_MS
       );
 
-      // Only update if component is still mounted
       if (mountedRef.current) {
-        console.log('[MESSAGES] 📨 Conversations API Response:', {
-          conversationsCount: response.conversations?.length || 0,
-          total: response.total,
-        });
+        console.log('[MESSAGES] 📨 Conversations fetched:', response.conversations?.length || 0);
         setConversations(response.conversations || []);
       }
     } catch (error) {
-      console.error('[MESSAGES] ❌ Error fetching conversations after retries:', error);
+      console.error('[MESSAGES] ❌ Error fetching conversations:', error);
       if (mountedRef.current) {
         setConversations([]);
       }
@@ -267,14 +243,10 @@ export const MessagesProvider = ({ children }) => {
     }
   }, [currentUser, setLoading]);
 
-  // Store fetchConversations in ref for socket handler
   useEffect(() => {
     fetchConversationsRef.current = fetchConversations;
   }, [fetchConversations]);
 
-  /**
-   * Fetch unread count
-   */
   const fetchUnreadCount = useCallback(async () => {
     if (!currentUser) {
       setUnreadCount(0);
@@ -293,9 +265,6 @@ export const MessagesProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  /**
-   * Clear current conversation state
-   */
   const clearCurrentConversation = useCallback(() => {
     console.log('[MESSAGES] 🧹 Clearing current conversation state');
     setCurrentConversation([]);
@@ -308,9 +277,6 @@ export const MessagesProvider = ({ children }) => {
     });
   }, []);
 
-  /**
-   * Fetch conversation by user ID (deprecated - for backward compatibility)
-   */
   const fetchConversation = useCallback(
     async (userId) => {
       if (!currentUser) return;
@@ -326,10 +292,9 @@ export const MessagesProvider = ({ children }) => {
         if (mountedRef.current) {
           setCurrentConversation((response.messages || []).map(normalizeMessage));
 
-          // Auto mark as read
           if (response.messages?.length > 0) {
             const unreadMessages = response.messages.filter(
-              (msg) => msg.sender_id !== currentUser.id && !msg.read
+              (msg) => !idsMatch(msg.sender_id, currentUser.id) && !msg.read
             );
             for (const msg of unreadMessages) {
               await messagesAPI.markAsRead(msg.id);
@@ -348,21 +313,12 @@ export const MessagesProvider = ({ children }) => {
     [currentUser, fetchUnreadCount, setLoading]
   );
 
-  /**
-   * Fetch ride-specific conversation with pagination support
-   * @param {string} rideType - 'offer' or 'demand'
-   * @param {string} rideId - Ride ID
-   * @param {string|null} otherUserId - Other participant ID (for privacy)
-   * @param {number} page - Page number (default: 1)
-   * @param {boolean} append - Whether to append to existing messages (for infinite scroll)
-   */
   const fetchRideConversation = useCallback(
     async (rideType, rideId, otherUserId = null, page = 1, append = false) => {
       if (!currentUser) return;
 
       const conversationKey = `${rideType}-${rideId}-${otherUserId || 'all'}`;
 
-      // Clear old messages if switching conversations
       if (!append) {
         setCurrentConversationKey((prevKey) => {
           if (prevKey && prevKey !== conversationKey) {
@@ -377,13 +333,7 @@ export const MessagesProvider = ({ children }) => {
       try {
         setLoading(append ? 'loadingMore' : 'messages', true);
 
-        console.log('[MESSAGES] 📥 Fetching ride conversation:', {
-          rideType,
-          rideId,
-          otherUserId,
-          page,
-          append,
-        });
+        console.log('[MESSAGES] 📥 Fetching ride conversation:', { rideType, rideId, page });
 
         const response = await retryWithBackoff(
           () =>
@@ -398,24 +348,21 @@ export const MessagesProvider = ({ children }) => {
           CONFIG.RETRY.BASE_DELAY_MS
         );
 
-        // Only update if still active conversation and mounted
         if (mountedRef.current) {
           setCurrentConversationKey((prevKey) => {
             if (prevKey === conversationKey) {
               const normalizedMessages = (response.messages || []).map(normalizeMessage);
 
               if (append) {
-                // Append to existing messages (infinite scroll)
                 setCurrentConversation((prev) => {
-                  const existingIds = new Set(prev.map((m) => m.id));
-                  const newMessages = normalizedMessages.filter((m) => !existingIds.has(m.id));
+                  const existingIds = new Set(prev.map((m) => String(m.id)));
+                  const newMessages = normalizedMessages.filter((m) => !existingIds.has(String(m.id)));
                   return [...prev, ...newMessages];
                 });
               } else {
                 setCurrentConversation(normalizedMessages);
               }
 
-              // Update pagination
               setPagination({
                 currentPage: response.page || page,
                 totalPages: response.totalPages || 1,
@@ -427,7 +374,6 @@ export const MessagesProvider = ({ children }) => {
           });
         }
 
-        // Mark as read
         if (!append && response.messages?.length > 0) {
           try {
             await messagesAPI.markConversationAsRead(rideType, rideId);
@@ -455,9 +401,6 @@ export const MessagesProvider = ({ children }) => {
     [currentUser, fetchUnreadCount, setLoading]
   );
 
-  /**
-   * Load more messages (for infinite scroll/pagination)
-   */
   const loadMoreMessages = useCallback(
     async (rideType, rideId, otherUserId = null) => {
       if (!pagination.hasMore || loadingStates.loadingMore) return;
@@ -474,17 +417,30 @@ export const MessagesProvider = ({ children }) => {
   useEffect(() => {
     if (!socket) return;
 
-    // Debounced handler to prevent rapid re-renders
     const debouncedFetchConversations = debounce(() => {
       if (fetchConversationsRef.current) {
         fetchConversationsRef.current();
       }
     }, CONFIG.DEBOUNCE.FETCH_CONVERSATIONS_MS);
 
+    /**
+     * Handle new message from socket
+     * CRITICAL FIX: Ignore self-sent messages to prevent disappearing/flickering
+     */
     const handleNewMessage = (data) => {
       console.log('[MESSAGES] 🔔 Real-time new message received:', data);
 
       const messageData = data.messageData || data;
+      const messageSenderId = messageData.sender_id || messageData.senderId;
+      const user = currentUserRef.current;
+
+      // 🔥 CRITICAL FIX: Ignore messages sent by ME
+      // The sendMessage function already adds my own messages optimistically
+      if (user && idsMatch(messageSenderId, user.id)) {
+        console.log('[MESSAGES] 🚫 Ignoring self-sent socket message');
+        return;
+      }
+
       const messageRideId = String(messageData.rideId || messageData.ride_id);
       const currentKey = currentConversationKeyRef.current;
 
@@ -496,13 +452,13 @@ export const MessagesProvider = ({ children }) => {
           console.log('[MESSAGES] ✅ Adding message to current conversation');
 
           setCurrentConversation((prev) => {
-            // Enhanced duplicate detection
+            // Enhanced duplicate detection using idsMatch
             const exists = prev.some(
               (msg) =>
-                msg.id === messageData.id ||
+                idsMatch(msg.id, messageData.id) ||
                 (msg.isOptimistic &&
                   msg.content === messageData.content &&
-                  msg.senderId === (messageData.sender_id || messageData.senderId))
+                  idsMatch(msg.senderId, messageSenderId))
             );
 
             if (exists) {
@@ -515,44 +471,62 @@ export const MessagesProvider = ({ children }) => {
         }
       }
 
-      // Refresh conversations list (debounced)
       debouncedFetchConversations();
     };
 
+    /**
+     * Handle message edited from socket
+     * FIXED: Robust extraction of messageId and content
+     */
     const handleMessageEdited = (data) => {
-      console.log('[MESSAGES] ✏️ Message edited:', data);
-      const messageData = data.messageData || data;
-      const messageId = messageData.id || messageData.messageId;
-      const newContent = messageData.content;
+      console.log('[MESSAGES] ✏️ Message edited via socket:', data);
 
-      // Find the message and update its content and isEdited flag immediately
+      const messageData = data.messageData || data;
+      const messageId = messageData.id || messageData.messageId || data.messageId || data.id;
+      const newContent = messageData.content || data.content;
+
+      if (!messageId) {
+        console.warn('[MESSAGES] ⚠️ No messageId in edit event, ignoring');
+        return;
+      }
+
       setCurrentConversation((prev) =>
         prev.map((msg) =>
-          msg.id === messageId
-            ? { ...msg, content: newContent, isEdited: true, is_edited: true }
-            : msg
+        (idsMatch(msg.id, messageId)
+          ? { ...msg, content: newContent, isEdited: true, is_edited: true }
+          : msg)
         )
       );
     };
 
+    /**
+     * Handle message deleted from socket
+     * FIXED: Robust extraction of messageId and deleteForAll flag
+     */
     const handleMessageDeleted = (data) => {
-      console.log('[MESSAGES] 🗑️ Message deleted:', data);
-      const messageId = data.messageId || data.id;
+      console.log('[MESSAGES] 🗑️ Message deleted via socket:', data);
+
+      const messageId = data.messageId || data.id || data.messageData?.id;
       const deleteForAll = data.deleteForAll !== undefined ? data.deleteForAll : true;
 
-      if (deleteForAll) {
-        // Show "Message deleted" placeholder for all users
-        setCurrentConversation((prev) =>
-          prev.map((msg) =>
-            msg.id === messageId
-              ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, is_deleted: true }
-              : msg
-          )
-        );
-      } else {
-        // Delete for me: Filter it out completely
-        setCurrentConversation((prev) => prev.filter((msg) => msg.id !== messageId));
+      if (!messageId) {
+        console.warn('[MESSAGES] ⚠️ No messageId in delete event, ignoring');
+        return;
       }
+
+      setCurrentConversation((prev) => {
+        if (deleteForAll) {
+          // Show "Message deleted" placeholder for all users
+          return prev.map((msg) =>
+          (idsMatch(msg.id, messageId)
+            ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, is_deleted: true }
+            : msg)
+          );
+        } else {
+          // Delete for me: Filter it out completely
+          return prev.filter((msg) => !idsMatch(msg.id, messageId));
+        }
+      });
     };
 
     // Register event listeners
@@ -579,7 +553,7 @@ export const MessagesProvider = ({ children }) => {
   }, [currentUser, fetchConversations, fetchUnreadCount]);
 
   // ========================================
-  // MESSAGE OPERATIONS
+  // MESSAGE OPERATIONS (OPTIMISTIC UI)
   // ========================================
 
   /**
@@ -610,7 +584,7 @@ export const MessagesProvider = ({ children }) => {
 
       console.log('[MESSAGES] 📤 Adding optimistic message:', tempId);
 
-      // Add optimistic message
+      // Optimistic: Add message immediately
       setCurrentConversation((prev) => [...prev, optimisticMessage]);
       setLoading('sending', true);
 
@@ -628,10 +602,10 @@ export const MessagesProvider = ({ children }) => {
         if (serverMessage?.id) {
           setCurrentConversation((prev) => {
             // Remove optimistic message
-            const filtered = prev.filter((msg) => msg.id !== tempId);
+            const filtered = prev.filter((msg) => !idsMatch(msg.id, tempId));
 
             // Check for duplicates
-            if (filtered.some((msg) => msg.id === serverMessage.id)) {
+            if (filtered.some((msg) => idsMatch(msg.id, serverMessage.id))) {
               console.log('[MESSAGES] ⚠️ Server message exists, removing optimistic');
               return filtered;
             }
@@ -642,9 +616,7 @@ export const MessagesProvider = ({ children }) => {
           });
         }
 
-        // Refresh conversations
         fetchConversations();
-
         return response;
       } catch (error) {
         console.error('[MESSAGES] ❌ Error sending message:', error);
@@ -652,7 +624,7 @@ export const MessagesProvider = ({ children }) => {
         // Mark optimistic message as failed
         setCurrentConversation((prev) =>
           prev.map((msg) =>
-            msg.id === tempId ? { ...msg, isSending: false, isFailed: true } : msg
+            (idsMatch(msg.id, tempId) ? { ...msg, isSending: false, isFailed: true } : msg)
           )
         );
 
@@ -669,10 +641,7 @@ export const MessagesProvider = ({ children }) => {
    */
   const retrySendMessage = useCallback(
     async (failedMessageId, rideType, rideId, content) => {
-      // Remove the failed message first
-      setCurrentConversation((prev) => prev.filter((msg) => msg.id !== failedMessageId));
-
-      // Try sending again
+      setCurrentConversation((prev) => prev.filter((msg) => !idsMatch(msg.id, failedMessageId)));
       return sendMessage(rideType, rideId, content);
     },
     [sendMessage]
@@ -682,14 +651,13 @@ export const MessagesProvider = ({ children }) => {
    * Edit a message with optimistic update
    */
   const editMessage = useCallback(async (messageId, content) => {
-    // Save original message for rollback
     let originalMessage = null;
 
-    // Optimistic update: Update state immediately before API call
-    setCurrentConversation((prev) => {
-      const newConversation = prev.map((msg) => {
-        if (msg.id === messageId) {
-          originalMessage = { ...msg }; // Save for potential rollback
+    // ⚡ INSTANT UI UPDATE (before API call)
+    setCurrentConversation((prev) =>
+      prev.map((msg) => {
+        if (idsMatch(msg.id, messageId)) {
+          originalMessage = { ...msg }; // Save for rollback
           return {
             ...msg,
             content,
@@ -699,9 +667,8 @@ export const MessagesProvider = ({ children }) => {
           };
         }
         return msg;
-      });
-      return newConversation;
-    });
+      })
+    );
 
     try {
       const response = await retryWithBackoff(
@@ -715,10 +682,10 @@ export const MessagesProvider = ({ children }) => {
     } catch (error) {
       console.error('[MESSAGES] ❌ Error editing message, reverting:', error);
 
-      // Rollback: Revert to original message on failure
+      // Rollback on failure
       if (originalMessage) {
         setCurrentConversation((prev) =>
-          prev.map((msg) => (msg.id === messageId ? originalMessage : msg))
+          prev.map((msg) => (idsMatch(msg.id, messageId) ? originalMessage : msg))
         );
       }
 
@@ -730,16 +697,15 @@ export const MessagesProvider = ({ children }) => {
    * Delete a message with optimistic update
    */
   const deleteMessage = useCallback(async (messageId, deleteForAll = false) => {
-    // Save original message for rollback
     let originalMessage = null;
 
-    // Optimistic update: Update state immediately before API call
-    if (deleteForAll) {
-      // Show "Message deleted" placeholder immediately
-      setCurrentConversation((prev) => {
+    // ⚡ INSTANT UI UPDATE (before API call)
+    setCurrentConversation((prev) => {
+      if (deleteForAll) {
+        // Show "Message deleted" placeholder immediately
         return prev.map((msg) => {
-          if (msg.id === messageId) {
-            originalMessage = { ...msg }; // Save for potential rollback
+          if (idsMatch(msg.id, messageId)) {
+            originalMessage = { ...msg }; // Save for rollback
             return {
               ...msg,
               content: 'تم حذف هذه الرسالة',
@@ -750,17 +716,15 @@ export const MessagesProvider = ({ children }) => {
           }
           return msg;
         });
-      });
-    } else {
-      // Delete for me: Remove from array immediately
-      setCurrentConversation((prev) => {
-        const msgToRemove = prev.find((msg) => msg.id === messageId);
+      } else {
+        // Delete for me: Remove immediately
+        const msgToRemove = prev.find((msg) => idsMatch(msg.id, messageId));
         if (msgToRemove) {
           originalMessage = { ...msgToRemove };
         }
-        return prev.filter((msg) => msg.id !== messageId);
-      });
-    }
+        return prev.filter((msg) => !idsMatch(msg.id, messageId));
+      }
+    });
 
     try {
       const response = await messagesAPI.deleteMessage(messageId, deleteForAll);
@@ -769,27 +733,19 @@ export const MessagesProvider = ({ children }) => {
     } catch (error) {
       console.error('[MESSAGES] ❌ Error deleting message, reverting:', error);
 
-      // Rollback: Restore original message on failure
+      // Rollback on failure
       if (originalMessage) {
         if (deleteForAll) {
           setCurrentConversation((prev) =>
-            prev.map((msg) => (msg.id === messageId ? originalMessage : msg))
+            prev.map((msg) => (idsMatch(msg.id, messageId) ? originalMessage : msg))
           );
         } else {
-          // Re-add the message back to the conversation
+          // Re-add message in correct order
           setCurrentConversation((prev) => {
-            // Find the correct position to insert the message back
-            const newConversation = [...prev];
-            // Insert back in order based on createdAt
-            const insertIndex = newConversation.findIndex(
-              (msg) => new Date(msg.createdAt) > new Date(originalMessage.createdAt)
+            const newConversation = [...prev, originalMessage];
+            return newConversation.sort(
+              (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
             );
-            if (insertIndex === -1) {
-              newConversation.push(originalMessage);
-            } else {
-              newConversation.splice(insertIndex, 0, originalMessage);
-            }
-            return newConversation;
           });
         }
       }
@@ -803,13 +759,11 @@ export const MessagesProvider = ({ children }) => {
    */
   const deleteConversation = useCallback(
     async (rideType, rideId) => {
-      // Save original conversation for rollback
       let originalConversation = null;
       let originalKey = null;
 
-      // Optimistic update: Clear conversation immediately before API call
+      // ⚡ INSTANT UI CLEAR (before API call)
       if (currentConversationKey?.startsWith(`${rideType}-${rideId}`)) {
-        // Store current state for potential rollback
         setCurrentConversation((prev) => {
           originalConversation = [...prev];
           return [];
@@ -822,7 +776,6 @@ export const MessagesProvider = ({ children }) => {
         const response = await messagesAPI.deleteConversation(rideType, rideId);
         console.log('[MESSAGES] ✅ Conversation deleted successfully:', rideType, rideId);
 
-        // Clear the full state after successful API call
         clearCurrentConversation();
         fetchConversations();
 
@@ -830,7 +783,7 @@ export const MessagesProvider = ({ children }) => {
       } catch (error) {
         console.error('[MESSAGES] ❌ Error deleting conversation, reverting:', error);
 
-        // Rollback: Restore original conversation on failure
+        // Rollback on failure
         if (originalConversation && originalKey === currentConversationKey) {
           setCurrentConversation(originalConversation);
           console.log('[MESSAGES] 🔄 Restored conversation after failure');
@@ -848,7 +801,7 @@ export const MessagesProvider = ({ children }) => {
   const updateMessageInConversation = useCallback((updatedMessage) => {
     setCurrentConversation((prev) =>
       prev.map((msg) =>
-        msg.id === updatedMessage.id ? { ...msg, ...normalizeMessage(updatedMessage) } : msg
+        (idsMatch(msg.id, updatedMessage.id) ? { ...msg, ...normalizeMessage(updatedMessage) } : msg)
       )
     );
   }, []);
@@ -859,7 +812,7 @@ export const MessagesProvider = ({ children }) => {
   const removeMessageFromConversation = useCallback((messageId) => {
     setCurrentConversation((prev) =>
       prev.map((msg) =>
-        msg.id === messageId ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true } : msg
+        (idsMatch(msg.id, messageId) ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true } : msg)
       )
     );
   }, []);
@@ -897,9 +850,9 @@ export const MessagesProvider = ({ children }) => {
       currentConversation,
       currentConversationKey,
       unreadCount,
-      loading, // Combined loading state
-      loadingStates, // Granular loading states
-      pagination, // Pagination info
+      loading,
+      loadingStates,
+      pagination,
 
       // Core functions
       sendMessage,
@@ -912,8 +865,8 @@ export const MessagesProvider = ({ children }) => {
       fetchRideConversation,
       fetchUnreadCount,
       clearCurrentConversation,
-      loadMoreMessages, // Pagination function
-      retrySendMessage, // Retry failed messages
+      loadMoreMessages,
+      retrySendMessage,
 
       // Socket update handlers
       updateMessageInConversation,
