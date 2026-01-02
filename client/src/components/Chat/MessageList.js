@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useMessages } from '../../context/MessagesContext';
 import MessageContextMenu from './MessageContextMenu';
 import EditMessageModal from './EditMessageModal';
 
 const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Connect to MessagesContext for edit/delete functions
   const { editMessage, deleteMessage } = useMessages();
@@ -18,10 +19,56 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   const longPressTimer = useRef(null);
   const longPressThreshold = 500; // 500ms for long press
 
-  // Auto-scroll to bottom when new messages arrive
+  // Scroll tracking refs
+  const prevMessageCountRef = useRef(0);
+  const isInitialMountRef = useRef(true);
+  const isNearBottomRef = useRef(true);
+
+  // Check if user is near bottom of scroll container
+  const checkIfNearBottom = useCallback(() => {
+    if (!containerRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    const threshold = 100; // 100px from bottom is considered "near bottom"
+    return scrollHeight - scrollTop - clientHeight < threshold;
+  }, []);
+
+  // Update isNearBottom when user scrolls
+  const handleScroll = useCallback(() => {
+    isNearBottomRef.current = checkIfNearBottom();
+  }, [checkIfNearBottom]);
+
+  // Scroll to bottom helper
+  const scrollToBottom = useCallback((behavior = 'smooth') => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior });
+    }
+  }, []);
+
+  // Smart auto-scroll logic
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const currentCount = messages?.length || 0;
+    const prevCount = prevMessageCountRef.current;
+
+    // Case 1: Initial mount - scroll instantly
+    if (isInitialMountRef.current && currentCount > 0) {
+      isInitialMountRef.current = false;
+      // Use setTimeout to ensure DOM has rendered
+      setTimeout(() => scrollToBottom('auto'), 50);
+      prevMessageCountRef.current = currentCount;
+      return;
+    }
+
+    // Case 2: New messages added (count increased)
+    if (currentCount > prevCount) {
+      // Only smooth scroll if user was already near bottom
+      if (isNearBottomRef.current) {
+        setTimeout(() => scrollToBottom('smooth'), 50);
+      }
+    }
+
+    // Update prev count (but not for reads/edits/deletes that don't increase count)
+    prevMessageCountRef.current = currentCount;
+  }, [messages?.length, scrollToBottom]);
 
   // Mark messages as read when component mounts or messages change
   useEffect(() => {
@@ -236,6 +283,8 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   return (
     <>
       <div
+        ref={containerRef}
+        onScroll={handleScroll}
         style={{
           flex: 1,
           overflowY: 'auto',
