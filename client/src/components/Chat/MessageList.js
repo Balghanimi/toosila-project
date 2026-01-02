@@ -260,10 +260,12 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     return (
       <div
         style={{
+          flex: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '200px',
+          width: '100%',
+          background: 'var(--surface-secondary)',
           color: 'var(--text-muted)',
           fontSize: 'var(--text-base)',
           fontFamily: '"Cairo", sans-serif',
@@ -287,13 +289,13 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
         onScroll={handleScroll}
         style={{
           flex: 1,
+          width: '100%',
           overflowY: 'auto',
+          overscrollBehaviorY: 'contain', // Prevent rubber-band affecting parent
           padding: 'var(--space-4)',
           background: 'var(--surface-secondary)',
-          borderRadius: 'var(--radius-lg)',
-          marginBottom: 'var(--space-4)',
-          maxHeight: '400px',
           direction: 'rtl',
+          minHeight: 0, // Important for flex child to allow shrinking
         }}
       >
         {messages.map((message, index) => {
