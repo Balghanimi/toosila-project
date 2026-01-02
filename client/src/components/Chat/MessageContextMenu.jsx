@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Edit2, Trash2, Copy } from 'lucide-react';
 
 /**

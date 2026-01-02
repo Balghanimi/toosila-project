@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMessages } from '../../context/MessagesContext';
-import { useAuth } from '../../context/AuthContext';
 import MessageContextMenu from './MessageContextMenu';
 import EditMessageModal from './EditMessageModal';
 
@@ -9,7 +8,6 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
 
   // Connect to MessagesContext for edit/delete functions
   const { editMessage, deleteMessage } = useMessages();
-  const { user } = useAuth();
 
   // State for context menu and edit modal
   const [contextMenu, setContextMenu] = useState(null); // { message, position, isOwnMessage }
