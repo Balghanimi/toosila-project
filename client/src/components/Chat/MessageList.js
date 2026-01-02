@@ -1,7 +1,24 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useMessages } from '../../context/MessagesContext';
+import { useAuth } from '../../context/AuthContext';
+import MessageContextMenu from './MessageContextMenu';
+import EditMessageModal from './EditMessageModal';
 
 const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   const messagesEndRef = useRef(null);
+
+  // Connect to MessagesContext for edit/delete functions
+  const { editMessage, deleteMessage } = useMessages();
+  const { user } = useAuth();
+
+  // State for context menu and edit modal
+  const [contextMenu, setContextMenu] = useState(null); // { message, position, isOwnMessage }
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+
+  // Long press handling for mobile
+  const longPressTimer = useRef(null);
+  const longPressThreshold = 500; // 500ms for long press
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -11,23 +28,19 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   // Mark messages as read when component mounts or messages change
   useEffect(() => {
     if (messages.length > 0 && onMarkAsRead) {
-      // FIX: Normalize IDs with trim() and case-insensitive comparison (consistent with rendering logic)
       const normalizedCurrentUserId = String(currentUserId || '').trim();
 
-      // Validate that currentUserId is not empty, null, undefined, or "undefined" string
       if (!normalizedCurrentUserId || normalizedCurrentUserId === 'undefined') {
-        return; // Skip if currentUserId is invalid
+        return;
       }
 
       const unreadMessages = messages.filter((msg) => {
         const msgSenderId = String(msg.senderId || msg.sender_id || '').trim();
 
-        // Validate msgSenderId
         if (!msgSenderId || msgSenderId === 'undefined') {
-          return false; // Skip invalid sender IDs
+          return false;
         }
 
-        // Case-insensitive comparison (consistent with rendering logic)
         const isNotOwnMessage =
           msgSenderId !== normalizedCurrentUserId &&
           msgSenderId.toLowerCase() !== normalizedCurrentUserId.toLowerCase();
@@ -36,7 +49,6 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
       });
 
       if (unreadMessages.length > 0) {
-        // Get the sender ID from the first unread message
         const senderId = unreadMessages[0].senderId || unreadMessages[0].sender_id;
         const tripId = unreadMessages[0].tripId;
         onMarkAsRead(currentUserId, tripId, senderId);
@@ -53,7 +65,6 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     if (!timestamp) return '';
     try {
       const date = new Date(timestamp);
-      // Check if date is valid
       if (isNaN(date.getTime())) return '';
 
       const now = new Date();
@@ -93,6 +104,113 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     }
   };
 
+  // Check if message can be edited (within 15 minutes)
+  const canEditMessage = (message) => {
+    if (message.isDeleted) return false;
+    const createdAt = new Date(message.createdAt || message.created_at);
+    const now = new Date();
+    const diffMinutes = (now - createdAt) / (1000 * 60);
+    return diffMinutes <= 15; // Can edit within 15 minutes
+  };
+
+  // Handle right-click on message
+  const handleContextMenu = (e, message, isOwnMessage) => {
+    e.preventDefault();
+    if (message.isDeleted) return;
+
+    setContextMenu({
+      message,
+      position: { x: e.clientX, y: e.clientY },
+      isOwnMessage,
+    });
+  };
+
+  // Handle long press start
+  const handleTouchStart = (message, isOwnMessage) => {
+    if (message.isDeleted) return;
+
+    longPressTimer.current = setTimeout(() => {
+      // Vibrate on mobile (if supported)
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+
+      setContextMenu({
+        message,
+        position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+        isOwnMessage,
+      });
+    }, longPressThreshold);
+  };
+
+  // Handle touch end (cancel long press)
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // Close context menu
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  // Handle edit action from context menu
+  const handleEdit = (message) => {
+    setEditingMessage(message);
+    setContextMenu(null);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async (newContent) => {
+    if (!editingMessage) return;
+
+    setIsEditLoading(true);
+    try {
+      await editMessage(editingMessage.id, newContent);
+      setEditingMessage(null);
+    } catch (error) {
+      console.error('[MessageList] Error editing message:', error);
+      // Error handling is done in context - just log here
+    } finally {
+      setIsEditLoading(false);
+    }
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingMessage(null);
+  };
+
+  // Handle delete for me
+  const handleDeleteForMe = async (message) => {
+    if (!window.confirm('هل تريد حذف هذه الرسالة من جهازك فقط؟')) return;
+
+    try {
+      await deleteMessage(message.id, false);
+    } catch (error) {
+      console.error('[MessageList] Error deleting message for me:', error);
+    }
+  };
+
+  // Handle delete for everyone
+  const handleDeleteForAll = async (message) => {
+    if (!window.confirm('هل تريد حذف هذه الرسالة للجميع؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+
+    try {
+      await deleteMessage(message.id, true);
+    } catch (error) {
+      console.error('[MessageList] Error deleting message for everyone:', error);
+    }
+  };
+
+  // Handle copy
+  const handleCopy = () => {
+    // Optionally show a toast notification here
+    console.log('[MessageList] Message copied to clipboard');
+  };
+
   if (!messages || messages.length === 0) {
     return (
       <div
@@ -118,241 +236,256 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
   }
 
   return (
-    <div
-      style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: 'var(--space-4)',
-        background: 'var(--surface-secondary)',
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: 'var(--space-4)',
-        maxHeight: '400px',
-        direction: 'rtl',
-      }}
-    >
-      {messages.map((message, index) => {
-        // FIX: Normalize both IDs to strings, trim whitespace, and handle all field name variations
-        // UUIDs are case-insensitive, so normalize to lowercase for comparison
-        const messageSenderId = String(message.senderId || message.sender_id || '').trim();
-        const normalizedCurrentUserId = String(currentUserId || '').trim();
+    <>
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 'var(--space-4)',
+          background: 'var(--surface-secondary)',
+          borderRadius: 'var(--radius-lg)',
+          marginBottom: 'var(--space-4)',
+          maxHeight: '400px',
+          direction: 'rtl',
+        }}
+      >
+        {messages.map((message, index) => {
+          const messageSenderId = String(message.senderId || message.sender_id || '').trim();
+          const normalizedCurrentUserId = String(currentUserId || '').trim();
 
-        // Validate IDs before comparison (prevent "undefined" string comparison)
-        const isValidMessageId = messageSenderId && messageSenderId !== 'undefined';
-        const isValidCurrentId = normalizedCurrentUserId && normalizedCurrentUserId !== 'undefined';
+          const isValidMessageId = messageSenderId && messageSenderId !== 'undefined';
+          const isValidCurrentId =
+            normalizedCurrentUserId && normalizedCurrentUserId !== 'undefined';
 
-        // Compare with both original and lowercase versions to handle any casing issues
-        const isOwnMessage =
-          isValidMessageId &&
-          isValidCurrentId &&
-          (messageSenderId === normalizedCurrentUserId ||
-            messageSenderId.toLowerCase() === normalizedCurrentUserId.toLowerCase());
+          const isOwnMessage =
+            isValidMessageId &&
+            isValidCurrentId &&
+            (messageSenderId === normalizedCurrentUserId ||
+              messageSenderId.toLowerCase() === normalizedCurrentUserId.toLowerCase());
 
-        // DEBUG: Log comparison for troubleshooting (only first message to avoid spam)
-        if (index === 0) {
-          console.log('[MessageList] 🔍 ID Comparison:', {
-            messageSenderId,
-            normalizedCurrentUserId,
-            isValidMessageId,
-            isValidCurrentId,
-            isOwnMessage,
-            exactMatch: messageSenderId === normalizedCurrentUserId,
-            caseInsensitiveMatch:
-              messageSenderId.toLowerCase() === normalizedCurrentUserId.toLowerCase(),
-            rawMessageSenderId: message.senderId,
-            rawMessage_sender_id: message.sender_id,
-            rawCurrentUserId: currentUserId,
-            messagesTotal: messages.length,
-          });
-        }
+          const msgTimestamp = getTimestamp(message);
+          const prevMsgTimestamp = index > 0 ? getTimestamp(messages[index - 1]) : null;
 
-        const msgTimestamp = getTimestamp(message);
-        const prevMsgTimestamp = index > 0 ? getTimestamp(messages[index - 1]) : null;
-
-        // Check if we should show date separator
-        let showDate = index === 0;
-        if (!showDate && msgTimestamp && prevMsgTimestamp) {
-          try {
-            const currentDate = new Date(msgTimestamp);
-            const prevDate = new Date(prevMsgTimestamp);
-            showDate =
-              !isNaN(currentDate.getTime()) &&
-              !isNaN(prevDate.getTime()) &&
-              currentDate.toDateString() !== prevDate.toDateString();
-          } catch {
-            showDate = false;
+          let showDate = index === 0;
+          if (!showDate && msgTimestamp && prevMsgTimestamp) {
+            try {
+              const currentDate = new Date(msgTimestamp);
+              const prevDate = new Date(prevMsgTimestamp);
+              showDate =
+                !isNaN(currentDate.getTime()) &&
+                !isNaN(prevDate.getTime()) &&
+                currentDate.toDateString() !== prevDate.toDateString();
+            } catch {
+              showDate = false;
+            }
           }
-        }
 
-        return (
-          <div key={message.id || index}>
-            {/* Date separator */}
-            {showDate && msgTimestamp && (
-              <div
-                style={{
-                  textAlign: 'center',
-                  margin: 'var(--space-4) 0',
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--text-muted)',
-                  fontFamily: '"Cairo", sans-serif',
-                }}
-              >
-                {formatDateSeparator(msgTimestamp)}
-              </div>
-            )}
-
-            {/* Message bubble */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-                marginBottom: 'var(--space-2)',
-                animation: 'fadeInUp 0.3s ease-out',
-              }}
-            >
-              <div
-                style={{
-                  maxWidth: '70%',
-                  padding: 'var(--space-3) var(--space-4)',
-                  borderRadius: isOwnMessage
-                    ? 'var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg)'
-                    : 'var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)',
-                  background: isOwnMessage
-                    ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                    : 'var(--surface-primary)',
-                  color: isOwnMessage ? 'white' : 'var(--text-primary)',
-                  boxShadow: 'var(--shadow-sm)',
-                  border: isOwnMessage ? 'none' : '1px solid var(--border-light)',
-                  position: 'relative',
-                }}
-              >
-                {/* Sender name for received messages */}
-                {!isOwnMessage && (message.senderName || message.sender_name) && (
-                  <div
-                    style={{
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: '600',
-                      color: 'var(--primary)',
-                      marginBottom: 'var(--space-1)',
-                      fontFamily: '"Cairo", sans-serif',
-                    }}
-                  >
-                    {message.senderName || message.sender_name}
-                  </div>
-                )}
-
-                {/* Message content */}
+          return (
+            <div key={message.id || index}>
+              {/* Date separator */}
+              {showDate && msgTimestamp && (
                 <div
                   style={{
-                    fontSize: 'var(--text-base)',
-                    lineHeight: '1.5',
+                    textAlign: 'center',
+                    margin: 'var(--space-4) 0',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-muted)',
                     fontFamily: '"Cairo", sans-serif',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    // Style deleted messages differently
-                    fontStyle: message.isDeleted ? 'italic' : 'normal',
-                    opacity: message.isDeleted ? 0.6 : 1,
                   }}
                 >
-                  {message.isDeleted ? 'تم حذف هذه الرسالة' : message.content}
+                  {formatDateSeparator(msgTimestamp)}
                 </div>
+              )}
 
-                {/* Edited indicator */}
-                {message.isEdited && !message.isDeleted && (
-                  <span
-                    style={{
-                      fontSize: 'var(--text-xs)',
-                      color: isOwnMessage ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-muted)',
-                      marginRight: 'var(--space-1)',
-                    }}
-                  >
-                    (معدلة)
-                  </span>
-                )}
-
-                {/* Message timestamp and read status */}
+              {/* Message bubble */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
+                  marginBottom: 'var(--space-2)',
+                  animation: 'fadeInUp 0.3s ease-out',
+                }}
+              >
                 <div
+                  onContextMenu={(e) => handleContextMenu(e, message, isOwnMessage)}
+                  onTouchStart={() => handleTouchStart(message, isOwnMessage)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchMove={handleTouchEnd}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-                    marginTop: 'var(--space-1)',
-                    fontSize: 'var(--text-xs)',
-                    opacity: 0.7,
-                    gap: 'var(--space-1)',
+                    maxWidth: '70%',
+                    padding: 'var(--space-3) var(--space-4)',
+                    borderRadius: isOwnMessage
+                      ? 'var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg)'
+                      : 'var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm)',
+                    background: isOwnMessage
+                      ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                      : 'var(--surface-primary)',
+                    color: isOwnMessage ? 'white' : 'var(--text-primary)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: isOwnMessage ? 'none' : '1px solid var(--border-light)',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: '"Cairo", sans-serif',
-                      color: isOwnMessage ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-muted)',
-                    }}
-                  >
-                    {formatTime(msgTimestamp)}
-                  </span>
-
-                  {/* Message status indicators for own messages */}
-                  {isOwnMessage && (
+                  {/* Sender name for received messages */}
+                  {!isOwnMessage && (message.senderName || message.sender_name) && (
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '2px',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: '600',
+                        color: 'var(--primary)',
+                        marginBottom: 'var(--space-1)',
+                        fontFamily: '"Cairo", sans-serif',
                       }}
                     >
-                      {/* Show sending indicator for optimistic messages */}
-                      {message.isOptimistic && (
-                        <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px' }}>
-                          ⏳
-                        </span>
-                      )}
-                      {!message.isOptimistic && message.status === 'sent' && (
-                        <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>✓</span>
-                      )}
-                      {message.status === 'delivered' && (
-                        <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>✓✓</span>
-                      )}
-                      {message.status === 'read' && <span style={{ color: '#4ade80' }}>✓✓</span>}
+                      {message.senderName || message.sender_name}
                     </div>
                   )}
 
-                  {/* Read indicator for received messages */}
-                  {!isOwnMessage && message.read && (
+                  {/* Message content */}
+                  <div
+                    style={{
+                      fontSize: 'var(--text-base)',
+                      lineHeight: '1.5',
+                      fontFamily: '"Cairo", sans-serif',
+                      wordBreak: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      fontStyle: message.isDeleted ? 'italic' : 'normal',
+                      opacity: message.isDeleted ? 0.6 : 1,
+                    }}
+                  >
+                    {message.isDeleted ? 'تم حذف هذه الرسالة' : message.content}
+                  </div>
+
+                  {/* Edited indicator */}
+                  {message.isEdited && !message.isDeleted && (
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: isOwnMessage ? 'rgba(255, 255, 255, 0.6)' : 'var(--text-muted)',
+                        marginRight: 'var(--space-1)',
+                      }}
+                    >
+                      (معدلة)
+                    </span>
+                  )}
+
+                  {/* Message timestamp and read status */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
+                      marginTop: 'var(--space-1)',
+                      fontSize: 'var(--text-xs)',
+                      opacity: 0.7,
+                      gap: 'var(--space-1)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: '"Cairo", sans-serif',
+                        color: isOwnMessage ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-muted)',
+                      }}
+                    >
+                      {formatTime(msgTimestamp)}
+                    </span>
+
+                    {/* Message status indicators for own messages */}
+                    {isOwnMessage && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                        }}
+                      >
+                        {message.isOptimistic && (
+                          <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px' }}>
+                            ⏳
+                          </span>
+                        )}
+                        {message.isFailed && (
+                          <span style={{ color: '#ef4444', fontSize: '10px' }}>❌</span>
+                        )}
+                        {!message.isOptimistic &&
+                          !message.isFailed &&
+                          message.status === 'sent' && (
+                            <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>✓</span>
+                          )}
+                        {message.status === 'delivered' && (
+                          <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>✓✓</span>
+                        )}
+                        {message.status === 'read' && <span style={{ color: '#4ade80' }}>✓✓</span>}
+                      </div>
+                    )}
+
+                    {/* Read indicator for received messages */}
+                    {!isOwnMessage && message.read && (
+                      <div
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          background: 'var(--primary)',
+                          borderRadius: '50%',
+                          marginRight: 'var(--space-1)',
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Unread indicator for received messages */}
+                  {!isOwnMessage && !message.read && (
                     <div
                       style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-4px',
                         width: '8px',
                         height: '8px',
                         background: 'var(--primary)',
                         borderRadius: '50%',
-                        marginRight: 'var(--space-1)',
+                        border: '2px solid white',
                       }}
                     />
                   )}
                 </div>
-
-                {/* Message status indicator */}
-                {!isOwnMessage && !message.read && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '-4px',
-                      right: '-4px',
-                      width: '8px',
-                      height: '8px',
-                      background: 'var(--primary)',
-                      borderRadius: '50%',
-                      border: '2px solid white',
-                    }}
-                  />
-                )}
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
 
-      {/* Scroll anchor */}
-      <div ref={messagesEndRef} />
-    </div>
+        {/* Scroll anchor */}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <MessageContextMenu
+          message={contextMenu.message}
+          isOwnMessage={contextMenu.isOwnMessage}
+          canEdit={contextMenu.isOwnMessage && canEditMessage(contextMenu.message)}
+          position={contextMenu.position}
+          onEdit={handleEdit}
+          onDeleteForMe={handleDeleteForMe}
+          onDeleteForAll={handleDeleteForAll}
+          onCopy={handleCopy}
+          onClose={handleCloseContextMenu}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {editingMessage && (
+        <EditMessageModal
+          message={editingMessage}
+          onSave={handleSaveEdit}
+          onCancel={handleCancelEdit}
+          isLoading={isEditLoading}
+        />
+      )}
+    </>
   );
 };
 
