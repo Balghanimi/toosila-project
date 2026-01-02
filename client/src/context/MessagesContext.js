@@ -522,11 +522,14 @@ export const MessagesProvider = ({ children }) => {
     const handleMessageEdited = (data) => {
       console.log('[MESSAGES] ✏️ Message edited:', data);
       const messageData = data.messageData || data;
+      const messageId = messageData.id || messageData.messageId;
+      const newContent = messageData.content;
 
+      // Find the message and update its content and isEdited flag immediately
       setCurrentConversation((prev) =>
         prev.map((msg) =>
-          msg.id === messageData.id
-            ? { ...msg, ...normalizeMessage(messageData), isEdited: true }
+          msg.id === messageId
+            ? { ...msg, content: newContent, isEdited: true, is_edited: true }
             : msg
         )
       );
@@ -535,12 +538,21 @@ export const MessagesProvider = ({ children }) => {
     const handleMessageDeleted = (data) => {
       console.log('[MESSAGES] 🗑️ Message deleted:', data);
       const messageId = data.messageId || data.id;
+      const deleteForAll = data.deleteForAll !== undefined ? data.deleteForAll : true;
 
-      setCurrentConversation((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true } : msg
-        )
-      );
+      if (deleteForAll) {
+        // Show "Message deleted" placeholder for all users
+        setCurrentConversation((prev) =>
+          prev.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, is_deleted: true }
+              : msg
+          )
+        );
+      } else {
+        // Delete for me: Filter it out completely
+        setCurrentConversation((prev) => prev.filter((msg) => msg.id !== messageId));
+      }
     };
 
     // Register event listeners
@@ -667,9 +679,30 @@ export const MessagesProvider = ({ children }) => {
   );
 
   /**
-   * Edit a message
+   * Edit a message with optimistic update
    */
   const editMessage = useCallback(async (messageId, content) => {
+    // Save original message for rollback
+    let originalMessage = null;
+
+    // Optimistic update: Update state immediately before API call
+    setCurrentConversation((prev) => {
+      const newConversation = prev.map((msg) => {
+        if (msg.id === messageId) {
+          originalMessage = { ...msg }; // Save for potential rollback
+          return {
+            ...msg,
+            content,
+            isEdited: true,
+            is_edited: true,
+            lastEditedAt: new Date().toISOString(),
+          };
+        }
+        return msg;
+      });
+      return newConversation;
+    });
+
     try {
       const response = await retryWithBackoff(
         () => messagesAPI.editMessage(messageId, content),
@@ -677,64 +710,136 @@ export const MessagesProvider = ({ children }) => {
         CONFIG.RETRY.BASE_DELAY_MS
       );
 
-      setCurrentConversation((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? { ...msg, content, isEdited: true, lastEditedAt: new Date().toISOString() }
-            : msg
-        )
-      );
-
+      console.log('[MESSAGES] ✅ Message edited successfully:', messageId);
       return response;
     } catch (error) {
-      console.error('[MESSAGES] Error editing message:', error);
-      throw error;
-    }
-  }, []);
+      console.error('[MESSAGES] ❌ Error editing message, reverting:', error);
 
-  /**
-   * Delete a message
-   */
-  const deleteMessage = useCallback(async (messageId, deleteForAll = false) => {
-    try {
-      const response = await messagesAPI.deleteMessage(messageId, deleteForAll);
-
-      if (deleteForAll) {
+      // Rollback: Revert to original message on failure
+      if (originalMessage) {
         setCurrentConversation((prev) =>
           prev.map((msg) =>
-            msg.id === messageId
-              ? { ...msg, content: 'تم حذف هذه الرسالة', isDeleted: true, deletedForEveryone: true }
-              : msg
+            msg.id === messageId ? originalMessage : msg
           )
         );
-      } else {
-        setCurrentConversation((prev) => prev.filter((msg) => msg.id !== messageId));
       }
 
-      return response;
-    } catch (error) {
-      console.error('[MESSAGES] Error deleting message:', error);
       throw error;
     }
   }, []);
 
   /**
-   * Delete entire conversation
+   * Delete a message with optimistic update
+   */
+  const deleteMessage = useCallback(async (messageId, deleteForAll = false) => {
+    // Save original message for rollback
+    let originalMessage = null;
+
+    // Optimistic update: Update state immediately before API call
+    if (deleteForAll) {
+      // Show "Message deleted" placeholder immediately
+      setCurrentConversation((prev) => {
+        return prev.map((msg) => {
+          if (msg.id === messageId) {
+            originalMessage = { ...msg }; // Save for potential rollback
+            return {
+              ...msg,
+              content: 'تم حذف هذه الرسالة',
+              isDeleted: true,
+              is_deleted: true,
+              deletedForEveryone: true,
+            };
+          }
+          return msg;
+        });
+      });
+    } else {
+      // Delete for me: Remove from array immediately
+      setCurrentConversation((prev) => {
+        const msgToRemove = prev.find((msg) => msg.id === messageId);
+        if (msgToRemove) {
+          originalMessage = { ...msgToRemove };
+        }
+        return prev.filter((msg) => msg.id !== messageId);
+      });
+    }
+
+    try {
+      const response = await messagesAPI.deleteMessage(messageId, deleteForAll);
+      console.log('[MESSAGES] ✅ Message deleted successfully:', messageId);
+      return response;
+    } catch (error) {
+      console.error('[MESSAGES] ❌ Error deleting message, reverting:', error);
+
+      // Rollback: Restore original message on failure
+      if (originalMessage) {
+        if (deleteForAll) {
+          setCurrentConversation((prev) =>
+            prev.map((msg) =>
+              msg.id === messageId ? originalMessage : msg
+            )
+          );
+        } else {
+          // Re-add the message back to the conversation
+          setCurrentConversation((prev) => {
+            // Find the correct position to insert the message back
+            const newConversation = [...prev];
+            // Insert back in order based on createdAt
+            const insertIndex = newConversation.findIndex(
+              (msg) => new Date(msg.createdAt) > new Date(originalMessage.createdAt)
+            );
+            if (insertIndex === -1) {
+              newConversation.push(originalMessage);
+            } else {
+              newConversation.splice(insertIndex, 0, originalMessage);
+            }
+            return newConversation;
+          });
+        }
+      }
+
+      throw error;
+    }
+  }, []);
+
+  /**
+   * Delete entire conversation with optimistic update
    */
   const deleteConversation = useCallback(
     async (rideType, rideId) => {
+      // Save original conversation for rollback
+      let originalConversation = null;
+      let originalKey = null;
+
+      // Optimistic update: Clear conversation immediately before API call
+      if (currentConversationKey?.startsWith(`${rideType}-${rideId}`)) {
+        // Store current state for potential rollback
+        setCurrentConversation((prev) => {
+          originalConversation = [...prev];
+          return [];
+        });
+        originalKey = currentConversationKey;
+        console.log('[MESSAGES] 🧹 Optimistic clear of conversation');
+      }
+
       try {
         const response = await messagesAPI.deleteConversation(rideType, rideId);
+        console.log('[MESSAGES] ✅ Conversation deleted successfully:', rideType, rideId);
 
-        if (currentConversationKey?.startsWith(`${rideType}-${rideId}`)) {
-          clearCurrentConversation();
-        }
-
+        // Clear the full state after successful API call
+        clearCurrentConversation();
         fetchConversations();
 
         return response;
       } catch (error) {
-        console.error('[MESSAGES] Error deleting conversation:', error);
+        console.error('[MESSAGES] ❌ Error deleting conversation, reverting:', error);
+
+        // Rollback: Restore original conversation on failure
+        if (originalConversation && originalKey === currentConversationKey) {
+          setCurrentConversation(originalConversation);
+          console.log('[MESSAGES] 🔄 Restored conversation after failure');
+        }
+
         throw error;
       }
     },
