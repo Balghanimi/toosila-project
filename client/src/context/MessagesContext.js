@@ -718,9 +718,7 @@ export const MessagesProvider = ({ children }) => {
       // Rollback: Revert to original message on failure
       if (originalMessage) {
         setCurrentConversation((prev) =>
-          prev.map((msg) =>
-            msg.id === messageId ? originalMessage : msg
-          )
+          prev.map((msg) => (msg.id === messageId ? originalMessage : msg))
         );
       }
 
@@ -775,9 +773,7 @@ export const MessagesProvider = ({ children }) => {
       if (originalMessage) {
         if (deleteForAll) {
           setCurrentConversation((prev) =>
-            prev.map((msg) =>
-              msg.id === messageId ? originalMessage : msg
-            )
+            prev.map((msg) => (msg.id === messageId ? originalMessage : msg))
           );
         } else {
           // Re-add the message back to the conversation
