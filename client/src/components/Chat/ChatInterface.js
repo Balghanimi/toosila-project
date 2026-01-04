@@ -238,27 +238,35 @@ const ChatInterface = ({
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        position: 'fixed', // Lock to viewport
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         height: '100dvh', // Dynamic viewport height for mobile
-        position: 'relative',
         background: 'var(--surface-primary)',
         overflow: 'hidden', // Parent NEVER scrolls
         direction: 'rtl',
+        zIndex: 100,
       }}
       className="chat-interface-container"
     >
-      {/* Chat Header */}
+      {/* Chat Header - FIXED at top */}
       <div
         style={{
-          flexShrink: 0, // Never shrink
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '70px', // Fixed header height
+          paddingTop: 'env(safe-area-inset-top, 0px)', // Safe area for iOS
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: 'var(--space-4)',
-          paddingTop: 'calc(var(--space-4) + env(safe-area-inset-top, 0px))', // Safe area for iOS
+          padding: 'var(--space-3) var(--space-4)',
           background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
           color: 'white',
+          zIndex: 10,
         }}
       >
         <div
@@ -364,30 +372,50 @@ const ChatInterface = ({
       {error && (
         <div
           style={{
+            position: 'absolute',
+            top: '70px',
+            left: 0,
+            right: 0,
             padding: 'var(--space-2) var(--space-4)',
             background: 'var(--error-light)',
             color: 'var(--error)',
             fontSize: 'var(--text-sm)',
             fontFamily: '"Cairo", sans-serif',
             textAlign: 'center',
-            borderBottom: '1px solid var(--border-light)',
+            zIndex: 5,
           }}
         >
           {error}
         </div>
       )}
 
-      {/* Messages Area - Takes ALL available space */}
-      <MessageList messages={currentConversation} currentUserId={user?.id} />
-
-      {/* Message Input - Anchored to bottom */}
+      {/* Messages Area - ABSOLUTELY POSITIONED to fill middle space */}
       <div
         style={{
-          flexShrink: 0, // Never shrink
-          padding: 'var(--space-4)',
-          paddingBottom: 'calc(var(--space-4) + env(safe-area-inset-bottom, 0px))', // Safe area for iOS
+          position: 'absolute',
+          top: '70px', // Below header
+          left: 0,
+          right: 0,
+          bottom: '80px', // Above input
+          overflow: 'hidden',
+        }}
+      >
+        <MessageList messages={currentConversation} currentUserId={user?.id} />
+      </div>
+
+      {/* Message Input - FIXED at bottom */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '80px', // Fixed input height
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)', // Safe area for iOS
+          padding: 'var(--space-3) var(--space-4)',
           background: 'var(--surface-primary)',
           borderTop: '1px solid var(--border-light)',
+          zIndex: 10,
         }}
       >
         <MessageInput

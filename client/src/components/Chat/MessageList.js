@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useMessages } from '../../context/MessagesContext';
 import MessageContextMenu from './MessageContextMenu';
 import EditMessageModal from './EditMessageModal';
@@ -37,36 +37,36 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     isNearBottomRef.current = checkIfNearBottom();
   }, [checkIfNearBottom]);
 
-  // Scroll to bottom helper
-  const scrollToBottom = useCallback((behavior = 'smooth') => {
+  // Scroll to bottom helper - SYNCHRONOUS for initial load
+  const scrollToBottom = useCallback((behavior = 'auto') => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior });
+      messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
     }
   }, []);
 
-  // Smart auto-scroll logic
-  useEffect(() => {
+  // NUCLEAR FIX: Use useLayoutEffect for synchronous scroll BEFORE browser paints
+  // This prevents the user from seeing any jump/jitter
+  useLayoutEffect(() => {
     const currentCount = messages?.length || 0;
     const prevCount = prevMessageCountRef.current;
 
-    // Case 1: Initial mount - scroll instantly
+    // Case 1: Initial mount or first load - INSTANT scroll before paint
     if (isInitialMountRef.current && currentCount > 0) {
       isInitialMountRef.current = false;
-      // Use setTimeout to ensure DOM has rendered
-      setTimeout(() => scrollToBottom('auto'), 50);
+      scrollToBottom('auto'); // INSTANT - no animation
       prevMessageCountRef.current = currentCount;
       return;
     }
 
     // Case 2: New messages added (count increased)
-    if (currentCount > prevCount) {
+    if (currentCount > prevCount && prevCount > 0) {
       // Only smooth scroll if user was already near bottom
       if (isNearBottomRef.current) {
-        setTimeout(() => scrollToBottom('smooth'), 50);
+        scrollToBottom('smooth');
       }
     }
 
-    // Update prev count (but not for reads/edits/deletes that don't increase count)
+    // Update prev count
     prevMessageCountRef.current = currentCount;
   }, [messages?.length, scrollToBottom]);
 
@@ -260,11 +260,14 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
     return (
       <div
         style={{
-          flex: 1,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '100%',
           background: 'var(--surface-secondary)',
           color: 'var(--text-muted)',
           fontSize: 'var(--text-base)',
@@ -288,14 +291,18 @@ const MessageList = ({ messages, currentUserId, onMarkAsRead }) => {
         ref={containerRef}
         onScroll={handleScroll}
         style={{
-          flex: 1,
-          width: '100%',
-          overflowY: 'auto',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflowY: 'scroll', // Always show scrollbar area
+          overflowX: 'hidden',
           overscrollBehaviorY: 'contain', // Prevent rubber-band affecting parent
+          WebkitOverflowScrolling: 'touch', // Smooth iOS scrolling
           padding: 'var(--space-4)',
           background: 'var(--surface-secondary)',
           direction: 'rtl',
-          minHeight: 0, // Important for flex child to allow shrinking
         }}
       >
         {messages.map((message, index) => {
